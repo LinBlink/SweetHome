@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/countries.dart';
+import '../../core/error_messages.dart';
+import '../../core/kinship/kinship_graph.dart';
+import '../../l10n/app_localizations.dart';
+import '../../models/family_member_vm.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/error_banner.dart';
+import '../../widgets/join_family_form.dart';
+import '../../widgets/phone_input_field.dart';
 
 enum _RegisterMode { create, join }
 
@@ -18,9 +26,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _familyCtrl = TextEditingController();
-  final _inviteCtrl = TextEditingController();
   bool _obscurePassword = true;
   _RegisterMode _mode = _RegisterMode.create;
+  Country _selectedCountry = Countries.defaultCountry;
+  Gender? _gender = Gender.male;
+  final _joinFormKey = GlobalKey<JoinFamilyFormState>();
 
   @override
   void dispose() {
@@ -28,18 +38,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _phoneCtrl.dispose();
     _passwordCtrl.dispose();
     _familyCtrl.dispose();
-    _inviteCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_gender == null) return;
+    JoinFamilySelection? join;
+    if (_mode == _RegisterMode.join) {
+      join = _joinFormKey.currentState?.getSelection();
+      if (join == null) return;
+    }
     await context.read<AuthProvider>().register(
           _nameCtrl.text.trim(),
-          _phoneCtrl.text.trim(),
+          PhoneInputField.fullPhone(_selectedCountry, _phoneCtrl),
           _passwordCtrl.text,
+          gender: _gender == Gender.male ? 'male' : 'female',
           familyName: _mode == _RegisterMode.create ? _familyCtrl.text.trim() : null,
-          inviteCode: _mode == _RegisterMode.join ? _inviteCtrl.text.trim() : null,
+          inviteCode: join?.inviteCode,
+          relationToMemberId: join?.relationAnchorMemberId,
+          relationType: join?.relationType.apiValue,
         );
     if (mounted && context.read<AuthProvider>().isAuthenticated) {
       Navigator.pop(context);
@@ -48,10 +66,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('创建账号'),
+        title: Text(l10n.registerTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
@@ -68,34 +87,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (auth.error != null) ...[
-                      _buildError(auth.error!, auth.clearError),
+                      ErrorBanner(
+                        message: localizeErrorMessage(auth.error!, l10n),
+                        onDismiss: auth.clearError,
+                      ),
                       const SizedBox(height: 16),
                     ],
                     _buildField(
                       controller: _nameCtrl,
-                      label: '你的昵称',
+                      label: l10n.registerNicknameLabel,
                       icon: Icons.person_outline,
                       validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? '请输入昵称' : null,
+                          (v == null || v.trim().isEmpty) ? l10n.registerNicknameRequired : null,
                     ),
                     const SizedBox(height: 16),
-                    _buildField(
+                    _buildGenderToggle(l10n),
+                    const SizedBox(height: 16),
+                    PhoneInputField(
                       controller: _phoneCtrl,
-                      label: '手机号',
-                      icon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) return '请输入手机号';
-                        if (v.trim().length < 11) return '手机号格式不正确';
-                        return null;
-                      },
+                      selectedCountry: _selectedCountry,
+                      onCountryChanged: (c) => setState(() => _selectedCountry = c),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _passwordCtrl,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        labelText: '密码',
+                        labelText: l10n.commonPasswordLabel,
                         prefixIcon: const Icon(Icons.lock_outline,
                             color: AppColors.primary),
                         suffixIcon: IconButton(
@@ -110,44 +128,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return '请输入密码';
-                        if (v.length < 6) return '密码至少6位';
+                        if (v == null || v.isEmpty) return l10n.commonPasswordRequired;
+                        if (v.length < 6) return l10n.commonPasswordTooShort;
                         return null;
                       },
                     ),
                     const SizedBox(height: 24),
-                    _buildModeToggle(),
+                    _buildModeToggle(l10n),
                     const SizedBox(height: 16),
                     if (_mode == _RegisterMode.create) ...[
                       _buildField(
                         controller: _familyCtrl,
-                        label: '家庭名称（如：王家、李家）',
+                        label: l10n.registerFamilyNameLabel,
                         icon: Icons.home_outlined,
                         validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? '请输入家庭名称' : null,
+                            (v == null || v.trim().isEmpty) ? l10n.registerFamilyNameRequired : null,
                       ),
                       const SizedBox(height: 6),
-                      const Text(
-                        '* 注册后可生成邀请码，邀请家人加入',
-                        style: TextStyle(fontSize: 12, color: AppColors.textHint),
+                      Text(
+                        l10n.registerFamilyNameHint,
+                        style: const TextStyle(fontSize: 12, color: AppColors.textHint),
                       ),
                     ] else ...[
-                      _buildField(
-                        controller: _inviteCtrl,
-                        label: '家庭邀请码',
-                        icon: Icons.vpn_key_outlined,
-                        textCapitalization: TextCapitalization.characters,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) return '请输入邀请码';
-                          if (v.trim().length < 4) return '邀请码格式不正确';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        '* 邀请码由家庭管理员生成，有效期48小时',
-                        style: TextStyle(fontSize: 12, color: AppColors.textHint),
-                      ),
+                      JoinFamilyForm(key: _joinFormKey),
                     ],
                     const SizedBox(height: 32),
                     SizedBox(
@@ -163,9 +166,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : Text(_mode == _RegisterMode.create
-                                ? '注册并创建家庭'
-                                : '注册并加入家庭'),
+                            : Text(switch (_mode) {
+                                _RegisterMode.create => l10n.registerSubmitCreate,
+                                _RegisterMode.join => l10n.registerSubmitJoin,
+                              }),
                       ),
                     ),
                   ],
@@ -178,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildModeToggle() {
+  Widget _buildGenderToggle(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceVariant,
@@ -187,23 +191,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
-          _ModeTab(
-            label: '创建新家庭',
+          _OptionTab(
+            label: l10n.registerGenderMale,
+            icon: Icons.male,
+            selected: _gender == Gender.male,
+            onTap: () => setState(() => _gender = Gender.male),
+          ),
+          _OptionTab(
+            label: l10n.registerGenderFemale,
+            icon: Icons.female,
+            selected: _gender == Gender.female,
+            onTap: () => setState(() => _gender = Gender.female),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeToggle(AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          _OptionTab(
+            label: l10n.registerCreateFamilyTab,
             icon: Icons.add_home_outlined,
             selected: _mode == _RegisterMode.create,
-            onTap: () {
-              setState(() => _mode = _RegisterMode.create);
-              _formKey.currentState?.reset();
-            },
+            onTap: () => setState(() => _mode = _RegisterMode.create),
           ),
-          _ModeTab(
-            label: '加入已有家庭',
+          _OptionTab(
+            label: l10n.registerJoinFamilyTab,
             icon: Icons.group_add_outlined,
             selected: _mode == _RegisterMode.join,
-            onTap: () {
-              setState(() => _mode = _RegisterMode.join);
-              _formKey.currentState?.reset();
-            },
+            onTap: () => setState(() => _mode = _RegisterMode.join),
           ),
         ],
       ),
@@ -230,39 +254,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildError(String msg, VoidCallback onDismiss) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: AppColors.danger, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(msg,
-                style: const TextStyle(color: AppColors.danger, fontSize: 13)),
-          ),
-          GestureDetector(
-            onTap: onDismiss,
-            child: const Icon(Icons.close, color: AppColors.danger, size: 16),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class _ModeTab extends StatelessWidget {
+class _OptionTab extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
-  const _ModeTab({
+  const _OptionTab({
     required this.label,
     required this.icon,
     required this.selected,

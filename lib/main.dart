@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'core/app_colors.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
+import 'providers/locale_provider.dart';
 import 'services/chat_service.dart';
 import 'services/websocket_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chat/conversation_list_screen.dart';
 import 'screens/profile_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final localeProvider = LocaleProvider();
+  await localeProvider.restore();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider.value(value: localeProvider),
+      ],
       child: const SweetHomeApp(),
     ),
   );
@@ -25,10 +34,19 @@ class SweetHomeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.watch<LocaleProvider>().locale;
     return MaterialApp(
       title: '过家家 · Sweet Home',
       theme: AppTheme.light(),
       debugShowCheckedModeBanner: false,
+      locale: locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const AuthGate(),
     );
   }
@@ -48,8 +66,13 @@ class AuthGate extends StatelessWidget {
               ws: AppConfig.mockMode
                   ? MockWebSocketService()
                   : WebSocketService(),
-              chatService: ChatService(auth.currentUser!.token),
+              chatService: ChatService(() => auth.currentUser!.token),
               currentUser: auth.currentUser!,
+              onUnauthorized: () async {
+                final ok = await auth.refreshSession();
+                if (!ok) await auth.logout();
+                return ok;
+              },
             )..loadConversations(),
             child: const MainShell(),
           );
@@ -87,6 +110,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _buildNavBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -107,7 +131,7 @@ class _MainShellState extends State<MainShell> {
                 child: _buildNavItem(
                   icon: Icons.chat_bubble_outline,
                   activeIcon: Icons.chat_bubble_rounded,
-                  label: '消息',
+                  label: l10n.navMessages,
                   isSelected: _currentIndex == 0,
                   onTap: () => setState(() => _currentIndex = 0),
                   badgeCount: _getUnreadCount(),
@@ -117,7 +141,7 @@ class _MainShellState extends State<MainShell> {
                 child: _buildNavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person_rounded,
-                  label: '我',
+                  label: l10n.navProfile,
                   isSelected: _currentIndex == 1,
                   onTap: () => setState(() => _currentIndex = 1),
                 ),
@@ -202,6 +226,7 @@ class _SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
@@ -228,8 +253,8 @@ class _SplashScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text('过家家',
-                style: TextStyle(
+            Text(l10n.brandName,
+                style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,

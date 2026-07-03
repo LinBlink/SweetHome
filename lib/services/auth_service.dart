@@ -3,12 +3,13 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/app_config.dart';
 import '../models/auth_models.dart';
+import 'api_client.dart';
 
 class AuthService {
   AuthService._();
 
   static const _prefKeys = [
-    'token', 'refreshToken', 'userId', 'name', 'phone', 'familyId', 'familyName', 'role'
+    'token', 'refreshToken', 'userId', 'name', 'phone', 'familyId', 'familyName', 'role', 'gender'
   ];
 
   static Future<AuthUser> login(LoginRequest req) async {
@@ -19,11 +20,8 @@ class AuthService {
           body: jsonEncode(req.toJson()),
         )
         .timeout(const Duration(seconds: 10));
-    final body = jsonDecode(resp.body) as Map<String, dynamic>;
-    if (resp.statusCode != 200) {
-      throw AuthException(body['message'] as String? ?? '登录失败');
-    }
-    final user = AuthUser.fromJson(body['data'] as Map<String, dynamic>);
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    final user = AuthUser.fromJson(data);
     await persistUser(user);
     return user;
   }
@@ -36,13 +34,51 @@ class AuthService {
           body: jsonEncode(req.toJson()),
         )
         .timeout(const Duration(seconds: 10));
-    final body = jsonDecode(resp.body) as Map<String, dynamic>;
-    if (resp.statusCode != 200 && resp.statusCode != 201) {
-      throw AuthException(body['message'] as String? ?? '注册失败');
-    }
-    final user = AuthUser.fromJson(body['data'] as Map<String, dynamic>);
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    final user = AuthUser.fromJson(data);
     await persistUser(user);
     return user;
+  }
+
+  /// `GET`/`PUT /users/me` return the flat user object with no token, so the
+  /// caller's current session (token/refreshToken) is threaded through to
+  /// rebuild a full [AuthUser] — see [AuthUser.fromUserFields].
+  static Future<AuthUser> fetchMe(AuthUser current) async {
+    final resp = await http
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}/users/me'),
+          headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${current.token}'},
+        )
+        .timeout(const Duration(seconds: 10));
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    return AuthUser.fromUserFields(data, token: current.token, refreshToken: current.refreshToken);
+  }
+
+  static Future<AuthUser> updateMe(AuthUser current, {required String name}) async {
+    final resp = await http
+        .put(
+          Uri.parse('${AppConfig.apiBaseUrl}/users/me'),
+          headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${current.token}'},
+          body: jsonEncode({'name': name}),
+        )
+        .timeout(const Duration(seconds: 10));
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    return AuthUser.fromUserFields(data, token: current.token, refreshToken: current.refreshToken);
+  }
+
+  /// `POST /auth/refresh` — see docs/api.md §1.3. Exchanges a still-valid
+  /// refresh token for a new short-lived JWT; the refresh token itself is
+  /// not rotated.
+  static Future<String> refresh(String refreshToken) async {
+    final resp = await http
+        .post(
+          Uri.parse('${AppConfig.apiBaseUrl}/auth/refresh'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'refreshToken': refreshToken}),
+        )
+        .timeout(const Duration(seconds: 10));
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    return data['token'] as String;
   }
 
   static Future<void> logout(String refreshToken) async {

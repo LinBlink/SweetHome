@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/error_messages.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/chat_provider.dart';
+import '../../widgets/error_banner.dart';
 import '../../widgets/message_bubble.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -75,6 +78,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -86,7 +90,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               builder: (context, chat, child) {
                 final count = chat.messagesFor(widget.conversationId).length;
                 return Text(
-                  count > 0 ? '$count 条消息' : '家庭聊天室',
+                  count > 0 ? l10n.chatRoomMessageCount(count) : l10n.chatRoomDefaultSubtitle,
                   style: const TextStyle(fontSize: 11, color: Colors.white70),
                 );
               },
@@ -98,19 +102,35 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.more_horiz), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.more_horiz),
+            tooltip: l10n.chatRoomMoreTooltip,
+            onPressed: () {},
+          ),
         ],
       ),
       body: Column(
         children: [
-          Expanded(child: _buildMessageList()),
-          _buildInputBar(),
+          Consumer<ChatProvider>(
+            builder: (ctx, chat, _) {
+              if (chat.error == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.all(12),
+                child: ErrorBanner(
+                  message: localizeErrorMessage(chat.error!, l10n),
+                  onDismiss: chat.clearError,
+                ),
+              );
+            },
+          ),
+          Expanded(child: _buildMessageList(l10n)),
+          _buildInputBar(l10n),
         ],
       ),
     );
   }
 
-  Widget _buildMessageList() {
+  Widget _buildMessageList(AppLocalizations l10n) {
     return Consumer<ChatProvider>(
       builder: (ctx, chat, _) {
         final messages = chat.messagesFor(widget.conversationId);
@@ -120,10 +140,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           );
         }
         if (messages.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              '发一条消息，打个招呼吧',
-              style: TextStyle(color: AppColors.textHint),
+              l10n.chatRoomEmptyHint,
+              style: const TextStyle(color: AppColors.textHint),
             ),
           );
         }
@@ -163,7 +183,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-  Widget _buildInputBar() {
+  Widget _buildInputBar(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -187,7 +207,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           IconButton(
             icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
             onPressed: () {},
-            tooltip: '更多',
+            tooltip: l10n.chatRoomMoreOption,
           ),
           Expanded(
             child: Container(
@@ -203,12 +223,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(
                     fontSize: 15, color: AppColors.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: '说点什么……',
-                  hintStyle: TextStyle(color: AppColors.textHint),
+                decoration: InputDecoration(
+                  hintText: l10n.chatRoomInputHint,
+                  hintStyle: const TextStyle(color: AppColors.textHint),
                   border: InputBorder.none,
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
               ),
             ),

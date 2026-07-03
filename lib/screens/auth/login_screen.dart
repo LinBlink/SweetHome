@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/countries.dart';
+import '../../core/error_messages.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/error_banner.dart';
+import '../../widgets/language_picker.dart';
+import '../../widgets/phone_input_field.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
+  Country _selectedCountry = Countries.defaultCountry;
 
   @override
   void dispose() {
@@ -27,13 +34,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     await context.read<AuthProvider>().login(
-          _phoneCtrl.text.trim(),
+          PhoneInputField.fullPhone(_selectedCountry, _phoneCtrl),
           _passwordCtrl.text,
         );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -41,14 +49,19 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             children: [
-              const SizedBox(height: 60),
-              _buildHeader(),
+              const SizedBox(height: 12),
+              const Align(
+                alignment: Alignment.centerRight,
+                child: LanguagePickerButton(),
+              ),
+              const SizedBox(height: 16),
+              _buildHeader(l10n),
               const SizedBox(height: 48),
-              _buildForm(),
+              _buildForm(l10n),
               const SizedBox(height: 32),
               _buildLoginButton(),
               const SizedBox(height: 20),
-              _buildRegisterLink(),
+              _buildRegisterLink(l10n),
             ],
           ),
         ),
@@ -56,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       children: [
         Container(
@@ -89,9 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
-          '过家家',
-          style: TextStyle(
+        Text(
+          l10n.brandName,
+          style: const TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -99,9 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          '家庭的温暖，一触即达',
-          style: TextStyle(
+        Text(
+          l10n.appTagline,
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.textSecondary,
             letterSpacing: 1,
@@ -111,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(AppLocalizations l10n) {
     return Consumer<AuthProvider>(
       builder: (ctx, auth, _) {
         return Form(
@@ -119,27 +132,22 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               if (auth.error != null)
-                _ErrorBanner(message: auth.error!, onDismiss: auth.clearError),
-              if (auth.error != null) const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneCtrl,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: '手机号',
-                  prefixIcon: Icon(Icons.phone_outlined, color: AppColors.primary),
+                ErrorBanner(
+                  message: localizeErrorMessage(auth.error!, l10n),
+                  onDismiss: auth.clearError,
                 ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return '请输入手机号';
-                  if (v.trim().length < 11) return '手机号格式不正确';
-                  return null;
-                },
+              if (auth.error != null) const SizedBox(height: 16),
+              PhoneInputField(
+                controller: _phoneCtrl,
+                selectedCountry: _selectedCountry,
+                onCountryChanged: (c) => setState(() => _selectedCountry = c),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordCtrl,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  labelText: '密码',
+                  labelText: l10n.commonPasswordLabel,
                   prefixIcon: const Icon(Icons.lock_outline, color: AppColors.primary),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -150,8 +158,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 validator: (v) {
-                  if (v == null || v.isEmpty) return '请输入密码';
-                  if (v.length < 6) return '密码至少6位';
+                  if (v == null || v.isEmpty) return l10n.commonPasswordRequired;
+                  if (v.length < 6) return l10n.commonPasswordTooShort;
                   return null;
                 },
               ),
@@ -178,58 +186,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.white,
                     ),
                   )
-                : const Text('登录'),
+                : Text(AppLocalizations.of(context)!.loginButton),
           ),
         );
       },
     );
   }
 
-  Widget _buildRegisterLink() {
+  Widget _buildRegisterLink(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text('还没有账号？', style: TextStyle(color: AppColors.textSecondary)),
+        Text(l10n.loginNoAccount, style: const TextStyle(color: AppColors.textSecondary)),
         TextButton(
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const RegisterScreen()),
           ),
-          child: const Text('立即注册', style: TextStyle(fontWeight: FontWeight.w600)),
+          child: Text(l10n.loginRegisterNow, style: const TextStyle(fontWeight: FontWeight.w600)),
         ),
       ],
-    );
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  final String message;
-  final VoidCallback onDismiss;
-  const _ErrorBanner({required this.message, required this.onDismiss});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: AppColors.danger, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(message,
-                style: const TextStyle(color: AppColors.danger, fontSize: 13)),
-          ),
-          GestureDetector(
-            onTap: onDismiss,
-            child: const Icon(Icons.close, color: AppColors.danger, size: 16),
-          ),
-        ],
-      ),
     );
   }
 }

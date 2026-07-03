@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/kinship/kinship_graph.dart';
 
 enum MessageType { text, image, voice, system }
 
@@ -13,6 +14,21 @@ class Conversation {
   final int unreadCount;
   final int memberCount;
 
+  /// Language-neutral relative-to-viewer kinship code for `type=direct`
+  /// conversations only (e.g. `"S"`), computed per-request by the backend —
+  /// see docs/api.md §4.1/§七. Null for group conversations. Localize with
+  /// `relationLabelFor()` at display time — the backend never localizes.
+  final String? relationCode;
+
+  /// The other participant's gender, needed to localize [relationCode]
+  /// (disambiguates the bare spouse code). `type=direct` only.
+  final Gender? otherUserGender;
+
+  /// The other participant's `userId`, `type=direct` conversations only —
+  /// used to look up live online status (WS `USER_STATUS`). Null for group
+  /// conversations. See docs/api.md §4.1.
+  final int? otherUserId;
+
   const Conversation({
     required this.id,
     required this.name,
@@ -23,6 +39,9 @@ class Conversation {
     required this.lastMessageAt,
     required this.unreadCount,
     required this.memberCount,
+    this.relationCode,
+    this.otherUserGender,
+    this.otherUserId,
   });
 
   factory Conversation.fromJson(Map<String, dynamic> json) {
@@ -37,6 +56,10 @@ class Conversation {
       lastMessageAt: DateTime.parse(json['lastMessageAt'] as String),
       unreadCount: json['unreadCount'] as int? ?? 0,
       memberCount: json['memberCount'] as int? ?? 0,
+      relationCode: json['relationCode'] as String?,
+      otherUserGender:
+          json['otherUserGender'] != null ? genderFromString(json['otherUserGender'] as String) : null,
+      otherUserId: json['otherUserId'] as int?,
     );
   }
 
@@ -51,6 +74,9 @@ class Conversation {
       lastMessageAt: lastMessageAt ?? this.lastMessageAt,
       unreadCount: unreadCount ?? this.unreadCount,
       memberCount: memberCount,
+      relationCode: relationCode,
+      otherUserGender: otherUserGender,
+      otherUserId: otherUserId,
     );
   }
 }
@@ -69,6 +95,16 @@ class Message {
   final bool isMe;
   final bool isPending;
 
+  /// Sender's language-neutral kinship code relative to the viewing user
+  /// (e.g. `"S"`, `"Son"`), computed per-request by the backend — see
+  /// docs/api.md §4.3/§5.2/§七. Localize with `relationLabelFor()` at display
+  /// time — the backend never localizes. Null for own messages.
+  final String? senderRelationCode;
+
+  /// Sender's gender, needed to localize [senderRelationCode] (disambiguates
+  /// the bare spouse code).
+  final Gender? senderGender;
+
   const Message({
     required this.clientId,
     this.serverId,
@@ -82,6 +118,8 @@ class Message {
     required this.sentAt,
     required this.isMe,
     this.isPending = false,
+    this.senderRelationCode,
+    this.senderGender,
   });
 
   factory Message.fromJson(Map<String, dynamic> json,
@@ -99,6 +137,9 @@ class Message {
       type: MessageType.text,
       sentAt: DateTime.parse(json['sentAt'] as String),
       isMe: senderId == currentUserId,
+      senderRelationCode: json['senderRelationCode'] as String?,
+      senderGender:
+          json['senderGender'] != null ? genderFromString(json['senderGender'] as String) : null,
     );
   }
 
@@ -124,6 +165,8 @@ class Message {
         sentAt: sentAt,
         isMe: isMe,
         isPending: isPending ?? this.isPending,
+        senderRelationCode: senderRelationCode,
+        senderGender: senderGender,
       );
 }
 

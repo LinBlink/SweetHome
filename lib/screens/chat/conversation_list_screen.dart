@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/error_messages.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/chat_provider.dart';
 import '../../widgets/conversation_tile.dart';
+import '../../widgets/error_banner.dart';
 import 'chat_room_screen.dart';
+import 'new_conversation_screen.dart';
 
 class ConversationListScreen extends StatefulWidget {
   const ConversationListScreen({super.key});
@@ -23,47 +27,78 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('消息'),
+        title: Text(l10n.navMessages),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {},
-            tooltip: '搜索',
+            tooltip: l10n.conversationsSearchTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {},
-            tooltip: '新建对话',
+            onPressed: () {
+              // ChatProvider lives below the root Navigator (created in
+              // AuthGate), so a pushed route can't inherit it — re-provide it
+              // explicitly, same as the ChatRoomScreen navigation below.
+              final chat = context.read<ChatProvider>();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: chat,
+                    child: const NewConversationScreen(),
+                  ),
+                ),
+              );
+            },
+            tooltip: l10n.conversationsNewTooltip,
           ),
         ],
       ),
       body: Consumer<ChatProvider>(
         builder: (ctx, chat, _) {
+          Widget body = _buildBody(ctx, chat, l10n);
           if (chat.connectionError != null) {
-            return _ConnectionErrorBanner(
+            body = _ConnectionErrorBanner(
               message: chat.connectionError!,
+              retryLabel: l10n.connectionErrorRetry,
               onRetry: chat.reconnect,
               onDismiss: chat.dismissConnectionError,
-              child: _buildBody(ctx, chat),
+              child: body,
             );
           }
-          return _buildBody(ctx, chat);
+          if (chat.error != null) {
+            body = Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: ErrorBanner(
+                    message: localizeErrorMessage(chat.error!, l10n),
+                    onDismiss: chat.clearError,
+                  ),
+                ),
+                Expanded(child: body),
+              ],
+            );
+          }
+          return body;
         },
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, ChatProvider chat) {
+  Widget _buildBody(BuildContext context, ChatProvider chat, AppLocalizations l10n) {
     if (chat.isLoadingConversations) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
     if (chat.conversations.isEmpty) {
-      return _EmptyState();
+      return _EmptyState(l10n: l10n);
     }
     return ListView.separated(
       itemCount: chat.conversations.length,
@@ -98,6 +133,9 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 }
 
 class _EmptyState extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _EmptyState({required this.l10n});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -107,17 +145,17 @@ class _EmptyState extends StatelessWidget {
           Icon(Icons.chat_bubble_outline,
               size: 72, color: AppColors.primaryLight.withValues(alpha: 0.6)),
           const SizedBox(height: 16),
-          const Text(
-            '还没有消息',
-            style: TextStyle(
+          Text(
+            l10n.conversationsEmptyTitle,
+            style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '邀请家人加入，开始聊天吧',
-            style: TextStyle(fontSize: 14, color: AppColors.textHint),
+          Text(
+            l10n.conversationsEmptySubtitle,
+            style: const TextStyle(fontSize: 14, color: AppColors.textHint),
           ),
         ],
       ),
@@ -127,12 +165,14 @@ class _EmptyState extends StatelessWidget {
 
 class _ConnectionErrorBanner extends StatelessWidget {
   final String message;
+  final String retryLabel;
   final VoidCallback onRetry;
   final VoidCallback onDismiss;
   final Widget child;
 
   const _ConnectionErrorBanner({
     required this.message,
+    required this.retryLabel,
     required this.onRetry,
     required this.onDismiss,
     required this.child,
@@ -160,8 +200,8 @@ class _ConnectionErrorBanner extends StatelessWidget {
                 style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(40, 28)),
-                child: const Text('重试',
-                    style: TextStyle(
+                child: Text(retryLabel,
+                    style: const TextStyle(
                         fontSize: 12, color: AppColors.primary)),
               ),
               GestureDetector(

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/kinship/kinship_graph.dart';
+import '../core/kinship/kinship_localizer.dart';
+import '../l10n/app_localizations.dart';
 import '../models/chat_models.dart';
+import '../providers/auth_provider.dart';
+import '../providers/chat_provider.dart';
+import '../providers/locale_provider.dart';
 import 'avatar_widget.dart';
 
 class ConversationTile extends StatelessWidget {
@@ -16,6 +23,16 @@ class ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final relationCode = conversation.relationCode;
+    String? relationLabel;
+    if (relationCode != null) {
+      relationLabel = relationLabelFor(
+        relationCode: relationCode,
+        targetGender: conversation.otherUserGender ?? Gender.male,
+        viewerGender: genderFromString(context.watch<AuthProvider>().currentUser?.gender),
+        appLocale: context.watch<LocaleProvider>().locale,
+      );
+    }
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -32,7 +49,9 @@ class ConversationTile extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          conversation.name,
+                          relationLabel != null
+                              ? '${conversation.name} · $relationLabel'
+                              : conversation.name,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -43,7 +62,7 @@ class ConversationTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _formatTime(conversation.lastMessageAt),
+                        _formatTime(conversation.lastMessageAt, AppLocalizations.of(context)!),
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textHint,
@@ -88,22 +107,55 @@ class ConversationTile extends StatelessWidget {
         radius: 26,
       );
     }
-    return AvatarWidget(
+    final avatar = AvatarWidget(
       label: conversation.avatarLabel,
       color: conversation.avatarColor,
       radius: 26,
     );
+    final otherUserId = conversation.otherUserId;
+    if (otherUserId == null) return avatar;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        avatar,
+        Positioned(
+          right: -1,
+          bottom: -1,
+          child: Selector<ChatProvider, bool>(
+            selector: (_, chat) => chat.isUserOnline(otherUserId),
+            builder: (_, isOnline, _) => isOnline ? const _OnlineDot() : const SizedBox.shrink(),
+          ),
+        ),
+      ],
+    );
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(DateTime dt, AppLocalizations l10n) {
     final local = dt.toLocal();
     final now = DateTime.now();
     final diff = now.difference(local);
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inHours < 1) return '${diff.inMinutes}分钟前';
+    if (diff.inMinutes < 1) return l10n.timeJustNow;
+    if (diff.inHours < 1) return l10n.timeMinutesAgo(diff.inMinutes);
     if (local.day == now.day) return DateFormat('HH:mm').format(local);
-    if (diff.inDays == 1) return '昨天';
+    if (diff.inDays == 1) return l10n.timeYesterday;
     return DateFormat('MM/dd').format(local);
+  }
+}
+
+class _OnlineDot extends StatelessWidget {
+  const _OnlineDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: AppColors.success,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.background, width: 2),
+      ),
+    );
   }
 }
 

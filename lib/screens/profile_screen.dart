@@ -1,35 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/language_picker.dart';
+import 'edit_profile_screen.dart';
+import 'family_members_screen.dart';
+import 'join_family_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('我')),
+      appBar: AppBar(title: Text(l10n.navProfile)),
       body: Column(
         children: [
-          _buildProfileHeader(user?.name ?? '', user?.familyName ?? ''),
+          InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+            ),
+            child: _buildProfileHeader(user?.name ?? '', user?.familyName ?? ''),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.people_outline, color: AppColors.primary),
+            title: Text(l10n.profileFamilyMembersRow),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FamilyMembersScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.group_add_outlined, color: AppColors.primary),
+            title: Text(l10n.joinFamilyTitle),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const JoinFamilyScreen()),
+            ),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          _LanguageRow(l10n: l10n),
           const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () => _confirmLogout(context),
+                onPressed: () => _confirmLogout(context, l10n),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.danger),
                   foregroundColor: AppColors.danger,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: const Text('退出登录',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                child: Text(l10n.profileLogout,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
               ),
             ),
           ),
@@ -82,19 +116,19 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _confirmLogout(BuildContext context) {
+  void _confirmLogout(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('退出登录',
-            style: TextStyle(color: AppColors.textPrimary)),
-        content: const Text('确定要退出当前账号吗？',
-            style: TextStyle(color: AppColors.textSecondary)),
+        title: Text(l10n.profileLogout,
+            style: const TextStyle(color: AppColors.textPrimary)),
+        content: Text(l10n.profileLogoutConfirmMessage,
+            style: const TextStyle(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -102,10 +136,33 @@ class ProfileScreen extends StatelessWidget {
               context.read<AuthProvider>().logout();
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text('退出'),
+            child: Text(l10n.profileLogout),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LanguageRow extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _LanguageRow({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final current = context.watch<LocaleProvider>().locale;
+    return ListTile(
+      leading: const Icon(Icons.language, color: AppColors.primary),
+      title: Text(l10n.profileLanguageRow),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(localeDisplayName(current), style: const TextStyle(color: AppColors.textSecondary)),
+          const SizedBox(width: 4),
+          const Icon(Icons.chevron_right, color: AppColors.textHint),
+        ],
+      ),
+      onTap: () => showLanguagePickerSheet(context),
     );
   }
 }

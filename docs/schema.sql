@@ -79,9 +79,14 @@ CREATE TABLE family_members
     family_id    BIGINT UNSIGNED                NOT NULL COMMENT '家庭 ID',
     user_id      BIGINT UNSIGNED                NOT NULL COMMENT '用户 ID',
     role         ENUM ('admin', 'member')        NOT NULL DEFAULT 'member' COMMENT '家庭角色：admin=管理员，member=成员',
-    display_role VARCHAR(20)                              COMMENT '家庭称谓，如：爸、妈、爷爷、小明',
+    gender       ENUM ('male', 'female')        NOT NULL COMMENT '性别，亲属称谓计算的基础输入（父/母、兄弟/姐妹等由此区分）',
+    birth_order  SMALLINT UNSIGNED                       COMMENT '同辈排行，数值越小越年长；NULL 表示未知（此时算法默认按年长处理），用于区分兄/弟、姐/妹',
     joined_at    DATETIME(3)                    NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '加入时间',
     deleted_at   DATETIME(3)                             COMMENT '退出/被移除时间（软删除）',
+    -- 注：原 display_role（如"爸""妈"）字段已移除。它是固定中文文本、且对所有查看者显示相同内容，
+    -- 不支持国际化，也无法表达"相对于查看者"的真实称谓（如爷爷看儿子应显示"儿子"而非"爸"）。
+    -- 现改为 gender + birth_order + family_relations 关系图，由服务端按请求者身份 + Accept-Language
+    -- 动态计算相对称谓，算法定义见 docs/api.md 「七、亲属称谓计算算法」。
 
     PRIMARY KEY (id),
     UNIQUE KEY uk_family_user (family_id, user_id),
@@ -213,6 +218,81 @@ CREATE TABLE refresh_tokens
   COMMENT = 'Refresh Token 表（支持多设备登录）';
 
 
+-- ════════════════════════════════════════
+-- 表 8：family_relations（家庭亲属关系图）
+-- 存储家庭成员之间的原始血亲/姻亲边（PARENT_OF 有向 + SPOUSE_OF 无向），
+-- 是「相对称谓」算法的唯一数据来源——不存任何称谓文本，称谓由算法在
+-- 每次请求时按查看者动态推导，详见 docs/api.md「七、亲属称谓计算算法」。
+-- ════════════════════════════════════════
+CREATE TABLE family_relations
+(
+    id                BIGINT UNSIGNED                  NOT NULL AUTO_INCREMENT,
+    family_id         BIGINT UNSIGNED                  NOT NULL COMMENT '家庭 ID（冗余字段，便于按家庭批量取整张关系图）',
+    subject_member_id BIGINT UNSIGNED                  NOT NULL COMMENT '关系主体 family_members.id',
+    relation_type     ENUM ('PARENT_OF', 'SPOUSE_OF')  NOT NULL COMMENT 'PARENT_OF=subject 是 object 的父/母（有向）；SPOUSE_OF=互为配偶（无方向，写入时需规范化 subject_member_id < object_member_id 以防重复行）',
+    object_member_id  BIGINT UNSIGNED                  NOT NULL COMMENT '关系客体 family_members.id',
+    created_at        DATETIME(3)                      NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    deleted_at        DATETIME(3)                               COMMENT '软删除时间戳（如离婚、关系录入错误撤销）',
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_relation (subject_member_id, relation_type, object_member_id),
+    INDEX idx_family_id (family_id),
+    INDEX idx_subject (subject_member_id),
+    INDEX idx_object (object_member_id),
+    CONSTRAINT fk_fr_family
+        FOREIGN KEY (family_id) REFERENCES families (id),
+    CONSTRAINT fk_fr_subject
+        FOREIGN KEY (subject_member_id) REFERENCES family_members (id),
+    CONSTRAINT fk_fr_object
+        FOREIGN KEY (object_member_id) REFERENCES family_members (id),
+    CONSTRAINT chk_fr_no_self
+        CHECK (subject_member_id <> object_member_id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '家庭成员关系图（血亲 PARENT_OF 有向边 + 姻亲 SPOUSE_OF 无向边）';
+
+
+-- ════════════════════════════════════════
+-- 表 9：family_join_requests（无邀请码的加入申请）
+-- 申请人不知道邀请码，但知道家庭里某位成员（target_member）的手机号，
+-- 提交申请后由该家庭管理员审批；批准后才真正创建 users/family_members/
+-- family_relations 记录，与直接持邀请码加入（3.4）殊途同归。
+-- 详见 docs/api.md「3.5 申请加入家庭（没有邀请码）」。
+-- ════════════════════════════════════════
+CREATE TABLE family_join_requests
+(
+    id                       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    family_id                BIGINT UNSIGNED NOT NULL COMMENT '目标家庭 ID（由 target_member_phone 反查得到）',
+    target_member_id         BIGINT UNSIGNED NOT NULL COMMENT '申请人认识的已有家庭成员 family_members.id，作为关系锚点',
+    requester_name           VARCHAR(50)     NOT NULL COMMENT '申请人昵称',
+    requester_phone          VARCHAR(20)     NOT NULL COMMENT '申请人手机号，批准后用于创建 users 记录',
+    requester_password_hash  VARCHAR(255)    NOT NULL COMMENT '申请时提交的密码（BCrypt），批准后直接复用，不要求二次输入',
+    requester_gender         ENUM ('male', 'female') NOT NULL,
+    relation_type            ENUM ('CHILD_OF', 'PARENT_OF', 'SPOUSE_OF', 'SIBLING_OF') NOT NULL COMMENT '申请人相对 target_member 的关系，语义同 family_relations 写入规则（docs/api.md §1.1/§3.4）',
+    message                  VARCHAR(200)             COMMENT '申请人留言，供管理员审批参考',
+    status                   ENUM ('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    created_at               DATETIME(3)     NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    resolved_at              DATETIME(3)              COMMENT '审批/拒绝时间',
+    resolved_by              BIGINT UNSIGNED          COMMENT '处理该申请的管理员 user_id',
+
+    PRIMARY KEY (id),
+    INDEX idx_family_id (family_id),
+    INDEX idx_target_member (target_member_id),
+    INDEX idx_status (status),
+    INDEX idx_requester_phone (requester_phone),
+    CONSTRAINT fk_fjr_family
+        FOREIGN KEY (family_id) REFERENCES families (id),
+    CONSTRAINT fk_fjr_target_member
+        FOREIGN KEY (target_member_id) REFERENCES family_members (id),
+    CONSTRAINT fk_fjr_resolved_by
+        FOREIGN KEY (resolved_by) REFERENCES users (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '无邀请码的加入申请（凭已知家庭成员手机号发起，等待管理员审批）';
+
+
 -- ═══════════════════════════════════════════════════════════════
 -- 初始化数据（开发环境种子数据）
 -- ═══════════════════════════════════════════════════════════════
@@ -226,10 +306,14 @@ VALUES (1, '13800138000', '$2a$10$PlaceholderBcryptHashHere.AAAAAAAAAAAAAAAAAAAA
 INSERT INTO families (id, name, created_by)
 VALUES (1, '王家', 1);
 
--- 家庭成员关系
-INSERT INTO family_members (family_id, user_id, role, display_role)
-VALUES (1, 1, 'admin', '爸'),
-       (1, 2, 'member', '妈');
+-- 家庭成员关系（性别用于称谓计算；不再存任何称谓文本）
+INSERT INTO family_members (id, family_id, user_id, role, gender)
+VALUES (1, 1, 1, 'admin', 'male'),
+       (2, 1, 2, 'member', 'female');
+
+-- 家庭关系图：王建国与张美玲互为配偶
+INSERT INTO family_relations (family_id, subject_member_id, relation_type, object_member_id)
+VALUES (1, 1, 'SPOUSE_OF', 2);
 
 -- 家庭群聊会话（注册时自动创建）
 INSERT INTO conversations (id, type, name, family_id)

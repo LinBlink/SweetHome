@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/kinship/kinship_graph.dart';
+import '../core/kinship/kinship_localizer.dart';
 import '../models/chat_models.dart';
+import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import 'avatar_widget.dart';
 
 class MessageBubble extends StatelessWidget {
@@ -12,6 +17,16 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMe = message.isMe;
+    final senderRelationCode = message.senderRelationCode;
+    String? senderRelationLabel;
+    if (senderRelationCode != null) {
+      senderRelationLabel = relationLabelFor(
+        relationCode: senderRelationCode,
+        targetGender: message.senderGender ?? Gender.male,
+        viewerGender: genderFromString(context.watch<AuthProvider>().currentUser?.gender),
+        appLocale: context.watch<LocaleProvider>().locale,
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
@@ -36,7 +51,9 @@ class MessageBubble extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 3),
                     child: Text(
-                      message.senderName,
+                      senderRelationLabel != null
+                          ? '${message.senderName} · $senderRelationLabel'
+                          : message.senderName,
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
