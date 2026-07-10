@@ -91,10 +91,20 @@
 
   "inviteGenerate": "Invite",
   "inviteCodeLabel": "Invite Code",
-  "inviteExpiresAt": "Expires at {time}",
-  "@inviteExpiresAt": {
-    "placeholders": { "time": { "type": "String" } }
+  "inviteExpiryDays": "Expires in {days} days",
+  "@inviteExpiryDays": {
+    "placeholders": { "days": { "type": "int" } }
   },
+  "inviteExpiryHours": "Expires in {hours} hours",
+  "@inviteExpiryHours": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "inviteExpiryMinutes": "Expires in {minutes} minutes",
+  "@inviteExpiryMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "inviteExpiryLessThanMinute": "Expires in less than a minute",
+  "inviteExpiryExpired": "Expired",
   "inviteCopy": "Copy",
   "inviteCopied": "Copied to clipboard",
 

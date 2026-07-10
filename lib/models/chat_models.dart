@@ -53,7 +53,12 @@ class Conversation {
       avatarColor: Color(
           int.parse((json['avatarColor'] as String? ?? 'FFBF5E3B'), radix: 16)),
       lastMessage: json['lastMessage'] as String? ?? '',
-      lastMessageAt: DateTime.parse(json['lastMessageAt'] as String),
+      // A freshly created conversation (see docs/api.md §4.2) has no messages
+      // yet, so the backend returns a null lastMessageAt — fall back to "now"
+      // rather than crashing the parse.
+      lastMessageAt: json['lastMessageAt'] != null
+          ? DateTime.parse(json['lastMessageAt'] as String)
+          : DateTime.now(),
       unreadCount: json['unreadCount'] as int? ?? 0,
       memberCount: json['memberCount'] as int? ?? 0,
       relationCode: json['relationCode'] as String?,

@@ -249,9 +249,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteCodeLabel => 'Invite Code';
 
   @override
-  String inviteExpiresAt(String time) {
-    return 'Expires at $time';
+  String inviteExpiryDays(int days) {
+    return 'Expires in $days days';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return 'Expires in $hours hours';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return 'Expires in $minutes minutes';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => 'Expires in less than a minute';
+
+  @override
+  String get inviteExpiryExpired => 'Expired';
 
   @override
   String get inviteCopy => 'Copy';

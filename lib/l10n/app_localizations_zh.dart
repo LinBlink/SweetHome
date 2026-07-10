@@ -241,9 +241,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get inviteCodeLabel => '邀请码';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time 过期';
+  String inviteExpiryDays(int days) {
+    return '$days天后过期';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours小时后过期';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes分钟后过期';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => '即将过期';
+
+  @override
+  String get inviteExpiryExpired => '已过期';
 
   @override
   String get inviteCopy => '复制';
@@ -595,9 +611,25 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get inviteCodeLabel => '邀请码';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time 过期';
+  String inviteExpiryDays(int days) {
+    return '$days天后过期';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours小时后过期';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes分钟后过期';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => '即将过期';
+
+  @override
+  String get inviteExpiryExpired => '已过期';
 
   @override
   String get inviteCopy => '复制';
@@ -949,9 +981,25 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get inviteCodeLabel => '邀請碼';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time 過期';
+  String inviteExpiryDays(int days) {
+    return '$days天後過期';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours小時後過期';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes分鐘後過期';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => '即將過期';
+
+  @override
+  String get inviteExpiryExpired => '已過期';
 
   @override
   String get inviteCopy => '複製';

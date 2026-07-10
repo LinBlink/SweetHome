@@ -241,9 +241,25 @@ class AppLocalizationsJa extends AppLocalizations {
   String get inviteCodeLabel => '招待コード';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time に失効';
+  String inviteExpiryDays(int days) {
+    return '$days日後に失効';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours時間後に失効';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes分後に失効';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => 'まもなく失効';
+
+  @override
+  String get inviteExpiryExpired => '失効済み';
 
   @override
   String get inviteCopy => 'コピー';

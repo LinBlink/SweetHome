@@ -88,7 +88,11 @@
 
   "inviteGenerate": "邀请",
   "inviteCodeLabel": "邀请码",
-  "inviteExpiresAt": "{time} 过期",
+  "inviteExpiryDays": "{days}天后过期",
+  "inviteExpiryHours": "{hours}小时后过期",
+  "inviteExpiryMinutes": "{minutes}分钟后过期",
+  "inviteExpiryLessThanMinute": "即将过期",
+  "inviteExpiryExpired": "已过期",
   "inviteCopy": "复制",
   "inviteCopied": "已复制到剪贴板",
 

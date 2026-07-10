@@ -241,9 +241,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get inviteCodeLabel => '초대 코드';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time에 만료';
+  String inviteExpiryDays(int days) {
+    return '$days일 후에 만료';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours시간 후에 만료';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes분 후에 만료';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => '곧 만료';
+
+  @override
+  String get inviteExpiryExpired => '만료됨';
 
   @override
   String get inviteCopy => '복사';

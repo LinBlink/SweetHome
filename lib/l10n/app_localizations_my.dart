@@ -249,9 +249,25 @@ class AppLocalizationsMy extends AppLocalizations {
   String get inviteCodeLabel => 'ဖိတ်ခေါ်ကုဒ်';
 
   @override
-  String inviteExpiresAt(String time) {
-    return '$time တွင် သက်တမ်းကုန်မည်';
+  String inviteExpiryDays(int days) {
+    return '$days ရက်အတွင်း သက်တမ်းကုန်မည်';
   }
+
+  @override
+  String inviteExpiryHours(int hours) {
+    return '$hours နာရီအတွင်း သက်တမ်းကုန်မည်';
+  }
+
+  @override
+  String inviteExpiryMinutes(int minutes) {
+    return '$minutes မိနစ်အတွင်း သက်တမ်းကုန်မည်';
+  }
+
+  @override
+  String get inviteExpiryLessThanMinute => 'မကြာမီ သက်တမ်းကုန်တော့မည်';
+
+  @override
+  String get inviteExpiryExpired => 'သက်တမ်းကုန်ပြီး';
 
   @override
   String get inviteCopy => 'ကူးယူရန်';

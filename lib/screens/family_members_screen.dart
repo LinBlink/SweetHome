@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/invite_expiry.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
 import '../l10n/app_localizations.dart';
@@ -63,7 +64,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    l10n.inviteExpiresAt(TimeOfDay.fromDateTime(info.expiresAt.toLocal()).format(ctx)),
+                    InviteExpiry.remaining(ctx, info.expiresAt.toLocal()),
                     style: const TextStyle(fontSize: 12, color: AppColors.textHint),
                   ),
                 ],

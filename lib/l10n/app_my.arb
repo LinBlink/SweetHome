@@ -88,7 +88,11 @@
 
   "inviteGenerate": "ဖိတ်ခေါ်ရန်",
   "inviteCodeLabel": "ဖိတ်ခေါ်ကုဒ်",
-  "inviteExpiresAt": "{time} တွင် သက်တမ်းကုန်မည်",
+  "inviteExpiryDays": "{days} ရက်အတွင်း သက်တမ်းကုန်မည်",
+  "inviteExpiryHours": "{hours} နာရီအတွင်း သက်တမ်းကုန်မည်",
+  "inviteExpiryMinutes": "{minutes} မိနစ်အတွင်း သက်တမ်းကုန်မည်",
+  "inviteExpiryLessThanMinute": "မကြာမီ သက်တမ်းကုန်တော့မည်",
+  "inviteExpiryExpired": "သက်တမ်းကုန်ပြီး",
   "inviteCopy": "ကူးယူရန်",
   "inviteCopied": "ကလစ်ဘုတ်သို့ ကူးယူပြီးပါပြီ",
 

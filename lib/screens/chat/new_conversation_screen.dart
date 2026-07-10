@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/error_messages.dart';
 import '../../core/kinship/kinship_graph.dart';
 import '../../core/kinship/kinship_localizer.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/api_exception.dart';
 import '../../models/family_member_vm.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
@@ -49,10 +51,14 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
           ),
         ),
       );
+    } on ApiException catch (e) {
+      // Surface the real server-provided reason rather than a generic message.
+      messenger.showSnackBar(SnackBar(content: Text(localizeErrorMessage(e.message, l10n))));
     } catch (_) {
       // Without this, a failure to create the conversation would leave the
       // tap doing nothing at all — surface it instead.
-      messenger.showSnackBar(SnackBar(content: Text(l10n.errorNetworkFailed)));
+      messenger.showSnackBar(
+          SnackBar(content: Text(localizeErrorMessage(kNetworkErrorSentinel, l10n))));
     } finally {
       if (mounted) setState(() => _starting = false);
     }

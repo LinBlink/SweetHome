@@ -88,7 +88,11 @@
 
   "inviteGenerate": "招待",
   "inviteCodeLabel": "招待コード",
-  "inviteExpiresAt": "{time} に失効",
+  "inviteExpiryDays": "{days}日後に失効",
+  "inviteExpiryHours": "{hours}時間後に失効",
+  "inviteExpiryMinutes": "{minutes}分後に失効",
+  "inviteExpiryLessThanMinute": "まもなく失効",
+  "inviteExpiryExpired": "失効済み",
   "inviteCopy": "コピー",
   "inviteCopied": "クリップボードにコピーしました",
 

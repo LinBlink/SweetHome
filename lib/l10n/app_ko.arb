@@ -88,7 +88,11 @@
 
   "inviteGenerate": "초대",
   "inviteCodeLabel": "초대 코드",
-  "inviteExpiresAt": "{time}에 만료",
+  "inviteExpiryDays": "{days}일 후에 만료",
+  "inviteExpiryHours": "{hours}시간 후에 만료",
+  "inviteExpiryMinutes": "{minutes}분 후에 만료",
+  "inviteExpiryLessThanMinute": "곧 만료",
+  "inviteExpiryExpired": "만료됨",
   "inviteCopy": "복사",
   "inviteCopied": "클립보드에 복사되었습니다",
 

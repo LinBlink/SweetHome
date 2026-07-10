@@ -562,11 +562,35 @@ abstract class AppLocalizations {
   /// **'Invite Code'**
   String get inviteCodeLabel;
 
-  /// No description provided for @inviteExpiresAt.
+  /// No description provided for @inviteExpiryDays.
   ///
   /// In en, this message translates to:
-  /// **'Expires at {time}'**
-  String inviteExpiresAt(String time);
+  /// **'Expires in {days} days'**
+  String inviteExpiryDays(int days);
+
+  /// No description provided for @inviteExpiryHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in {hours} hours'**
+  String inviteExpiryHours(int hours);
+
+  /// No description provided for @inviteExpiryMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in {minutes} minutes'**
+  String inviteExpiryMinutes(int minutes);
+
+  /// No description provided for @inviteExpiryLessThanMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in less than a minute'**
+  String get inviteExpiryLessThanMinute;
+
+  /// No description provided for @inviteExpiryExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get inviteExpiryExpired;
 
   /// No description provided for @inviteCopy.
   ///
