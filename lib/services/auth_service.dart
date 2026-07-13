@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/app_config.dart';
 import '../models/auth_models.dart';
@@ -9,7 +11,8 @@ class AuthService {
   AuthService._();
 
   static const _prefKeys = [
-    'token', 'refreshToken', 'userId', 'name', 'phone', 'familyId', 'familyName', 'role', 'gender'
+    'token', 'refreshToken', 'userId', 'name', 'phone',
+    'familyId', 'familyName', 'role', 'gender', 'avatarUrl',
   ];
 
   static Future<AuthUser> login(LoginRequest req) async {
@@ -64,6 +67,55 @@ class AuthService {
         .timeout(const Duration(seconds: 10));
     final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
     return AuthUser.fromUserFields(data, token: current.token, refreshToken: current.refreshToken);
+  }
+
+  /// `POST /users/upload/avatar` (docs/api.md §2.3) — multipart upload of a
+  /// single image file (field name `file`). The backend writes the file to
+  /// Cloudflare R2 and returns the new public address; the server also
+  /// updates `users.avatar_url` to that address, so we return the URL for
+  /// the caller to drop straight into the local [AuthUser].
+  ///
+  /// [filename] is the part's filename (use the `XFile.name` from
+  /// `image_picker`).
+  ///
+  /// [contentType] is the MIME type of the part — the backend's
+  /// `UploadServiceImpl` calls `avatarFile.getContentType()` to enforce
+  /// its `image/*` check, so the client must set the part's Content-Type
+  /// explicitly. `image_picker` exposes this on `XFile.mimeType`; without
+  /// it, the part would default to `application/octet-stream` and trip
+  /// the `FILE_TYPE_ILLEGAL` 400.
+  static Future<String> uploadAvatar(
+    AuthUser current, {
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) async {
+    final uri = Uri.parse('${AppConfig.apiBaseUrl}/users/upload/avatar');
+    final req = http.MultipartRequest('POST', uri);
+    req.headers['Authorization'] = 'Bearer ${current.token}';
+    req.files.add(http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: filename,
+      contentType: _parseMediaType(contentType),
+    ));
+    final streamed = await req.send().timeout(const Duration(seconds: 30));
+    final resp = await http.Response.fromStream(streamed);
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    return data['addressReturn'] as String;
+  }
+
+  /// Parses a `type/subtype` string into the `MediaType` the `http` package
+  /// wants. Returns `null` on missing / malformed input — `MultipartFile`
+  /// then falls back to its filename-extension guess (which already
+  /// produces `image/jpeg` etc. for picker output, so missing mimeType
+  /// isn't fatal — but the explicit form is the only way to guarantee
+  /// the backend's `image/*` check sees a real image MIME).
+  static MediaType? _parseMediaType(String? mime) {
+    if (mime == null) return null;
+    final slash = mime.indexOf('/');
+    if (slash <= 0 || slash == mime.length - 1) return null;
+    return MediaType(mime.substring(0, slash), mime.substring(slash + 1));
   }
 
   /// `POST /auth/refresh` — see docs/api.md §1.3. Exchanges a still-valid

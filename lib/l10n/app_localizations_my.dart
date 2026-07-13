@@ -243,6 +243,15 @@ class AppLocalizationsMy extends AppLocalizations {
   String get editProfileSave => 'သိမ်းရန်';
 
   @override
+  String get editProfileChangeAvatar => 'ပုံပြောင်းရန်';
+
+  @override
+  String get editProfileAvatarUploading => 'တင်နေသည်…';
+
+  @override
+  String get editProfileAvatarFailed => 'တင်ခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ';
+
+  @override
   String get inviteGenerate => 'ဖိတ်ခေါ်ရန်';
 
   @override

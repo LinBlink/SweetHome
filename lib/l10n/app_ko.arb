@@ -85,6 +85,9 @@
   "editProfileTitle": "프로필 편집",
   "editProfileNicknameLabel": "닉네임",
   "editProfileSave": "저장",
+  "editProfileChangeAvatar": "아바타 변경",
+  "editProfileAvatarUploading": "업로드 중…",
+  "editProfileAvatarFailed": "업로드에 실패했습니다. 다시 시도해 주세요",
 
   "inviteGenerate": "초대",
   "inviteCodeLabel": "초대 코드",

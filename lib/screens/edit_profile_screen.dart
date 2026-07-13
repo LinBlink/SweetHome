@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/error_messages.dart';
 import '../l10n/app_localizations.dart';
+import '../models/api_exception.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/avatar_widget.dart';
 import '../widgets/error_banner.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
   bool _saving = false;
+  bool _uploadingAvatar = false;
   String? _error;
 
   @override
@@ -47,9 +51,61 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  /// `POST /users/upload/avatar` (docs/api.md §2.3). Picks a single image
+  /// from the gallery, lets `image_picker` downscale to ≤512px @ 85% JPEG
+  /// quality (the doc's "压缩为 webp 等体积较小的格式" guidance — we trade
+  /// webp for the cross-platform-safe JPEG+resize combo `image_picker`
+  /// supports out of the box), then uploads the bytes.
+  Future<void> _pickAndUploadAvatar(AppLocalizations l10n) async {
+    if (_uploadingAvatar) return;
+    final picker = ImagePicker();
+    final XFile? picked;
+    try {
+      picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+    } catch (_) {
+      setState(() => _error = l10n.editProfileAvatarFailed);
+      return;
+    }
+    if (picked == null) return; // user cancelled
+    setState(() {
+      _uploadingAvatar = true;
+      _error = null;
+    });
+    try {
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+      // `XFile.mimeType` is the real image MIME the picker detected
+      // (e.g. "image/jpeg"). Without forwarding it, the `http` package
+      // would default the multipart part's Content-Type to
+      // `application/octet-stream` and the backend's `FILE_TYPE_ILLEGAL`
+      // 400 would reject the upload.
+      await context.read<AuthProvider>().uploadAvatar(
+            bytes: bytes,
+            filename: picked.name,
+            contentType: picked.mimeType,
+          );
+    } on ApiException catch (e) {
+      // Surface the server's message (e.g. 400 FILE_SIZE_ILLEGAL,
+      // FILE_TYPE_ILLEGAL) verbatim — those are user-actionable.
+      setState(() => _error = e.message);
+    } catch (_) {
+      setState(() => _error = l10n.editProfileAvatarFailed);
+    } finally {
+      if (mounted) setState(() => _uploadingAvatar = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // watch the user so the avatar refreshes immediately after upload
+    // (uploadAvatar calls notifyListeners, which re-runs this build).
+    final user = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n.editProfileTitle)),
@@ -65,6 +121,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ErrorBanner(message: _error!, onDismiss: () => setState(() => _error = null)),
                   const SizedBox(height: 16),
                 ],
+                _AvatarPicker(
+                  name: user?.name ?? '',
+                  avatarUrl: user?.avatarUrl,
+                  uploading: _uploadingAvatar,
+                  changeLabel: l10n.editProfileChangeAvatar,
+                  uploadingLabel: l10n.editProfileAvatarUploading,
+                  onTap: () => _pickAndUploadAvatar(l10n),
+                ),
+                const SizedBox(height: 28),
                 TextFormField(
                   controller: _nameCtrl,
                   decoration: InputDecoration(
@@ -89,6 +154,68 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AvatarPicker extends StatelessWidget {
+  final String name;
+  final String? avatarUrl;
+  final bool uploading;
+  final String changeLabel;
+  final String uploadingLabel;
+  final VoidCallback onTap;
+
+  const _AvatarPicker({
+    required this.name,
+    required this.avatarUrl,
+    required this.uploading,
+    required this.changeLabel,
+    required this.uploadingLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              AvatarWidget(
+                label: name.isEmpty ? '家' : name[0],
+                color: AppColors.primary,
+                imageUrl: avatarUrl,
+                radius: 48,
+              ),
+              if (uploading)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: uploading ? null : onTap,
+            icon: const Icon(Icons.camera_alt_outlined, size: 18),
+            label: Text(uploading ? uploadingLabel : changeLabel),
+            style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+          ),
+        ],
       ),
     );
   }

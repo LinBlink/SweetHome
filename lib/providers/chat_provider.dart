@@ -152,13 +152,20 @@ class ChatProvider extends ChangeNotifier {
           before: loadMore ? _cursors[conversationId] : null,
           currentUserId: _currentUser.userId,
         );
+        // Backend returns pages ordered by `id DESC` (newest first within
+        // the page) — docs/api.md §4.3. The chat room renders with the
+        // convention `_messages[length - 1 - i]` over a reverse: true
+        // ListView, which assumes ASC time order (oldest first, newest
+        // last). Flip the page once at the boundary so the rest of the
+        // provider can keep appending (WS / optimistic-send) uniformly.
+        final pageOldestFirst = result.messages.reversed.toList();
         if (loadMore) {
           _messages[conversationId] = [
-            ...result.messages,
+            ...pageOldestFirst,
             ...(_messages[conversationId] ?? []),
           ];
         } else {
-          _messages[conversationId] = result.messages;
+          _messages[conversationId] = pageOldestFirst;
         }
         _cursors[conversationId] = result.hasMore ? result.nextCursor : null;
       }
@@ -226,7 +233,7 @@ class ChatProvider extends ChangeNotifier {
           payload: {
             'conversationId': conversationId,
             'content': content,
-            'messageType': 'text',
+            'messageType': MessageType.text.apiValue,
             'clientId': clientId,
           },
         );

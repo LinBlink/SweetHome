@@ -235,6 +235,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get editProfileSave => '저장';
 
   @override
+  String get editProfileChangeAvatar => '아바타 변경';
+
+  @override
+  String get editProfileAvatarUploading => '업로드 중…';
+
+  @override
+  String get editProfileAvatarFailed => '업로드에 실패했습니다. 다시 시도해 주세요';
+
+  @override
   String get inviteGenerate => '초대';
 
   @override

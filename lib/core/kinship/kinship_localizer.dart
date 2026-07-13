@@ -40,15 +40,19 @@ String kinshipLocaleCodeFor(Locale? locale) {
 /// viewer-gender-dependent terms in [viewerGenderDependentCodes] (falls back
 /// to `male` if the viewer's gender isn't known).
 ///
+/// Returns `null` when the relation can't be disambiguated at all (currently
+/// only the `S` code with unknown `targetGender`) — callers should treat
+/// that as "no label to show" rather than rendering a generic term.
+///
 /// This is a thin wrapper over [localizeRelationCode] for callers that
 /// already have the token path (mock mode, which builds the graph locally).
 /// For real-mode data, where only the backend-computed `relationCode`
 /// string travels over the wire (see docs/api.md §七 — the backend only
 /// ever produces the language-neutral code; all localization is a client
 /// concern), call [localizeRelationCode] directly.
-String localizeRelation(
+String? localizeRelation(
   List<RelToken> tokens, {
-  required Gender targetGender,
+  Gender? targetGender,
   Gender? viewerGender,
   String localeCode = kDefaultKinshipLocale,
 }) {
@@ -65,9 +69,19 @@ String localizeRelation(
 /// `"SELF"`) into display text for [localeCode]. This is the single source
 /// of truth for kinship-term translation — the backend never localizes,
 /// it only ever produces the code (see docs/api.md §七).
-String localizeRelationCode(
+///
+/// [targetGender] only matters for the bare spouse code `S`:
+/// - `Gender.male`   → `spouseOfMale` (e.g. 丈夫 / Husband)
+/// - `Gender.female` → `spouseOfFemale` (e.g. 妻子 / Wife)
+/// - `null`          → `null` (no label — we refuse to print a neutral
+///                    "配偶"/"Spouse" because the product rule is "show
+///                    丈夫 or 妻子, nothing else")
+/// Callers must pass the API's actual `senderGender` / `otherUserGender`
+/// straight through — **do not fall back to `Gender.male` on null**, or
+/// female spouses get rendered as "husband" (the old bug).
+String? localizeRelationCode(
   String code, {
-  required Gender targetGender,
+  Gender? targetGender,
   Gender? viewerGender,
   String localeCode = kDefaultKinshipLocale,
 }) {
@@ -75,7 +89,9 @@ String localizeRelationCode(
   if (code == kSelfRelationCode) return terms.selfTerm;
 
   if (code == 'S') {
-    return targetGender == Gender.male ? terms.spouseOfMale : terms.spouseOfFemale;
+    if (targetGender == Gender.male) return terms.spouseOfMale;
+    if (targetGender == Gender.female) return terms.spouseOfFemale;
+    return null;
   }
 
   if (viewerGenderDependentCodes.contains(code)) {
@@ -95,9 +111,9 @@ String localizeRelationCode(
 
 /// Convenience wrapper combining [kinshipLocaleCodeFor] + [localizeRelationCode]
 /// for widget code — pass the raw `Locale?` from `LocaleProvider` directly.
-String relationLabelFor({
+String? relationLabelFor({
   required String relationCode,
-  required Gender targetGender,
+  Gender? targetGender,
   Gender? viewerGender,
   required Locale? appLocale,
 }) =>

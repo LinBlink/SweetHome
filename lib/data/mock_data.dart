@@ -46,10 +46,10 @@ class MockDataSource {
 
   static final Map<int, Color> _avatarColorByMemberId = {
     1: AppColors.primary,
-    2: AppColors.avatarColors[1],
-    3: AppColors.avatarColors[3],
-    4: AppColors.avatarColors[2],
-    5: AppColors.avatarColors[4],
+    2: AppColors.avatarColorFor(2),
+    3: AppColors.avatarColorFor(3),
+    4: AppColors.avatarColorFor(4),
+    5: AppColors.avatarColorFor(5),
   };
 
   static Color avatarColorFor(int memberId) => _avatarColorByMemberId[memberId] ?? AppColors.primary;

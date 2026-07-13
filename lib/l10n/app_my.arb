@@ -85,6 +85,9 @@
   "editProfileTitle": "ကိုယ်ရေးအချက်အလက် တည်းဖြတ်ရန်",
   "editProfileNicknameLabel": "အမည်",
   "editProfileSave": "သိမ်းရန်",
+  "editProfileChangeAvatar": "ပုံပြောင်းရန်",
+  "editProfileAvatarUploading": "တင်နေသည်…",
+  "editProfileAvatarFailed": "တင်ခြင်း မအောင်မြင်ပါ။ ထပ်ကြိုးစားပါ",
 
   "inviteGenerate": "ဖိတ်ခေါ်ရန်",
   "inviteCodeLabel": "ဖိတ်ခေါ်ကုဒ်",

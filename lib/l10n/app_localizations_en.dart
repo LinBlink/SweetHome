@@ -243,6 +243,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editProfileSave => 'Save';
 
   @override
+  String get editProfileChangeAvatar => 'Change Avatar';
+
+  @override
+  String get editProfileAvatarUploading => 'Uploading…';
+
+  @override
+  String get editProfileAvatarFailed => 'Upload failed, please try again';
+
+  @override
   String get inviteGenerate => 'Invite';
 
   @override

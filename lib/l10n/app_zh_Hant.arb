@@ -85,6 +85,9 @@
   "editProfileTitle": "編輯資料",
   "editProfileNicknameLabel": "暱稱",
   "editProfileSave": "儲存",
+  "editProfileChangeAvatar": "更換頭像",
+  "editProfileAvatarUploading": "上傳中…",
+  "editProfileAvatarFailed": "上傳失敗，請重試",
 
   "inviteGenerate": "邀請",
   "inviteCodeLabel": "邀請碼",

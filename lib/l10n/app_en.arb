@@ -88,6 +88,9 @@
   "editProfileTitle": "Edit Profile",
   "editProfileNicknameLabel": "Nickname",
   "editProfileSave": "Save",
+  "editProfileChangeAvatar": "Change Avatar",
+  "editProfileAvatarUploading": "Uploading…",
+  "editProfileAvatarFailed": "Upload failed, please try again",
 
   "inviteGenerate": "Invite",
   "inviteCodeLabel": "Invite Code",

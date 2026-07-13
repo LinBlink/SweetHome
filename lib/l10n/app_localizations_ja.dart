@@ -235,6 +235,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editProfileSave => '保存';
 
   @override
+  String get editProfileChangeAvatar => 'アバターを変更';
+
+  @override
+  String get editProfileAvatarUploading => 'アップロード中…';
+
+  @override
+  String get editProfileAvatarFailed => 'アップロードに失敗しました。もう一度お試しください';
+
+  @override
   String get inviteGenerate => '招待';
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/avatar_label.dart';
 import '../../core/error_messages.dart';
 import '../../core/kinship/kinship_graph.dart';
 import '../../core/kinship/kinship_localizer.dart';
@@ -94,17 +95,20 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
                   final member = members[i];
                   return ListTile(
                     leading: AvatarWidget(
-                      label: member.name.isNotEmpty ? member.name.substring(0, 1) : '?',
-                      color: AppColors.avatarColors[member.userId % AppColors.avatarColors.length],
+                      label: memberAvatarLabel(member.name),
+                      color: AppColors.avatarColorFor(member.userId),
+                      imageUrl: member.avatarUrl,
                       radius: 22,
                     ),
                     title: Text(member.name),
-                    subtitle: Text(relationLabelFor(
-                      relationCode: member.relationCode,
-                      targetGender: member.gender,
-                      viewerGender: viewerGender,
-                      appLocale: appLocale,
-                    )),
+                    subtitle: Text(
+                      relationLabelFor(
+                        relationCode: member.relationCode,
+                        targetGender: member.gender,
+                        viewerGender: viewerGender,
+                        appLocale: appLocale,
+                      ) ?? '',
+                    ),
                     onTap: () => _startChat(member),
                   );
                 },

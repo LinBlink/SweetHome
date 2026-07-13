@@ -174,6 +174,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   ),
                 );
               }
+              // Convention: messages are stored ASC (oldest first, newest
+              // last). With reverse: true, item i=0 paints at the visual
+              // bottom — so the list's last element (newest) sits there.
               final msg = messages[messages.length - 1 - i];
               return MessageBubble(message: msg);
             },

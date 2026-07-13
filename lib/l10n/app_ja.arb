@@ -85,6 +85,9 @@
   "editProfileTitle": "プロフィール編集",
   "editProfileNicknameLabel": "ニックネーム",
   "editProfileSave": "保存",
+  "editProfileChangeAvatar": "アバターを変更",
+  "editProfileAvatarUploading": "アップロード中…",
+  "editProfileAvatarFailed": "アップロードに失敗しました。もう一度お試しください",
 
   "inviteGenerate": "招待",
   "inviteCodeLabel": "招待コード",

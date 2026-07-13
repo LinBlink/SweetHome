@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/avatar_label.dart';
 import '../core/invite_expiry.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
@@ -128,16 +129,18 @@ class _MemberTile extends StatelessWidget {
 
   const _MemberTile({required this.member, required this.l10n});
 
-  Color get _avatarColor =>
-      AppColors.avatarColors[member.userId % AppColors.avatarColors.length];
-
-  String get _avatarInitial =>
-      member.name.isNotEmpty ? member.name.substring(0, 1) : '?';
+  // Falls back to the member's name abbreviation (see
+  // `memberAvatarLabel`) when no `avatarUrl` is set or the image fails
+  // to load — the AvatarWidget's `errorBuilder` handles the latter.
+  String get _avatarLabel => memberAvatarLabel(member.name);
 
   @override
   Widget build(BuildContext context) {
     final appLocale = context.watch<LocaleProvider>().locale;
-    final viewerGender = genderFromString(context.watch<AuthProvider>().currentUser?.gender);
+    final auth = context.watch<AuthProvider>();
+    final viewerGender = genderFromString(auth.currentUser?.gender);
+    final avatarColor =
+        AppColors.avatarColorFor(member.userId, selfUserId: auth.currentUser?.userId);
     final relationLabel = relationLabelFor(
       relationCode: member.relationCode,
       targetGender: member.gender,
@@ -151,7 +154,12 @@ class _MemberTile extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              AvatarWidget(label: _avatarInitial, color: _avatarColor, radius: 26),
+              AvatarWidget(
+                label: _avatarLabel,
+                color: avatarColor,
+                imageUrl: member.avatarUrl,
+                radius: 26,
+              ),
               Positioned(
                 right: -1,
                 bottom: -1,
@@ -195,7 +203,7 @@ class _MemberTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  relationLabel,
+                  relationLabel ?? '',
                   style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
               ],

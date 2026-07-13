@@ -1,7 +1,44 @@
 import 'package:flutter/material.dart';
 import '../core/kinship/kinship_graph.dart';
 
-enum MessageType { text, image, voice, system }
+enum MessageType {
+  text,
+  image,
+  voice,
+  system;
+
+  /// Maps the API's `messageType` string (`"TEXT"` / `"IMAGE"` / `"VOICE"`)
+  /// to this enum. Case-insensitive; unknown values fall back to [text].
+  /// See docs/api.md §4.3/§5.2.
+  static MessageType fromApi(String? raw) {
+    switch (raw?.toUpperCase()) {
+      case 'TEXT':
+        return MessageType.text;
+      case 'IMAGE':
+        return MessageType.image;
+      case 'VOICE':
+        return MessageType.voice;
+      case 'SYSTEM':
+        return MessageType.system;
+      default:
+        return MessageType.text;
+    }
+  }
+
+  /// Inverse of [fromApi] — wire value for outbound WS frames and REST bodies.
+  String get apiValue {
+    switch (this) {
+      case MessageType.text:
+        return 'TEXT';
+      case MessageType.image:
+        return 'IMAGE';
+      case MessageType.voice:
+        return 'VOICE';
+      case MessageType.system:
+        return 'SYSTEM';
+    }
+  }
+}
 
 class Conversation {
   final int id;
@@ -9,6 +46,7 @@ class Conversation {
   final bool isGroup;
   final String avatarLabel;
   final Color avatarColor;
+  final String? avatarUrl;
   final String lastMessage;
   final DateTime lastMessageAt;
   final int unreadCount;
@@ -35,6 +73,7 @@ class Conversation {
     required this.isGroup,
     required this.avatarLabel,
     required this.avatarColor,
+    this.avatarUrl,
     required this.lastMessage,
     required this.lastMessageAt,
     required this.unreadCount,
@@ -52,6 +91,7 @@ class Conversation {
       avatarLabel: json['avatarLabel'] as String? ?? '家',
       avatarColor: Color(
           int.parse((json['avatarColor'] as String? ?? 'FFBF5E3B'), radix: 16)),
+      avatarUrl: json['avatarUrl'] as String?,
       lastMessage: json['lastMessage'] as String? ?? '',
       // A freshly created conversation (see docs/api.md §4.2) has no messages
       // yet, so the backend returns a null lastMessageAt — fall back to "now"
@@ -75,6 +115,7 @@ class Conversation {
       isGroup: isGroup,
       avatarLabel: avatarLabel,
       avatarColor: avatarColor,
+      avatarUrl: avatarUrl,
       lastMessage: lastMessage ?? this.lastMessage,
       lastMessageAt: lastMessageAt ?? this.lastMessageAt,
       unreadCount: unreadCount ?? this.unreadCount,
@@ -93,6 +134,7 @@ class Message {
   final int senderId;
   final String senderName;
   final String senderAvatarLabel;
+  final String? senderAvatarUrl;
   final Color senderAvatarColor;
   final String content;
   final MessageType type;
@@ -117,6 +159,7 @@ class Message {
     required this.senderId,
     required this.senderName,
     required this.senderAvatarLabel,
+    this.senderAvatarUrl,
     required this.senderAvatarColor,
     required this.content,
     required this.type,
@@ -137,9 +180,10 @@ class Message {
       senderId: senderId,
       senderName: json['senderName'] as String? ?? '',
       senderAvatarLabel: json['senderAvatarLabel'] as String? ?? '?',
+      senderAvatarUrl: json['senderAvatarUrl'] as String?,
       senderAvatarColor: const Color(0xFFBF5E3B),
       content: json['content'] as String,
-      type: MessageType.text,
+      type: MessageType.fromApi(json['messageType'] as String?),
       sentAt: DateTime.parse(json['sentAt'] as String),
       isMe: senderId == currentUserId,
       senderRelationCode: json['senderRelationCode'] as String?,
@@ -154,16 +198,18 @@ class Message {
         'senderId': senderId,
         'senderName': senderName,
         'content': content,
+        'messageType': type.apiValue,
         'sentAt': sentAt.toIso8601String(),
       };
 
-  Message copyWith({int? serverId, bool? isPending}) => Message(
+  Message copyWith({int? serverId, bool? isPending, String? senderAvatarUrl}) => Message(
         clientId: clientId,
         serverId: serverId ?? this.serverId,
         conversationId: conversationId,
         senderId: senderId,
         senderName: senderName,
         senderAvatarLabel: senderAvatarLabel,
+        senderAvatarUrl: senderAvatarUrl ?? this.senderAvatarUrl,
         senderAvatarColor: senderAvatarColor,
         content: content,
         type: type,

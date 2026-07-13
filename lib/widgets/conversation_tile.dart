@@ -28,7 +28,7 @@ class ConversationTile extends StatelessWidget {
     if (relationCode != null) {
       relationLabel = relationLabelFor(
         relationCode: relationCode,
-        targetGender: conversation.otherUserGender ?? Gender.male,
+        targetGender: conversation.otherUserGender,
         viewerGender: genderFromString(context.watch<AuthProvider>().currentUser?.gender),
         appLocale: context.watch<LocaleProvider>().locale,
       );
@@ -104,12 +104,14 @@ class ConversationTile extends StatelessWidget {
       return GroupAvatarWidget(
         label: conversation.avatarLabel,
         memberCount: conversation.memberCount,
+        imageUrl: conversation.avatarUrl,
         radius: 26,
       );
     }
     final avatar = AvatarWidget(
       label: conversation.avatarLabel,
       color: conversation.avatarColor,
+      imageUrl: conversation.avatarUrl,
       radius: 26,
     );
     final otherUserId = conversation.otherUserId;

@@ -22,7 +22,7 @@ class MessageBubble extends StatelessWidget {
     if (senderRelationCode != null) {
       senderRelationLabel = relationLabelFor(
         relationCode: senderRelationCode,
-        targetGender: message.senderGender ?? Gender.male,
+        targetGender: message.senderGender,
         viewerGender: genderFromString(context.watch<AuthProvider>().currentUser?.gender),
         appLocale: context.watch<LocaleProvider>().locale,
       );
@@ -38,6 +38,7 @@ class MessageBubble extends StatelessWidget {
             AvatarWidget(
               label: message.senderAvatarLabel,
               color: message.senderAvatarColor,
+              imageUrl: message.senderAvatarUrl,
               radius: 18,
             ),
             const SizedBox(width: 8),
@@ -100,6 +101,7 @@ class MessageBubble extends StatelessWidget {
             AvatarWidget(
               label: message.senderAvatarLabel,
               color: AppColors.primary,
+              imageUrl: message.senderAvatarUrl,
               radius: 18,
             ),
           ],

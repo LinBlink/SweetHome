@@ -70,12 +70,17 @@ class ChatService {
     String content,
     String clientId, {
     required int currentUserId,
+    MessageType type = MessageType.text,
   }) async {
     final resp = await http
         .post(
           Uri.parse('${AppConfig.apiBaseUrl}/conversations/$conversationId/messages'),
           headers: _headers,
-          body: jsonEncode({'content': content, 'type': 'text', 'clientId': clientId}),
+          body: jsonEncode({
+            'content': content,
+            'type': type.apiValue,
+            'clientId': clientId,
+          }),
         )
         .timeout(const Duration(seconds: 10));
     final data = ApiClient.unwrap(resp) as Map<String, dynamic>;

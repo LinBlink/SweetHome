@@ -550,6 +550,24 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get editProfileSave;
 
+  /// No description provided for @editProfileChangeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Avatar'**
+  String get editProfileChangeAvatar;
+
+  /// No description provided for @editProfileAvatarUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get editProfileAvatarUploading;
+
+  /// No description provided for @editProfileAvatarFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed, please try again'**
+  String get editProfileAvatarFailed;
+
   /// No description provided for @inviteGenerate.
   ///
   /// In en, this message translates to:

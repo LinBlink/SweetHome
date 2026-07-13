@@ -27,7 +27,11 @@ class ProfileScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (_) => const EditProfileScreen()),
             ),
-            child: _buildProfileHeader(user?.name ?? '', user?.familyName ?? ''),
+            child: _buildProfileHeader(
+              name: user?.name ?? '',
+              familyName: user?.familyName ?? '',
+              avatarUrl: user?.avatarUrl,
+            ),
           ),
           const SizedBox(height: 8),
           ListTile(
@@ -72,7 +76,11 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(String name, String familyName) {
+  Widget _buildProfileHeader({
+    required String name,
+    required String familyName,
+    String? avatarUrl,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
@@ -88,6 +96,7 @@ class ProfileScreen extends StatelessWidget {
           AvatarWidget(
             label: name.isEmpty ? '家' : name[0],
             color: AppColors.primaryDark,
+            imageUrl: avatarUrl,
             radius: 40,
           ),
           const SizedBox(height: 16),

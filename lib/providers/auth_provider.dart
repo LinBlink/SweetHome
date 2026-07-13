@@ -32,10 +32,18 @@ class AuthProvider extends ChangeNotifier {
       _currentUser = await AuthService.loadUser();
     } catch (_) {
       _currentUser = null;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+    // Best-effort: refresh from /users/me so persisted-but-stale fields
+    // (gender, avatarUrl) catch up if a previous session left them empty.
+    if (_currentUser != null) {
+      try {
+        final fresh = await AuthService.fetchMe(_currentUser!);
+        _currentUser = fresh;
+        await AuthService.persistUser(_currentUser!);
+      } catch (_) {}
+    }
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> login(String phone, String password) async {
@@ -49,6 +57,15 @@ class AuthProvider extends ChangeNotifier {
       } else {
         _currentUser =
             await AuthService.login(LoginRequest(phone: phone, password: password));
+        // The §1.2 login response omits `gender` and `avatarUrl`; follow up
+        // with §2.1 to populate them so kinship localization (S.F#male vs
+        // S.F#female) and the profile-screen avatar render correctly. A
+        // failure here is non-fatal — the user is already authenticated.
+        try {
+          final fresh = await AuthService.fetchMe(_currentUser!);
+          _currentUser = fresh;
+          await AuthService.persistUser(_currentUser!);
+        } catch (_) {}
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -90,6 +107,13 @@ class AuthProvider extends ChangeNotifier {
             relationType: relationType,
           ),
         );
+        // §1.1 register response omits `gender`/`avatarUrl`; follow up with
+        // §2.1 (best-effort, just like login above).
+        try {
+          final fresh = await AuthService.fetchMe(_currentUser!);
+          _currentUser = fresh;
+          await AuthService.persistUser(_currentUser!);
+        } catch (_) {}
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -135,6 +159,46 @@ class AuthProvider extends ChangeNotifier {
       await AuthService.persistUser(_currentUser!);
     }
     notifyListeners();
+  }
+
+  /// `POST /users/upload/avatar` (docs/api.md §2.3). The [bytes] should be
+  /// the picked file's content; [filename] is forwarded as the multipart
+  /// part's filename and [contentType] as the part's Content-Type header
+  /// (the backend's `UploadServiceImpl` reads `getContentType()` to
+  /// enforce its `image/*` rule — passing it explicitly is the only way
+  /// to guarantee that check sees a real `image/...` MIME, regardless of
+  /// what the `http` package would otherwise infer from the filename).
+  /// On success the local [AuthUser]'s `avatarUrl` is updated and
+  /// persisted, and the new URL is returned.
+  ///
+  /// In mock mode there's no backend to upload to, so we synthesize a
+  /// fake URL to drive the same UI path.
+  Future<String?> uploadAvatar({
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) async {
+    final user = _currentUser;
+    if (user == null) return null;
+    if (AppConfig.mockMode) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      final fakeUrl =
+          'https://mock.local/avatars/${user.userId}-${DateTime.now().millisecondsSinceEpoch}.jpg';
+      _currentUser = user.copyWith(avatarUrl: fakeUrl);
+      await AuthService.persistUser(_currentUser!);
+      notifyListeners();
+      return fakeUrl;
+    }
+    final url = await AuthService.uploadAvatar(
+      user,
+      bytes: bytes,
+      filename: filename,
+      contentType: contentType,
+    );
+    _currentUser = user.copyWith(avatarUrl: url);
+    await AuthService.persistUser(_currentUser!);
+    notifyListeners();
+    return url;
   }
 
   /// Joins a different family via invite code while already logged in — see

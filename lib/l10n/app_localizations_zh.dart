@@ -235,6 +235,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editProfileSave => '保存';
 
   @override
+  String get editProfileChangeAvatar => '更换头像';
+
+  @override
+  String get editProfileAvatarUploading => '上传中…';
+
+  @override
+  String get editProfileAvatarFailed => '上传失败，请重试';
+
+  @override
   String get inviteGenerate => '邀请';
 
   @override
@@ -605,6 +614,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get editProfileSave => '保存';
 
   @override
+  String get editProfileChangeAvatar => '更换头像';
+
+  @override
+  String get editProfileAvatarUploading => '上传中…';
+
+  @override
+  String get editProfileAvatarFailed => '上传失败，请重试';
+
+  @override
   String get inviteGenerate => '邀请';
 
   @override
@@ -973,6 +991,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get editProfileSave => '儲存';
+
+  @override
+  String get editProfileChangeAvatar => '更換頭像';
+
+  @override
+  String get editProfileAvatarUploading => '上傳中…';
+
+  @override
+  String get editProfileAvatarFailed => '上傳失敗，請重試';
 
   @override
   String get inviteGenerate => '邀請';

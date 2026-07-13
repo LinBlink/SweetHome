@@ -51,6 +51,7 @@ class AuthUser {
   final String familyName;
   final String role;
   final String gender;
+  final String? avatarUrl;
 
   const AuthUser({
     required this.token,
@@ -62,8 +63,14 @@ class AuthUser {
     required this.familyName,
     required this.role,
     required this.gender,
+    this.avatarUrl,
   });
 
+  /// Parses the §1.1 / §1.2 register / login response envelope. Those
+  /// responses do **not** include `gender` or `avatarUrl` — callers should
+  /// follow up with `GET /users/me` (§2.1) to populate them, otherwise the
+  /// viewer-gender-dependent kinship terms and the profile-screen avatar
+  /// will fall back to defaults.
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>? ?? json;
     return AuthUser(
@@ -76,6 +83,7 @@ class AuthUser {
       familyName: user['familyName'] as String,
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
+      avatarUrl: user['avatarUrl'] as String?,
     );
   }
 
@@ -96,10 +104,19 @@ class AuthUser {
       familyName: user['familyName'] as String,
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
+      avatarUrl: user['avatarUrl'] as String?,
     );
   }
 
-  AuthUser copyWith({String? token, String? name, int? familyId, String? familyName, String? role}) =>
+  AuthUser copyWith({
+    String? token,
+    String? name,
+    int? familyId,
+    String? familyName,
+    String? role,
+    String? gender,
+    String? avatarUrl,
+  }) =>
       AuthUser(
         token: token ?? this.token,
         refreshToken: refreshToken,
@@ -109,7 +126,8 @@ class AuthUser {
         familyId: familyId ?? this.familyId,
         familyName: familyName ?? this.familyName,
         role: role ?? this.role,
-        gender: gender,
+        gender: gender ?? this.gender,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
       );
 
   Map<String, String> toPrefs() => {
@@ -122,6 +140,8 @@ class AuthUser {
         'familyName': familyName,
         'role': role,
         'gender': gender,
+        // ignore: use_null_aware_elements
+        if (avatarUrl != null) 'avatarUrl': avatarUrl!,
       };
 
   static AuthUser? fromPrefs(Map<String, String?> prefs) {
@@ -136,6 +156,7 @@ class AuthUser {
       familyName: prefs['familyName'] ?? '',
       role: prefs['role'] ?? 'member',
       gender: prefs['gender'] ?? 'male',
+      avatarUrl: prefs['avatarUrl'],
     );
   }
 }
