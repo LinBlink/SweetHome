@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sweethome_flutter"
+    namespace = "asia.sweethome"
     // Multiple plugins (image_picker_android, geolocator_android,
     // shared_preferences_android, flutter_plugin_android_lifecycle)
     // and their transitive androidx.* deps now require
@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.sweethome_flutter"
+        applicationId = "asia.sweethome"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

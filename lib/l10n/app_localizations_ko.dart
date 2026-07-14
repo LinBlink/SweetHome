@@ -610,4 +610,202 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get countryTaiwan => '대만';
+
+  @override
+  String get chatRoomSendImageTooltip => '이미지 보내기';
+
+  @override
+  String get chatRoomImageUploading => '이미지 업로드 중…';
+
+  @override
+  String get chatRoomImageUploadFailed => '이미지를 보낼 수 없습니다';
+
+  @override
+  String get chatMessageTypeImage => '[이미지]';
+
+  @override
+  String get chatMessageTypeVoice => '[음성]';
+
+  @override
+  String get chatMessageTypeSystem => '[시스템]';
+
+  @override
+  String get locationHistoryTitle => '오늘의 이동 경로';
+
+  @override
+  String get locationHistoryEmpty => '이 날의 이동 경로 데이터가 없습니다';
+
+  @override
+  String get locationHistoryEmptyDesc => '선택한 날짜에 구성원이 위치를 보고하지 않았습니다.';
+
+  @override
+  String get profileMe => '나';
+
+  @override
+  String get locationHistoryPickDate => '날짜 선택';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '경로 포인트 $count개';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name의 이동 경로';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date 이동 경로';
+  }
+
+  @override
+  String get locationHistoryView => '경로 보기';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return '배터리 $percent%';
+  }
+
+  @override
+  String get fenceListTitle => '지오펜스';
+
+  @override
+  String get fenceListEmpty => '지오펜스가 없습니다';
+
+  @override
+  String get fenceListGuardingGroup => '내가 지킴';
+
+  @override
+  String get fenceListGuardedGroup => '지켜주는 사람';
+
+  @override
+  String get fenceListNoGuarding => '아직 설정한 지오펜스가 없습니다.';
+
+  @override
+  String get fenceListNoGuarded => '아직 나를 위한 지오펜스를 설정한 가족이 없습니다.';
+
+  @override
+  String get fenceListEmptyDesc =>
+      '가족이 영역에 들어가거나 나올 때 알림을 받을 수 있는 안전 구역을 추가하세요.';
+
+  @override
+  String get fenceCreateTitle => '지오펜스 추가';
+
+  @override
+  String get fenceNameLabel => '펜스 이름';
+
+  @override
+  String get fenceNameHint => '예: 학교, 집';
+
+  @override
+  String get fenceRangeLabel => '반경 (미터)';
+
+  @override
+  String get fenceRangeHint => '예: 200';
+
+  @override
+  String get fenceInvalidRange => '반경은 0보다 커야 합니다';
+
+  @override
+  String get fencePickLocationTitle => '지도에서 중심점 선택';
+
+  @override
+  String get fencePickLocationHint => '지도를 탭하여 중심점을 놓고 반경을 설정하세요.';
+
+  @override
+  String get fencePickLocationSelected => '중심점이 설정됨';
+
+  @override
+  String get fencePickLocationRequired => '지도에서 중심점을 선택해주세요';
+
+  @override
+  String get fenceTargetLabel => '관찰 대상';
+
+  @override
+  String get fenceCreatedBy => '설정자';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '생성일 $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return '반경 ${meters}m';
+  }
+
+  @override
+  String get fenceCreateButton => '생성';
+
+  @override
+  String get fenceCreateSuccess => '지오펜스가 생성되었습니다';
+
+  @override
+  String get fenceDelete => '삭제';
+
+  @override
+  String get fenceDeleteConfirm => '이 지오펜스를 삭제하시겠습니까?';
+
+  @override
+  String get fenceDeleteSuccess => '지오펜스가 삭제되었습니다';
+
+  @override
+  String get fenceNoWatchableMembers => '관찰할 가족 구성원이 없습니다';
+
+  @override
+  String get fenceAlarmsTitle => '지오펜스 알림';
+
+  @override
+  String get fenceAlarmEmpty => '알림 없음';
+
+  @override
+  String get fenceAlarmEmptyDesc => '관찰 중인 가족이 펜스를 출입하면 여기에 알림이 표시됩니다.';
+
+  @override
+  String get fenceAlarmInside => '진입';
+
+  @override
+  String get fenceAlarmOutside => '이탈';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return '알림 시각 $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => '지오펜스';
+
+  @override
+  String get myHomeFenceDesc => '가족의 안전 영역을 설정하고 출입 알림 받기';
+
+  @override
+  String get myHomeFenceAlarmsEntry => '지오펜스 알림';
+
+  @override
+  String get myHomeFenceAlarmsDesc => '가족의 펜스 출입 기록 확인';
+
+  @override
+  String get locationHubTitle => '실시간 위치';
+
+  @override
+  String get locationHubSubtitle => '가족의 실시간 위치, 이동 경로, 지오펜스 및 알림';
+
+  @override
+  String get locationHubLiveMapDesc => '가족 구성원의 현재 위치를 확인하세요';
+
+  @override
+  String get locationHubHistoryDesc => '구성원의 하루 이동 경로 확인';
+
+  @override
+  String get locationHubFenceDesc => '안전 영역을 설정하고 출입 알림 받기';
+
+  @override
+  String get locationHubFenceAlarmsDesc => '가족의 펜스 출입 기록 확인';
+
+  @override
+  String get profileJoinRequestsRow => '가입 요청';
+
+  @override
+  String get profileJoinRequestsAdminOnly => '관리자만';
 }

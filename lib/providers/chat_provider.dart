@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:uuid/uuid.dart';
 import '../core/app_config.dart';
 import '../core/app_colors.dart';
@@ -7,6 +8,7 @@ import '../data/mock_data.dart';
 import '../models/api_exception.dart';
 import '../models/chat_models.dart';
 import '../models/auth_models.dart';
+import '../services/auth_service.dart';
 import '../services/chat_service.dart';
 import '../services/websocket_service.dart';
 
@@ -147,8 +149,9 @@ class ChatProvider extends ChangeNotifier {
     if (_loadingMessages[conversationId] == true) return;
     if (loadMore &&
         _cursors[conversationId] == null &&
-        _messages[conversationId] != null)
+        _messages[conversationId] != null) {
       return;
+    }
 
     _loadingMessages[conversationId] = true;
     notifyListeners();
@@ -206,8 +209,9 @@ class ChatProvider extends ChangeNotifier {
     int? lastServerId;
     for (final m in msgs) {
       final id = m.serverId;
-      if (id != null && (lastServerId == null || id > lastServerId))
+      if (id != null && (lastServerId == null || id > lastServerId)) {
         lastServerId = id;
+      }
     }
     if (lastServerId == null) return;
     _ws.send(
@@ -251,23 +255,12 @@ class ChatProvider extends ChangeNotifier {
         final confirmed = optimistic.copyWith(isPending: false);
         _replaceOptimistic(conversationId, clientId, confirmed);
       } else {
-        // `WebSocketService.send` is a silent no-op when the socket is
-        // down — it never throws — so without this check a disconnected
-        // client would never fall through to the REST fallback below and
-        // the optimistic message would stay `isPending: true` forever.
-        if (!_ws.isConnected) {
-          throw StateError('WebSocket not connected');
-        }
-        final wsMsg = WsOutboundMessage(
-          type: 'SEND_MESSAGE',
-          payload: {
-            'conversationId': conversationId,
-            'content': content,
-            'messageType': MessageType.text.apiValue,
-            'clientId': clientId,
-          },
+        await _sendOverWire(
+          conversationId: conversationId,
+          content: content,
+          type: MessageType.text,
+          clientId: clientId,
         );
-        _ws.send(wsMsg);
       }
     } catch (_) {
       if (!AppConfig.mockMode) {
@@ -341,7 +334,11 @@ class ChatProvider extends ChangeNotifier {
         } else {
           _messages[m.conversationId]!.add(m);
         }
-        _updateConversationLastMessage(m.conversationId, m.content);
+        _updateConversationLastMessage(
+          m.conversationId,
+          m.content,
+          type: m.type,
+        );
         notifyListeners();
         // The user is actively looking at this conversation right now —
         // advance the read cursor immediately instead of waiting for the
@@ -376,13 +373,160 @@ class ChatProvider extends ChangeNotifier {
     if (idx >= 0) list[idx] = replacement;
   }
 
-  void _updateConversationLastMessage(int convId, String content) {
+  void _updateConversationLastMessage(
+    int convId,
+    String content, {
+    MessageType? type,
+  }) {
     final idx = _conversations.indexWhere((c) => c.id == convId);
     if (idx >= 0) {
       _conversations[idx] = _conversations[idx].copyWith(
         lastMessage: content,
         lastMessageAt: DateTime.now(),
+        lastMessageType: type,
       );
+    }
+  }
+
+  /// `POST /users/upload/image` (docs/api.md §2.4) → `SEND_MESSAGE`
+  /// with `type=image` (docs/api.md §4.4/§5.2). The upload and the
+  /// message send are two independent steps — the upload returns a
+  /// URL, and that URL is the `content` of the chat message. We do
+  /// them sequentially inside the provider so the call site only sees
+  /// one "send image" button.
+  ///
+  /// Returns `true` on success (the optimistic message has been
+  /// reconciled with the server's confirmation), `false` on any
+  /// failure. The optimistic message stays in the list either way;
+  /// failures flip `isPending` back to `false` so the bubble doesn't
+  /// stay in the perpetual-pending state.
+  ///
+  /// [contentType] follows the same magic-byte sniffing pattern as
+  /// avatar upload — see `AuthService.uploadAvatar`.
+  Future<bool> sendImageMessage(
+    int conversationId, {
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) async {
+    final clientId = _uuid.v4();
+    final optimistic = Message(
+      clientId: clientId,
+      conversationId: conversationId,
+      senderId: _currentUser.userId,
+      senderName: _currentUser.name,
+      senderAvatarLabel: _currentUser.name.isNotEmpty
+          ? _currentUser.name[0]
+          : '我',
+      senderAvatarColor: AppColors.primary,
+      content: '',
+      type: MessageType.image,
+      sentAt: DateTime.now(),
+      isMe: true,
+      isPending: true,
+    );
+
+    _messages[conversationId] ??= [];
+    _messages[conversationId]!.add(optimistic);
+    _updateConversationLastMessage(
+      conversationId,
+      optimistic.content,
+      type: MessageType.image,
+    );
+    notifyListeners();
+
+    try {
+      String imageUrl;
+      if (AppConfig.mockMode) {
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+        imageUrl = 'https://mock.local/photos/${_currentUser.userId}-$clientId.jpg';
+      } else {
+        // Compress before upload. image_picker's maxWidth/quality
+        // args only kick in on iOS/Android; on Web the picker hands
+        // us the raw original bytes, which routinely busts the §2.4
+        // 1 MB cap on phone camera rolls. flutter_image_compress
+        // runs on every platform (native uses libjpeg-turbo, web uses
+        // a WASM codec), so this single call covers all targets.
+        // Output as JPEG regardless of source format — keeps the
+        // decoded payload small and consistent with the rest of the
+        // media pipeline.
+        final compressed = await _compressForUpload(bytes);
+        imageUrl = await AuthService.uploadImage(
+          _currentUser,
+          bytes: compressed,
+          filename: filename,
+          contentType: 'image/jpeg',
+        );
+      }
+      final replacement = optimistic.copyWith(
+        isPending: false,
+        senderAvatarUrl: _currentUser.avatarUrl,
+        content: imageUrl,
+      );
+      _replaceOptimistic(conversationId, clientId, replacement);
+      _updateConversationLastMessage(
+        conversationId,
+        imageUrl,
+        type: MessageType.image,
+      );
+      notifyListeners();
+      if (!AppConfig.mockMode) {
+        await _sendOverWire(
+          conversationId: conversationId,
+          content: imageUrl,
+          type: MessageType.image,
+          clientId: clientId,
+        );
+      }
+      return true;
+    } catch (_) {
+      _replaceOptimistic(
+        conversationId,
+        clientId,
+        optimistic.copyWith(isPending: false),
+      );
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> _sendOverWire({
+    required int conversationId,
+    required String content,
+    required MessageType type,
+    required String clientId,
+  }) async {
+    if (_ws.isConnected) {
+      _ws.send(
+        WsOutboundMessage(
+          type: 'SEND_MESSAGE',
+          payload: {
+            'conversationId': conversationId,
+            'content': content,
+            'messageType': type.apiValue,
+            'clientId': clientId,
+          },
+        ),
+      );
+      return;
+    }
+    try {
+      final sent = await _chatService.sendMessage(
+        conversationId,
+        content,
+        clientId,
+        currentUserId: _currentUser.userId,
+        type: type,
+      );
+      _replaceOptimistic(conversationId, clientId, sent);
+      notifyListeners();
+    } on ApiException catch (e) {
+      _handleApiException(e);
+    } catch (_) {
+      // Best-effort: the optimistic message has already been
+      // reconciled with the original uploaded URL; if the fallback
+      // REST send fails, we leave the bubble as-is. The server
+      // likely has it anyway (upload succeeded).
     }
   }
 
@@ -395,6 +539,38 @@ class ChatProvider extends ChangeNotifier {
     _connectionError = null;
     _ws.connect();
     notifyListeners();
+  }
+
+  /// Lossy re-encode aimed at the §2.4 1 MB cap. Caps the longer
+  /// edge at 1280 px (the same ceiling `image_picker` already uses
+  /// on iOS/Android, so on those platforms this is typically a
+  /// no-op resize but always a re-encode) and targets quality 80,
+  /// which is the conventional JPEG sweet spot — barely
+  /// distinguishable from the original at chat-bubble viewing
+  /// size, and usually 5–10× smaller than the input on a phone
+  /// camera photo.
+  ///
+  /// If the compressor itself fails (rare — only happens on
+  /// malformed source bytes that `detectImageMimeType` couldn't
+  /// classify), we fall back to the original bytes rather than
+  /// failing the whole send. The picker should already have
+  /// produced a valid image, but if the upload would have worked
+  /// without compression it shouldn't be compression's fault it
+  /// doesn't.
+  Future<Uint8List> _compressForUpload(Uint8List bytes) async {
+    try {
+      final out = await FlutterImageCompress.compressWithList(
+        bytes,
+        minWidth: 1280,
+        minHeight: 1280,
+        quality: 80,
+        format: CompressFormat.jpeg,
+      );
+      if (out.isEmpty) return bytes;
+      return out;
+    } catch (_) {
+      return bytes;
+    }
   }
 
   @override

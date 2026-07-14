@@ -255,5 +255,95 @@
   "countryMyanmar": "Myanmar",
   "countryHongKong": "Hong Kong SAR",
   "countryMacau": "Macau SAR",
-  "countryTaiwan": "Taiwan"
+  "countryTaiwan": "Taiwan",
+  "chatRoomSendImageTooltip": "Send image",
+  "chatRoomImageUploading": "Uploading image…",
+  "chatRoomImageUploadFailed": "Couldn't send image",
+  "chatMessageTypeImage": "[Image]",
+  "chatMessageTypeVoice": "[Voice]",
+  "chatMessageTypeSystem": "[System]",
+  "locationHistoryTitle": "Today's Trajectory",
+  "locationHistoryEmpty": "No trajectory points for this day",
+  "locationHistoryEmptyDesc": "The member hasn't reported a location on the selected day.",
+  "profileMe": "Me",
+  "locationHistoryPickDate": "Pick date",
+  "locationHistoryPointCount": "{count} trajectory points",
+  "@locationHistoryPointCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "locationHistoryForMember": "{name}'s trajectory",
+  "locationHistoryForDate": "{date}",
+  "locationHistoryView": "View trajectory",
+  "locationHistoryBatteryLabel": "Battery {percent}%",
+  "fenceListTitle": "Geofences",
+  "fenceListEmpty": "No geofences yet",
+  "fenceListGuardingGroup": "I'm watching",
+  "fenceListGuardedGroup": "Watching me",
+  "fenceListNoGuarding": "You haven't set up any geofences yet.",
+  "fenceListNoGuarded": "No family member has set up a geofence for you.",
+  "fenceListEmptyDesc": "Add a fence to be notified when a family member enters or leaves it.",
+  "fenceCreateTitle": "Add Geofence",
+  "fenceNameLabel": "Fence name",
+  "fenceNameHint": "e.g. School, Home",
+  "fenceRangeLabel": "Radius (meters)",
+  "fenceRangeHint": "e.g. 200",
+  "fenceInvalidRange": "Radius must be greater than 0",
+  "fencePickLocationTitle": "Pick the fence center on the map",
+  "fencePickLocationHint": "Tap the map to place the center, then set a radius.",
+  "fencePickLocationSelected": "Center set",
+  "fencePickLocationRequired": "Please pick a center on the map",
+  "fenceTargetLabel": "Watched member",
+  "fenceCreatedBy": "Set by",
+  "fenceCreatedAt": "Created {date}",
+  "@fenceCreatedAt": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "fenceRadiusLabel": "Radius {meters} m",
+  "@fenceRadiusLabel": {
+    "placeholders": {
+      "meters": { "type": "int" }
+    }
+  },
+  "fenceCreateButton": "Create",
+  "fenceCreateSuccess": "Geofence created",
+  "fenceDelete": "Delete",
+  "fenceDeleteConfirm": "Delete this geofence?",
+  "fenceDeleteSuccess": "Geofence deleted",
+  "fenceNoWatchableMembers": "No family members to watch",
+  "fenceAlarmsTitle": "Geofence Alerts",
+  "fenceAlarmEmpty": "No alerts",
+  "fenceAlarmEmptyDesc": "You will be notified here when a member you watch leaves a fence.",
+  "fenceAlarmInside": "Entered",
+  "fenceAlarmOutside": "Left",
+  "fenceAlarmTime": "Triggered at {time}",
+  "@fenceAlarmTime": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "myHomeFenceEntry": "Geofences",
+  "myHomeFenceDesc": "Set safe zones and get notified when family enters or leaves",
+  "myHomeFenceAlarmsEntry": "Geofence Alerts",
+  "myHomeFenceAlarmsDesc": "History of when family entered or left a fence",
+  "myHomeFamilyTreeEntry": "Family Tree",
+  "myHomeFamilyTreeDesc": "A clean view of your whole family at a glance",
+  "familyTreeTitle": "Family Tree",
+  "familyTreeViewerYou": "You",
+  "familyTreeViewerLabel": "You",
+  "familyTreeEmpty": "No family members yet",
+  "familyTreeEmptyDesc": "Once your family joins, their relationships will appear here.",
+  "familyTreeOtherFamily": "Other relatives",
+  "familyTreeOtherFamilyDesc": "Plus {count} more family members shown as a list",
+  "locationHubTitle": "Real-time Location",
+  "locationHubSubtitle": "Live map, history, geofences and alerts for the whole family",
+  "locationHubLiveMapDesc": "See where each family member is right now",
+  "locationHubHistoryDesc": "View a member's movement for a chosen day",
+  "locationHubFenceDesc": "Set safe zones and get notified on entry or exit",
+  "locationHubFenceAlarmsDesc": "History of when family entered or left a fence",
+  "profileJoinRequestsRow": "Join Requests",
+  "profileJoinRequestsAdminOnly": "Admin only"
 }

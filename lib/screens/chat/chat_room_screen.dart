@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/error_messages.dart';
+import '../../core/image_mime.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/api_exception.dart';
 import '../../providers/chat_provider.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/message_bubble.dart';
@@ -25,6 +28,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final _textCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _canSend = false;
+  bool _uploadingImage = false;
 
   @override
   void initState() {
@@ -58,6 +62,66 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     await context.read<ChatProvider>().sendMessage(widget.conversationId, text);
     if (!mounted) return;
     _scrollToBottom();
+  }
+
+  /// Image-send path. The picker feeds us bytes which the provider
+  /// uploads via `POST /users/upload/image` (§2.4) and then sends as
+  /// a message via §4.4 (REST) or §5.2 (WS) with `type = "image"` and
+  /// `content = <r2-url>`. Disables the picker while an upload is in
+  /// flight so the user can't double-tap and queue two uploads for
+  /// the same conversation.
+  Future<void> _pickAndSendImage() async {
+    if (_uploadingImage) return;
+    final l10n = AppLocalizations.of(context)!;
+    final picker = ImagePicker();
+    final XFile? picked;
+    try {
+      picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1280,
+        maxHeight: 1280,
+        imageQuality: 80,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack(l10n.chatRoomImageUploadFailed);
+      return;
+    }
+    if (picked == null) return; // user cancelled
+    setState(() => _uploadingImage = true);
+    try {
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+      final contentType =
+          detectImageMimeType(bytes) ?? picked.mimeType ?? 'image/jpeg';
+      final messenger = ScaffoldMessenger.of(context);
+      final ok = await context.read<ChatProvider>().sendImageMessage(
+            widget.conversationId,
+            bytes: bytes,
+            filename: picked.name,
+            contentType: contentType,
+          );
+      if (!mounted) return;
+      if (ok) {
+        _scrollToBottom();
+      } else {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.chatRoomImageUploadFailed)),
+        );
+      }
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      _showSnack(localizeErrorMessage(e.message, l10n));
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack(l10n.chatRoomImageUploadFailed);
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
+    }
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _scrollToBottom() {
@@ -220,11 +284,27 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
-            onPressed: () {},
-            tooltip: l10n.chatRoomMoreOption,
-          ),
+          // "+" image picker — replaces the old placeholder "More"
+          // button. While an upload is in flight we swap to a small
+          // spinner so the user sees the action was picked up.
+          _uploadingImage
+              ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.add_circle_outline,
+                      color: AppColors.primary),
+                  onPressed: _pickAndSendImage,
+                  tooltip: l10n.chatRoomSendImageTooltip,
+                ),
           Expanded(
             child: Container(
               constraints: const BoxConstraints(maxHeight: 120),

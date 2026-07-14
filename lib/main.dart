@@ -125,6 +125,14 @@ class _MainShellState extends State<MainShell> {
 
   int _currentIndex = 0;
 
+  /// Drives the cross-finger swipe between tabs. `PageView` is used
+  /// instead of `IndexedStack` so left/right drag swipes between
+  /// screens, while `PageView(children: ...)` (as opposed to
+  /// `.builder`) keeps every page mounted off-screen the way
+  /// `IndexedStack` did — so a tab's scroll position / map camera /
+  /// in-progress upload cycle survives a swipe-away-and-back.
+  final PageController _pageController = PageController();
+
   static const _screens = [
     ConversationListScreen(),
     ContactsScreen(),
@@ -134,9 +142,42 @@ class _MainShellState extends State<MainShell> {
   ];
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  /// Switch tabs from code (FAB tap or nav-bar tap). Updates the
+  /// reactive `_currentIndex` so the nav highlights follow, and
+  /// animates the PageView to the same index so a tap looks like
+  /// a swipe. `onPageChanged` will fire again from the animation
+  /// and re-set `_currentIndex` — same value, so this is just a
+  /// double-setState no-op for the index.
+  void _goTo(int index) {
+    if (index < 0 || index >= _screens.length) return;
+    setState(() => _currentIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      // body: PageView is mounted in place of IndexedStack — drag
+      // left/right anywhere on a tab body to switch tabs. PageView's
+      // internal horizontal gesture wins on bare body areas;
+      // per-screen scrollables (vertical ListView, the map's
+      // pan handler) still consume their own gestures normally
+      // because Flutter's gesture arena resolves conflicts per
+      // pointer-down.
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (i) => setState(() => _currentIndex = i),
+        children: _screens,
+      ),
       // bottomNavigationBar is the visible bar with 4 regular tabs;
       // the raised MyHome button is overlaid on top of it via
       // floatingActionButtonLocation.centerDocked. FAB sits *above*
@@ -157,7 +198,7 @@ class _MainShellState extends State<MainShell> {
       child: FloatingActionButton(
         // `centerDocked` leaves the FAB half-inside the bar; nudge
         // it up so the circle sits clearly above the bar line.
-        onPressed: () => setState(() => _currentIndex = _kMyHomeIndex),
+        onPressed: () => _goTo(_kMyHomeIndex),
         backgroundColor: isSelected ? AppColors.primaryDark : AppColors.primary,
         elevation: 4,
         shape: const CircleBorder(),
@@ -197,7 +238,7 @@ class _MainShellState extends State<MainShell> {
                   activeIcon: Icons.chat_bubble_rounded,
                   label: l10n.navMessages,
                   isSelected: _currentIndex == 0,
-                  onTap: () => setState(() => _currentIndex = 0),
+                  onTap: () => _goTo(0),
                   badgeCount: _getUnreadCount(),
                 ),
               ),
@@ -207,7 +248,7 @@ class _MainShellState extends State<MainShell> {
                   activeIcon: Icons.contacts_rounded,
                   label: l10n.navContacts,
                   isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
+                  onTap: () => _goTo(1),
                 ),
               ),
               // Empty slot for the raised center FAB.
@@ -218,7 +259,7 @@ class _MainShellState extends State<MainShell> {
                   activeIcon: Icons.timeline_rounded,
                   label: l10n.navFamilyFeed,
                   isSelected: _currentIndex == 3,
-                  onTap: () => setState(() => _currentIndex = 3),
+                  onTap: () => _goTo(3),
                 ),
               ),
               Expanded(
@@ -227,7 +268,7 @@ class _MainShellState extends State<MainShell> {
                   activeIcon: Icons.person_rounded,
                   label: l10n.navProfile,
                   isSelected: _currentIndex == 4,
-                  onTap: () => setState(() => _currentIndex = 4),
+                  onTap: () => _goTo(4),
                 ),
               ),
             ],

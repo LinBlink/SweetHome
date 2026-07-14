@@ -67,6 +67,12 @@ class Conversation {
   /// conversations. See docs/api.md §4.1.
   final int? otherUserId;
 
+  /// Last message's type — `text` / `image` / `voice` / `system`
+  /// (defaults to `text` when missing). Drives how the conversation
+  /// list renders the [lastMessage] preview: raw URL vs. localized
+  /// placeholder like "[图片]" / "[Image]". See docs/api.md §4.1.
+  final MessageType lastMessageType;
+
   const Conversation({
     required this.id,
     required this.name,
@@ -81,6 +87,7 @@ class Conversation {
     this.relationCode,
     this.otherUserGender,
     this.otherUserId,
+    this.lastMessageType = MessageType.text,
   });
 
   factory Conversation.fromJson(Map<String, dynamic> json) {
@@ -104,11 +111,17 @@ class Conversation {
       relationCode: json['relationCode'] as String?,
       otherUserGender:
           json['otherUserGender'] != null ? genderFromString(json['otherUserGender'] as String) : null,
-      otherUserId: json['otherUserId'] as int?,
+otherUserId: json['otherUserId'] as int?,
+      lastMessageType: MessageType.fromApi(json['lastMessageType'] as String?),
     );
   }
 
-  Conversation copyWith({int? unreadCount, String? lastMessage, DateTime? lastMessageAt}) {
+  Conversation copyWith({
+    int? unreadCount,
+    String? lastMessage,
+    DateTime? lastMessageAt,
+    MessageType? lastMessageType,
+  }) {
     return Conversation(
       id: id,
       name: name,
@@ -123,6 +136,7 @@ class Conversation {
       relationCode: relationCode,
       otherUserGender: otherUserGender,
       otherUserId: otherUserId,
+      lastMessageType: lastMessageType ?? this.lastMessageType,
     );
   }
 }
@@ -183,7 +197,13 @@ class Message {
       senderAvatarUrl: json['senderAvatarUrl'] as String?,
       senderAvatarColor: const Color(0xFFBF5E3B),
       content: json['content'] as String,
-      type: MessageType.fromApi(json['messageType'] as String?),
+      // REST §4.3 returns `"type"`, WS §5.2 returns `"messageType"` — accept
+      // whichever the current frame carries. Without this fallback an image
+      // message loaded from history silently parses as `text` (and renders
+      // as a raw-URL text bubble instead of via `_ImageBubble`).
+      type: MessageType.fromApi(
+        (json['messageType'] ?? json['type']) as String?,
+      ),
       sentAt: DateTime.parse(json['sentAt'] as String),
       isMe: senderId == currentUserId,
       senderRelationCode: json['senderRelationCode'] as String?,
@@ -202,7 +222,7 @@ class Message {
         'sentAt': sentAt.toIso8601String(),
       };
 
-  Message copyWith({int? serverId, bool? isPending, String? senderAvatarUrl}) => Message(
+  Message copyWith({int? serverId, bool? isPending, String? senderAvatarUrl, String? content}) => Message(
         clientId: clientId,
         serverId: serverId ?? this.serverId,
         conversationId: conversationId,
@@ -211,7 +231,7 @@ class Message {
         senderAvatarLabel: senderAvatarLabel,
         senderAvatarUrl: senderAvatarUrl ?? this.senderAvatarUrl,
         senderAvatarColor: senderAvatarColor,
-        content: content,
+        content: content ?? this.content,
         type: type,
         sentAt: sentAt,
         isMe: isMe,

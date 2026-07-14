@@ -107,3 +107,65 @@ class LocationReport {
     'updateTime': updateTime.toUtc().toIso8601String(),
   };
 }
+
+/// One point in a member's trajectory history — docs/api.md §6.3.
+/// `battery == -1` matches the §6.1 sentinel for "unknown".
+class LocationHistoryPoint {
+  final double lng;
+  final double lat;
+  final int battery;
+  final DateTime updatedAt;
+
+  const LocationHistoryPoint({
+    required this.lng,
+    required this.lat,
+    required this.battery,
+    required this.updatedAt,
+  });
+
+  factory LocationHistoryPoint.fromJson(Map<String, dynamic> json) {
+    return LocationHistoryPoint(
+      lng: (json['lng'] as num).toDouble(),
+      lat: (json['lat'] as num).toDouble(),
+      battery: json['battery'] as int? ?? -1,
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+}
+
+/// Response of `GET /location/{targetUserId}/history?date=YYYY-MM-DD`
+/// (docs/api.md §6.3). The server returns `locations` sorted ASC by
+/// `updatedAt` (oldest first) — the screen renders the polyline
+/// directly in that order.
+class LocationHistory {
+  final int familyId;
+  final String familyName;
+  final int userId;
+  final String username;
+  final String? userAvatarUrl;
+  final List<LocationHistoryPoint> locations;
+
+  const LocationHistory({
+    required this.familyId,
+    required this.familyName,
+    required this.userId,
+    required this.username,
+    required this.userAvatarUrl,
+    required this.locations,
+  });
+
+  factory LocationHistory.fromJson(Map<String, dynamic> json) {
+    return LocationHistory(
+      familyId: json['familyId'] as int,
+      familyName: json['familyName'] as String,
+      userId: json['userId'] as int,
+      username: json['username'] as String,
+      userAvatarUrl: json['userAvatarUrl'] as String?,
+      locations: (json['locations'] as List? ?? const [])
+          .map((e) => LocationHistoryPoint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  bool get isEmpty => locations.isEmpty;
+}

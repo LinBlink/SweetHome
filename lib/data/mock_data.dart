@@ -6,6 +6,7 @@ import '../core/kinship/kinship_graph.dart';
 import '../models/auth_models.dart';
 import '../models/chat_models.dart';
 import '../models/family_member_vm.dart';
+import '../models/fence.dart';
 import '../models/join_request.dart';
 import '../models/location.dart';
 
@@ -475,6 +476,139 @@ class MockDataSource {
   /// instead of going through the HTTP client.
   static FamilyLocations mockFamilyLocations() => _familyLocationsFixture();
 
+  // -- §6.3 mock trajectory history ---------------------------------
+  // Synthesizes a believable ~30-point trail for 王小明 between
+  // 08:00 and 13:00 on the queried day (school → lunch → back
+  // home) so the new LocationHistoryScreen has a non-empty default
+  // state in mock mode.
+
+  static LocationHistory _historyFixture(int targetUserId) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final member = familyGraph.memberById(targetUserId);
+    final name = member?.name ?? 'Member $targetUserId';
+    // Anchor near 116.4310,39.9012 (王小明's "school" base in the
+    // §6.2 fixture). Walk out to lunch and back.
+    final base = const _LngLat(116.4310, 39.9012);
+    final lunch = const _LngLat(116.4125, 39.9045);
+    final List<_LngLat> trail = [];
+    for (int i = 0; i < 10; i++) {
+      final t = i / 9;
+      trail.add(_LngLat(
+        base.lng + (lunch.lng - base.lng) * t,
+        base.lat + (lunch.lat - base.lat) * t,
+      ));
+    }
+    for (int i = 1; i < 10; i++) {
+      final t = i / 9;
+      trail.add(_LngLat(
+        lunch.lng + (base.lng - lunch.lng) * t,
+        lunch.lat + (base.lat - lunch.lat) * t,
+      ));
+    }
+    // Sample every ~10 minutes from 08:00 to 13:00 → 31 points.
+    return LocationHistory(
+      familyId: 1,
+      familyName: '王家',
+      userId: targetUserId,
+      username: name,
+      userAvatarUrl: null,
+      locations: List.generate(trail.length, (i) {
+        final hour = 8 + (i * 10) ~/ 60;
+        final minute = (i * 10) % 60;
+        return LocationHistoryPoint(
+          lng: trail[i].lng,
+          lat: trail[i].lat,
+          battery: 92 - (i ~/ 4),
+          updatedAt: today.add(Duration(hours: hour, minutes: minute)),
+        );
+      }),
+    );
+  }
+
+  /// Mock-mode stub for `LocationService.fetchLocationHistory`.
+  static LocationHistory mockLocationHistory({required int targetUserId}) =>
+      _historyFixture(targetUserId);
+
+  // -- §6.6 mock fence fixtures -------------------------------------
+  // Two pre-set fences for the family: one set by the admin (王建国)
+  // for 王小明 around his school, another by 王建国 for 王爷爷 around
+  // his usual park. Exercised by MyHomeScreen → FenceListScreen.
+
+  static List<Fence> _fenceFixture() {
+    final now = DateTime.now();
+    return [
+      Fence(
+        id: 1,
+        name: '学校',
+        setterUserId: 1,
+        targetUserId: 4,
+        fenceLng: 116.4310,
+        fenceLat: 39.9012,
+        fenceRange: 200,
+        createdAt: now.subtract(const Duration(days: 3)),
+        updatedAt: now.subtract(const Duration(days: 3)),
+      ),
+      Fence(
+        id: 2,
+        name: '公园',
+        setterUserId: 1,
+        targetUserId: 3,
+        fenceLng: 116.3855,
+        fenceLat: 39.9213,
+        fenceRange: 300,
+        createdAt: now.subtract(const Duration(days: 1)),
+        updatedAt: now.subtract(const Duration(days: 1)),
+      ),
+    ];
+  }
+
+  static List<Fence> mockFences() => List.unmodifiable(_fenceFixture());
+
+  // -- §6.7 mock fence-alarm fixtures -------------------------------
+  // Three recent alarms: one entry (school), one exit (school),
+  // one exit (park — 王爷爷 went for a walk outside his usual
+  // spot).
+
+  static List<FenceAlarm> _fenceAlarmFixture() {
+    final now = DateTime.now();
+    return [
+      FenceAlarm(
+        id: 10,
+        fenceId: 1,
+        fenceName: '学校',
+        alarmType: 'STEPPED_OUTSIDE',
+        alarmedAt: now.subtract(const Duration(minutes: 25)),
+        targetUserId: 4,
+        targetUsername: '王小明',
+        targetUserAvatarUrl: null,
+      ),
+      FenceAlarm(
+        id: 9,
+        fenceId: 1,
+        fenceName: '学校',
+        alarmType: 'STEPPED_INSIDE',
+        alarmedAt: now.subtract(const Duration(hours: 2, minutes: 10)),
+        targetUserId: 4,
+        targetUsername: '王小明',
+        targetUserAvatarUrl: null,
+      ),
+      FenceAlarm(
+        id: 8,
+        fenceId: 2,
+        fenceName: '公园',
+        alarmType: 'STEPPED_OUTSIDE',
+        alarmedAt: now.subtract(const Duration(hours: 5)),
+        targetUserId: 3,
+        targetUsername: '王爷爷',
+        targetUserAvatarUrl: null,
+      ),
+    ];
+  }
+
+  static List<FenceAlarm> mockFenceAlarms() =>
+      List.unmodifiable(_fenceAlarmFixture());
+
   // -- §3.5.2 mock join-request fixtures -----------------------------
   // Two pending requests for the family admin to review.
 
@@ -509,6 +643,15 @@ class MockDataSource {
   /// Mock-mode stub for `FamilyService.fetchJoinRequests`.
   static List<JoinRequest> mockJoinRequests() =>
       List.unmodifiable(_pendingJoinRequestsFixture());
+}
+
+/// Internal struct used only by the mock location fixture above —
+/// keeps the inline list tidy without polluting the public model
+/// surface.
+class _LngLat {
+  final double lng;
+  final double lat;
+  const _LngLat(this.lng, this.lat);
 }
 
 /// Internal struct used only by the mock location fixture above —

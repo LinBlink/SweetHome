@@ -33,6 +33,7 @@ class ConversationTile extends StatelessWidget {
         appLocale: context.watch<LocaleProvider>().locale,
       );
     }
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -74,14 +75,9 @@ class ConversationTile extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          conversation.lastMessage,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                        child: _LastMessagePreview(
+                          conversation: conversation,
+                          l10n: l10n,
                         ),
                       ),
                       if (conversation.unreadCount > 0) ...[
@@ -157,6 +153,70 @@ class _OnlineDot extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: AppColors.background, width: 2),
       ),
+    );
+  }
+}
+
+/// Renders the conversation's last-message preview. For non-text
+/// messages the server's `lastMessage` is the raw R2 URL (per
+/// docs/api.md §4.1's "服务端只给结构化数据，不做展示层加工" principle),
+/// so we render a localized placeholder instead of the URL — the
+/// `lastMessageType` field tells us which placeholder to use.
+class _LastMessagePreview extends StatelessWidget {
+  final Conversation conversation;
+  final AppLocalizations l10n;
+  const _LastMessagePreview({required this.conversation, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final raw = conversation.lastMessage;
+    final IconData? leading;
+    final String text;
+    switch (conversation.lastMessageType) {
+      case MessageType.image:
+        leading = Icons.image_outlined;
+        text = l10n.chatMessageTypeImage;
+        break;
+      case MessageType.voice:
+        leading = Icons.mic_none_rounded;
+        text = l10n.chatMessageTypeVoice;
+        break;
+      case MessageType.system:
+        leading = Icons.info_outline;
+        text = l10n.chatMessageTypeSystem;
+        break;
+      case MessageType.text:
+        leading = null;
+        text = raw;
+        break;
+    }
+    if (leading == null) {
+      return Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13,
+          color: AppColors.textSecondary,
+        ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      );
+    }
+    return Row(
+      children: [
+        Icon(leading, size: 14, color: AppColors.textHint),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textHint,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
     );
   }
 }

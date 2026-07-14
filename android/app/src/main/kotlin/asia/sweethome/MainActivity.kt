@@ -1,4 +1,4 @@
-package com.example.sweethome_flutter
+package asia.sweethome
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -99,18 +99,56 @@ class _LocationScreenState extends State<LocationScreen> {
     context.read<LocationProvider>().toggleSharing();
   }
 
-  /// Center the map on the cluster of member fixes. If only one
-  /// member is sharing, zoom to a fixed level (15 ≈ street view).
-  void _fitToMembers(List<MemberLocation> members) {
-    if (members.isEmpty) return;
-    if (members.length == 1) {
-      _mapController.move(LatLng(members.first.lat, members.first.lng), 15);
-      return;
+  /// Compute the initial camera fit BEFORE FlutterMap is built, so
+  /// the very first frame already has the right viewport. Calling
+  /// [_mapController.fitCamera] from a post-frame callback (the
+  /// older approach) introduces a race: FlutterMap mounts with the
+  /// default camera, paints one frame, then we jump the camera to
+  /// the marker bounds mid-frame — at which point the TileLayer
+  /// has to re-issue tile requests for the new viewport, racing
+  /// against the MarkerLayer overlay's first paint, and on Web in
+  /// particular the result is the map blank with markers visible
+  /// until the user drags (a gesture event nudges the rendering
+  /// pipeline and the in-flight tiles finish). Setting
+  /// `initialCameraFit` skips that whole intermediate state —
+  /// markers + tiles both render in their correct positions on
+  /// frame 1.
+  MapOptions _initialOptions(List<MemberLocation> members) {
+    if (members.isEmpty) {
+      return MapOptions(
+        initialCenter: const LatLng(39.9087, 116.3975),
+        initialZoom: 11,
+        minZoom: 3,
+        maxZoom: 18,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+        ),
+      );
     }
-    final points = members.map((m) => LatLng(m.lat, m.lng)).toList();
-    final bounds = LatLngBounds.fromPoints(points);
-    _mapController.fitCamera(
-      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48)),
+    if (members.length == 1) {
+      return MapOptions(
+        initialCenter: LatLng(members.first.lat, members.first.lng),
+        initialZoom: 15,
+        minZoom: 3,
+        maxZoom: 18,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+        ),
+      );
+    }
+    final bounds = LatLngBounds.fromPoints(
+      members.map((m) => LatLng(m.lat, m.lng)).toList(),
+    );
+    return MapOptions(
+      initialCameraFit: CameraFit.bounds(
+        bounds: bounds,
+        padding: const EdgeInsets.all(48),
+      ),
+      minZoom: 3,
+      maxZoom: 18,
+      interactionOptions: const InteractionOptions(
+        flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+      ),
     );
   }
 
@@ -182,14 +220,13 @@ class _LocationScreenState extends State<LocationScreen> {
           }
           final data = snapshot.data!;
           final members = data.familyMemberLocations;
-          // Auto-fit on the first successful load (or when the
-          // marker set changes from empty to non-empty).
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) _fitToMembers(members);
-          });
           return Column(
             children: [
-              _MapPanel(members: members, mapController: _mapController),
+              _MapPanel(
+                members: members,
+                mapController: _mapController,
+                options: _initialOptions(members),
+              ),
               _StatsStrip(data: data, l10n: l10n),
               _ProviderBanner(),
               const Divider(height: 1, color: AppColors.divider),
@@ -230,30 +267,23 @@ class _LocationScreenState extends State<LocationScreen> {
 class _MapPanel extends StatelessWidget {
   final List<MemberLocation> members;
   final MapController mapController;
+  final MapOptions options;
 
-  const _MapPanel({required this.members, required this.mapController});
+  const _MapPanel({
+    required this.members,
+    required this.mapController,
+    required this.options,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Sensible default center: Beijing (天安门). When the family
-    // members come back with fixes we call fitToMembers in the
-    // post-frame callback above to override this.
-    const initialCenter = LatLng(39.9087, 116.3975);
     return SizedBox(
       height: 280,
       child: Stack(
         children: [
           FlutterMap(
             mapController: mapController,
-            options: const MapOptions(
-              initialCenter: initialCenter,
-              initialZoom: 11,
-              minZoom: 3,
-              maxZoom: 18,
-              interactionOptions: InteractionOptions(
-                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-              ),
-            ),
+            options: options,
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',

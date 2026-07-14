@@ -1227,6 +1227,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Taiwan'**
   String get countryTaiwan;
+
+  /// No description provided for @chatRoomSendImageTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send image'**
+  String get chatRoomSendImageTooltip;
+
+  /// No description provided for @chatRoomImageUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading image…'**
+  String get chatRoomImageUploading;
+
+  /// No description provided for @chatRoomImageUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send image'**
+  String get chatRoomImageUploadFailed;
+
+  /// No description provided for @chatMessageTypeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'[Image]'**
+  String get chatMessageTypeImage;
+
+  /// No description provided for @chatMessageTypeVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'[Voice]'**
+  String get chatMessageTypeVoice;
+
+  /// No description provided for @chatMessageTypeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'[System]'**
+  String get chatMessageTypeSystem;
+
+  /// No description provided for @locationHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Trajectory'**
+  String get locationHistoryTitle;
+
+  /// No description provided for @locationHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No trajectory points for this day'**
+  String get locationHistoryEmpty;
+
+  /// No description provided for @locationHistoryEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The member hasn\'t reported a location on the selected day.'**
+  String get locationHistoryEmptyDesc;
+
+  /// No description provided for @profileMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get profileMe;
+
+  /// No description provided for @locationHistoryPickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick date'**
+  String get locationHistoryPickDate;
+
+  /// No description provided for @locationHistoryPointCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} trajectory points'**
+  String locationHistoryPointCount(int count);
+
+  /// No description provided for @locationHistoryForMember.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s trajectory'**
+  String locationHistoryForMember(Object name);
+
+  /// No description provided for @locationHistoryForDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}'**
+  String locationHistoryForDate(Object date);
+
+  /// No description provided for @locationHistoryView.
+  ///
+  /// In en, this message translates to:
+  /// **'View trajectory'**
+  String get locationHistoryView;
+
+  /// No description provided for @locationHistoryBatteryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery {percent}%'**
+  String locationHistoryBatteryLabel(Object percent);
+
+  /// No description provided for @fenceListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofences'**
+  String get fenceListTitle;
+
+  /// No description provided for @fenceListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No geofences yet'**
+  String get fenceListEmpty;
+
+  /// No description provided for @fenceListGuardingGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m watching'**
+  String get fenceListGuardingGroup;
+
+  /// No description provided for @fenceListGuardedGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Watching me'**
+  String get fenceListGuardedGroup;
+
+  /// No description provided for @fenceListNoGuarding.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t set up any geofences yet.'**
+  String get fenceListNoGuarding;
+
+  /// No description provided for @fenceListNoGuarded.
+  ///
+  /// In en, this message translates to:
+  /// **'No family member has set up a geofence for you.'**
+  String get fenceListNoGuarded;
+
+  /// No description provided for @fenceListEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a fence to be notified when a family member enters or leaves it.'**
+  String get fenceListEmptyDesc;
+
+  /// No description provided for @fenceCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Geofence'**
+  String get fenceCreateTitle;
+
+  /// No description provided for @fenceNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fence name'**
+  String get fenceNameLabel;
+
+  /// No description provided for @fenceNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. School, Home'**
+  String get fenceNameHint;
+
+  /// No description provided for @fenceRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius (meters)'**
+  String get fenceRangeLabel;
+
+  /// No description provided for @fenceRangeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 200'**
+  String get fenceRangeHint;
+
+  /// No description provided for @fenceInvalidRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius must be greater than 0'**
+  String get fenceInvalidRange;
+
+  /// No description provided for @fencePickLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the fence center on the map'**
+  String get fencePickLocationTitle;
+
+  /// No description provided for @fencePickLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to place the center, then set a radius.'**
+  String get fencePickLocationHint;
+
+  /// No description provided for @fencePickLocationSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Center set'**
+  String get fencePickLocationSelected;
+
+  /// No description provided for @fencePickLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick a center on the map'**
+  String get fencePickLocationRequired;
+
+  /// No description provided for @fenceTargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Watched member'**
+  String get fenceTargetLabel;
+
+  /// No description provided for @fenceCreatedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Set by'**
+  String get fenceCreatedBy;
+
+  /// No description provided for @fenceCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {date}'**
+  String fenceCreatedAt(String date);
+
+  /// No description provided for @fenceRadiusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius {meters} m'**
+  String fenceRadiusLabel(int meters);
+
+  /// No description provided for @fenceCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get fenceCreateButton;
+
+  /// No description provided for @fenceCreateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofence created'**
+  String get fenceCreateSuccess;
+
+  /// No description provided for @fenceDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get fenceDelete;
+
+  /// No description provided for @fenceDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this geofence?'**
+  String get fenceDeleteConfirm;
+
+  /// No description provided for @fenceDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofence deleted'**
+  String get fenceDeleteSuccess;
+
+  /// No description provided for @fenceNoWatchableMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members to watch'**
+  String get fenceNoWatchableMembers;
+
+  /// No description provided for @fenceAlarmsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofence Alerts'**
+  String get fenceAlarmsTitle;
+
+  /// No description provided for @fenceAlarmEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No alerts'**
+  String get fenceAlarmEmpty;
+
+  /// No description provided for @fenceAlarmEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be notified here when a member you watch leaves a fence.'**
+  String get fenceAlarmEmptyDesc;
+
+  /// No description provided for @fenceAlarmInside.
+  ///
+  /// In en, this message translates to:
+  /// **'Entered'**
+  String get fenceAlarmInside;
+
+  /// No description provided for @fenceAlarmOutside.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get fenceAlarmOutside;
+
+  /// No description provided for @fenceAlarmTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Triggered at {time}'**
+  String fenceAlarmTime(String time);
+
+  /// No description provided for @myHomeFenceEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofences'**
+  String get myHomeFenceEntry;
+
+  /// No description provided for @myHomeFenceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set safe zones and get notified when family enters or leaves'**
+  String get myHomeFenceDesc;
+
+  /// No description provided for @myHomeFenceAlarmsEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Geofence Alerts'**
+  String get myHomeFenceAlarmsEntry;
+
+  /// No description provided for @myHomeFenceAlarmsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'History of when family entered or left a fence'**
+  String get myHomeFenceAlarmsDesc;
+
+  /// No description provided for @locationHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Location'**
+  String get locationHubTitle;
+
+  /// No description provided for @locationHubSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live map, history, geofences and alerts for the whole family'**
+  String get locationHubSubtitle;
+
+  /// No description provided for @locationHubLiveMapDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See where each family member is right now'**
+  String get locationHubLiveMapDesc;
+
+  /// No description provided for @locationHubHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'View a member\'s movement for a chosen day'**
+  String get locationHubHistoryDesc;
+
+  /// No description provided for @locationHubFenceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set safe zones and get notified on entry or exit'**
+  String get locationHubFenceDesc;
+
+  /// No description provided for @locationHubFenceAlarmsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'History of when family entered or left a fence'**
+  String get locationHubFenceAlarmsDesc;
+
+  /// No description provided for @profileJoinRequestsRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Requests'**
+  String get profileJoinRequestsRow;
+
+  /// No description provided for @profileJoinRequestsAdminOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin only'**
+  String get profileJoinRequestsAdminOnly;
 }
 
 class _AppLocalizationsDelegate

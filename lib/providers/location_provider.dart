@@ -113,10 +113,15 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const String _kSharingPrefsKey = 'location_sharing_enabled';
 
   /// Call once right after construction (see `main.dart`) to resume
-  /// sharing if it was on when the app was last closed.
+  /// sharing. Defaults to ON for users who have never toggled the
+  /// setting before — a fresh install should land on a working
+  /// family-location dashboard without making the user flip a
+  /// switch first. Once the user explicitly turns it off,
+  /// `prefs.setBool(false)` is written and subsequent launches
+  /// honour that explicit choice.
   Future<void> restoreSharingState() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool(_kSharingPrefsKey) ?? false) {
+    if (prefs.getBool(_kSharingPrefsKey) ?? true) {
       await startSharing();
     }
   }

@@ -606,6 +606,203 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get countryTaiwan => '中国台湾';
+
+  @override
+  String get chatRoomSendImageTooltip => '发送图片';
+
+  @override
+  String get chatRoomImageUploading => '图片上传中…';
+
+  @override
+  String get chatRoomImageUploadFailed => '图片发送失败';
+
+  @override
+  String get chatMessageTypeImage => '[图片]';
+
+  @override
+  String get chatMessageTypeVoice => '[语音]';
+
+  @override
+  String get chatMessageTypeSystem => '[系统消息]';
+
+  @override
+  String get locationHistoryTitle => '今日轨迹';
+
+  @override
+  String get locationHistoryEmpty => '当天暂无轨迹记录';
+
+  @override
+  String get locationHistoryEmptyDesc => '该成员当天未上报过位置。';
+
+  @override
+  String get profileMe => '我';
+
+  @override
+  String get locationHistoryPickDate => '选择日期';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '共 $count 个轨迹点';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name 的轨迹';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date 轨迹';
+  }
+
+  @override
+  String get locationHistoryView => '查看轨迹';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return '电量 $percent%';
+  }
+
+  @override
+  String get fenceListTitle => '电子围栏';
+
+  @override
+  String get fenceListEmpty => '暂无围栏';
+
+  @override
+  String get fenceListGuardingGroup => '我监护谁';
+
+  @override
+  String get fenceListGuardedGroup => '被谁监护';
+
+  @override
+  String get fenceListNoGuarding => '你还没有设置过围栏';
+
+  @override
+  String get fenceListNoGuarded => '还没有家人为你设置围栏';
+
+  @override
+  String get fenceListEmptyDesc => '为家人设置安全活动范围，进入或离开时收到提醒。';
+
+  @override
+  String get fenceCreateTitle => '新建围栏';
+
+  @override
+  String get fenceNameLabel => '围栏名称';
+
+  @override
+  String get fenceNameHint => '例如：学校、家附近';
+
+  @override
+  String get fenceRangeLabel => '围栏半径（米）';
+
+  @override
+  String get fenceRangeHint => '例如：200';
+
+  @override
+  String get fenceInvalidRange => '半径必须大于 0';
+
+  @override
+  String get fencePickLocationTitle => '在地图上选择围栏中心点';
+
+  @override
+  String get fencePickLocationHint => '点击地图选择位置，再设置半径。';
+
+  @override
+  String get fencePickLocationSelected => '已选择中心点';
+
+  @override
+  String get fencePickLocationRequired => '请在地图上选择中心点';
+
+  @override
+  String get fenceTargetLabel => '被监护人';
+
+  @override
+  String get fenceCreatedBy => '设置者';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '创建于 $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return '半径 $meters 米';
+  }
+
+  @override
+  String get fenceCreateButton => '创建';
+
+  @override
+  String get fenceCreateSuccess => '围栏已创建';
+
+  @override
+  String get fenceDelete => '删除';
+
+  @override
+  String get fenceDeleteConfirm => '确定要删除此围栏吗？';
+
+  @override
+  String get fenceDeleteSuccess => '围栏已删除';
+
+  @override
+  String get fenceNoWatchableMembers => '暂无可被监护的家庭成员';
+
+  @override
+  String get fenceAlarmsTitle => '围栏报警';
+
+  @override
+  String get fenceAlarmEmpty => '暂无报警';
+
+  @override
+  String get fenceAlarmEmptyDesc => '被你监护的家人离开围栏时，会在此提醒你。';
+
+  @override
+  String get fenceAlarmInside => '进入';
+
+  @override
+  String get fenceAlarmOutside => '离开';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return '触发时间 $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => '电子围栏';
+
+  @override
+  String get myHomeFenceDesc => '为家人设置安全活动范围';
+
+  @override
+  String get myHomeFenceAlarmsEntry => '围栏报警';
+
+  @override
+  String get myHomeFenceAlarmsDesc => '查看家人进出围栏的提醒';
+
+  @override
+  String get locationHubTitle => '实时位置';
+
+  @override
+  String get locationHubSubtitle => '查看家人实时位置、活动轨迹、围栏与报警';
+
+  @override
+  String get locationHubLiveMapDesc => '查看每个家庭成员的当前位置';
+
+  @override
+  String get locationHubHistoryDesc => '查看成员某一天的活动轨迹';
+
+  @override
+  String get locationHubFenceDesc => '设置安全活动范围，进入或离开时收到提醒';
+
+  @override
+  String get locationHubFenceAlarmsDesc => '查看家人进出围栏的提醒';
+
+  @override
+  String get profileJoinRequestsRow => '加入申请';
+
+  @override
+  String get profileJoinRequestsAdminOnly => '仅管理员可见';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1210,6 +1407,200 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get countryTaiwan => '中国台湾';
+
+  @override
+  String get chatRoomSendImageTooltip => '发送图片';
+
+  @override
+  String get chatRoomImageUploading => '图片上传中…';
+
+  @override
+  String get chatRoomImageUploadFailed => '图片发送失败';
+
+  @override
+  String get chatMessageTypeImage => '[图片]';
+
+  @override
+  String get chatMessageTypeVoice => '[语音]';
+
+  @override
+  String get chatMessageTypeSystem => '[系统消息]';
+
+  @override
+  String get locationHistoryTitle => '今日轨迹';
+
+  @override
+  String get locationHistoryEmpty => '当天暂无轨迹记录';
+
+  @override
+  String get locationHistoryEmptyDesc => '该成员当天未上报过位置。';
+
+  @override
+  String get locationHistoryPickDate => '选择日期';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '共 $count 个轨迹点';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name 的轨迹';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date 轨迹';
+  }
+
+  @override
+  String get locationHistoryView => '查看轨迹';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return '电量 $percent%';
+  }
+
+  @override
+  String get fenceListTitle => '电子围栏';
+
+  @override
+  String get fenceListEmpty => '暂无围栏';
+
+  @override
+  String get fenceListGuardingGroup => '我监护谁';
+
+  @override
+  String get fenceListGuardedGroup => '被谁监护';
+
+  @override
+  String get fenceListNoGuarding => '你还没有设置过围栏';
+
+  @override
+  String get fenceListNoGuarded => '还没有家人为你设置围栏';
+
+  @override
+  String get fenceListEmptyDesc => '为家人设置安全活动范围，进入或离开时收到提醒。';
+
+  @override
+  String get fenceCreateTitle => '新建围栏';
+
+  @override
+  String get fenceNameLabel => '围栏名称';
+
+  @override
+  String get fenceNameHint => '例如：学校、家附近';
+
+  @override
+  String get fenceRangeLabel => '围栏半径（米）';
+
+  @override
+  String get fenceRangeHint => '例如：200';
+
+  @override
+  String get fenceInvalidRange => '半径必须大于 0';
+
+  @override
+  String get fencePickLocationTitle => '在地图上选择围栏中心点';
+
+  @override
+  String get fencePickLocationHint => '点击地图选择位置，再设置半径。';
+
+  @override
+  String get fencePickLocationSelected => '已选择中心点';
+
+  @override
+  String get fencePickLocationRequired => '请在地图上选择中心点';
+
+  @override
+  String get fenceTargetLabel => '被监护人';
+
+  @override
+  String get fenceCreatedBy => '设置者';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '创建于 $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return '半径 $meters 米';
+  }
+
+  @override
+  String get fenceCreateButton => '创建';
+
+  @override
+  String get fenceCreateSuccess => '围栏已创建';
+
+  @override
+  String get fenceDelete => '删除';
+
+  @override
+  String get fenceDeleteConfirm => '确定要删除此围栏吗？';
+
+  @override
+  String get fenceDeleteSuccess => '围栏已删除';
+
+  @override
+  String get fenceNoWatchableMembers => '暂无可被监护的家庭成员';
+
+  @override
+  String get fenceAlarmsTitle => '围栏报警';
+
+  @override
+  String get fenceAlarmEmpty => '暂无报警';
+
+  @override
+  String get fenceAlarmEmptyDesc => '被你监护的家人离开围栏时，会在此提醒你。';
+
+  @override
+  String get fenceAlarmInside => '进入';
+
+  @override
+  String get fenceAlarmOutside => '离开';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return '触发时间 $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => '电子围栏';
+
+  @override
+  String get myHomeFenceDesc => '为家人设置安全活动范围';
+
+  @override
+  String get myHomeFenceAlarmsEntry => '围栏报警';
+
+  @override
+  String get myHomeFenceAlarmsDesc => '查看家人进出围栏的提醒';
+
+  @override
+  String get locationHubTitle => '实时位置';
+
+  @override
+  String get locationHubSubtitle => '查看家人实时位置、活动轨迹、围栏与报警';
+
+  @override
+  String get locationHubLiveMapDesc => '查看每个家庭成员的当前位置';
+
+  @override
+  String get locationHubHistoryDesc => '查看成员某一天的活动轨迹';
+
+  @override
+  String get locationHubFenceDesc => '设置安全活动范围，进入或离开时收到提醒';
+
+  @override
+  String get locationHubFenceAlarmsDesc => '查看家人进出围栏的提醒';
+
+  @override
+  String get profileJoinRequestsRow => '加入申请';
+
+  @override
+  String get profileJoinRequestsAdminOnly => '仅管理员可见';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1814,4 +2205,198 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get countryTaiwan => '台灣';
+
+  @override
+  String get chatRoomSendImageTooltip => '發送圖片';
+
+  @override
+  String get chatRoomImageUploading => '圖片上傳中…';
+
+  @override
+  String get chatRoomImageUploadFailed => '圖片發送失敗';
+
+  @override
+  String get chatMessageTypeImage => '[圖片]';
+
+  @override
+  String get chatMessageTypeVoice => '[語音]';
+
+  @override
+  String get chatMessageTypeSystem => '[系統訊息]';
+
+  @override
+  String get locationHistoryTitle => '今日軌跡';
+
+  @override
+  String get locationHistoryEmpty => '當天暫無軌跡記錄';
+
+  @override
+  String get locationHistoryEmptyDesc => '該成員當天未上報過位置。';
+
+  @override
+  String get locationHistoryPickDate => '選擇日期';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '共 $count 個軌跡點';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name 的軌跡';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date 軌跡';
+  }
+
+  @override
+  String get locationHistoryView => '查看軌跡';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return '電量 $percent%';
+  }
+
+  @override
+  String get fenceListTitle => '電子圍欄';
+
+  @override
+  String get fenceListEmpty => '暫無圍欄';
+
+  @override
+  String get fenceListGuardingGroup => '我監護誰';
+
+  @override
+  String get fenceListGuardedGroup => '被誰監護';
+
+  @override
+  String get fenceListNoGuarding => '你還沒有設定過圍欄';
+
+  @override
+  String get fenceListNoGuarded => '還沒有家人為你設定圍欄';
+
+  @override
+  String get fenceListEmptyDesc => '為家人設定安全活動範圍，進入或離開時收到提醒。';
+
+  @override
+  String get fenceCreateTitle => '新建圍欄';
+
+  @override
+  String get fenceNameLabel => '圍欄名稱';
+
+  @override
+  String get fenceNameHint => '例如：學校、家附近';
+
+  @override
+  String get fenceRangeLabel => '圍欄半徑（公尺）';
+
+  @override
+  String get fenceRangeHint => '例如：200';
+
+  @override
+  String get fenceInvalidRange => '半徑必須大於 0';
+
+  @override
+  String get fencePickLocationTitle => '在地圖上選擇圍欄中心點';
+
+  @override
+  String get fencePickLocationHint => '點擊地圖選擇位置，再設定半徑。';
+
+  @override
+  String get fencePickLocationSelected => '已選擇中心點';
+
+  @override
+  String get fencePickLocationRequired => '請在地圖上選擇中心點';
+
+  @override
+  String get fenceTargetLabel => '被監護人';
+
+  @override
+  String get fenceCreatedBy => '設定者';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '建立於 $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return '半徑 $meters 公尺';
+  }
+
+  @override
+  String get fenceCreateButton => '建立';
+
+  @override
+  String get fenceCreateSuccess => '圍欄已建立';
+
+  @override
+  String get fenceDelete => '刪除';
+
+  @override
+  String get fenceDeleteConfirm => '確定要刪除此圍欄嗎？';
+
+  @override
+  String get fenceDeleteSuccess => '圍欄已刪除';
+
+  @override
+  String get fenceNoWatchableMembers => '暫無可被監護的家庭成員';
+
+  @override
+  String get fenceAlarmsTitle => '圍欄警報';
+
+  @override
+  String get fenceAlarmEmpty => '暫無警報';
+
+  @override
+  String get fenceAlarmEmptyDesc => '被你監護的家人離開圍欄時，會在此提醒你。';
+
+  @override
+  String get fenceAlarmInside => '進入';
+
+  @override
+  String get fenceAlarmOutside => '離開';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return '觸發時間 $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => '電子圍欄';
+
+  @override
+  String get myHomeFenceDesc => '為家人設定安全活動範圍';
+
+  @override
+  String get myHomeFenceAlarmsEntry => '圍欄警報';
+
+  @override
+  String get myHomeFenceAlarmsDesc => '查看家人進出圍欄的提醒';
+
+  @override
+  String get locationHubTitle => '即時位置';
+
+  @override
+  String get locationHubSubtitle => '查看家人即時位置、活動軌跡、圍欄與警報';
+
+  @override
+  String get locationHubLiveMapDesc => '查看每個家庭成員的當前位置';
+
+  @override
+  String get locationHubHistoryDesc => '查看成員某一天的活動軌跡';
+
+  @override
+  String get locationHubFenceDesc => '設定安全活動範圍，進入或離開時收到提醒';
+
+  @override
+  String get locationHubFenceAlarmsDesc => '查看家人進出圍欄的提醒';
+
+  @override
+  String get profileJoinRequestsRow => '加入申請';
+
+  @override
+  String get profileJoinRequestsAdminOnly => '僅管理員可見';
 }

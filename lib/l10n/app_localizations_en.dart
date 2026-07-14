@@ -627,4 +627,213 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countryTaiwan => 'Taiwan';
+
+  @override
+  String get chatRoomSendImageTooltip => 'Send image';
+
+  @override
+  String get chatRoomImageUploading => 'Uploading image…';
+
+  @override
+  String get chatRoomImageUploadFailed => 'Couldn\'t send image';
+
+  @override
+  String get chatMessageTypeImage => '[Image]';
+
+  @override
+  String get chatMessageTypeVoice => '[Voice]';
+
+  @override
+  String get chatMessageTypeSystem => '[System]';
+
+  @override
+  String get locationHistoryTitle => 'Today\'s Trajectory';
+
+  @override
+  String get locationHistoryEmpty => 'No trajectory points for this day';
+
+  @override
+  String get locationHistoryEmptyDesc =>
+      'The member hasn\'t reported a location on the selected day.';
+
+  @override
+  String get profileMe => 'Me';
+
+  @override
+  String get locationHistoryPickDate => 'Pick date';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '$count trajectory points';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name\'s trajectory';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date';
+  }
+
+  @override
+  String get locationHistoryView => 'View trajectory';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return 'Battery $percent%';
+  }
+
+  @override
+  String get fenceListTitle => 'Geofences';
+
+  @override
+  String get fenceListEmpty => 'No geofences yet';
+
+  @override
+  String get fenceListGuardingGroup => 'I\'m watching';
+
+  @override
+  String get fenceListGuardedGroup => 'Watching me';
+
+  @override
+  String get fenceListNoGuarding => 'You haven\'t set up any geofences yet.';
+
+  @override
+  String get fenceListNoGuarded =>
+      'No family member has set up a geofence for you.';
+
+  @override
+  String get fenceListEmptyDesc =>
+      'Add a fence to be notified when a family member enters or leaves it.';
+
+  @override
+  String get fenceCreateTitle => 'Add Geofence';
+
+  @override
+  String get fenceNameLabel => 'Fence name';
+
+  @override
+  String get fenceNameHint => 'e.g. School, Home';
+
+  @override
+  String get fenceRangeLabel => 'Radius (meters)';
+
+  @override
+  String get fenceRangeHint => 'e.g. 200';
+
+  @override
+  String get fenceInvalidRange => 'Radius must be greater than 0';
+
+  @override
+  String get fencePickLocationTitle => 'Pick the fence center on the map';
+
+  @override
+  String get fencePickLocationHint =>
+      'Tap the map to place the center, then set a radius.';
+
+  @override
+  String get fencePickLocationSelected => 'Center set';
+
+  @override
+  String get fencePickLocationRequired => 'Please pick a center on the map';
+
+  @override
+  String get fenceTargetLabel => 'Watched member';
+
+  @override
+  String get fenceCreatedBy => 'Set by';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return 'Radius $meters m';
+  }
+
+  @override
+  String get fenceCreateButton => 'Create';
+
+  @override
+  String get fenceCreateSuccess => 'Geofence created';
+
+  @override
+  String get fenceDelete => 'Delete';
+
+  @override
+  String get fenceDeleteConfirm => 'Delete this geofence?';
+
+  @override
+  String get fenceDeleteSuccess => 'Geofence deleted';
+
+  @override
+  String get fenceNoWatchableMembers => 'No family members to watch';
+
+  @override
+  String get fenceAlarmsTitle => 'Geofence Alerts';
+
+  @override
+  String get fenceAlarmEmpty => 'No alerts';
+
+  @override
+  String get fenceAlarmEmptyDesc =>
+      'You will be notified here when a member you watch leaves a fence.';
+
+  @override
+  String get fenceAlarmInside => 'Entered';
+
+  @override
+  String get fenceAlarmOutside => 'Left';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return 'Triggered at $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => 'Geofences';
+
+  @override
+  String get myHomeFenceDesc =>
+      'Set safe zones and get notified when family enters or leaves';
+
+  @override
+  String get myHomeFenceAlarmsEntry => 'Geofence Alerts';
+
+  @override
+  String get myHomeFenceAlarmsDesc =>
+      'History of when family entered or left a fence';
+
+  @override
+  String get locationHubTitle => 'Real-time Location';
+
+  @override
+  String get locationHubSubtitle =>
+      'Live map, history, geofences and alerts for the whole family';
+
+  @override
+  String get locationHubLiveMapDesc =>
+      'See where each family member is right now';
+
+  @override
+  String get locationHubHistoryDesc =>
+      'View a member\'s movement for a chosen day';
+
+  @override
+  String get locationHubFenceDesc =>
+      'Set safe zones and get notified on entry or exit';
+
+  @override
+  String get locationHubFenceAlarmsDesc =>
+      'History of when family entered or left a fence';
+
+  @override
+  String get profileJoinRequestsRow => 'Join Requests';
+
+  @override
+  String get profileJoinRequestsAdminOnly => 'Admin only';
 }

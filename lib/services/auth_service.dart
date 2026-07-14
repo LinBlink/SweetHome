@@ -105,6 +105,39 @@ class AuthService {
     return data['addressReturn'] as String;
   }
 
+  /// `POST /users/upload/image` (docs/api.md §2.4) — multipart upload
+  /// of a single chat image (field name `file`). Returns a public
+  /// Cloudflare R2 URL that the caller should pass back as
+  /// `Message.content` with `type = "image"` via §4.4 (REST) or §5.2
+  /// (WS). Same validation rules as `/users/upload/avatar` except the
+  /// size cap is 1 MB instead of 500 KB and the returned URL does NOT
+  /// also update `users.avatar_url` — uploading a chat image does not
+  /// accidentally change the user's avatar.
+  ///
+  /// [bytes] / [filename] / [contentType] follow the same shape as
+  /// [uploadAvatar]; the backend's `image/*` check is satisfied the
+  /// same way.
+  static Future<String> uploadImage(
+    AuthUser current, {
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) async {
+    final uri = Uri.parse('${AppConfig.apiBaseUrl}/users/upload/image');
+    final req = http.MultipartRequest('POST', uri);
+    req.headers['Authorization'] = 'Bearer ${current.token}';
+    req.files.add(http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: filename,
+      contentType: _parseMediaType(contentType),
+    ));
+    final streamed = await req.send().timeout(const Duration(seconds: 30));
+    final resp = await http.Response.fromStream(streamed);
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    return data['addressReturn'] as String;
+  }
+
   /// Parses a `type/subtype` string into the `MediaType` the `http` package
   /// wants. Returns `null` on missing / malformed input — `MultipartFile`
   /// then falls back to its filename-extension guess (which already

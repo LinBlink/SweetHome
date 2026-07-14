@@ -629,4 +629,214 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get countryTaiwan => 'ထိုင်ဝမ်';
+
+  @override
+  String get chatRoomSendImageTooltip => 'ပုံပို့ရန်';
+
+  @override
+  String get chatRoomImageUploading => 'ပုံ တင်နေသည်…';
+
+  @override
+  String get chatRoomImageUploadFailed => 'ပုံပို့၍ မရပါ';
+
+  @override
+  String get chatMessageTypeImage => '[ပုံ]';
+
+  @override
+  String get chatMessageTypeVoice => '[အသံ]';
+
+  @override
+  String get chatMessageTypeSystem => '[စနစ်]';
+
+  @override
+  String get locationHistoryTitle => 'ယနေ့ လမ်းကြောင်း';
+
+  @override
+  String get locationHistoryEmpty => 'ဤနေ့အတွက် လမ်းကြောင်း မှတ်တမ်း မရှိပါ';
+
+  @override
+  String get locationHistoryEmptyDesc =>
+      'ရွေးထားသော နေ့တွင် အဖွဲ့ဝင်က တည်နေရာ မပို့ထားပါ။';
+
+  @override
+  String get profileMe => 'ကျွန်ုပ်';
+
+  @override
+  String get locationHistoryPickDate => 'ရက်စွဲ ရွေးရန်';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return 'လမ်းကြောင်း အမှတ် $count ခု';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name ၏ လမ်းကြောင်း';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date လမ်းကြောင်း';
+  }
+
+  @override
+  String get locationHistoryView => 'လမ်းကြောင်း ကြည့်ရန်';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return 'ဘက်ထရီ $percent%';
+  }
+
+  @override
+  String get fenceListTitle => 'ဂျီယိုဖင်းများ';
+
+  @override
+  String get fenceListEmpty => 'ဂျီယိုဖင်း မရှိသေးပါ';
+
+  @override
+  String get fenceListGuardingGroup => 'ကျွန်ုပ် စောင့်ကြည့်သူ';
+
+  @override
+  String get fenceListGuardedGroup => 'ကျွန်ုပ်ကို စောင့်ကြည့်သူ';
+
+  @override
+  String get fenceListNoGuarding => 'ဂျီယိုဖင်း မထည့်ရသေးပါ။';
+
+  @override
+  String get fenceListNoGuarded =>
+      'ကျွန်ုပ်အတွက် ဂျီယိုဖင်း ထည့်ထားသော မိသားစုဝင် မရှိသေးပါ။';
+
+  @override
+  String get fenceListEmptyDesc =>
+      'မိသားစုဝင် ဧရိယာ ဝင်/ထွက်ချိန်တွင် အကြောင်းကြားရန် ဘေးကင်းရာ ဧရိယာတစ်ခု ထည့်ပါ။';
+
+  @override
+  String get fenceCreateTitle => 'ဂျီယိုဖင်း အသစ်ထည့်ရန်';
+
+  @override
+  String get fenceNameLabel => 'ဖင်း အမည်';
+
+  @override
+  String get fenceNameHint => 'ဥပမာ - ကျောင်း၊ အိမ်';
+
+  @override
+  String get fenceRangeLabel => 'အချင်းဝက် (မီတာ)';
+
+  @override
+  String get fenceRangeHint => 'ဥပမာ - ၂၀၀';
+
+  @override
+  String get fenceInvalidRange => 'အချင်းဝက်သည် ၀ ထက် ကြီးရပါမည်';
+
+  @override
+  String get fencePickLocationTitle => 'မြေပုံပေါ်တွင် ဗဟိုအမှတ် ရွေးပါ';
+
+  @override
+  String get fencePickLocationHint =>
+      'မြေပုံကို နှိပ်၍ ဗဟိုအမှတ် ထားပြီး အချင်းဝက် သတ်မှတ်ပါ။';
+
+  @override
+  String get fencePickLocationSelected => 'ဗဟိုအမှတ် သတ်မှတ်ပြီးပါပြီ';
+
+  @override
+  String get fencePickLocationRequired =>
+      'ကျေးဇူးပြု၍ မြေပုံပေါ်တွင် ဗဟိုအမှတ် ရွေးပါ';
+
+  @override
+  String get fenceTargetLabel => 'စောင့်ကြည့်မည့် အဖွဲ့ဝင်';
+
+  @override
+  String get fenceCreatedBy => 'သတ်မှတ်သူ';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '$date တွင် ဖန်တီးခဲ့သည်';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return 'အချင်းဝက် $meters မီတာ';
+  }
+
+  @override
+  String get fenceCreateButton => 'ဖန်တီးရန်';
+
+  @override
+  String get fenceCreateSuccess => 'ဂျီယိုဖင်း ဖန်တီးပြီးပါပြီ';
+
+  @override
+  String get fenceDelete => 'ဖျက်ရန်';
+
+  @override
+  String get fenceDeleteConfirm => 'ဤဂျီယိုဖင်းကို ဖျက်မည်လား?';
+
+  @override
+  String get fenceDeleteSuccess => 'ဂျီယိုဖင်း ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get fenceNoWatchableMembers => 'စောင့်ကြည့်ရန် မိသားစုဝင် မရှိပါ';
+
+  @override
+  String get fenceAlarmsTitle => 'ဂျီယိုဖင်း အကြောင်းကြားချက်များ';
+
+  @override
+  String get fenceAlarmEmpty => 'အကြောင်းကြားချက် မရှိပါ';
+
+  @override
+  String get fenceAlarmEmptyDesc =>
+      'သင် စောင့်ကြည့်နေသော မိသားစုဝင် ဖင်းမှ ထွက်ခွာပါက ဤနေရာတွင် အကြောင်းကြားပါမည်။';
+
+  @override
+  String get fenceAlarmInside => 'ဝင်ရောက်';
+
+  @override
+  String get fenceAlarmOutside => 'ထွက်ခွာ';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return 'အချိန် $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => 'ဂျီယိုဖင်းများ';
+
+  @override
+  String get myHomeFenceDesc =>
+      'မိသားစုအတွက် ဘေးကင်းရာ ဧရိယာ သတ်မှတ်ပြီး ဝင်/ထွက် အကြောင်းကြားချက် ရယူပါ';
+
+  @override
+  String get myHomeFenceAlarmsEntry => 'ဂျီယိုဖင်း အကြောင်းကြားချက်များ';
+
+  @override
+  String get myHomeFenceAlarmsDesc =>
+      'မိသားစုဝင်များ၏ ဖင်း ဝင်/ထွက် မှတ်တမ်းများ';
+
+  @override
+  String get locationHubTitle => 'လက်ရှိတည်နေရာ';
+
+  @override
+  String get locationHubSubtitle =>
+      'မိသားစု၏ တည်နေရာ၊ လမ်းကြောင်း၊ ဂျီယိုဖင်းနှင့် အကြောင်းကြားချက်များ';
+
+  @override
+  String get locationHubLiveMapDesc =>
+      'မိသားစုဝင်တစ်ဦးစီ၏ လက်ရှိတည်နေရာကို ကြည့်ရှုပါ';
+
+  @override
+  String get locationHubHistoryDesc =>
+      'ရွေးထားသော နေ့အတွက် အဖွဲ့ဝင်၏ လမ်းကြောင်းကို ကြည့်ပါ';
+
+  @override
+  String get locationHubFenceDesc =>
+      'ဘေးကင်းရာ ဧရိယာ သတ်မှတ်ပြီး ဝင်/ထွက်ချိန်တွင် အကြောင်းကြားပါ';
+
+  @override
+  String get locationHubFenceAlarmsDesc =>
+      'မိသားစုဝင်များ၏ ဖင်း ဝင်/ထွက် မှတ်တမ်းများ';
+
+  @override
+  String get profileJoinRequestsRow => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
+
+  @override
+  String get profileJoinRequestsAdminOnly => 'အုပ်ချုပ်သူများသာ';
 }

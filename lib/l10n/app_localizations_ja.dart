@@ -609,4 +609,201 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get countryTaiwan => '台湾';
+
+  @override
+  String get chatRoomSendImageTooltip => '画像を送信';
+
+  @override
+  String get chatRoomImageUploading => '画像をアップロード中…';
+
+  @override
+  String get chatRoomImageUploadFailed => '画像を送信できませんでした';
+
+  @override
+  String get chatMessageTypeImage => '[画像]';
+
+  @override
+  String get chatMessageTypeVoice => '[音声]';
+
+  @override
+  String get chatMessageTypeSystem => '[システム]';
+
+  @override
+  String get locationHistoryTitle => '本日の軌跡';
+
+  @override
+  String get locationHistoryEmpty => 'この日の軌跡データはありません';
+
+  @override
+  String get locationHistoryEmptyDesc => 'このメンバーは選択した日に位置情報を送信していません。';
+
+  @override
+  String get profileMe => '自分';
+
+  @override
+  String get locationHistoryPickDate => '日付を選択';
+
+  @override
+  String locationHistoryPointCount(int count) {
+    return '軌跡ポイント $count 件';
+  }
+
+  @override
+  String locationHistoryForMember(Object name) {
+    return '$name の軌跡';
+  }
+
+  @override
+  String locationHistoryForDate(Object date) {
+    return '$date の軌跡';
+  }
+
+  @override
+  String get locationHistoryView => '軌跡を表示';
+
+  @override
+  String locationHistoryBatteryLabel(Object percent) {
+    return 'バッテリー $percent%';
+  }
+
+  @override
+  String get fenceListTitle => 'ジオフェンス';
+
+  @override
+  String get fenceListEmpty => 'ジオフェンスがありません';
+
+  @override
+  String get fenceListGuardingGroup => '見守り中';
+
+  @override
+  String get fenceListGuardedGroup => '見守られている';
+
+  @override
+  String get fenceListNoGuarding => 'ジオフェンスはまだ設定されていません。';
+
+  @override
+  String get fenceListNoGuarded => 'あなたのためにジオフェンスを設定した家族はまだいません。';
+
+  @override
+  String get fenceListEmptyDesc => '家族がエリアに出入りしたときに通知されるセーフゾーンを追加できます。';
+
+  @override
+  String get fenceCreateTitle => 'ジオフェンスを追加';
+
+  @override
+  String get fenceNameLabel => 'フェンス名';
+
+  @override
+  String get fenceNameHint => '例：学校、家';
+
+  @override
+  String get fenceRangeLabel => '半径（メートル）';
+
+  @override
+  String get fenceRangeHint => '例：200';
+
+  @override
+  String get fenceInvalidRange => '半径は 0 より大きい値を入力してください';
+
+  @override
+  String get fencePickLocationTitle => 'マップで中心点を選択';
+
+  @override
+  String get fencePickLocationHint => 'マップをタップして中心点を置き、半径を設定します。';
+
+  @override
+  String get fencePickLocationSelected => '中心点を設定しました';
+
+  @override
+  String get fencePickLocationRequired => 'マップで中心点を選択してください';
+
+  @override
+  String get fenceTargetLabel => '見守るメンバー';
+
+  @override
+  String get fenceCreatedBy => '設定者';
+
+  @override
+  String fenceCreatedAt(String date) {
+    return '作成日時 $date';
+  }
+
+  @override
+  String fenceRadiusLabel(int meters) {
+    return '半径 $meters m';
+  }
+
+  @override
+  String get fenceCreateButton => '作成';
+
+  @override
+  String get fenceCreateSuccess => 'ジオフェンスを作成しました';
+
+  @override
+  String get fenceDelete => '削除';
+
+  @override
+  String get fenceDeleteConfirm => 'このジオフェンスを削除しますか？';
+
+  @override
+  String get fenceDeleteSuccess => 'ジオフェンスを削除しました';
+
+  @override
+  String get fenceNoWatchableMembers => '見守る家族メンバーがいません';
+
+  @override
+  String get fenceAlarmsTitle => 'ジオフェンス通知';
+
+  @override
+  String get fenceAlarmEmpty => '通知はありません';
+
+  @override
+  String get fenceAlarmEmptyDesc => '見守っている家族がフェンスを出入りすると、ここに通知されます。';
+
+  @override
+  String get fenceAlarmInside => 'エリアに入りました';
+
+  @override
+  String get fenceAlarmOutside => 'エリアから出ました';
+
+  @override
+  String fenceAlarmTime(String time) {
+    return '通知時刻 $time';
+  }
+
+  @override
+  String get myHomeFenceEntry => 'ジオフェンス';
+
+  @override
+  String get myHomeFenceDesc => '家族の安全エリアを設定し、出入り時に通知を受け取る';
+
+  @override
+  String get myHomeFenceAlarmsEntry => 'ジオフェンス通知';
+
+  @override
+  String get myHomeFenceAlarmsDesc => '家族のエリア出入り履歴を確認';
+
+  @override
+  String get locationHubTitle => 'リアルタイム位置情報';
+
+  @override
+  String get locationHubSubtitle => '家族の現在地・軌跡・ジオフェンスと通知';
+
+  @override
+  String get locationHubLiveMapDesc => '家族それぞれの現在地を確認';
+
+  @override
+  String get locationHubHistoryDesc => 'メンバーのある日の動きを確認';
+
+  @override
+  String get locationHubFenceDesc => '安全エリアを設定し、出入り時に通知を受け取る';
+
+  @override
+  String get locationHubFenceAlarmsDesc => '家族のエリア出入り履歴を確認';
+
+  @override
+  String get profileJoinRequestsRow => '参加申請';
+
+  @override
+  String get profileJoinRequestsAdminOnly => '管理者のみ';
 }
