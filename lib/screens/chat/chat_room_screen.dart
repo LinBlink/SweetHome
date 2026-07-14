@@ -41,6 +41,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   void dispose() {
+    // So a `NEW_MESSAGE` pushed for this conversation after the user
+    // navigates away doesn't get auto-marked read by ChatProvider — see
+    // ChatProvider.clearActiveConversation.
+    context.read<ChatProvider>().clearActiveConversation(widget.conversationId);
     _textCtrl.dispose();
     _scrollCtrl.dispose();
     super.dispose();
@@ -52,6 +56,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _textCtrl.clear();
     setState(() => _canSend = false);
     await context.read<ChatProvider>().sendMessage(widget.conversationId, text);
+    if (!mounted) return;
     _scrollToBottom();
   }
 

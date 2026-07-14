@@ -5,6 +5,7 @@ import '../core/app_config.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/location_provider.dart';
 import '../services/family_service.dart';
 import 'join_requests_screen.dart';
 import 'location_screen.dart';
@@ -86,7 +87,18 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
               subtitle: l10n.myHomeLocationDesc,
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const LocationScreen()),
+                MaterialPageRoute(
+                  // `Navigator.push` inserts the new route as a sibling
+                  // of MyHomeScreen's own provider scope, not a
+                  // descendant of it, so the app-scoped LocationProvider
+                  // (provided in main.dart) has to be re-provided
+                  // explicitly here — same pattern used for ChatProvider
+                  // elsewhere in this app.
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: context.read<LocationProvider>(),
+                    child: const LocationScreen(),
+                  ),
+                ),
               ),
             ),
             if (isAdmin) ...[

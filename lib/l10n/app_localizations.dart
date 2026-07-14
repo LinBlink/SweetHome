@@ -658,6 +658,78 @@ abstract class AppLocalizations {
   /// **'Share my location'**
   String get locationReportNow;
 
+  /// No description provided for @locationShareOnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location sharing is on'**
+  String get locationShareOnTitle;
+
+  /// No description provided for @locationShareOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location sharing is off'**
+  String get locationShareOffTitle;
+
+  /// No description provided for @locationShareOnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your position is reported to family about every 30 seconds.'**
+  String get locationShareOnSubtitle;
+
+  /// No description provided for @locationShareOffSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on to let family see where you are.'**
+  String get locationShareOffSubtitle;
+
+  /// No description provided for @locationShareToggleOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location sharing'**
+  String get locationShareToggleOn;
+
+  /// No description provided for @locationShareToggleOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off location sharing'**
+  String get locationShareToggleOff;
+
+  /// No description provided for @locationShareCancelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Location sharing is off — turn it on to report your position.'**
+  String get locationShareCancelHint;
+
+  /// No description provided for @locationResolving.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolving address…'**
+  String get locationResolving;
+
+  /// No description provided for @locationAddressUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Address unavailable'**
+  String get locationAddressUnavailable;
+
+  /// No description provided for @locationAddressFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Address unavailable for this language — showing English.'**
+  String get locationAddressFallback;
+
+  /// No description provided for @locationFullscreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Fullscreen map'**
+  String get locationFullscreen;
+
+  /// No description provided for @locationExitFullscreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit fullscreen'**
+  String get locationExitFullscreen;
+
   /// No description provided for @locationReportFailed.
   ///
   /// In en, this message translates to:

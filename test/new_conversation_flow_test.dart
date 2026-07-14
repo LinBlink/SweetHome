@@ -9,11 +9,13 @@ import 'package:sweethome_flutter/services/websocket_service.dart';
 
 // A WebSocket stand-in with no background timers/sockets.
 class _NoopWs extends WebSocketService {
+  _NoopWs() : super(tokenProvider: () => '');
+
   final _c = StreamController<WsInboundMessage>.broadcast();
   @override
   Stream<WsInboundMessage> get stream => _c.stream;
   @override
-  void connect(String token) {}
+  void connect() {}
   @override
   void send(WsOutboundMessage msg) {}
   @override

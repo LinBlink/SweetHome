@@ -28,6 +28,19 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <!-- Disable Impeller (Vulkan) and fall back to Skia. Observed
+                 on MEIZU 21 (Qualcomm, "Could not load mapper.qti.so"
+                 driver warning in logcat): the OSM map on LocationScreen
+                 loads tiles successfully but they stay un-painted until
+                 the user pans/interacts with the map, which is a known
+                 class of Impeller-on-Vulkan repaint-scheduling bug on
+                 certain Android GPU/driver combos, not something fixable
+                 from Dart app code. This is Flutter's own documented
+                 opt-out for that bug class. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.EnableImpeller"
+              android:value="false"
+              />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

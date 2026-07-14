@@ -174,5 +174,17 @@
   "requestJoinModeByCode": "ဖိတ်ကုဒ် ရှိသည်",
   "requestJoinModeByPhone": "မိသားစုဝင်တစ်ယောက်၏ ဖုန်းနံပါတ် သိသည်",
   "requestJoinNoFamilySubmit": "လျှောက်လွှာ ပို့ရန်",
-  "requestJoinByCodeHint": "ဖိတ်ကုဒ် ရှိပါက ဤနေရာတွင် အသုံးပြုပါ။"
+  "requestJoinByCodeHint": "ဖိတ်ကုဒ် ရှိပါက ဤနေရာတွင် အသုံးပြုပါ။",
+  "locationResolving": "လိပ်စာ ရှာနေသည်…",
+  "locationAddressUnavailable": "လိပ်စာ ရယူ၍ မရပါ",
+  "locationAddressFallback": "ဤဘာသာအတွက် လိပ်စာ ဒေတာ မရှိသောကြောင့် အင်္ဂလိပ်ဘာသာဖြင့် ပြသထားသည်။",
+  "locationFullscreen": "မြေပုံကို ဖန်မြင်အပြည့ဖြင့် ပြပါ",
+  "locationExitFullscreen": "ဖန်မြင်အပြည့မှ ထွက်ရန်",
+  "locationShareOnTitle": "တည်နေရာ မျှဝေခြင်း ဖွင့်ထားသည်",
+  "locationShareOffTitle": "တည်နေရာ မျှဝေခြင်း ပိတ်ထားသည်",
+  "locationShareOnSubtitle": "လက်ရှိတည်နေရာကို မိသားစုထံ စက္ကန့် 30 ခန့်တိုင်း အလိုအလျန် ပို့ပေးနေသည်။",
+  "locationShareOffSubtitle": "ဖွင့်ထားလျှင် မိသားစုဝင်များက သင့်ရဲ့ တည်နေရာကို မြင်ရပါမည်။",
+  "locationShareToggleOn": "တည်နေရာ မျှဝေခြင်း ဖွင့်ရန်",
+  "locationShareToggleOff": "တည်နေရာ မျှဝေခြင်း ပိတ်ရန်",
+  "locationShareCancelHint": "တည်နေရာ မျှဝေခြင်း ပိတ်ထားသည် — ဖွင့်လျှင် တည်နေရာကို အလိုအလျန် မျှဝေပါမည်။"
 }

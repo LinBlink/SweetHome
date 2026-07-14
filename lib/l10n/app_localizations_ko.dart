@@ -308,6 +308,42 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationReportNow => '내 위치 공유하기';
 
   @override
+  String get locationShareOnTitle => '위치 공유가 켜져 있습니다';
+
+  @override
+  String get locationShareOffTitle => '위치 공유가 꺼져 있습니다';
+
+  @override
+  String get locationShareOnSubtitle => '현재 위치가 약 30초마다 가족에게 자동 전송됩니다.';
+
+  @override
+  String get locationShareOffSubtitle => '켜면 가족이 내 위치를 볼 수 있습니다.';
+
+  @override
+  String get locationShareToggleOn => '위치 공유 켜기';
+
+  @override
+  String get locationShareToggleOff => '위치 공유 끄기';
+
+  @override
+  String get locationShareCancelHint => '위치 공유가 꺼져 있습니다 — 켜면 위치가 자동으로 공유됩니다.';
+
+  @override
+  String get locationResolving => '주소 확인 중…';
+
+  @override
+  String get locationAddressUnavailable => '주소를 확인할 수 없습니다';
+
+  @override
+  String get locationAddressFallback => '이 언어의 주소 데이터가 없어 영어로 표시합니다.';
+
+  @override
+  String get locationFullscreen => '전체 화면 지도';
+
+  @override
+  String get locationExitFullscreen => '전체 화면 종료';
+
+  @override
   String get locationReportFailed => '위치를 공유할 수 없습니다';
 
   @override

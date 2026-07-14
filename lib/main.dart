@@ -8,7 +8,9 @@ import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/location_provider.dart';
 import 'services/chat_service.dart';
+import 'services/location_service.dart';
 import 'services/websocket_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chat/conversation_list_screen.dart';
@@ -64,15 +66,39 @@ class AuthGate extends StatelessWidget {
       builder: (ctx, auth, _) {
         if (auth.isLoading) return const _SplashScreen();
         if (auth.isAuthenticated) {
-          return ChangeNotifierProvider(
-            create: (_) => ChatProvider(
-              ws: AppConfig.mockMode
-                  ? MockWebSocketService()
-                  : WebSocketService(),
-              chatService: ChatService(() => auth.currentUser!.token),
-              currentUser: auth.currentUser!,
-              onUnauthorized: auth.handleUnauthorized,
-            )..loadConversations(),
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (_) => ChatProvider(
+                  ws: AppConfig.mockMode
+                      ? MockWebSocketService()
+                      : WebSocketService(
+                          tokenProvider: () => auth.currentUser!.token,
+                        ),
+                  chatService: ChatService(() => auth.currentUser!.token),
+                  currentUser: auth.currentUser!,
+                  onUnauthorized: auth.handleUnauthorized,
+                )..loadConversations(),
+              ),
+              // App-scoped (not screen-scoped) so the §6.1 sharing
+              // toggle/timer survives navigating away from and back
+              // to LocationScreen — previously LocationScreen owned
+              // and disposed its own LocationProvider on unmount, so
+              // reopening the screen always showed sharing as off
+              // even if the user had just turned it on. Lives exactly
+              // as long as ChatProvider (created on login, torn down
+              // on logout via this same subtree leaving/re-entering
+              // the widget tree). `restoreSharingState()` also resumes
+              // sharing across a full app restart (not just navigation)
+              // by reading the on/off flag it persists to
+              // SharedPreferences on every toggle.
+              ChangeNotifierProvider(
+                create: (_) => LocationProvider(
+                  service: LocationService(() => auth.currentUser!.token),
+                  mockMode: AppConfig.mockMode,
+                )..restoreSharingState(),
+              ),
+            ],
             child: const MainShell(),
           );
         }

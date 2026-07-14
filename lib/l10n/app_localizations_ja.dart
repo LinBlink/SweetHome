@@ -308,6 +308,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationReportNow => '自分の位置を共有';
 
   @override
+  String get locationShareOnTitle => '位置情報の共有がオンです';
+
+  @override
+  String get locationShareOffTitle => '位置情報の共有がオフです';
+
+  @override
+  String get locationShareOnSubtitle => '現在地は約 30 秒ごとに家族に自動送信されます。';
+
+  @override
+  String get locationShareOffSubtitle => 'オンにすると、家族があなたの現在地を確認できます。';
+
+  @override
+  String get locationShareToggleOn => '位置情報の共有をオンにする';
+
+  @override
+  String get locationShareToggleOff => '位置情報の共有をオフにする';
+
+  @override
+  String get locationShareCancelHint => '位置情報の共有はオフです — オンにすると位置が自動送信されます。';
+
+  @override
+  String get locationResolving => '住所を解析中…';
+
+  @override
+  String get locationAddressUnavailable => '住所を取得できません';
+
+  @override
+  String get locationAddressFallback => 'この言語の住所データがないため英語で表示しています。';
+
+  @override
+  String get locationFullscreen => 'フルスクリーンで地図を表示';
+
+  @override
+  String get locationExitFullscreen => 'フルスクリーンを終了';
+
+  @override
   String get locationReportFailed => '位置情報の共有に失敗しました';
 
   @override

@@ -308,6 +308,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationReportNow => '分享我的位置';
 
   @override
+  String get locationShareOnTitle => '位置共享已开启';
+
+  @override
+  String get locationShareOffTitle => '位置共享已关闭';
+
+  @override
+  String get locationShareOnSubtitle => '位置约每 30 秒自动发送给家人。';
+
+  @override
+  String get locationShareOffSubtitle => '开启后，家人即可看到你的位置。';
+
+  @override
+  String get locationShareToggleOn => '开启位置共享';
+
+  @override
+  String get locationShareToggleOff => '关闭位置共享';
+
+  @override
+  String get locationShareCancelHint => '位置共享未开启 — 打开开关后自动上报位置。';
+
+  @override
+  String get locationResolving => '正在解析地址…';
+
+  @override
+  String get locationAddressUnavailable => '无法解析地址';
+
+  @override
+  String get locationAddressFallback => '当前语言无该地址数据 — 显示英文版本。';
+
+  @override
+  String get locationFullscreen => '全屏显示地图';
+
+  @override
+  String get locationExitFullscreen => '退出全屏';
+
+  @override
   String get locationReportFailed => '位置分享失败';
 
   @override
@@ -876,6 +912,42 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationReportNow => '分享我的位置';
 
   @override
+  String get locationShareOnTitle => '位置共享已开启';
+
+  @override
+  String get locationShareOffTitle => '位置共享已关闭';
+
+  @override
+  String get locationShareOnSubtitle => '位置约每 30 秒自动发送给家人。';
+
+  @override
+  String get locationShareOffSubtitle => '开启后，家人即可看到你的位置。';
+
+  @override
+  String get locationShareToggleOn => '开启位置共享';
+
+  @override
+  String get locationShareToggleOff => '关闭位置共享';
+
+  @override
+  String get locationShareCancelHint => '位置共享未开启 — 打开开关后自动上报位置。';
+
+  @override
+  String get locationResolving => '正在解析地址…';
+
+  @override
+  String get locationAddressUnavailable => '无法解析地址';
+
+  @override
+  String get locationAddressFallback => '当前语言无该地址数据 — 显示英文版本。';
+
+  @override
+  String get locationFullscreen => '全屏显示地图';
+
+  @override
+  String get locationExitFullscreen => '退出全屏';
+
+  @override
   String get locationReportFailed => '位置分享失败';
 
   @override
@@ -1442,6 +1514,42 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get locationReportNow => '分享我的位置';
+
+  @override
+  String get locationShareOnTitle => '位置共享已開啟';
+
+  @override
+  String get locationShareOffTitle => '位置共享已關閉';
+
+  @override
+  String get locationShareOnSubtitle => '位置約每 30 秒自動傳送給家人。';
+
+  @override
+  String get locationShareOffSubtitle => '開啟後，家人即可看到你的位置。';
+
+  @override
+  String get locationShareToggleOn => '開啟位置共享';
+
+  @override
+  String get locationShareToggleOff => '關閉位置共享';
+
+  @override
+  String get locationShareCancelHint => '位置共享未開啟 — 打開開關後自動上報位置。';
+
+  @override
+  String get locationResolving => '正在解析地址…';
+
+  @override
+  String get locationAddressUnavailable => '無法解析地址';
+
+  @override
+  String get locationAddressFallback => '目前語言無此地址資料 — 顯示英文版本。';
+
+  @override
+  String get locationFullscreen => '全螢幕顯示地圖';
+
+  @override
+  String get locationExitFullscreen => '退出全螢幕';
 
   @override
   String get locationReportFailed => '位置分享失敗';

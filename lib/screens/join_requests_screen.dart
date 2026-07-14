@@ -52,7 +52,7 @@ class _JoinRequestsScreenState extends State<JoinRequestsScreen> {
   /// Returns the reason the admin typed, or null if cancelled.
   Future<String?> _askForRejectReason(AppLocalizations l10n) async {
     final ctrl = TextEditingController();
-    return showDialog<String?>(
+    final result = await showDialog<String?>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
@@ -81,6 +81,8 @@ class _JoinRequestsScreenState extends State<JoinRequestsScreen> {
         ],
       ),
     );
+    ctrl.dispose();
+    return result;
   }
 
   Future<void> _approve(JoinRequest req) async {

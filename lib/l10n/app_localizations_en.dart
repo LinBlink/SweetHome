@@ -318,6 +318,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationReportNow => 'Share my location';
 
   @override
+  String get locationShareOnTitle => 'Location sharing is on';
+
+  @override
+  String get locationShareOffTitle => 'Location sharing is off';
+
+  @override
+  String get locationShareOnSubtitle =>
+      'Your position is reported to family about every 30 seconds.';
+
+  @override
+  String get locationShareOffSubtitle =>
+      'Turn on to let family see where you are.';
+
+  @override
+  String get locationShareToggleOn => 'Turn on location sharing';
+
+  @override
+  String get locationShareToggleOff => 'Turn off location sharing';
+
+  @override
+  String get locationShareCancelHint =>
+      'Location sharing is off — turn it on to report your position.';
+
+  @override
+  String get locationResolving => 'Resolving address…';
+
+  @override
+  String get locationAddressUnavailable => 'Address unavailable';
+
+  @override
+  String get locationAddressFallback =>
+      'Address unavailable for this language — showing English.';
+
+  @override
+  String get locationFullscreen => 'Fullscreen map';
+
+  @override
+  String get locationExitFullscreen => 'Exit fullscreen';
+
+  @override
   String get locationReportFailed => 'Could not share location';
 
   @override

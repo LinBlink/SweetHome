@@ -318,6 +318,46 @@ class AppLocalizationsMy extends AppLocalizations {
   String get locationReportNow => 'ကျွန်ုပ်၏တည်နေရာကို မျှဝေမည်';
 
   @override
+  String get locationShareOnTitle => 'တည်နေရာ မျှဝေခြင်း ဖွင့်ထားသည်';
+
+  @override
+  String get locationShareOffTitle => 'တည်နေရာ မျှဝေခြင်း ပိတ်ထားသည်';
+
+  @override
+  String get locationShareOnSubtitle =>
+      'လက်ရှိတည်နေရာကို မိသားစုထံ စက္ကန့် 30 ခန့်တိုင်း အလိုအလျန် ပို့ပေးနေသည်။';
+
+  @override
+  String get locationShareOffSubtitle =>
+      'ဖွင့်ထားလျှင် မိသားစုဝင်များက သင့်ရဲ့ တည်နေရာကို မြင်ရပါမည်။';
+
+  @override
+  String get locationShareToggleOn => 'တည်နေရာ မျှဝေခြင်း ဖွင့်ရန်';
+
+  @override
+  String get locationShareToggleOff => 'တည်နေရာ မျှဝေခြင်း ပိတ်ရန်';
+
+  @override
+  String get locationShareCancelHint =>
+      'တည်နေရာ မျှဝေခြင်း ပိတ်ထားသည် — ဖွင့်လျှင် တည်နေရာကို အလိုအလျန် မျှဝေပါမည်။';
+
+  @override
+  String get locationResolving => 'လိပ်စာ ရှာနေသည်…';
+
+  @override
+  String get locationAddressUnavailable => 'လိပ်စာ ရယူ၍ မရပါ';
+
+  @override
+  String get locationAddressFallback =>
+      'ဤဘာသာအတွက် လိပ်စာ ဒေတာ မရှိသောကြောင့် အင်္ဂလိပ်ဘာသာဖြင့် ပြသထားသည်။';
+
+  @override
+  String get locationFullscreen => 'မြေပုံကို ဖန်မြင်အပြည့ဖြင့် ပြပါ';
+
+  @override
+  String get locationExitFullscreen => 'ဖန်မြင်အပြည့မှ ထွက်ရန်';
+
+  @override
   String get locationReportFailed => 'တည်နေရာမျှဝေမှု မအောင်မြင်ပါ';
 
   @override

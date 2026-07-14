@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/address_resolver.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -17,6 +19,7 @@ import '../services/location_service.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/error_banner.dart';
 import 'location_debug_screen.dart';
+import 'location_fullscreen_screen.dart';
 
 /// API §6 实时位置 page. Layout (top to bottom):
 ///   1. OSM map with one avatar-marker per member with a fresh fix
@@ -38,7 +41,6 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   late final LocationService _service;
-  late final LocationProvider _provider;
   Future<FamilyLocations>? _future;
   final MapController _mapController = MapController();
 
@@ -49,14 +51,13 @@ class _LocationScreenState extends State<LocationScreen> {
       final user = context.read<AuthProvider>().currentUser;
       return user?.token ?? '';
     });
-    _provider = LocationProvider(
-      service: _service,
-      mockMode: AppConfig.mockMode,
-    );
-    // Kick off the upload loop as soon as the screen is on stage —
-    // the spec says "首次采集必定上报" so the first sample goes
-    // out before the user even sees the map.
-    _provider.startSharing();
+    // Sharing itself isn't auto-started here — `LocationProvider` is
+    // app-scoped (provided in `main.dart`, alongside `ChatProvider`)
+    // so it already reflects whatever on/off state the user last set,
+    // even if that was on a previous visit to this screen. We still
+    // eagerly load the family locations because that's a *read* path
+    // that shows the map markers — independent of whether the local
+    // user is sharing.
     _future = _loadLocations();
   }
 
@@ -69,7 +70,6 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   void dispose() {
-    _provider.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -79,28 +79,24 @@ class _LocationScreenState extends State<LocationScreen> {
     await _future;
   }
 
-  Future<void> _shareMyLocation() async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    final ok = await _provider.reportNow();
-    if (!mounted) return;
-    if (ok) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.locationReportNow)));
-      _refresh();
-    } else {
-      // Translate the provider's machine-readable error code into a
-      // localized message. Unknown codes fall back to the generic
-      // "could not share location" so the user at least knows the
-      // button didn't work.
-      final err = _provider.lastError;
-      final localized = switch (err) {
-        'GPS_TIMEOUT' => l10n.locationGpsTimeout,
-        'GPS_NOT_AVAILABLE' => l10n.locationGpsUnavailable,
-        'GPS_OFF' => l10n.locationGpsOff,
-        _ => l10n.locationReportFailed,
-      };
-      messenger.showSnackBar(SnackBar(content: Text(localized)));
-    }
+  /// Push a dedicated fullscreen-map screen. We don't gate the
+  /// push on `_future` having completed — if the user taps
+  /// fullscreen while the initial family-locations fetch is still
+  /// in flight, the fullscreen screen owns its own `FutureBuilder`
+  /// and re-issues the fetch.
+  void _openFullscreen() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const LocationFullscreenScreen()),
+    );
+  }
+
+  /// Wire the toggle switch: ON starts the §6.1 background loop,
+  /// OFF cancels it. The provider's `toggleSharing()` itself guards
+  /// against mid-sample toggles (`isAttempting` short-circuits the
+  /// call), so we don't need extra state here.
+  void _onToggleSharing() {
+    context.read<LocationProvider>().toggleSharing();
   }
 
   /// Center the map on the cluster of member fixes. If only one
@@ -121,102 +117,111 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Watch the provider so the "Share my location" button reflects
-    // permission/permission-permanently-denied/gps-off status.
-    return ChangeNotifierProvider.value(
-      value: _provider,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          title: Text(l10n.locationTitle),
-          actions: [
-            // Debug-build-only entry to the raw capture/report log —
-            // never shown in a release build, so no l10n needed for
-            // a screen a real user will never see.
-            if (kDebugMode)
-              IconButton(
-                icon: const Icon(Icons.bug_report_outlined),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChangeNotifierProvider.value(
-                      value: _provider,
-                      child: const LocationDebugScreen(),
-                    ),
-                  ),
-                ),
-                tooltip: 'Location debug',
-              ),
+    // LocationProvider is app-scoped (provided in main.dart alongside
+    // ChatProvider), not owned by this screen, so `_ProviderBanner`,
+    // `_ShareToggle`, `_LastReportedLine` below can `context.watch` it
+    // directly without a local `ChangeNotifierProvider.value` wrapper.
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(l10n.locationTitle),
+        actions: [
+          // Debug-build-only entry to the raw capture/report log —
+          // never shown in a release build, so no l10n needed for
+          // a screen a real user will never see.
+          if (kDebugMode)
             IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: _refresh,
-              tooltip: l10n.locationRefresh,
-            ),
-          ],
-        ),
-        body: FutureBuilder<FamilyLocations>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
-            }
-            if (snapshot.hasError) {
-              final isApi = snapshot.error is ApiException;
-              return ErrorBanner(
-                message: localizeErrorMessage(
-                  isApi
-                      ? (snapshot.error as ApiException).message
-                      : kNetworkErrorSentinel,
-                  l10n,
-                ),
-                onDismiss: _refresh,
-              );
-            }
-            final data = snapshot.data!;
-            final members = data.familyMemberLocations;
-            // Auto-fit on the first successful load (or when the
-            // marker set changes from empty to non-empty).
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _fitToMembers(members);
-            });
-            return Column(
-              children: [
-                _MapPanel(members: members, mapController: _mapController),
-                _StatsStrip(data: data, l10n: l10n),
-                _ProviderBanner(),
-                const Divider(height: 1, color: AppColors.divider),
-                Expanded(
-                  child: members.isEmpty
-                      ? _EmptyState(l10n: l10n, total: data.totalMemberCount)
-                      : ListView.separated(
-                          itemCount: members.length,
-                          separatorBuilder: (_, _) =>
-                              const Divider(height: 1, indent: 70),
-                          itemBuilder: (_, i) =>
-                              _MemberTile(member: members[i], l10n: l10n),
-                        ),
-                ),
-                SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _LastReportedLine(),
-                        const SizedBox(height: 8),
-                        _ShareLocationButton(onPressed: _shareMyLocation),
-                      ],
-                    ),
+              icon: const Icon(Icons.bug_report_outlined),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // `Navigator.push` inserts the new route as a
+                  // sibling of this screen's own provider scope, not
+                  // a descendant of it, so LocationProvider has to be
+                  // re-provided explicitly here (same pattern used
+                  // for ChatProvider elsewhere in this app).
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: context.read<LocationProvider>(),
+                    child: const LocationDebugScreen(),
                   ),
                 ),
-              ],
+              ),
+              tooltip: 'Location debug',
+            ),
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            onPressed: () => _openFullscreen(),
+            tooltip: l10n.locationFullscreen,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+            tooltip: l10n.locationRefresh,
+          ),
+        ],
+      ),
+      body: FutureBuilder<FamilyLocations>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
-          },
-        ),
+          }
+          if (snapshot.hasError) {
+            final isApi = snapshot.error is ApiException;
+            return ErrorBanner(
+              message: localizeErrorMessage(
+                isApi
+                    ? (snapshot.error as ApiException).message
+                    : kNetworkErrorSentinel,
+                l10n,
+              ),
+              onDismiss: _refresh,
+            );
+          }
+          final data = snapshot.data!;
+          final members = data.familyMemberLocations;
+          // Auto-fit on the first successful load (or when the
+          // marker set changes from empty to non-empty).
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _fitToMembers(members);
+          });
+          return Column(
+            children: [
+              _MapPanel(members: members, mapController: _mapController),
+              _StatsStrip(data: data, l10n: l10n),
+              _ProviderBanner(),
+              const Divider(height: 1, color: AppColors.divider),
+              Expanded(
+                child: members.isEmpty
+                    ? _EmptyState(l10n: l10n, total: data.totalMemberCount)
+                    : ListView.separated(
+                        itemCount: members.length,
+                        separatorBuilder: (_, _) =>
+                            const Divider(height: 1, indent: 70),
+                        itemBuilder: (_, i) =>
+                            _MemberTile(member: members[i], l10n: l10n),
+                      ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _LastReportedLine(),
+                      const SizedBox(height: 8),
+                      _ShareToggle(onChanged: _onToggleSharing),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -254,13 +259,29 @@ class _MapPanel extends StatelessWidget {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'asia.sweethome.flutter',
                 maxZoom: 19,
+                // Default `TileDisplay.fadeIn()` starts each tile at
+                // opacity 0 and only reveals it once a 100ms
+                // AnimationController finishes — on a freshly pushed
+                // route that ticker can stall before its first tick,
+                // leaving fully-loaded tiles invisible until some
+                // later interaction nudges the rendering pipeline
+                // (the "map only shows up after I tap it" symptom).
+                // Instantaneous display shows each tile the moment it
+                // decodes, with no ticker involved.
+                tileDisplay: const TileDisplay.instantaneous(),
               ),
               MarkerLayer(
                 markers: [
                   for (final m in members)
                     Marker(
-                      width: 44,
-                      height: 44,
+                      // Width fits ~5–6 CJK chars or 8 Latin chars; the
+                      // inner `Container` clamps with `maxLines: 1 +
+                      // ellipsis` so longer names look truncated rather
+                      // than wrapping. The old 44 px width was too
+                      // narrow for 4-character Chinese names — the
+                      // BUGS_TO_FIX user complaint of "人名没有完全显示出来".
+                      width: 130,
+                      height: 80,
                       point: LatLng(m.lat, m.lng),
                       alignment: Alignment.topCenter,
                       child: _MemberMarker(member: m),
@@ -286,31 +307,67 @@ class _MemberMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = AppColors.avatarColorFor(member.userId);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 4,
-                offset: Offset(0, 2),
+    return SizedBox(
+      width: 130,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Name badge — sits above the avatar pin so the full
+          // username is visible even on 4-char CJK names
+          // ("王小明", "张美玲"). White pill with a 1px outline in
+          // the member's avatar color so the badge and pin read as
+          // one marker, not two.
+          Container(
+            constraints: const BoxConstraints(maxWidth: 124),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.95),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: color, width: 1),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Text(
+              member.username,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: color,
               ),
-            ],
+            ),
           ),
-          child: AvatarWidget(
-            label: memberAvatarLabel(member.username),
-            color: color,
-            imageUrl: member.userAvatarUrl,
-            radius: 20,
+          const SizedBox(height: 2),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: AvatarWidget(
+              label: memberAvatarLabel(member.username),
+              color: color,
+              imageUrl: member.userAvatarUrl,
+              radius: 16,
+            ),
           ),
-        ),
-        // Small triangle pointing down (pin tail).
-        Container(width: 2, height: 8, color: color),
-      ],
+          // Small triangle pointing down (pin tail).
+          Container(width: 2, height: 6, color: color),
+        ],
+      ),
     );
   }
 }
@@ -400,13 +457,7 @@ class _ProviderBanner extends StatelessWidget {
           icon: Icons.location_disabled,
           message: l10n.locationPermissionDenied,
           action: TextButton(
-            onPressed: () {
-              // No platform channel for opening settings without a
-              // plugin; just surface a hint. Tapping "Open settings"
-              // would call `permission_handler.openAppSettings()`,
-              // but adding that dep just for this is overkill —
-              // the system surfaces the deep-link elsewhere.
-            },
+            onPressed: () => Geolocator.openAppSettings(),
             child: Text(l10n.locationPermissionOpenSettings),
           ),
         );
@@ -501,6 +552,71 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+/// Reverse-geocoded address for one member. Reads from
+/// [AddressResolver] which already coalesces concurrent calls and
+/// caches by (coord, locale), so the Future below resolves fast
+/// after the first build.
+class _AddressLine extends StatelessWidget {
+  final double lng;
+  final double lat;
+  final Locale locale;
+  final AppLocalizations l10n;
+  const _AddressLine({
+    required this.lng,
+    required this.lat,
+    required this.locale,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: AddressResolver.resolve(lng, lat, locale),
+      initialData: AddressResolver.peek(lng, lat, locale),
+      builder: (context, snap) {
+        // Check `hasData` before `connectionState` so a cache hit
+        // (delivered via `initialData`) renders the address
+        // immediately instead of flashing the loading spinner for the
+        // one microtask `resolve` always takes, even on a cache hit.
+        if (snap.hasData) {
+          return Text(
+            snap.data!,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          );
+        }
+        if (snap.connectionState == ConnectionState.waiting) {
+          return Row(
+            children: [
+              const SizedBox(
+                width: 10,
+                height: 10,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: AppColors.textHint,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.locationResolving,
+                style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+              ),
+            ],
+          );
+        }
+        return Text(
+          l10n.locationAddressUnavailable,
+          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+        );
+      },
+    );
+  }
+}
+
 class _MemberTile extends StatelessWidget {
   final MemberLocation member;
   final AppLocalizations l10n;
@@ -519,6 +635,7 @@ class _MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = AppColors.avatarColorFor(member.userId);
+    final locale = Localizations.localeOf(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -574,15 +691,18 @@ class _MemberTile extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  l10n.locationCoordinates(
-                    member.lng.toStringAsFixed(4),
-                    member.lat.toStringAsFixed(4),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+                // Address line replaces the old "lng, lat" string per
+                // BUGS_TO_FIX user requirement. The widget rebuilds
+                // when notifyListeners() fires (location toggle,
+                // status changes) but `FutureBuilder` keyed by the
+                // (lng, lat, locale) tuple effectively memoizes via
+                // AddressResolver's internal cache, so the platform
+                // geocoder is hit exactly once per (member, locale).
+                _AddressLine(
+                  lng: member.lng,
+                  lat: member.lat,
+                  locale: locale,
+                  l10n: l10n,
                 ),
                 const SizedBox(height: 2),
                 Row(
@@ -625,40 +745,103 @@ class _MemberTile extends StatelessWidget {
   }
 }
 
-/// "Share my location" button, disabled + spinning while a capture is
-/// in flight. `LocationProvider.reportNow()` can take up to ~90s
-/// (multi-tier GPS fallback) before it resolves either way — without
-/// this the button stays tappable and visually unchanged the whole
-/// time, which looks exactly like the tap did nothing until the error
-/// toast finally appears (see `LocationProvider._attemptSample`'s doc
-/// comment for the underlying fix: `isAttempting` used to only be
-/// tracked for the background timer, not the manual button).
-class _ShareLocationButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  const _ShareLocationButton({required this.onPressed});
+/// On/off toggle for the §6.1 background location-sharing loop.
+/// ON → `_provider.startSharing()` (1-minute timer + immediate
+/// first sample, plus a "last gasp" sample on `AppLifecycleState.paused`).
+/// OFF → `_provider.stopSharing()` (timer cancelled, lifecycle
+/// observer detached, no more network).
+///
+/// While a GPS acquire is in flight (`isAttempting == true`) we
+/// disable the switch to avoid an orphaned in-flight future —
+/// toggling off mid-sample would leave `_captureFix` running with
+/// no consumer for its result. The `Switch`'s onChanged is left
+/// enabled when the sample fails — only the *toggling* is
+/// blocked, not the next sample after it resolves.
+class _ShareToggle extends StatelessWidget {
+  final VoidCallback onChanged;
+  const _ShareToggle({required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isAttempting = context.watch<LocationProvider>().isAttempting;
-    return ElevatedButton.icon(
-      icon: isAttempting
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : const Icon(Icons.my_location),
-      label: Text(l10n.locationReportNow),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+    final provider = context.watch<LocationProvider>();
+    final isRunning = provider.isRunning;
+    final isAttempting = provider.isAttempting;
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isRunning ? AppColors.primary : AppColors.divider,
+          width: isRunning ? 1.5 : 1,
+        ),
       ),
-      onPressed: isAttempting ? null : onPressed,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: isRunning
+                  ? AppColors.primaryLight.withValues(alpha: 0.25)
+                  : AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              isAttempting
+                  ? Icons.gps_not_fixed
+                  : (isRunning ? Icons.location_on : Icons.location_off),
+              color: isRunning ? AppColors.primary : AppColors.textHint,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isRunning
+                      ? l10n.locationShareOnTitle
+                      : l10n.locationShareOffTitle,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  isAttempting
+                      ? l10n.locationLocating
+                      : (isRunning
+                            ? l10n.locationShareOnSubtitle
+                            : l10n.locationShareOffSubtitle),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isAttempting
+                        ? AppColors.primary
+                        : AppColors.textHint,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: isRunning,
+            // `onChanged: null` when a sample is in flight → renders
+            // the switch grey (Material's standard disabled look)
+            // but keeps the row visible so the user sees the
+            // "Locating…" subtitle rather than a row that just
+            // disappears.
+            onChanged: isAttempting ? null : (_) => onChanged(),
+          ),
+        ],
+      ),
     );
   }
 }

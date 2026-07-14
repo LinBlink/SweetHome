@@ -27,6 +27,14 @@ class ChatProvider extends ChangeNotifier {
   final _uuid = const Uuid();
   final Set<int> _onlineUserIds = {};
 
+  /// The conversation the user currently has `ChatRoomScreen` open on, if
+  /// any. Used by [_handleWsMessage] so a `NEW_MESSAGE` pushed while the
+  /// room is already open gets marked read immediately instead of sitting
+  /// unread on the server until the next time the conversation is opened
+  /// (which is what [_syncReadState] is otherwise only triggered by, via
+  /// [loadMessages]'s initial page fetch).
+  int? _activeConversationId;
+
   List<Conversation> get conversations => _conversations;
   bool get isLoadingConversations => _isLoadingConversations;
   String? get connectionError => _connectionError;
@@ -49,7 +57,7 @@ class ChatProvider extends ChangeNotifier {
        _chatService = chatService,
        _currentUser = currentUser,
        _onUnauthorized = onUnauthorized {
-    _ws.connect(_currentUser.token);
+    _ws.connect();
     _wsSub = _ws.stream.listen(_handleWsMessage);
   }
 
@@ -243,6 +251,13 @@ class ChatProvider extends ChangeNotifier {
         final confirmed = optimistic.copyWith(isPending: false);
         _replaceOptimistic(conversationId, clientId, confirmed);
       } else {
+        // `WebSocketService.send` is a silent no-op when the socket is
+        // down — it never throws — so without this check a disconnected
+        // client would never fall through to the REST fallback below and
+        // the optimistic message would stay `isPending: true` forever.
+        if (!_ws.isConnected) {
+          throw StateError('WebSocket not connected');
+        }
         final wsMsg = WsOutboundMessage(
           type: 'SEND_MESSAGE',
           payload: {
@@ -286,6 +301,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void setActiveConversation(int convId) {
+    _activeConversationId = convId;
     _ws.send(
       WsOutboundMessage(
         type: 'JOIN_CONVERSATION',
@@ -297,6 +313,16 @@ class ChatProvider extends ChangeNotifier {
       _conversations[idx] = _conversations[idx].copyWith(unreadCount: 0);
       notifyListeners();
     }
+  }
+
+  /// Call from `ChatRoomScreen.dispose()` so a `NEW_MESSAGE` pushed for
+  /// this conversation *after* the user has navigated away doesn't get
+  /// auto-marked read by [_handleWsMessage] — only guards against a stale
+  /// [_activeConversationId] still pointing at a conversation the user has
+  /// since left; a no-op if another conversation was opened in the
+  /// meantime (that call's [setActiveConversation] already overwrote it).
+  void clearActiveConversation(int convId) {
+    if (_activeConversationId == convId) _activeConversationId = null;
   }
 
   void _handleWsMessage(WsInboundMessage msg) {
@@ -317,6 +343,13 @@ class ChatProvider extends ChangeNotifier {
         }
         _updateConversationLastMessage(m.conversationId, m.content);
         notifyListeners();
+        // The user is actively looking at this conversation right now —
+        // advance the read cursor immediately instead of waiting for the
+        // next time they open it (which is the only other place
+        // `_syncReadState` runs).
+        if (m.conversationId == _activeConversationId) {
+          _syncReadState(m.conversationId);
+        }
 
       case 'USER_STATUS':
         final userId = msg.data['userId'] as int?;
@@ -360,7 +393,7 @@ class ChatProvider extends ChangeNotifier {
 
   void reconnect() {
     _connectionError = null;
-    _ws.connect(_currentUser.token);
+    _ws.connect();
     notifyListeners();
   }
 

@@ -6,7 +6,13 @@ plugins {
 
 android {
     namespace = "com.example.sweethome_flutter"
-    compileSdk = flutter.compileSdkVersion
+    // Multiple plugins (image_picker_android, geolocator_android,
+    // shared_preferences_android, flutter_plugin_android_lifecycle)
+    // and their transitive androidx.* deps now require
+    // compileSdk ≥ 36. Hardcode to 36 — Flutter's default lags
+    // behind, and bumping is forward-only (backward compatible
+    // with lower target/minSdk).
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

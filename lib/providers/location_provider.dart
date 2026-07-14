@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/location.dart';
 import '../services/location_service.dart';
 
@@ -102,6 +105,27 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// separate log widget.
   void debugLogRaw(String message) => _log(message);
 
+  /// Persisted on/off flag so the sharing toggle survives an app
+  /// restart (process kill, not just backgrounding) — without this
+  /// the toggle only lives as long as `LocationProvider` does, which
+  /// is the login session's in-memory lifetime, so a fresh cold start
+  /// always looked "off" even if the user had just turned it on.
+  static const String _kSharingPrefsKey = 'location_sharing_enabled';
+
+  /// Call once right after construction (see `main.dart`) to resume
+  /// sharing if it was on when the app was last closed.
+  Future<void> restoreSharingState() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_kSharingPrefsKey) ?? false) {
+      await startSharing();
+    }
+  }
+
+  Future<void> _persistSharingState(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kSharingPrefsKey, enabled);
+  }
+
   /// Begin the ~1-minute sampling loop + lifecycle hook. Idempotent.
   /// The first sample is reported immediately per §6.1
   /// ("首次采集必定上报").
@@ -114,6 +138,7 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     // First fix is mandatory.
     unawaited(_sampleAndReport());
     _timer = Timer.periodic(_kSampleInterval, (_) => _sampleAndReport());
+    unawaited(_persistSharingState(true));
   }
 
   /// Cancel the loop and detach the lifecycle hook. Safe to call
@@ -125,6 +150,24 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     _status = LocationStatus.idle;
     WidgetsBinding.instance.removeObserver(this);
     notifyListeners();
+    // Also covers logout: `dispose()` calls `stopSharing()`, so a
+    // different user logging in later on the same device doesn't
+    // inherit a previous account's sharing preference.
+    unawaited(_persistSharingState(false));
+  }
+
+  /// Flip between [startSharing] and [stopSharing]. Bound to the
+  /// share-toggle `Switch` on the location screen. Disabled while a
+  /// sample is in flight so the user can't toggle off mid-GPS-fix
+  /// (which would orphan the in-flight `_sampleAndReport` future and
+  /// surface a confusing half-applied report on next mount).
+  void toggleSharing() {
+    if (_isAttempting) return;
+    if (_isRunning) {
+      stopSharing();
+    } else {
+      startSharing();
+    }
   }
 
   /// One-shot "share my location" button on the location screen.
@@ -154,7 +197,16 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// `Timer.periodic` straight at `_attemptSample`) so its `void`
   /// return type doesn't leak `_attemptSample`'s bool into the
   /// `Timer.periodic` callback signature.
-  Future<void> _sampleAndReport() => _attemptSample(force: false);
+  Future<void> _sampleAndReport() async {
+    // The background tier budget (up to ~45s: `_kSampleTimeout` 30s +
+    // lowest-tier 10s + 5s last-known check) can exceed the 30s timer
+    // interval, so a slow/indoor fix can still be in flight when the
+    // next tick fires. Skip that tick rather than starting a second
+    // concurrent `_attemptSample`, which would race on `_isAttempting`/
+    // `_lastReported`/etc. and could double-report.
+    if (_isAttempting) return;
+    await _attemptSample(force: false);
+  }
 
   /// Sample → report, shared by the background timer and the manual
   /// "Share my location" button. §6.1 only specifies "约每分钟采集一次"
@@ -400,19 +452,73 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  /// Reads the host phone's battery level for inclusion in the
+  /// §6.1 report payload. Returns `null` when:
+  ///  - the platform has no battery API (desktop / web — `battery_plus`
+  ///    surfaces -1 there),
+  ///  - the OS denies the read (e.g. Chrome blocks the Battery API
+  ///    when the document isn't user-gesture-originated),
+  ///  - we're in MOCK_MODE and want a believable 78→74% drain
+  ///    curve instead of fake -1.
+  ///
+  /// Docs/api.md §6.1: "battery 超过 100 → 400 LOCATION_BATTERY_INVALID"
+  /// so we clamp defensively before sending.
+  Future<int?> _readBatteryPercent() async {
+    if (_mockMode) {
+      // Stable mock "battery" with a slow downward drift so the
+      // mock dashboard's battery pill doesn't look frozen between
+      // reports. Range 78%..74% over ~10 minutes.
+      final pct = 78 - ((DateTime.now().millisecondsSinceEpoch ~/ 60000) % 5);
+      return pct;
+    }
+    try {
+      final raw = await Battery().batteryLevel;
+      // `battery_plus` uses -1 as the sentinel for "no battery API on
+      // this platform" on most platforms (headless test, some
+      // desktop targets). Surface that to the server the same way the
+      // API docs prescribe — leave `battery` null on the request so
+      // the server records -1.
+      //
+      // Web is a different story: `battery_plus_web` returns `0` (not
+      // -1) when `navigator.getBattery()` is unavailable (Safari,
+      // Firefox, or a Chrome context without a user gesture) — see
+      // `battery_plus_web.dart`'s `batteryLevel` getter. Since this
+      // app explicitly targets Web, treating `0` as "actually 0%" on
+      // that platform would misreport "no battery API" as "phone is
+      // dead" on the family dashboard. Real devices at a genuine 0%
+      // are effectively powered off and won't be actively reporting
+      // anyway, so folding `0` into the "unknown" case on web is a
+      // safe trade.
+      if (kIsWeb ? raw <= 0 : raw < 0) return null;
+      // Defensive clamp: server rejects > 100 with 400
+      // LOCATION_BATTERY_INVALID. Some devices report 101-105 in
+      // the brief moment after coming off a charger.
+      return raw.clamp(0, 100);
+    } catch (e) {
+      _log('battery read failed: $e');
+      return null;
+    }
+  }
+
   Future<void> _sendReport(LocationFix fix) async {
+    // Per docs/api.md §6.1: `battery` is optional; if we can't read
+    // it (web, unsupported platform, OS denies) we leave it null and
+    // the server stores `-1` as its sentinel for "unknown".
+    // Re-read on every report (no caching) so the value reflects
+    // the phone's actual state at send-time — accurate enough for
+    // the family's at-a-glance dashboard and cheap (~10 ms on
+    // Android via a sticky Binder call into BatteryService).
+    final battery = await _readBatteryPercent();
     final report = LocationReport(
       lng: fix.position.longitude,
       lat: fix.position.latitude,
-      // `Geolocator.getCurrentPosition` doesn't surface battery; the
-      // server's documented default for missing battery is -1, which
-      // is what we get by leaving the field null in the request.
-      battery: null,
+      battery: battery,
       updateTime: fix.capturedAt,
     );
     _log(
       'reporting lat=${report.lat.toStringAsFixed(5)}, '
       'lng=${report.lng.toStringAsFixed(5)}, '
+      'battery=${battery ?? -1}, '
       'updateTime=${report.updateTime.toIso8601String()}',
     );
     try {
