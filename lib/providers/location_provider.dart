@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,11 +7,13 @@ import '../services/location_service.dart';
 
 /// Owns the foreground-only location-sharing loop required by
 /// docs/api.md §6.1: first fix is reported immediately, then a
-/// 1-minute timer re-samples; the report is sent only if the new
-/// fix is at least [_kMinMoveMeters] away from the previously
-/// reported one (otherwise dropped as "didn't move"). On
-/// `AppLifecycleState.paused` / `detached` we try to capture a
-/// final "last gasp" position so the next time anyone opens the
+/// ~1-minute timer re-samples and reports *every* successful fix —
+/// the spec has no distance/displacement gate, so don't add one (an
+/// earlier version of this file did, and it silently killed all
+/// periodic reports after the first once the user stopped moving —
+/// see git history / AGENTS.md for the postmortem). On
+/// `AppLifecycleState.paused` / `detached` we try to capture a final
+/// "last gasp" position so the next time anyone opens the
 /// family-location screen they see something close to where the
 /// user was when they left.
 ///
@@ -22,32 +23,26 @@ import '../services/location_service.dart';
 /// side of the feature.
 class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   LocationProvider({required LocationService service, required bool mockMode})
-      : _service = service,
-        _mockMode = mockMode;
+    : _service = service,
+      _mockMode = mockMode;
 
   final LocationService _service;
   final bool _mockMode;
 
-  /// 50 m — the same threshold used by Android's
-  /// `FusedLocationProvider` default small-displacement heuristic.
-  /// Anything below this is considered "didn't move" and dropped
-  /// per §6.1's "位置变化不大则跳过上报" rule.
-  static const double _kMinMoveMeters = 50;
-
   /// Sample cadence — the spec (§6.1) says "约每分钟" (about every
-/// minute). We use 30 s rather than 60 s because in practice
-/// Android cold-start GPS often only locks after 20-30 s, so the
-/// user otherwise sees their first report 60+ seconds after
-/// opening the screen instead of ~30 s. After the first
-/// successful report the cadence is fine; the slightly tighter
-/// tick is invisible once GPS is warm.
+  /// minute). We use 30 s rather than 60 s because in practice
+  /// Android cold-start GPS often only locks after 20-30 s, so the
+  /// user otherwise sees their first report 60+ seconds after
+  /// opening the screen instead of ~30 s. After the first
+  /// successful report the cadence is fine; the slightly tighter
+  /// tick is invisible once GPS is warm.
   static const Duration _kSampleInterval = Duration(seconds: 30);
 
   /// 30 s for the background tick. Android cold-start GPS in
   /// indoor / weak-signal environments routinely takes 20-30 s for
-  /// the first fix; the old 10 s budget caused every timer tick
-  /// to trip `TimeoutException` and pollute [_lastError]. We let
-  /// the timer fail silently when this happens — see [_captureFix].
+  /// the first fix; a shorter budget causes every timer tick to
+  /// trip `TimeoutException` and pollute [_lastError]. We let the
+  /// timer fail silently when this happens — see [_captureFix].
   static const Duration _kSampleTimeout = Duration(seconds: 30);
 
   /// 60 s for the manual "Share my location" button — user-initiated,
@@ -69,6 +64,7 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   int _attemptCount = 0;
   LocationStatus _status = LocationStatus.idle;
   String? _lastError;
+  final List<LocationDebugEntry> _debugLog = [];
 
   /// Public flags for the UI.
   bool get isRunning => _isRunning;
@@ -78,7 +74,35 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   String? get lastError => _lastError;
   DateTime? get lastReportAt => _lastReported?.reportedAt;
 
-  /// Begin the 1-minute sampling loop + lifecycle hook. Idempotent.
+  /// Newest-first trail of every step `_captureFix`/`_sendReport` took
+  /// (permission checks, each tier's accuracy/timeout/outcome, report
+  /// send result). Exists purely for `LocationDebugScreen` — nothing
+  /// in the production UI reads this. Capped so a long-running session
+  /// doesn't leak memory.
+  List<LocationDebugEntry> get debugLog => List.unmodifiable(_debugLog);
+
+  void _log(String message) {
+    _debugLog.insert(0, LocationDebugEntry(DateTime.now(), message));
+    if (_debugLog.length > 200) {
+      _debugLog.removeRange(200, _debugLog.length);
+    }
+    notifyListeners();
+  }
+
+  /// For `LocationDebugScreen`'s "Clear log" button.
+  void clearDebugLog() {
+    _debugLog.clear();
+    notifyListeners();
+  }
+
+  /// Lets `LocationDebugScreen` append its own raw-primitive test
+  /// results (e.g. a standalone `Geolocator.getCurrentPosition` call
+  /// outside the normal tiered pipeline) into the same chronological
+  /// log as `_captureFix`/`_sendReport`, instead of keeping a second,
+  /// separate log widget.
+  void debugLogRaw(String message) => _log(message);
+
+  /// Begin the ~1-minute sampling loop + lifecycle hook. Idempotent.
   /// The first sample is reported immediately per §6.1
   /// ("首次采集必定上报").
   Future<void> startSharing() async {
@@ -104,15 +128,11 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// One-shot "share my location" button on the location screen.
-  /// Runs the same sample+report pipeline as the timer; ignores
-  /// the "didn't move" skip. Uses the longer [_kManualTimeout] so
-  /// the user gets a chance at a real GPS fix even on cold-start.
-  Future<bool> reportNow() async {
-    final fix = await _captureFix(force: true);
-    if (fix == null) return false;
-    await _sendReport(fix);
-    return true;
-  }
+  /// Runs the same sample+report pipeline as the timer (via
+  /// [_attemptSample]) with `force: true`, which uses the longer
+  /// [_kManualTimeout] so the user gets a chance at a real GPS fix
+  /// even on cold-start.
+  Future<bool> reportNow() => _attemptSample(force: true);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -129,27 +149,45 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  /// Sample → compare distance → report. The Timer wrapper catches
-  /// errors so the loop never dies.
-  Future<void> _sampleAndReport() async {
+  /// Background-timer entry point — same pipeline as [reportNow], just
+  /// `force: false`. Kept as a separate method (instead of pointing
+  /// `Timer.periodic` straight at `_attemptSample`) so its `void`
+  /// return type doesn't leak `_attemptSample`'s bool into the
+  /// `Timer.periodic` callback signature.
+  Future<void> _sampleAndReport() => _attemptSample(force: false);
+
+  /// Sample → report, shared by the background timer and the manual
+  /// "Share my location" button. §6.1 only specifies "约每分钟采集一次"
+  /// — there is no server-side or documented distance gate, so every
+  /// successful sample is reported. Errors are caught here (not
+  /// rethrown) so:
+  ///  - the background `Timer` never dies on a single bad sample —
+  ///    the loop just tries again on the next tick.
+  ///  - the manual button gets a clean `false` return instead of an
+  ///    exception escaping uncaught through its `onPressed` (an
+  ///    earlier version of this file didn't catch `_sendReport`'s
+  ///    rethrow here, so a failed manual report threw all the way up
+  ///    with no UI feedback at all).
+  /// `_isAttempting` is set for the *entire* call, including the
+  /// manual path — without this the "Locating…" status line and any
+  /// other `isAttempting`-driven UI stay frozen for the whole
+  /// multi-tier timeout window (up to 90s), which looks exactly like
+  /// the button did nothing until the error toast finally appears.
+  Future<bool> _attemptSample({required bool force}) async {
     _isAttempting = true;
     _attemptCount++;
+    _log('${force ? "manual" : "background"} attempt #$_attemptCount start');
     notifyListeners();
     try {
-      final fix = await _captureFix(force: false);
-      if (fix == null) return;
-      final last = _lastReported;
-      if (last != null &&
-          _distanceMeters(last.position, fix.position) < _kMinMoveMeters) {
-        // Per §6.1: 位置变化不大则跳过上报.
-        return;
-      }
+      final fix = await _captureFix(force: force);
+      if (fix == null) return false;
       await _sendReport(fix);
+      return true;
     } catch (e) {
-      // Don't kill the loop on a single bad sample — log and keep
-      // the timer running. Surfacing to UI is best-effort.
       _lastError = e.toString();
+      _log('attempt failed: $e');
       notifyListeners();
+      return false;
     } finally {
       _isAttempting = false;
       notifyListeners();
@@ -159,34 +197,27 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// Permission flow + actual `Geolocator.getCurrentPosition` (or a
   /// mock position in MOCK_MODE). Sets [_status] appropriately so
   /// the UI can prompt the user.
-///
-/// Two-stage capture strategy on real devices:
-/// 1. Try `Geolocator.getLastKnownPosition()` — instant, doesn't
-///    require an active GPS lock. If the cached fix is younger than
-///    [_kLastKnownFreshness], use it directly.
-/// 2. Otherwise fall through to `Geolocator.getCurrentPosition()`
-///    with [_kSampleTimeout] (background) or [_kManualTimeout]
-///    (manual button). On timeout, the background loop returns
-///    null silently (the next tick will try again); the manual
-///    call sets a machine-readable error code so the UI can
-///    surface a localized message.
-///
-/// Without this, Android cold-start GPS (typical 20-30 s for the
-/// first fix in indoor / weak-signal environments) would silently
-/// starve the upload loop — every timer tick would return null and
-/// the user would never see a "Updated just now" badge despite the
-/// app being "correctly" configured.
+  ///
+  /// Two-stage capture strategy on real devices:
+  /// 1. Try `Geolocator.getLastKnownPosition()` — instant, doesn't
+  ///    require an active GPS lock. If the cached fix is younger than
+  ///    [_kLastKnownFreshness], use it directly.
+  /// 2. Otherwise fall through to `Geolocator.getCurrentPosition()`
+  ///    with [_kSampleTimeout] (background) or [_kManualTimeout]
+  ///    (manual button). On timeout, the background loop returns
+  ///    null silently (the next tick will try again); the manual
+  ///    call sets a machine-readable error code so the UI can
+  ///    surface a localized message.
   Future<LocationFix?> _captureFix({required bool force}) async {
     if (_mockMode) {
-      // Stable mock "fix" — varies slightly so the distance gate
-      // behaves realistically when the timer ticks.
-      return LocationFix(
-        position: _mockPosition(),
-        capturedAt: DateTime.now(),
-      );
+      // Stable mock "fix" that varies slightly per tick so the UI's
+      // coordinates/timestamp visibly move between reports.
+      _log('mock mode: returning synthetic fix');
+      return LocationFix(position: _mockPosition(), capturedAt: DateTime.now());
     }
     // 1. Check service enabled (GPS on).
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    _log('isLocationServiceEnabled=$serviceEnabled');
     if (!serviceEnabled) {
       _status = LocationStatus.gpsOff;
       // Also surface a machine-readable error code so the manual
@@ -201,8 +232,10 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     }
     // 2. Check / request permission.
     var permission = await Geolocator.checkPermission();
+    _log('checkPermission=$permission');
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      _log('requestPermission=$permission');
     }
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
@@ -212,70 +245,122 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
       notifyListeners();
       return null;
     }
+    // Android 12+ (API 31+) lets the user grant "approximate location"
+    // instead of "precise" — `checkPermission`/`requestPermission`
+    // above still report the permission as granted either way, so
+    // this is easy to miss. With only reduced accuracy granted, every
+    // GPS_PROVIDER request below can time out indefinitely no matter
+    // how long the budget is, because the OS simply won't hand fine
+    // fixes to an app that only asked for (or was only given)
+    // approximate location — this is diagnostic-only for now (logged,
+    // not acted on) since there's no in-app API on Android to
+    // re-prompt for precise-only; fixing it requires the user to flip
+    // "Use precise location" in system Settings > Apps > this app.
+    try {
+      final accuracy = await Geolocator.getLocationAccuracy();
+      _log('getLocationAccuracy=$accuracy');
+    } catch (e) {
+      _log('getLocationAccuracy failed: $e');
+    }
     // 3. Cheap path: last-known position. The OS keeps a recent
     //    GPS lock cached; if it's fresh enough we use it and
     //    skip the (potentially long) cold-start acquire.
+    //
+    //    `forceAndroidLocationManager: true` here too — see the
+    //    step-4 comment for why this app defaults to the GMS-free
+    //    path everywhere on Android instead of trying Google Play
+    //    Services first. This call also has no `timeLimit` of its
+    //    own (bare method-channel invoke, no native-side timeout),
+    //    so a hang would otherwise leave this `await` — and the
+    //    whole capture/report pipeline — stuck forever (surfaced to
+    //    the user as "Locating…" never resolving); bound it
+    //    explicitly so a hang always falls through to step 4.
     try {
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null &&
-          DateTime.now().difference(lastKnown.timestamp) <
-              _kLastKnownFreshness) {
-        return LocationFix(
-          position: lastKnown,
-          capturedAt: DateTime.now(),
+      final lastKnown = await Geolocator.getLastKnownPosition(
+        forceAndroidLocationManager: true,
+      ).timeout(const Duration(seconds: 5));
+      if (lastKnown == null) {
+        _log('getLastKnownPosition: no cached fix');
+      } else {
+        final age = DateTime.now().difference(lastKnown.timestamp);
+        if (age < _kLastKnownFreshness) {
+          _log(
+            'getLastKnownPosition: using cached fix (age=${age.inSeconds}s)',
+          );
+          return LocationFix(position: lastKnown, capturedAt: DateTime.now());
+        }
+        _log(
+          'getLastKnownPosition: cached fix too stale (age=${age.inSeconds}s)',
         );
       }
-    } catch (_) {
-      // getLastKnownPosition can throw on devices with no prior
-      // GPS session; that's fine, we'll try the fresh acquire
-      // below.
+    } catch (e) {
+      // getLastKnownPosition can throw (no prior GPS session) or
+      // time out (see above); either way fall through to the timed
+      // fresh-acquire tiers below.
+      _log('getLastKnownPosition: failed/timed out ($e)');
     }
-    // 4. Fresh acquire, tiered by accuracy + timeout. We start with
-    //    the most likely-to-succeed accuracy for the caller's
-    //    context (medium for the background timer — WiFi/cell
-    //    triangulation locks in <5 s indoors where pure GPS would
-    //    never lock — high for the manual button where the user
-    //    explicitly asked for an accurate fix) and fall back to
-    //    progressively weaker accuracy if the first attempt times
-    //    out. Without this fallback chain, an indoor user on the
-    //    background tick would see a 30 s timer expiry → silent
-    //    skip → UI unchanged → looks like nothing is happening.
+    // 4. Fresh acquire, tiered by accuracy + timeout. Every tier sets
+    //    `forceAndroidLocationManager: true` — this app targets
+    //    mainland China users, where Google Play Services is
+    //    essentially never present (Google services are unavailable
+    //    there), so the default Fused Location Provider
+    //    (`FusedLocationProviderClient`) would hang or throw
+    //    `ApiException` on virtually every real device in the target
+    //    market. Trying it "first, for speed" (an earlier version of
+    //    this file did) means every single acquisition burns a whole
+    //    tier's timeout on a call that is essentially guaranteed to
+    //    fail for this audience before ever reaching the method that
+    //    actually works. The stock `LocationManager` API has no GMS
+    //    dependency and works on every Android device with a GPS
+    //    chip — and per `geolocator_android`'s own provider-selection
+    //    logic (`LocationManagerClient.determineProvider`), on
+    //    Android 12+ (API 31+) it transparently uses the OS-native
+    //    `FUSED_PROVIDER` (WiFi/cell fusion, no GMS involved) when
+    //    available, so forcing it isn't even an accuracy trade-off on
+    //    modern devices — only pre-12 / no-native-fused devices fall
+    //    back to raw GPS_PROVIDER satellite fixes.
     //
-    //    `forceAndroidLocationManager: true` forces Android's
-    //    stock `LocationManager` API instead of the default
-    //    Fused Location Provider (`FusedLocationProviderClient`).
-    //    The latter requires Google Play Services, which most
-    //    Chinese OEM ROMs (华为 EMUI / 小米 MIUI / OPPO ColorOS /
-    //    Vivo OriginOS / 一加 HydrogenOS CN) ship without — on
-    //    those devices `FusedLocationProviderClient` hangs
-    //    indefinitely or throws `ApiException`, surfacing to the
-    //    user as the "无法及时获取 GPS 定位" timeout. The stock
-    //    `LocationManager` is part of the OS itself (no GMS
-    //    dependency) and works on every Android device that has a
-    //    GPS chip; trade-off is no WiFi/cell fusion, so cold-start
-    //    fixes are slower than fused — we compensate by tiering
-    //    accuracy down on timeout.
+    //    The tiers still fall back by accuracy on timeout (an indoor
+    //    user needs a chance at *some* fix, not silence), and the
+    //    final tier uses `LocationAccuracy.lowest`, which is the only
+    //    accuracy value that maps to `PASSIVE_PROVIDER` — a genuinely
+    //    different, near-instant provider that returns whatever
+    //    position any other app/service on the device most recently
+    //    requested, rather than GPS_PROVIDER again (forced
+    //    `LocationManager` maps every *other* accuracy tier to
+    //    GPS_PROVIDER once it's enabled, so `lowest` is the only tier
+    //    that actually diversifies the fallback chain instead of
+    //    retrying the same satellite fix with a shorter timeout).
     final tiers = force
         ? const [
             (LocationAccuracy.high, _kManualTimeout),
             (LocationAccuracy.medium, Duration(seconds: 20)),
-            (LocationAccuracy.low, Duration(seconds: 10)),
+            (LocationAccuracy.lowest, Duration(seconds: 10)),
           ]
         : const [
             (LocationAccuracy.medium, _kSampleTimeout),
-            (LocationAccuracy.low, Duration(seconds: 10)),
+            (LocationAccuracy.lowest, Duration(seconds: 10)),
           ];
 
     Position? pos;
     for (final (acc, timeout) in tiers) {
+      final sw = Stopwatch()..start();
+      _log('tier acc=$acc timeout=${timeout.inSeconds}s: requesting…');
       try {
         pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: acc,
           timeLimit: timeout,
           forceAndroidLocationManager: true,
         );
+        _log(
+          'tier acc=$acc: fix in ${sw.elapsedMilliseconds}ms '
+          '(lat=${pos.latitude.toStringAsFixed(5)}, '
+          'lng=${pos.longitude.toStringAsFixed(5)}, '
+          'accuracy=${pos.accuracy.toStringAsFixed(0)}m)',
+        );
         break; // got a fix, stop trying lower tiers
       } on TimeoutException {
+        _log('tier acc=$acc: timed out after ${sw.elapsedMilliseconds}ms');
         // Try the next tier.
         continue;
       }
@@ -289,6 +374,7 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
       //    lock, OEM "privacy protection" blocking). Detection
       //    via a quick second check isLocationServiceEnabled +
       //    check that we got at least one location provider.
+      _log('all tiers exhausted with no fix');
       if (force) {
         final available = await _hasUsableGpsProvider();
         _lastError = available ? 'GPS_TIMEOUT' : 'GPS_NOT_AVAILABLE';
@@ -297,10 +383,7 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
       }
       return null;
     }
-    return LocationFix(
-      position: pos,
-      capturedAt: DateTime.now(),
-    );
+    return LocationFix(position: pos, capturedAt: DateTime.now());
   }
 
   /// Best-effort diagnostic for "why is GPS not working". True
@@ -327,13 +410,17 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
       battery: null,
       updateTime: fix.capturedAt,
     );
+    _log(
+      'reporting lat=${report.lat.toStringAsFixed(5)}, '
+      'lng=${report.lng.toStringAsFixed(5)}, '
+      'updateTime=${report.updateTime.toIso8601String()}',
+    );
     try {
       if (_mockMode) {
         // No backend to hit in MOCK_MODE — skip the HTTP call but
         // still update [_lastReported] so the UI's "Updated Xm ago"
-        // badge moves forward and the distance-gate stays consistent.
-        // Without this, [_lastReported] stays null forever and every
-        // 1-minute timer tick trips the distance gate.
+        // badge moves forward and behaves consistently with the real
+        // path. Without this, [_lastReported] stays null forever.
         await Future<void>.delayed(const Duration(milliseconds: 50));
       } else {
         await _service.reportPosition(report);
@@ -345,38 +432,22 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
       );
       _status = LocationStatus.running;
       _lastError = null;
+      _log('report OK');
       notifyListeners();
     } catch (e) {
       _lastError = e.toString();
       _status = LocationStatus.error;
+      _log('report failed: $e');
       notifyListeners();
       rethrow;
     }
   }
 
-  /// Great-circle distance (Haversine) in meters. Standalone
-  /// helper so it can be unit-tested independently.
-  static double _distanceMeters(Position a, Position b) {
-    const earthRadius = 6371000.0;
-    final lat1 = a.latitude * math.pi / 180;
-    final lat2 = b.latitude * math.pi / 180;
-    final dLat = lat2 - lat1;
-    final dLng = (b.longitude - a.longitude) * math.pi / 180;
-    final h = (1 - math.cos(dLat)) / 2 +
-        math.cos(lat1) *
-            math.cos(lat2) *
-            (1 - math.cos(dLng)) /
-            2;
-    return 2 * earthRadius * math.asin(math.sqrt(h));
-  }
-
   /// Stable mock fix anchored near Beijing (天安门 ~ 39.9087 N,
-  /// 116.3975 E) with a tiny per-tick offset so the distance gate
-  /// behaves realistically when the timer fires.
+  /// 116.3975 E) with a tiny per-tick offset so consecutive reports
+  /// aren't at the exact same point.
   Position _mockPosition() {
     final now = DateTime.now().millisecondsSinceEpoch;
-    // Oscillate ±0.0003 deg (~33 m) so consecutive mock samples
-    // sometimes pass the 50 m gate and sometimes don't.
     final offset = (now ~/ 1000) % 100;
     return Position(
       longitude: 116.3975 + (offset - 50) * 0.00003,
@@ -433,4 +504,12 @@ class LocationFix {
     required this.capturedAt,
     this.reportedAt,
   });
+}
+
+/// One timestamped step in `LocationProvider`'s capture/report
+/// pipeline. See `LocationProvider.debugLog` / `LocationDebugScreen`.
+class LocationDebugEntry {
+  final DateTime time;
+  final String message;
+  const LocationDebugEntry(this.time, this.message);
 }

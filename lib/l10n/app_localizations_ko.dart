@@ -223,7 +223,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get myHomeLocationEntry => '실시간 위치';
 
   @override
-  String get myHomeLocationDesc => '가족 구성원의 현재 위치 보기';
+  String get myHomeLocationDesc => '가족 구성원의 현재 위치를 확인하세요';
 
   @override
   String get myHomeJoinRequestsEntry => '가입 요청';
@@ -265,18 +265,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationOnline => '온라인';
 
   @override
-  String get locationOffline => '위치 정보 없음';
+  String get locationOffline => '최근 위치 없음';
 
   @override
-  String get locationUpdatedJustNow => '방금 업데이트';
+  String get locationUpdatedJustNow => '방금 업데이트됨';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
+  String locationUpdatedMinutesAgo(Object minutes) {
     return '$minutes분 전 업데이트';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return '배터리: $percent%';
   }
 
@@ -284,28 +284,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationBatteryUnknown => '배터리: 알 수 없음';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return '경도 $lng, 위도 $lat';
   }
 
   @override
-  String get locationNoData => '위치 데이터 없음';
+  String get locationNoData => '아직 위치 정보가 없습니다';
 
   @override
-  String get locationNoDataDesc => '가족 구성원이 위치 공유를 활성화하면 여기에 표시됩니다.';
+  String get locationNoDataDesc => '가족 구성원이 위치 공유를 켜야 여기에 표시됩니다.';
 
   @override
-  String locationTotalMembers(int total) {
-    return '총 $total명의 가족';
+  String locationTotalMembers(Object total) {
+    return '가족 $total명';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
-    return '위치 공유 중 $online/$total명';
+  String locationOnlineCount(Object online, Object total) {
+    return '$online/$total명이 위치를 공유 중';
   }
 
   @override
-  String get locationReportNow => '내 위치 공유';
+  String get locationReportNow => '내 위치 공유하기';
 
   @override
   String get locationReportFailed => '위치를 공유할 수 없습니다';
@@ -314,18 +314,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationLocating => '위치 확인 중…';
 
   @override
-  String get locationPermissionTitle => '위치 권한 필요';
+  String get locationPermissionTitle => '위치 권한이 필요합니다';
 
   @override
   String get locationPermissionBody =>
-      '가족과 위치를 공유하려면 Sweet Home의 위치 접근을 허용하세요.';
+      '가족과 위치를 공유하려면 Sweet Home의 위치 접근을 허용해주세요.';
 
   @override
   String get locationPermissionGrant => '권한 허용';
 
   @override
   String get locationPermissionDenied =>
-      '권한이 거부되었습니다. 시스템 설정에서 활성화한 후 다시 시도하세요.';
+      '권한이 거부되었습니다. 시스템 설정에서 허용한 후 다시 시도해주세요.';
 
   @override
   String get locationPermissionOpenSettings => '설정 열기';
@@ -334,14 +334,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationGpsOff => 'GPS가 꺼져 있습니다. 켜면 정확한 위치를 공유할 수 있습니다.';
 
   @override
-  String get locationGpsTimeout => '시간 내에 GPS 위치를 가져올 수 없습니다. 실외에서 다시 시도하세요.';
+  String get locationGpsTimeout =>
+      '시간 내에 GPS 위치를 가져오지 못했습니다. 실외에서 신호를 확인한 후 다시 시도해주세요.';
 
   @override
   String get locationGpsUnavailable =>
-      '이 기기에서는 위치 서비스를 사용할 수 없습니다. 시스템 설정, 개발자 옵션의 모의 위치 앱 또는 제조사 개인정보 설정을 확인하세요.';
+      '이 기기에서 위치 서비스를 사용할 수 없습니다. 시스템 설정, 모의 위치 앱, 제조사 개인정보 설정을 확인해주세요.';
 
   @override
-  String get locationRefresh => '새로 고침';
+  String get locationRefresh => '새로고침';
 
   @override
   String get joinRequestsAdminTitle => '가입 요청';

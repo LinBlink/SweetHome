@@ -608,13 +608,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Updated {minutes}m ago'**
-  String locationUpdatedMinutesAgo(int minutes);
+  String locationUpdatedMinutesAgo(Object minutes);
 
   /// No description provided for @locationBattery.
   ///
   /// In en, this message translates to:
   /// **'Battery: {percent}%'**
-  String locationBattery(int percent);
+  String locationBattery(Object percent);
 
   /// No description provided for @locationBatteryUnknown.
   ///
@@ -626,7 +626,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'lng {lng}, lat {lat}'**
-  String locationCoordinates(String lng, String lat);
+  String locationCoordinates(Object lat, Object lng);
 
   /// No description provided for @locationNoData.
   ///
@@ -644,13 +644,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{total} family members'**
-  String locationTotalMembers(int total);
+  String locationTotalMembers(Object total);
 
   /// No description provided for @locationOnlineCount.
   ///
   /// In en, this message translates to:
   /// **'{online}/{total} sharing location'**
-  String locationOnlineCount(int online, int total);
+  String locationOnlineCount(Object online, Object total);
 
   /// No description provided for @locationReportNow.
   ///

@@ -1,27 +1,22 @@
 {
   "@@locale": "zh_Hant",
-
   "appTitle": "過家家 · Sweet Home",
   "brandName": "過家家",
   "appTagline": "家庭的溫暖，一觸即達",
-
   "navMessages": "消息",
   "navContacts": "聯絡人",
   "navMyHome": "我的家",
   "navFamilyFeed": "家庭動態",
   "navProfile": "我的",
-
   "commonCancel": "取消",
   "commonConfirm": "確定",
   "commonPasswordLabel": "密碼",
   "commonPasswordRequired": "請輸入密碼",
   "commonPasswordTooShort": "密碼至少6位",
   "errorNetworkFailed": "網路連線失敗，請稍後重試",
-
   "loginButton": "登入",
   "loginNoAccount": "還沒有帳號？",
   "loginRegisterNow": "立即註冊",
-
   "registerTitle": "建立帳號",
   "registerNicknameLabel": "你的暱稱",
   "registerNicknameRequired": "請輸入暱稱",
@@ -49,7 +44,6 @@
   "registerRelationAnchorRequired": "請選擇與哪位成員的關係",
   "registerSubmitCreate": "註冊並建立家庭",
   "registerSubmitJoin": "註冊並加入家庭",
-
   "requestJoinTargetPhoneLabel": "你認識的家庭成員的手機號",
   "requestJoinTargetPhoneRequired": "請輸入對方手機號",
   "requestJoinTargetPhoneHint": "* 不需要邀請碼，只需要填一個已經在這個家庭裡的人的手機號，對方家庭的管理員會審核你的申請",
@@ -57,7 +51,6 @@
   "requestJoinSubmit": "提交申請",
   "requestJoinSubmittedTitle": "申請已提交",
   "requestJoinSubmittedMessage": "你的申請已發送給家庭管理員審核，審核通過後請用剛才填寫的手機號和密碼登入",
-
   "joinRequestsTitle": "加入申請",
   "joinRequestsEmpty": "暫無待處理的申請",
   "joinRequestsRelationLine": "想成為 {targetName} 的{relation}",
@@ -67,31 +60,26 @@
   "relationNounSibling": "兄弟姐妹",
   "joinRequestsApprove": "通過",
   "joinRequestsReject": "拒絕",
-
   "phoneLabel": "手機號",
   "phoneRequired": "請輸入手機號",
   "phoneInvalid": "手機號格式不正確",
   "countryPickerTitle": "選擇國家/地區",
-
   "profileLogout": "登出",
   "profileLogoutConfirmMessage": "確定要登出目前帳號嗎？",
   "profileLanguageRow": "語言",
   "profileFamilyMembersRow": "家庭成員",
-
   "conversationsSearchTooltip": "搜尋",
   "conversationsNewTooltip": "新建對話",
   "conversationsEmptyTitle": "還沒有訊息",
   "conversationsEmptySubtitle": "邀請家人加入，開始聊天吧",
   "connectionErrorRetry": "重試",
   "newConversationTitle": "新建對話",
-
   "editProfileTitle": "編輯資料",
   "editProfileNicknameLabel": "暱稱",
   "editProfileSave": "儲存",
   "editProfileChangeAvatar": "更換頭像",
   "editProfileAvatarUploading": "上傳中…",
   "editProfileAvatarFailed": "上傳失敗，請重試",
-
   "inviteGenerate": "邀請",
   "inviteCodeLabel": "邀請碼",
   "inviteExpiryDays": "{days}天後過期",
@@ -101,24 +89,19 @@
   "inviteExpiryExpired": "已過期",
   "inviteCopy": "複製",
   "inviteCopied": "已複製到剪貼簿",
-
   "joinFamilyTitle": "加入其他家庭",
   "joinFamilyConfirmMessage": "加入新家庭將退出目前所在的家庭，確定要繼續嗎？",
-
   "chatRoomMessageCount": "{count} 則訊息",
   "chatRoomDefaultSubtitle": "家庭聊天室",
   "chatRoomMoreTooltip": "更多",
   "chatRoomEmptyHint": "傳一則訊息，打個招呼吧",
   "chatRoomInputHint": "說點什麼……",
   "chatRoomMoreOption": "更多",
-
   "familyMembersTitle": "家庭成員",
   "familyMembersAdminBadge": "管理員",
-
   "timeJustNow": "剛剛",
   "timeMinutesAgo": "{minutes}分鐘前",
   "timeYesterday": "昨天",
-
   "countryChina": "中國",
   "countryUSA": "美國",
   "countryCanada": "加拿大",
@@ -140,26 +123,17 @@
   "countryHongKong": "中國香港",
   "countryMacau": "中國澳門",
   "countryTaiwan": "台灣",
-
-  "profileLogout": "登出",
-  "profileLogoutConfirmMessage": "確定要登出目前帳號嗎？",
-  "profileLanguageRow": "語言",
-  "profileFamilyMembersRow": "家庭成員",
-
   "myHomeTitle": "我的家",
   "myHomeLocationEntry": "即時位置",
   "myHomeLocationDesc": "查看每個家庭成員的當前位置",
   "myHomeJoinRequestsEntry": "加入申請",
   "myHomeJoinRequestsDesc": "審核並批准加入本家庭的申請",
   "myHomeJoinRequestsBadge": "{count, plural, =0{暫無待處理} =1{1 條待處理} other{{count} 條待處理}}",
-
   "familyFeedTitle": "家庭動態",
   "familyFeedComingSoon": "即將上線",
   "familyFeedComingSoonDesc": "家庭動態與里程碑即將推出。",
-
   "contactsTitle": "聯絡人",
   "contactsEmpty": "暫無家庭成員",
-
   "locationTitle": "即時位置",
   "locationOnline": "在線",
   "locationOffline": "暫無位置",
@@ -168,23 +142,22 @@
   "locationBattery": "電量：{percent}%",
   "locationBatteryUnknown": "電量：未知",
   "locationCoordinates": "經度 {lng}，緯度 {lat}",
-  "locationNoData": "暫無位置資料",
-  "locationNoDataDesc": "家庭成員需開啟位置共享後，才會在此顯示。",
+  "locationNoData": "暫無位置數據",
+  "locationNoDataDesc": "家庭成員需要開啟位置共享後，才能在此顯示。",
   "locationTotalMembers": "共 {total} 位成員",
-  "locationOnlineCount": "位置共享中 {online}/{total} 位",
+  "locationOnlineCount": "{online}/{total} 位正在共享位置",
   "locationReportNow": "分享我的位置",
   "locationReportFailed": "位置分享失敗",
   "locationLocating": "正在定位…",
   "locationPermissionTitle": "需要定位權限",
-  "locationPermissionBody": "如需向家庭成員共享你的位置，請允許過家家存取你的位置。",
+  "locationPermissionBody": "如需向家庭成員共享你的位置，請允許過家家訪問你的位置。",
   "locationPermissionGrant": "授予權限",
-  "locationPermissionDenied": "權限被拒。請到系統設定中開啟後再嘗試分享位置。",
-  "locationPermissionOpenSettings": "打開設定",
+  "locationPermissionDenied": "權限被拒絕。請到系統設置中開啟後，再嘗試分享位置。",
+  "locationPermissionOpenSettings": "打開設置",
   "locationGpsOff": "GPS 已關閉。開啟後可分享精確位置。",
-  "locationGpsTimeout": "無法及時取得 GPS 定位。請到開闊處或檢查訊號後重試。",
-  "locationGpsUnavailable": "裝置目前無法取得位置。請檢查系統設定、開發者選項的模擬位置應用，或廠商隱私設定。",
-  "locationRefresh": "重新整理",
-
+  "locationGpsTimeout": "無法及時獲取 GPS 定位。請到開闊處或檢查信號後重試。",
+  "locationGpsUnavailable": "設備當前無法獲取位置。請檢查系統設置、開發者選項的模擬位置應用，或廠商隱私設置。",
+  "locationRefresh": "刷新",
   "joinRequestsAdminTitle": "加入申請",
   "joinRequestsAdminEmpty": "暫無待處理的申請。",
   "joinRequestsAdminReject": "拒絕",
@@ -198,7 +171,6 @@
   "joinRequestsAdminRejectSuccess": "已拒絕",
   "joinRequestsAdminApproveSuccess": "已通過",
   "joinRequestsAdminError": "操作失敗",
-
   "requestJoinModeByCode": "我有邀請碼",
   "requestJoinModeByPhone": "我認識某位成員的手機號",
   "requestJoinNoFamilySubmit": "提交申請",

@@ -280,12 +280,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationUpdatedJustNow => 'Updated just now';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
+  String locationUpdatedMinutesAgo(Object minutes) {
     return 'Updated ${minutes}m ago';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return 'Battery: $percent%';
   }
 
@@ -293,7 +293,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationBatteryUnknown => 'Battery: unknown';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return 'lng $lng, lat $lat';
   }
 
@@ -305,12 +305,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Family members need to enable location sharing for their position to show up here.';
 
   @override
-  String locationTotalMembers(int total) {
+  String locationTotalMembers(Object total) {
     return '$total family members';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
+  String locationOnlineCount(Object online, Object total) {
     return '$online/$total sharing location';
   }
 

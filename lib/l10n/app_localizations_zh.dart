@@ -271,12 +271,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationUpdatedJustNow => '刚刚更新';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
+  String locationUpdatedMinutesAgo(Object minutes) {
     return '$minutes 分钟前更新';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return '电量：$percent%';
   }
 
@@ -284,7 +284,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationBatteryUnknown => '电量：未知';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return '经度 $lng，纬度 $lat';
   }
 
@@ -295,12 +295,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationNoDataDesc => '家庭成员需要开启位置共享后，才能在此显示。';
 
   @override
-  String locationTotalMembers(int total) {
+  String locationTotalMembers(Object total) {
     return '共 $total 位成员';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
+  String locationOnlineCount(Object online, Object total) {
     return '$online/$total 位正在共享位置';
   }
 
@@ -839,12 +839,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationUpdatedJustNow => '刚刚更新';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
+  String locationUpdatedMinutesAgo(Object minutes) {
     return '$minutes 分钟前更新';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return '电量：$percent%';
   }
 
@@ -852,7 +852,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationBatteryUnknown => '电量：未知';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return '经度 $lng，纬度 $lat';
   }
 
@@ -863,12 +863,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationNoDataDesc => '家庭成员需要开启位置共享后，才能在此显示。';
 
   @override
-  String locationTotalMembers(int total) {
+  String locationTotalMembers(Object total) {
     return '共 $total 位成员';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
+  String locationOnlineCount(Object online, Object total) {
     return '$online/$total 位正在共享位置';
   }
 
@@ -1407,12 +1407,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationUpdatedJustNow => '剛剛更新';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
+  String locationUpdatedMinutesAgo(Object minutes) {
     return '$minutes 分鐘前更新';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return '電量：$percent%';
   }
 
@@ -1420,24 +1420,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationBatteryUnknown => '電量：未知';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return '經度 $lng，緯度 $lat';
   }
 
   @override
-  String get locationNoData => '暫無位置資料';
+  String get locationNoData => '暫無位置數據';
 
   @override
-  String get locationNoDataDesc => '家庭成員需開啟位置共享後，才會在此顯示。';
+  String get locationNoDataDesc => '家庭成員需要開啟位置共享後，才能在此顯示。';
 
   @override
-  String locationTotalMembers(int total) {
+  String locationTotalMembers(Object total) {
     return '共 $total 位成員';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
-    return '位置共享中 $online/$total 位';
+  String locationOnlineCount(Object online, Object total) {
+    return '$online/$total 位正在共享位置';
   }
 
   @override
@@ -1453,29 +1453,29 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationPermissionTitle => '需要定位權限';
 
   @override
-  String get locationPermissionBody => '如需向家庭成員共享你的位置，請允許過家家存取你的位置。';
+  String get locationPermissionBody => '如需向家庭成員共享你的位置，請允許過家家訪問你的位置。';
 
   @override
   String get locationPermissionGrant => '授予權限';
 
   @override
-  String get locationPermissionDenied => '權限被拒。請到系統設定中開啟後再嘗試分享位置。';
+  String get locationPermissionDenied => '權限被拒絕。請到系統設置中開啟後，再嘗試分享位置。';
 
   @override
-  String get locationPermissionOpenSettings => '打開設定';
+  String get locationPermissionOpenSettings => '打開設置';
 
   @override
   String get locationGpsOff => 'GPS 已關閉。開啟後可分享精確位置。';
 
   @override
-  String get locationGpsTimeout => '無法及時取得 GPS 定位。請到開闊處或檢查訊號後重試。';
+  String get locationGpsTimeout => '無法及時獲取 GPS 定位。請到開闊處或檢查信號後重試。';
 
   @override
   String get locationGpsUnavailable =>
-      '裝置目前無法取得位置。請檢查系統設定、開發者選項的模擬位置應用，或廠商隱私設定。';
+      '設備當前無法獲取位置。請檢查系統設置、開發者選項的模擬位置應用，或廠商隱私設置。';
 
   @override
-  String get locationRefresh => '重新整理';
+  String get locationRefresh => '刷新';
 
   @override
   String get joinRequestsAdminTitle => '加入申請';

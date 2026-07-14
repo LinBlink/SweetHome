@@ -78,7 +78,8 @@ class MemberLocation {
   /// `onlineMemberCount` is the canonical source, but for individual
   /// rows we also want a per-member "is this dot green" hint — use
   /// the same 10-minute window.
-  bool get isFresh => DateTime.now().difference(updatedAt) <= const Duration(minutes: 10);
+  bool get isFresh =>
+      DateTime.now().difference(updatedAt) <= const Duration(minutes: 10);
 }
 
 /// Body for `POST /location/report` (docs/api.md §6.1). `battery` is
@@ -100,9 +101,9 @@ class LocationReport {
   });
 
   Map<String, dynamic> toJson() => {
-        'lng': lng,
-        'lat': lat,
-        if (battery != null) 'battery': battery,
-        'updateTime': updateTime.toUtc().toIso8601String(),
-      };
+    'lng': lng,
+    'lat': lat,
+    if (battery != null) 'battery': battery,
+    'updateTime': updateTime.toUtc().toIso8601String(),
+  };
 }

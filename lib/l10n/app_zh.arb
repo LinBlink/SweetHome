@@ -1,27 +1,22 @@
 {
   "@@locale": "zh",
-
   "appTitle": "过家家 · Sweet Home",
   "brandName": "过家家",
   "appTagline": "家庭的温暖，一触即达",
-
   "navMessages": "消息",
   "navContacts": "联系人",
   "navMyHome": "我的家",
   "navFamilyFeed": "家庭动态",
   "navProfile": "我的",
-
   "commonCancel": "取消",
   "commonConfirm": "确定",
   "commonPasswordLabel": "密码",
   "commonPasswordRequired": "请输入密码",
   "commonPasswordTooShort": "密码至少6位",
   "errorNetworkFailed": "网络连接失败，请稍后重试",
-
   "loginButton": "登录",
   "loginNoAccount": "还没有账号？",
   "loginRegisterNow": "立即注册",
-
   "registerTitle": "创建账号",
   "registerNicknameLabel": "你的昵称",
   "registerNicknameRequired": "请输入昵称",
@@ -49,7 +44,6 @@
   "registerRelationAnchorRequired": "请选择与哪位成员的关系",
   "registerSubmitCreate": "注册并创建家庭",
   "registerSubmitJoin": "注册并加入家庭",
-
   "requestJoinTargetPhoneLabel": "你认识的家庭成员的手机号",
   "requestJoinTargetPhoneRequired": "请输入对方手机号",
   "requestJoinTargetPhoneHint": "* 不需要邀请码，只需要填一个已经在这个家庭里的人的手机号，对方家庭的管理员会审核你的申请",
@@ -57,7 +51,6 @@
   "requestJoinSubmit": "提交申请",
   "requestJoinSubmittedTitle": "申请已提交",
   "requestJoinSubmittedMessage": "你的申请已发送给家庭管理员审核，审核通过后请用刚才填写的手机号和密码登录",
-
   "joinRequestsTitle": "加入申请",
   "joinRequestsEmpty": "暂无待处理的申请",
   "joinRequestsRelationLine": "想成为 {targetName} 的{relation}",
@@ -67,31 +60,25 @@
   "relationNounSibling": "兄弟姐妹",
   "joinRequestsApprove": "通过",
   "joinRequestsReject": "拒绝",
-
   "phoneLabel": "手机号",
   "phoneRequired": "请输入手机号",
   "phoneInvalid": "手机号格式不正确",
   "countryPickerTitle": "选择国家/地区",
-
   "profileLogout": "退出登录",
   "profileLogoutConfirmMessage": "确定要退出当前账号吗？",
   "profileLanguageRow": "语言",
   "profileFamilyMembersRow": "家庭成员",
-
   "myHomeTitle": "我的家",
   "myHomeLocationEntry": "实时位置",
   "myHomeLocationDesc": "查看每个家庭成员的当前位置",
   "myHomeJoinRequestsEntry": "加入申请",
   "myHomeJoinRequestsDesc": "审核并批准加入本家庭的申请",
   "myHomeJoinRequestsBadge": "{count, plural, =0{暂无待处理} =1{1 条待处理} other{{count} 条待处理}}",
-
   "familyFeedTitle": "家庭动态",
   "familyFeedComingSoon": "即将上线",
   "familyFeedComingSoonDesc": "家庭动态与里程碑即将推出。",
-
   "contactsTitle": "联系人",
   "contactsEmpty": "暂无家庭成员",
-
   "locationTitle": "实时位置",
   "locationOnline": "在线",
   "locationOffline": "暂无位置",
@@ -116,7 +103,6 @@
   "locationGpsTimeout": "无法及时获取 GPS 定位。请到开阔处或检查信号后重试。",
   "locationGpsUnavailable": "设备当前无法获取位置。请检查系统设置、开发者选项的模拟位置应用，或厂商隐私设置。",
   "locationRefresh": "刷新",
-
   "joinRequestsAdminTitle": "加入申请",
   "joinRequestsAdminEmpty": "暂无待处理的申请。",
   "joinRequestsAdminReject": "拒绝",
@@ -130,26 +116,22 @@
   "joinRequestsAdminRejectSuccess": "已拒绝",
   "joinRequestsAdminApproveSuccess": "已通过",
   "joinRequestsAdminError": "操作失败",
-
   "requestJoinModeByCode": "我有邀请码",
   "requestJoinModeByPhone": "我认识某位成员的手机号",
   "requestJoinNoFamilySubmit": "提交申请",
   "requestJoinByCodeHint": "如已拿到邀请码，可使用邀请码加入。",
-
   "conversationsSearchTooltip": "搜索",
   "conversationsNewTooltip": "新建对话",
   "conversationsEmptyTitle": "还没有消息",
   "conversationsEmptySubtitle": "邀请家人加入，开始聊天吧",
   "connectionErrorRetry": "重试",
   "newConversationTitle": "新建对话",
-
   "editProfileTitle": "编辑资料",
   "editProfileNicknameLabel": "昵称",
   "editProfileSave": "保存",
   "editProfileChangeAvatar": "更换头像",
   "editProfileAvatarUploading": "上传中…",
   "editProfileAvatarFailed": "上传失败，请重试",
-
   "inviteGenerate": "邀请",
   "inviteCodeLabel": "邀请码",
   "inviteExpiryDays": "{days}天后过期",
@@ -159,24 +141,19 @@
   "inviteExpiryExpired": "已过期",
   "inviteCopy": "复制",
   "inviteCopied": "已复制到剪贴板",
-
   "joinFamilyTitle": "加入其他家庭",
   "joinFamilyConfirmMessage": "加入新家庭将退出当前所在的家庭，确定要继续吗？",
-
   "chatRoomMessageCount": "{count} 条消息",
   "chatRoomDefaultSubtitle": "家庭聊天室",
   "chatRoomMoreTooltip": "更多",
   "chatRoomEmptyHint": "发一条消息，打个招呼吧",
   "chatRoomInputHint": "说点什么……",
   "chatRoomMoreOption": "更多",
-
   "familyMembersTitle": "家庭成员",
   "familyMembersAdminBadge": "管理员",
-
   "timeJustNow": "刚刚",
   "timeMinutesAgo": "{minutes}分钟前",
   "timeYesterday": "昨天",
-
   "countryChina": "中国",
   "countryUSA": "美国",
   "countryCanada": "加拿大",

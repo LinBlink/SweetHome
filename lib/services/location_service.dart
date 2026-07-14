@@ -12,9 +12,9 @@ class LocationService {
   LocationService(this._tokenProvider);
 
   Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${_tokenProvider()}',
-      };
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ${_tokenProvider()}',
+  };
 
   /// `GET /location/family` — docs/api.md §6.2. Returns the calling
   /// user's whole family's member positions; members with no live

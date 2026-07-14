@@ -220,10 +220,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get myHomeTitle => 'ホーム';
 
   @override
-  String get myHomeLocationEntry => 'リアルタイム位置';
+  String get myHomeLocationEntry => 'リアルタイム位置情報';
 
   @override
-  String get myHomeLocationDesc => '家族の現在の位置を確認';
+  String get myHomeLocationDesc => '家族それぞれの現在地を確認';
 
   @override
   String get myHomeJoinRequestsEntry => '参加申請';
@@ -259,7 +259,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get contactsEmpty => '家族メンバーがいません';
 
   @override
-  String get locationTitle => 'リアルタイム位置';
+  String get locationTitle => 'リアルタイム位置情報';
 
   @override
   String get locationOnline => 'オンライン';
@@ -271,12 +271,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationUpdatedJustNow => 'たった今更新';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
-    return '$minutes 分前に更新';
+  String locationUpdatedMinutesAgo(Object minutes) {
+    return '$minutes分前に更新';
   }
 
   @override
-  String locationBattery(int percent) {
+  String locationBattery(Object percent) {
     return 'バッテリー：$percent%';
   }
 
@@ -284,60 +284,62 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationBatteryUnknown => 'バッテリー：不明';
 
   @override
-  String locationCoordinates(String lng, String lat) {
+  String locationCoordinates(Object lat, Object lng) {
     return '経度 $lng、緯度 $lat';
   }
 
   @override
-  String get locationNoData => '位置情報なし';
+  String get locationNoData => '位置情報がありません';
 
   @override
-  String get locationNoDataDesc => '家族が位置情報の共有を有効にすると、ここに表示されます。';
+  String get locationNoDataDesc => '家族が位置共有をオンにすると、ここに表示されます。';
 
   @override
-  String locationTotalMembers(int total) {
-    return '家族 $total 名';
+  String locationTotalMembers(Object total) {
+    return '家族$total人';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
-    return '位置共有中 $online/$total 名';
+  String locationOnlineCount(Object online, Object total) {
+    return '$online/$total 人が位置情報を共有中';
   }
 
   @override
   String get locationReportNow => '自分の位置を共有';
 
   @override
-  String get locationReportFailed => '位置情報を共有できませんでした';
+  String get locationReportFailed => '位置情報の共有に失敗しました';
 
   @override
   String get locationLocating => '位置情報を取得中…';
 
   @override
-  String get locationPermissionTitle => '位置情報の許可が必要です';
+  String get locationPermissionTitle => '位置情報の権限が必要です';
 
   @override
   String get locationPermissionBody =>
-      '家族に位置を共有するには、Sweet Home による位置情報へのアクセスを許可してください。';
+      '家族と位置情報を共有するには、Sweet Home の位置情報アクセスを許可してください。';
 
   @override
-  String get locationPermissionGrant => '許可する';
+  String get locationPermissionGrant => '権限を許可';
 
   @override
-  String get locationPermissionDenied => '権限が拒否されました。設定で有効にしてから再度お試しください。';
+  String get locationPermissionDenied =>
+      '権限が拒否されました。システム設定で許可してから、もう一度お試しください。';
 
   @override
   String get locationPermissionOpenSettings => '設定を開く';
 
   @override
-  String get locationGpsOff => 'GPS がオフです。オンにすると正確な位置を共有できます。';
+  String get locationGpsOff => 'GPSがオフです。オンにすると正確な位置を共有できます。';
 
   @override
-  String get locationGpsTimeout => 'GPS を取得できませんでした。屋外でもう一度お試しください。';
+  String get locationGpsTimeout =>
+      '時間内にGPS位置を取得できませんでした。屋外で電波状況を確認してから再試行してください。';
 
   @override
   String get locationGpsUnavailable =>
-      'この端末では位置情報を取得できません。システム設定、開発者向けオプションの模擬位置アプリ、または各社のプライバシー設定を確認してください。';
+      'この端末では位置情報サービスを利用できません。システム設定、モック位置情報アプリ、メーカーのプライバシー設定を確認してください。';
 
   @override
   String get locationRefresh => '更新';

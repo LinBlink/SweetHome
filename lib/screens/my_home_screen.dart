@@ -70,8 +70,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isAdmin =
-        context.watch<AuthProvider>().currentUser?.role == 'admin';
+    final isAdmin = context.watch<AuthProvider>().currentUser?.role == 'admin';
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n.myHomeTitle)),
@@ -87,9 +86,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
               subtitle: l10n.myHomeLocationDesc,
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const LocationScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const LocationScreen()),
               ),
             ),
             if (isAdmin) ...[
@@ -196,13 +193,18 @@ class _HubTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                          fontSize: 12, color: AppColors.textHint),
+                        fontSize: 12,
+                        color: AppColors.textHint,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppColors.textHint, size: 20),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.textHint,
+                size: 20,
+              ),
             ],
           ),
         ),

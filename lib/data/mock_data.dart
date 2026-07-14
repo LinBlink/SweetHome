@@ -37,12 +37,36 @@ class MockDataSource {
       FamilyMember(id: 5, name: '王小雨', gender: Gender.female, birthOrder: 2),
     ],
     relations: const [
-      FamilyRelation(subjectId: 3, type: RelationEdgeType.parentOf, objectId: 1),
-      FamilyRelation(subjectId: 1, type: RelationEdgeType.spouseOf, objectId: 2),
-      FamilyRelation(subjectId: 1, type: RelationEdgeType.parentOf, objectId: 4),
-      FamilyRelation(subjectId: 1, type: RelationEdgeType.parentOf, objectId: 5),
-      FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 4),
-      FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 5),
+      FamilyRelation(
+        subjectId: 3,
+        type: RelationEdgeType.parentOf,
+        objectId: 1,
+      ),
+      FamilyRelation(
+        subjectId: 1,
+        type: RelationEdgeType.spouseOf,
+        objectId: 2,
+      ),
+      FamilyRelation(
+        subjectId: 1,
+        type: RelationEdgeType.parentOf,
+        objectId: 4,
+      ),
+      FamilyRelation(
+        subjectId: 1,
+        type: RelationEdgeType.parentOf,
+        objectId: 5,
+      ),
+      FamilyRelation(
+        subjectId: 2,
+        type: RelationEdgeType.parentOf,
+        objectId: 4,
+      ),
+      FamilyRelation(
+        subjectId: 2,
+        type: RelationEdgeType.parentOf,
+        objectId: 5,
+      ),
     ],
   );
 
@@ -54,7 +78,8 @@ class MockDataSource {
     5: AppColors.avatarColorFor(5),
   };
 
-  static Color avatarColorFor(int memberId) => _avatarColorByMemberId[memberId] ?? AppColors.primary;
+  static Color avatarColorFor(int memberId) =>
+      _avatarColorByMemberId[memberId] ?? AppColors.primary;
 
   /// Avatar circle content is always a name initial — purely visual, never a
   /// kinship term (avatar circles only render a single character; see
@@ -95,8 +120,10 @@ class MockDataSource {
   /// returns a plausible-looking random 8-char code each call.
   static String randomInviteCode() {
     final rand = Random();
-    return List.generate(8, (_) => _inviteCodeAlphabet[rand.nextInt(_inviteCodeAlphabet.length)])
-        .join();
+    return List.generate(
+      8,
+      (_) => _inviteCodeAlphabet[rand.nextInt(_inviteCodeAlphabet.length)],
+    ).join();
   }
 
   /// Mock mode doesn't validate the invite code — any code previews the
@@ -107,7 +134,13 @@ class MockDataSource {
       familyId: 1,
       familyName: '王家',
       members: familyGraph.members
-          .map((m) => FamilyMemberPreview(memberId: m.id, name: m.name, gender: m.gender))
+          .map(
+            (m) => FamilyMemberPreview(
+              memberId: m.id,
+              name: m.name,
+              gender: m.gender,
+            ),
+          )
           .toList(),
     );
   }
@@ -166,48 +199,142 @@ class MockDataSource {
   static List<Message> _buildGroupMessages() {
     final now = DateTime.now();
     return [
-      _msg(id: 'g1', convId: 1, senderId: 2, name: '张美玲',
-          content: '早上好大家！今天天气不错', time: now.subtract(const Duration(hours: 8))),
-      _msg(id: 'g2', convId: 1, senderId: 3, name: '王爷爷',
-          content: '早，我去公园打太极了', time: now.subtract(const Duration(hours: 7, minutes: 50))),
-      _msg(id: 'g3', convId: 1, senderId: 4, name: '王小明',
-          content: '爸爸妈妈早安！我去上学了', time: now.subtract(const Duration(hours: 7, minutes: 30))),
-      _msg(id: 'g4', convId: 1, senderId: 1, name: '王建国', isMe: true,
-          content: '小明上学路上注意安全！', time: now.subtract(const Duration(hours: 7, minutes: 28))),
-      _msg(id: 'g5', convId: 1, senderId: 5, name: '王小雨',
-          content: '哥哥等等我一起走！', time: now.subtract(const Duration(hours: 7, minutes: 25))),
-      _msg(id: 'g6', convId: 1, senderId: 2, name: '张美玲',
-          content: '中午我做红烧肉，大家早点回来', time: now.subtract(const Duration(hours: 4))),
-      _msg(id: 'g7', convId: 1, senderId: 3, name: '王爷爷',
-          content: '好好好，我最爱吃红烧肉了', time: now.subtract(const Duration(hours: 3, minutes: 58))),
-      _msg(id: 'g8', convId: 1, senderId: 1, name: '王建国', isMe: true,
-          content: '妈做饭辛苦了！我五点钟到家', time: now.subtract(const Duration(hours: 3, minutes: 55))),
-      _msg(id: 'g9', convId: 1, senderId: 2, name: '张美玲',
-          content: '晚饭准备好了，快回家吃饭！', time: now.subtract(const Duration(minutes: 3))),
+      _msg(
+        id: 'g1',
+        convId: 1,
+        senderId: 2,
+        name: '张美玲',
+        content: '早上好大家！今天天气不错',
+        time: now.subtract(const Duration(hours: 8)),
+      ),
+      _msg(
+        id: 'g2',
+        convId: 1,
+        senderId: 3,
+        name: '王爷爷',
+        content: '早，我去公园打太极了',
+        time: now.subtract(const Duration(hours: 7, minutes: 50)),
+      ),
+      _msg(
+        id: 'g3',
+        convId: 1,
+        senderId: 4,
+        name: '王小明',
+        content: '爸爸妈妈早安！我去上学了',
+        time: now.subtract(const Duration(hours: 7, minutes: 30)),
+      ),
+      _msg(
+        id: 'g4',
+        convId: 1,
+        senderId: 1,
+        name: '王建国',
+        isMe: true,
+        content: '小明上学路上注意安全！',
+        time: now.subtract(const Duration(hours: 7, minutes: 28)),
+      ),
+      _msg(
+        id: 'g5',
+        convId: 1,
+        senderId: 5,
+        name: '王小雨',
+        content: '哥哥等等我一起走！',
+        time: now.subtract(const Duration(hours: 7, minutes: 25)),
+      ),
+      _msg(
+        id: 'g6',
+        convId: 1,
+        senderId: 2,
+        name: '张美玲',
+        content: '中午我做红烧肉，大家早点回来',
+        time: now.subtract(const Duration(hours: 4)),
+      ),
+      _msg(
+        id: 'g7',
+        convId: 1,
+        senderId: 3,
+        name: '王爷爷',
+        content: '好好好，我最爱吃红烧肉了',
+        time: now.subtract(const Duration(hours: 3, minutes: 58)),
+      ),
+      _msg(
+        id: 'g8',
+        convId: 1,
+        senderId: 1,
+        name: '王建国',
+        isMe: true,
+        content: '妈做饭辛苦了！我五点钟到家',
+        time: now.subtract(const Duration(hours: 3, minutes: 55)),
+      ),
+      _msg(
+        id: 'g9',
+        convId: 1,
+        senderId: 2,
+        name: '张美玲',
+        content: '晚饭准备好了，快回家吃饭！',
+        time: now.subtract(const Duration(minutes: 3)),
+      ),
     ];
   }
 
   static List<Message> _buildDirectMessages() {
     final now = DateTime.now();
     return [
-      _msg(id: 'd1', convId: 2, senderId: 2, name: '张美玲',
-          content: '老公，下班别忘了买酱油', time: now.subtract(const Duration(hours: 2))),
-      _msg(id: 'd2', convId: 2, senderId: 1, name: '王建国', isMe: true,
-          content: '好的，还需要别的吗？', time: now.subtract(const Duration(hours: 1, minutes: 58))),
-      _msg(id: 'd3', convId: 2, senderId: 2, name: '张美玲',
-          content: '今天超市打折，我去买点菜', time: now.subtract(const Duration(hours: 1))),
+      _msg(
+        id: 'd1',
+        convId: 2,
+        senderId: 2,
+        name: '张美玲',
+        content: '老公，下班别忘了买酱油',
+        time: now.subtract(const Duration(hours: 2)),
+      ),
+      _msg(
+        id: 'd2',
+        convId: 2,
+        senderId: 1,
+        name: '王建国',
+        isMe: true,
+        content: '好的，还需要别的吗？',
+        time: now.subtract(const Duration(hours: 1, minutes: 58)),
+      ),
+      _msg(
+        id: 'd3',
+        convId: 2,
+        senderId: 2,
+        name: '张美玲',
+        content: '今天超市打折，我去买点菜',
+        time: now.subtract(const Duration(hours: 1)),
+      ),
     ];
   }
 
   static List<Message> _buildSonMessages() {
     final now = DateTime.now();
     return [
-      _msg(id: 's1', convId: 3, senderId: 4, name: '王小明',
-          content: '爸，今天数学考了98分！', time: now.subtract(const Duration(hours: 5))),
-      _msg(id: 's2', convId: 3, senderId: 1, name: '王建国', isMe: true,
-          content: '厉害！继续加油，晚上奖励你打游戏一小时', time: now.subtract(const Duration(hours: 4, minutes: 55))),
-      _msg(id: 's3', convId: 3, senderId: 4, name: '王小明',
-          content: '爸，作业做完了！', time: now.subtract(const Duration(hours: 3))),
+      _msg(
+        id: 's1',
+        convId: 3,
+        senderId: 4,
+        name: '王小明',
+        content: '爸，今天数学考了98分！',
+        time: now.subtract(const Duration(hours: 5)),
+      ),
+      _msg(
+        id: 's2',
+        convId: 3,
+        senderId: 1,
+        name: '王建国',
+        isMe: true,
+        content: '厉害！继续加油，晚上奖励你打游戏一小时',
+        time: now.subtract(const Duration(hours: 4, minutes: 55)),
+      ),
+      _msg(
+        id: 's3',
+        convId: 3,
+        senderId: 4,
+        name: '王小明',
+        content: '爸，作业做完了！',
+        time: now.subtract(const Duration(hours: 3)),
+      ),
     ];
   }
 

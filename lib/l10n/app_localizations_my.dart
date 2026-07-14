@@ -226,11 +226,11 @@ class AppLocalizationsMy extends AppLocalizations {
   String get myHomeTitle => 'ကျွန်မတို့အိမ်';
 
   @override
-  String get myHomeLocationEntry => 'တည့်တည့်က တည်နေရာ';
+  String get myHomeLocationEntry => 'လက်ရှိတည်နေရာ';
 
   @override
   String get myHomeLocationDesc =>
-      'မိသားစုဝင်တစ်ယောက်ချင်းရဲ့ လက်ရှိတည်နေရာကို ကြည့်ရန်';
+      'မိသားစုဝင်တစ်ဦးစီ၏ လက်ရှိတည်နေရာကို ကြည့်ရှုပါ';
 
   @override
   String get myHomeJoinRequestsEntry => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
@@ -268,92 +268,92 @@ class AppLocalizationsMy extends AppLocalizations {
   String get contactsEmpty => 'မိသားစုဝင် မရှိသေးပါ';
 
   @override
-  String get locationTitle => 'တည့်တည့်က တည်နေရာ';
+  String get locationTitle => 'လက်ရှိတည်နေရာ';
 
   @override
   String get locationOnline => 'အွန်လိုင်း';
 
   @override
-  String get locationOffline => 'တည်နေရာ မရှိပါ';
+  String get locationOffline => 'တည်နေရာ မရှိသေးပါ';
 
   @override
-  String get locationUpdatedJustNow => 'ယခုလေးတင် အပ်ဒိတ်လုပ်ပြီး';
+  String get locationUpdatedJustNow => 'ယခုလေးတင် အပ်ဒိတ်လုပ်ခဲ့သည်';
 
   @override
-  String locationUpdatedMinutesAgo(int minutes) {
-    return '$minutes မိနစ် အကြာက အပ်ဒိတ်လုပ်ပြီး';
+  String locationUpdatedMinutesAgo(Object minutes) {
+    return '$minutes မိနစ်အကြာက အပ်ဒိတ်လုပ်ခဲ့သည်';
   }
 
   @override
-  String locationBattery(int percent) {
-    return 'ဘက်ထရီ: $percent%';
+  String locationBattery(Object percent) {
+    return 'ဘက်ထရီ：$percent%';
   }
 
   @override
-  String get locationBatteryUnknown => 'ဘက်ထရီ: မသိပါ';
+  String get locationBatteryUnknown => 'ဘက်ထရီ：မသိ';
 
   @override
-  String locationCoordinates(String lng, String lat) {
-    return 'လေတိုင်အရှည် $lng၊ လေပြည့်အကျယ် $lat';
+  String locationCoordinates(Object lat, Object lng) {
+    return 'လောင်ဂျီတွဒ် $lng၊ လက်တီတွဒ် $lat';
   }
 
   @override
-  String get locationNoData => 'တည်နေရာ ဒေတာ မရှိသေးပါ';
+  String get locationNoData => 'တည်နေရာအချက်အလက် မရှိသေးပါ';
 
   @override
   String get locationNoDataDesc =>
-      'မိသားစုဝင်များ တည်နေရာ မျှဝေခြင်းကို ဖွင့်ထားမှ ဤနေရာတွင် ပြပါမည်။';
+      'မိသားစုဝင်များ တည်နေရာမျှဝေမှုကို ဖွင့်ထားမှသာ ဤနေရာတွင် ပေါ်လာမည်။';
 
   @override
-  String locationTotalMembers(int total) {
-    return 'မိသားစုဝင် $total ယောက်';
+  String locationTotalMembers(Object total) {
+    return 'မိသားစုဝင် $total ဦး';
   }
 
   @override
-  String locationOnlineCount(int online, int total) {
-    return 'တည်နေရာ မျှဝေနေသည် $online/$total';
+  String locationOnlineCount(Object online, Object total) {
+    return '$online/$total ဦးက တည်နေရာမျှဝေနေသည်';
   }
 
   @override
-  String get locationReportNow => 'ကျွန်မတို့ တည်နေရာ မျှဝေရန်';
+  String get locationReportNow => 'ကျွန်ုပ်၏တည်နေရာကို မျှဝေမည်';
 
   @override
-  String get locationReportFailed => 'တည်နေရာ မျှဝေ၍ မရပါ';
+  String get locationReportFailed => 'တည်နေရာမျှဝေမှု မအောင်မြင်ပါ';
 
   @override
-  String get locationLocating => 'တည်နေရာ ရှာဖွေနေသည်…';
+  String get locationLocating => 'တည်နေရာရှာနေသည်…';
 
   @override
-  String get locationPermissionTitle => 'တည်နေရာ ခွင့်ပြုချက် လိုအပ်သည်';
+  String get locationPermissionTitle => 'တည်နေရာခွင့်ပြုချက် လိုအပ်သည်';
 
   @override
   String get locationPermissionBody =>
-      'မိသားစုနှင့် တည်နေရာ မျှဝေရန်အတွက် Sweet Home အား တည်နေရာ ဝင်ရောက်ခွင့် ပေးပါ။';
+      'မိသားစုနှင့် တည်နေရာမျှဝေရန် Sweet Home အား တည်နေရာသုံးခွင့်ပြုပါ။';
 
   @override
-  String get locationPermissionGrant => 'ခွင့်ပြုရန်';
+  String get locationPermissionGrant => 'ခွင့်ပြုပါ';
 
   @override
   String get locationPermissionDenied =>
-      'ခွင့်ပြုချက် ပယ်ချခံရသည်။ စနစ်ဆက်တင်တွင် ဖွင့်ပြီးမှ ထပ်စမ်းကြည့်ပါ။';
+      'ခွင့်ပြုချက် ငြင်းပယ်ခံရသည်။ စနစ်ဆက်တင်တွင် ဖွင့်ပြီးမှ ထပ်စမ်းကြည့်ပါ။';
 
   @override
   String get locationPermissionOpenSettings => 'ဆက်တင်များ ဖွင့်ရန်';
 
   @override
   String get locationGpsOff =>
-      'GPS ပိတ်ထားသည်။ ဖွင့်ထားပါက တည်နေရာ တိကျစွာ မျှဝေနိုင်သည်။';
+      'GPS ပိတ်ထားသည်။ ဖွင့်ထားမှ တိကျသော တည်နေရာကို မျှဝေနိုင်မည်။';
 
   @override
   String get locationGpsTimeout =>
-      'အချိန်မီ GPS တည်နေရာ ရယူ၍ မရပါ။ ပွင့်လင်နေရာတွင် ထပ်စမ်းကြည့်ပါ။';
+      'အချိန်မီ GPS တည်နေရာ မရရှိပါ။ ပြင်ပတွင် သို့မဟုတ် အချက်ပြမှုကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။';
 
   @override
   String get locationGpsUnavailable =>
-      'ဤစက်ပစ္စည်းတွင် တည်နေရာ ဝန်ဆောင်မှု မရနိုင်ပါ။ စနစ်ဆက်တင်၊ ဆော့ဝဲသမား ရွေးချယ်ချက်များရှိ သရုပ်ဆောင်တည်နေရာအက်ပ်၊ သို့မဟုတ် ထုတ်လုပ်သူ ကိုယ်ရေးကိုယ်တိုင် ဆက်တင်များကို စစ်ဆေးပါ။';
+      'ဤစက်ပစ္စည်းတွင် တည်နေရာဝန်ဆောင်မှု မရနိုင်ပါ။ စနစ်ဆက်တင်၊ အတု တည်နေရာအက်ပ်၊ သို့မဟုတ် ကုမ္ပဏီ၏ ကိုယ်ရေးအချက်အလက်ဆက်တင်များကို စစ်ဆေးပါ။';
 
   @override
-  String get locationRefresh => 'ပြန်လည်ရယူရန်';
+  String get locationRefresh => 'ပြန်လည်စတင်ရန်';
 
   @override
   String get joinRequestsAdminTitle => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';

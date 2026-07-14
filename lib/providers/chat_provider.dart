@@ -45,10 +45,10 @@ class ChatProvider extends ChangeNotifier {
     required ChatService chatService,
     required AuthUser currentUser,
     Future<bool> Function()? onUnauthorized,
-  })  : _ws = ws,
-        _chatService = chatService,
-        _currentUser = currentUser,
-        _onUnauthorized = onUnauthorized {
+  }) : _ws = ws,
+       _chatService = chatService,
+       _currentUser = currentUser,
+       _onUnauthorized = onUnauthorized {
     _ws.connect(_currentUser.token);
     _wsSub = _ws.stream.listen(_handleWsMessage);
   }
@@ -104,7 +104,9 @@ class ChatProvider extends ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 300));
       final member = MockDataSource.familyGraph.memberById(targetUserId);
       final newConv = Conversation(
-        id: (_conversations.map((c) => c.id).fold(0, (a, b) => a > b ? a : b)) + 1,
+        id:
+            (_conversations.map((c) => c.id).fold(0, (a, b) => a > b ? a : b)) +
+            1,
         name: member?.name ?? '',
         isGroup: false,
         avatarLabel: MockDataSource.avatarInitialFor(targetUserId),
@@ -135,7 +137,10 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> loadMessages(int conversationId, {bool loadMore = false}) async {
     if (_loadingMessages[conversationId] == true) return;
-    if (loadMore && _cursors[conversationId] == null && _messages[conversationId] != null) return;
+    if (loadMore &&
+        _cursors[conversationId] == null &&
+        _messages[conversationId] != null)
+      return;
 
     _loadingMessages[conversationId] = true;
     notifyListeners();
@@ -143,7 +148,9 @@ class ChatProvider extends ChangeNotifier {
       if (AppConfig.mockMode) {
         await Future.delayed(const Duration(milliseconds: 300));
         if (!loadMore) {
-          _messages[conversationId] = MockDataSource.messagesFor(conversationId);
+          _messages[conversationId] = MockDataSource.messagesFor(
+            conversationId,
+          );
           _cursors[conversationId] = null;
         }
       } else {
@@ -191,13 +198,19 @@ class ChatProvider extends ChangeNotifier {
     int? lastServerId;
     for (final m in msgs) {
       final id = m.serverId;
-      if (id != null && (lastServerId == null || id > lastServerId)) lastServerId = id;
+      if (id != null && (lastServerId == null || id > lastServerId))
+        lastServerId = id;
     }
     if (lastServerId == null) return;
-    _ws.send(WsOutboundMessage(
-      type: 'READ',
-      payload: {'conversationId': conversationId, 'lastReadMessageId': lastServerId},
-    ));
+    _ws.send(
+      WsOutboundMessage(
+        type: 'READ',
+        payload: {
+          'conversationId': conversationId,
+          'lastReadMessageId': lastServerId,
+        },
+      ),
+    );
     _chatService.markRead(conversationId, lastServerId).catchError((_) {});
   }
 
@@ -208,7 +221,9 @@ class ChatProvider extends ChangeNotifier {
       conversationId: conversationId,
       senderId: _currentUser.userId,
       senderName: _currentUser.name,
-      senderAvatarLabel: _currentUser.name.isNotEmpty ? _currentUser.name[0] : '我',
+      senderAvatarLabel: _currentUser.name.isNotEmpty
+          ? _currentUser.name[0]
+          : '我',
       senderAvatarColor: AppColors.primary,
       content: content,
       type: MessageType.text,
@@ -243,17 +258,27 @@ class ChatProvider extends ChangeNotifier {
       if (!AppConfig.mockMode) {
         try {
           final sent = await _chatService.sendMessage(
-            conversationId, content, clientId,
+            conversationId,
+            content,
+            clientId,
             currentUserId: _currentUser.userId,
           );
           _replaceOptimistic(conversationId, clientId, sent);
           notifyListeners();
         } on ApiException catch (e) {
           _handleApiException(e);
-          _replaceOptimistic(conversationId, clientId, optimistic.copyWith(isPending: false));
+          _replaceOptimistic(
+            conversationId,
+            clientId,
+            optimistic.copyWith(isPending: false),
+          );
           notifyListeners();
         } catch (_) {
-          _replaceOptimistic(conversationId, clientId, optimistic.copyWith(isPending: false));
+          _replaceOptimistic(
+            conversationId,
+            clientId,
+            optimistic.copyWith(isPending: false),
+          );
           notifyListeners();
         }
       }
@@ -261,10 +286,12 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void setActiveConversation(int convId) {
-    _ws.send(WsOutboundMessage(
-      type: 'JOIN_CONVERSATION',
-      payload: {'conversationId': convId},
-    ));
+    _ws.send(
+      WsOutboundMessage(
+        type: 'JOIN_CONVERSATION',
+        payload: {'conversationId': convId},
+      ),
+    );
     final idx = _conversations.indexWhere((c) => c.id == convId);
     if (idx >= 0) {
       _conversations[idx] = _conversations[idx].copyWith(unreadCount: 0);
@@ -275,10 +302,14 @@ class ChatProvider extends ChangeNotifier {
   void _handleWsMessage(WsInboundMessage msg) {
     switch (msg.type) {
       case 'NEW_MESSAGE':
-        final m = Message.fromJson(msg.data, currentUserId: _currentUser.userId);
+        final m = Message.fromJson(
+          msg.data,
+          currentUserId: _currentUser.userId,
+        );
         _messages[m.conversationId] ??= [];
-        final existingIdx = _messages[m.conversationId]!
-            .indexWhere((x) => x.clientId == m.clientId);
+        final existingIdx = _messages[m.conversationId]!.indexWhere(
+          (x) => x.clientId == m.clientId,
+        );
         if (existingIdx >= 0) {
           _messages[m.conversationId]![existingIdx] = m;
         } else {

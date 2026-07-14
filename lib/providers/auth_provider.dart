@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../core/app_config.dart';
 import '../core/error_messages.dart';
@@ -5,6 +7,7 @@ import '../data/mock_data.dart';
 import '../models/api_exception.dart';
 import '../models/auth_models.dart';
 import '../models/family_member_vm.dart';
+import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/family_service.dart';
 
@@ -19,6 +22,12 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
 
   AuthProvider() {
+    // One AuthProvider per app run (created once at root in main.dart)
+    // — self-register so *any* service call anywhere that routes
+    // through ApiClient.unwrap and hits a 401 flows through the same
+    // refresh-or-logout handling as ChatProvider's existing 401 path,
+    // without every provider/screen needing its own bespoke wiring.
+    ApiClient.onUnauthorized = () => unawaited(handleUnauthorized());
     _restoreSession();
   }
 
@@ -55,8 +64,9 @@ class AuthProvider extends ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 600));
         _currentUser = MockDataSource.mockUser;
       } else {
-        _currentUser =
-            await AuthService.login(LoginRequest(phone: phone, password: password));
+        _currentUser = await AuthService.login(
+          LoginRequest(phone: phone, password: password),
+        );
         // The §1.2 login response omits `gender` and `avatarUrl`; follow up
         // with §2.1 to populate them so kinship localization (S.F#male vs
         // S.F#female) and the profile-screen avatar render correctly. A
@@ -275,6 +285,37 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  Future<bool>? _unauthorizedHandling;
+
+  /// Single entry point for "a request came back 401" from anywhere in
+  /// the app — [ApiClient.onUnauthorized] (registered in the
+  /// constructor above) calls this for every service that routes
+  /// through [ApiClient.unwrap], and [ChatProvider]'s own 401 path
+  /// (wired in `main.dart`) calls it too so both share one in-flight
+  /// refresh instead of racing separate `refreshSession()` calls when
+  /// several requests hit 401 around the same time (e.g. a batch of
+  /// chat + location + family calls all firing right as the JWT
+  /// expires). Memoizes the in-flight `Future` synchronously (`??=`,
+  /// before any `await`), so re-entrant calls made in the same event
+  /// as the first — including one that might come from *inside*
+  /// `refreshSession()` itself, if the refresh-token call also 401s —
+  /// just await the same result instead of starting a second refresh
+  /// or double-logging-out.
+  Future<bool> handleUnauthorized() {
+    return _unauthorizedHandling ??= _doHandleUnauthorized();
+  }
+
+  Future<bool> _doHandleUnauthorized() async {
+    try {
+      if (!isAuthenticated) return false;
+      final ok = await refreshSession();
+      if (!ok) await logout();
+      return ok;
+    } finally {
+      _unauthorizedHandling = null;
     }
   }
 

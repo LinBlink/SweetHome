@@ -34,13 +34,13 @@ void main() {
   group('MemberLocation.isFresh / minutesAgo', () {
     final base = DateTime.now();
     MemberLocation make(Duration ago) => MemberLocation.fromJson({
-          'userId': 1,
-          'username': 'x',
-          'lng': 0,
-          'lat': 0,
-          'battery': 50,
-          'updatedAt': base.subtract(ago).toUtc().toIso8601String(),
-        });
+      'userId': 1,
+      'username': 'x',
+      'lng': 0,
+      'lat': 0,
+      'battery': 50,
+      'updatedAt': base.subtract(ago).toUtc().toIso8601String(),
+    });
 
     test('a fix from now is fresh with 0 minutes', () {
       final m = make(Duration.zero);
@@ -65,7 +65,10 @@ void main() {
         'lng': 0,
         'lat': 0,
         'battery': 50,
-        'updatedAt': DateTime.now().add(const Duration(minutes: 5)).toUtc().toIso8601String(),
+        'updatedAt': DateTime.now()
+            .add(const Duration(minutes: 5))
+            .toUtc()
+            .toIso8601String(),
       });
       expect(future.minutesAgo, 0);
     });

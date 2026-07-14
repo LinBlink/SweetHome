@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,6 +16,7 @@ import '../providers/location_provider.dart';
 import '../services/location_service.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/error_banner.dart';
+import 'location_debug_screen.dart';
 
 /// API §6 实时位置 page. Layout (top to bottom):
 ///   1. OSM map with one avatar-marker per member with a fresh fix
@@ -83,9 +85,7 @@ class _LocationScreenState extends State<LocationScreen> {
     final ok = await _provider.reportNow();
     if (!mounted) return;
     if (ok) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.locationReportNow)),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.locationReportNow)));
       _refresh();
     } else {
       // Translate the provider's machine-readable error code into a
@@ -108,19 +108,13 @@ class _LocationScreenState extends State<LocationScreen> {
   void _fitToMembers(List<MemberLocation> members) {
     if (members.isEmpty) return;
     if (members.length == 1) {
-      _mapController.move(
-        LatLng(members.first.lat, members.first.lng),
-        15,
-      );
+      _mapController.move(LatLng(members.first.lat, members.first.lng), 15);
       return;
     }
     final points = members.map((m) => LatLng(m.lat, m.lng)).toList();
     final bounds = LatLngBounds.fromPoints(points);
     _mapController.fitCamera(
-      CameraFit.bounds(
-        bounds: bounds,
-        padding: const EdgeInsets.all(48),
-      ),
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48)),
     );
   }
 
@@ -136,6 +130,23 @@ class _LocationScreenState extends State<LocationScreen> {
         appBar: AppBar(
           title: Text(l10n.locationTitle),
           actions: [
+            // Debug-build-only entry to the raw capture/report log —
+            // never shown in a release build, so no l10n needed for
+            // a screen a real user will never see.
+            if (kDebugMode)
+              IconButton(
+                icon: const Icon(Icons.bug_report_outlined),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: _provider,
+                      child: const LocationDebugScreen(),
+                    ),
+                  ),
+                ),
+                tooltip: 'Location debug',
+              ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: _refresh,
@@ -172,10 +183,7 @@ class _LocationScreenState extends State<LocationScreen> {
             });
             return Column(
               children: [
-                _MapPanel(
-                  members: members,
-                  mapController: _mapController,
-                ),
+                _MapPanel(members: members, mapController: _mapController),
                 _StatsStrip(data: data, l10n: l10n),
                 _ProviderBanner(),
                 const Divider(height: 1, color: AppColors.divider),
@@ -200,16 +208,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       children: [
                         _LastReportedLine(),
                         const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.my_location),
-                          label: Text(l10n.locationReportNow),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onPressed: _shareMyLocation,
-                        ),
+                        _ShareLocationButton(onPressed: _shareMyLocation),
                       ],
                     ),
                   ),
@@ -271,11 +270,7 @@ class _MapPanel extends StatelessWidget {
               // OSM tile usage policy requires visible attribution.
               // Keep it small and on a translucent background so it
               // doesn't fight with markers.
-              const Positioned(
-                left: 0,
-                bottom: 0,
-                child: _OsmAttribution(),
-              ),
+              const Positioned(left: 0, bottom: 0, child: _OsmAttribution()),
             ],
           ),
         ],
@@ -314,11 +309,7 @@ class _MemberMarker extends StatelessWidget {
           ),
         ),
         // Small triangle pointing down (pin tail).
-        Container(
-          width: 2,
-          height: 8,
-          color: color,
-        ),
+        Container(width: 2, height: 8, color: color),
       ],
     );
   }
@@ -369,10 +360,7 @@ class _StatsStrip extends StatelessWidget {
           ),
           Text(
             l10n.locationTotalMembers(data.totalMemberCount),
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textHint,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.textHint),
           ),
         ],
       ),
@@ -400,9 +388,9 @@ class _ProviderBanner extends StatelessWidget {
           action: TextButton(
             onPressed: () =>
                 context.read<LocationProvider>().reportNow().then((_) {
-              // The OS dialog handles the actual grant; this just
-              // re-tries after the user comes back.
-            }),
+                  // The OS dialog handles the actual grant; this just
+                  // re-tries after the user comes back.
+                }),
             child: Text(l10n.locationPermissionGrant),
           ),
         );
@@ -457,10 +445,7 @@ class _Banner extends StatelessWidget {
           Icon(icon, size: 18, color: color),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              message,
-              style: TextStyle(fontSize: 12, color: color),
-            ),
+            child: Text(message, style: TextStyle(fontSize: 12, color: color)),
           ),
           ?action,
         ],
@@ -506,8 +491,7 @@ class _EmptyState extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 l10n.locationTotalMembers(total),
-                style: const TextStyle(
-                    fontSize: 11, color: AppColors.textHint),
+                style: const TextStyle(fontSize: 11, color: AppColors.textHint),
               ),
             ],
           ],
@@ -564,7 +548,10 @@ class _MemberTile extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: member.isFresh
                             ? AppColors.success.withValues(alpha: 0.15)
@@ -572,7 +559,9 @@ class _MemberTile extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        member.isFresh ? l10n.locationOnline : l10n.locationOffline,
+                        member.isFresh
+                            ? l10n.locationOnline
+                            : l10n.locationOffline,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -591,27 +580,39 @@ class _MemberTile extends StatelessWidget {
                     member.lat.toStringAsFixed(4),
                   ),
                   style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary),
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    const Icon(Icons.battery_full,
-                        size: 12, color: AppColors.textHint),
+                    const Icon(
+                      Icons.battery_full,
+                      size: 12,
+                      color: AppColors.textHint,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       _batteryLabel(),
                       style: const TextStyle(
-                          fontSize: 11, color: AppColors.textHint),
+                        fontSize: 11,
+                        color: AppColors.textHint,
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    const Icon(Icons.access_time,
-                        size: 12, color: AppColors.textHint),
+                    const Icon(
+                      Icons.access_time,
+                      size: 12,
+                      color: AppColors.textHint,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       _timeLabel(),
                       style: const TextStyle(
-                          fontSize: 11, color: AppColors.textHint),
+                        fontSize: 11,
+                        color: AppColors.textHint,
+                      ),
                     ),
                   ],
                 ),
@@ -620,6 +621,44 @@ class _MemberTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// "Share my location" button, disabled + spinning while a capture is
+/// in flight. `LocationProvider.reportNow()` can take up to ~90s
+/// (multi-tier GPS fallback) before it resolves either way — without
+/// this the button stays tappable and visually unchanged the whole
+/// time, which looks exactly like the tap did nothing until the error
+/// toast finally appears (see `LocationProvider._attemptSample`'s doc
+/// comment for the underlying fix: `isAttempting` used to only be
+/// tracked for the background timer, not the manual button).
+class _ShareLocationButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _ShareLocationButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isAttempting = context.watch<LocationProvider>().isAttempting;
+    return ElevatedButton.icon(
+      icon: isAttempting
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Icon(Icons.my_location),
+      label: Text(l10n.locationReportNow),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+      onPressed: isAttempting ? null : onPressed,
     );
   }
 }
@@ -669,8 +708,8 @@ class _LastReportedLine extends StatelessWidget {
       final agoLabel = agoSec < 5
           ? l10n.locationUpdatedJustNow
           : agoSec < 60
-              ? '${agoSec}s'
-              : l10n.locationUpdatedMinutesAgo(agoSec ~/ 60);
+          ? '${agoSec}s'
+          : l10n.locationUpdatedMinutesAgo(agoSec ~/ 60);
       icon = Icons.cloud_done_outlined;
       text = agoLabel;
       color = AppColors.success;
@@ -692,8 +731,7 @@ class _LastReportedLine extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '(#${provider.attemptCount})',
-            style: const TextStyle(
-                fontSize: 11, color: AppColors.textHint),
+            style: const TextStyle(fontSize: 11, color: AppColors.textHint),
           ),
         ],
       ],

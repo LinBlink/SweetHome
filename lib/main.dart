@@ -71,11 +71,7 @@ class AuthGate extends StatelessWidget {
                   : WebSocketService(),
               chatService: ChatService(() => auth.currentUser!.token),
               currentUser: auth.currentUser!,
-              onUnauthorized: () async {
-                final ok = await auth.refreshSession();
-                if (!ok) await auth.logout();
-                return ok;
-              },
+              onUnauthorized: auth.handleUnauthorized,
             )..loadConversations(),
             child: const MainShell(),
           );
@@ -114,10 +110,7 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       // bottomNavigationBar is the visible bar with 4 regular tabs;
       // the raised MyHome button is overlaid on top of it via
       // floatingActionButtonLocation.centerDocked. FAB sits *above*
@@ -139,8 +132,7 @@ class _MainShellState extends State<MainShell> {
         // `centerDocked` leaves the FAB half-inside the bar; nudge
         // it up so the circle sits clearly above the bar line.
         onPressed: () => setState(() => _currentIndex = _kMyHomeIndex),
-        backgroundColor:
-            isSelected ? AppColors.primaryDark : AppColors.primary,
+        backgroundColor: isSelected ? AppColors.primaryDark : AppColors.primary,
         elevation: 4,
         shape: const CircleBorder(),
         tooltip: l10n.navMyHome,
@@ -256,7 +248,10 @@ class _MainShellState extends State<MainShell> {
                   top: -4,
                   child: Container(
                     constraints: const BoxConstraints(minWidth: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.danger,
                       borderRadius: BorderRadius.circular(8),
@@ -264,9 +259,10 @@ class _MainShellState extends State<MainShell> {
                     child: Text(
                       badgeCount > 99 ? '99+' : '$badgeCount',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700),
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -311,20 +307,26 @@ class _SplashScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Center(
-                child: Text('家',
-                    style: TextStyle(
-                        fontSize: 40,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700)),
+                child: Text(
+                  '家',
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            Text(l10n.brandName,
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: 3)),
+            Text(
+              l10n.brandName,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: 3,
+              ),
+            ),
             const SizedBox(height: 40),
             const CircularProgressIndicator(color: AppColors.primary),
           ],

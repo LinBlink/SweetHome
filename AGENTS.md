@@ -74,10 +74,32 @@ flutter test                                                      # all tests
   closes the WS — do not let `ChatProvider` outlive `AuthGate`'s authenticated
   subtree.
 - `lib/providers/location_provider.dart` — drives the §6.1 upload loop
-  (1-minute `Timer.periodic` + first-fix-mandatory + last-gasp on
-  AppLifecycleState.paused/detached + distance gate so "didn't move" samples
-  are dropped). The `LocationScreen` is a separate consumer; the
-  `LocationService.fetchFamilyLocations()` call goes through HTTP,
+  (~1-minute `Timer.periodic` + first-fix-mandatory + last-gasp on
+  AppLifecycleState.paused/detached). Reports *every* successful sample —
+  no distance/displacement gate (an earlier version had one; it silently
+  killed periodic reports once the user stopped moving, since the spec
+  only says "约每分钟采集一次" with no such rule — don't reintroduce it).
+  `_captureFix`'s tiered GPS acquire sets `forceAndroidLocationManager: true`
+  on every tier (this app targets mainland China, where Google Play
+  Services is essentially never present, so trying the default Fused
+  Location Provider "first, for speed" just burns a whole tier's timeout
+  on a call that's guaranteed to fail for the target audience). The stock
+  `LocationManager` has no GMS dependency and, on Android 12+, transparently
+  uses the OS-native `FUSED_PROVIDER` — so forcing it isn't an accuracy
+  trade-off on modern devices. The final fallback tier uses
+  `LocationAccuracy.lowest` specifically because that's the only accuracy
+  value `geolocator_android`'s `LocationManagerClient.determineProvider`
+  maps to `PASSIVE_PROVIDER` — every other accuracy tier resolves to
+  GPS_PROVIDER once GPS is enabled, so `lowest` is the only tier that
+  actually diversifies the fallback instead of retrying the same
+  satellite fix with a shorter timeout.
+  `Geolocator.getLastKnownPosition()` is wrapped in a 5s `.timeout()` —
+  it has no timeout of its own and can hang indefinitely on GMS-less
+  devices, which otherwise leaves the UI stuck on "Locating…" forever.
+  `reportNow()` catches `_sendReport`'s rethrow so a failed manual report
+  surfaces a localized error banner instead of throwing uncaught through
+  the button's `onPressed`. The `LocationScreen` is a separate consumer;
+  the `LocationService.fetchFamilyLocations()` call goes through HTTP,
   not this provider.
 - `lib/services/chat_service.dart` — REST: conversations, cursor-paginated
   message history (`before`/`nextCursor`), POST send-as-fallback.
