@@ -66,5 +66,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Location permissions for the §6 "实时位置" feature on iOS.
+		 The WhenInUse key is required for the in-app map; the Always key
+		 is required for background reporting (AppLifecycleState.paused). -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>为了在"我的家-实时位置"中显示和上报你的位置，请允许定位权限。</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>为了在 App 后台时仍能上报最后位置（API §6.1 的"退出前补发"），请允许始终定位。</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

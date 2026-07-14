@@ -21,6 +21,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navMessages => '메시지';
 
   @override
+  String get navContacts => '연락처';
+
+  @override
+  String get navMyHome => '홈';
+
+  @override
+  String get navFamilyFeed => '패밀리 피드';
+
+  @override
   String get navProfile => '나';
 
   @override
@@ -199,13 +208,195 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileLogout => '로그아웃';
 
   @override
-  String get profileLogoutConfirmMessage => '정말 로그아웃 하시겠습니까?';
+  String get profileLogoutConfirmMessage => '로그아웃하시겠습니까?';
 
   @override
   String get profileLanguageRow => '언어';
 
   @override
   String get profileFamilyMembersRow => '가족 구성원';
+
+  @override
+  String get myHomeTitle => '홈';
+
+  @override
+  String get myHomeLocationEntry => '실시간 위치';
+
+  @override
+  String get myHomeLocationDesc => '가족 구성원의 현재 위치 보기';
+
+  @override
+  String get myHomeJoinRequestsEntry => '가입 요청';
+
+  @override
+  String get myHomeJoinRequestsDesc => '가족 가입 요청 검토 및 승인';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count건 대기',
+      one: '1건 대기',
+      zero: '대기 없음',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => '패밀리 피드';
+
+  @override
+  String get familyFeedComingSoon => '곧 출시';
+
+  @override
+  String get familyFeedComingSoonDesc => '가족 소식과 마일스톤이 곧 도착합니다.';
+
+  @override
+  String get contactsTitle => '연락처';
+
+  @override
+  String get contactsEmpty => '아직 가족 구성원이 없습니다';
+
+  @override
+  String get locationTitle => '실시간 위치';
+
+  @override
+  String get locationOnline => '온라인';
+
+  @override
+  String get locationOffline => '위치 정보 없음';
+
+  @override
+  String get locationUpdatedJustNow => '방금 업데이트';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes분 전 업데이트';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return '배터리: $percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => '배터리: 알 수 없음';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return '경도 $lng, 위도 $lat';
+  }
+
+  @override
+  String get locationNoData => '위치 데이터 없음';
+
+  @override
+  String get locationNoDataDesc => '가족 구성원이 위치 공유를 활성화하면 여기에 표시됩니다.';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '총 $total명의 가족';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '위치 공유 중 $online/$total명';
+  }
+
+  @override
+  String get locationReportNow => '내 위치 공유';
+
+  @override
+  String get locationReportFailed => '위치를 공유할 수 없습니다';
+
+  @override
+  String get locationLocating => '위치 확인 중…';
+
+  @override
+  String get locationPermissionTitle => '위치 권한 필요';
+
+  @override
+  String get locationPermissionBody =>
+      '가족과 위치를 공유하려면 Sweet Home의 위치 접근을 허용하세요.';
+
+  @override
+  String get locationPermissionGrant => '권한 허용';
+
+  @override
+  String get locationPermissionDenied =>
+      '권한이 거부되었습니다. 시스템 설정에서 활성화한 후 다시 시도하세요.';
+
+  @override
+  String get locationPermissionOpenSettings => '설정 열기';
+
+  @override
+  String get locationGpsOff => 'GPS가 꺼져 있습니다. 켜면 정확한 위치를 공유할 수 있습니다.';
+
+  @override
+  String get locationGpsTimeout => '시간 내에 GPS 위치를 가져올 수 없습니다. 실외에서 다시 시도하세요.';
+
+  @override
+  String get locationGpsUnavailable =>
+      '이 기기에서는 위치 서비스를 사용할 수 없습니다. 시스템 설정, 개발자 옵션의 모의 위치 앱 또는 제조사 개인정보 설정을 확인하세요.';
+
+  @override
+  String get locationRefresh => '새로 고침';
+
+  @override
+  String get joinRequestsAdminTitle => '가입 요청';
+
+  @override
+  String get joinRequestsAdminEmpty => '현재 대기 중인 요청이 없습니다.';
+
+  @override
+  String get joinRequestsAdminReject => '거절';
+
+  @override
+  String get joinRequestsAdminApprove => '승인';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '$targetName의 $relation이 되고 싶음';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return '메시지: $message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => '이 요청을 거절하시겠습니까?';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => '거절 사유 (선택)';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => '거절';
+
+  @override
+  String get joinRequestsAdminRejectCancel => '취소';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => '요청이 거절되었습니다';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => '요청이 승인되었습니다';
+
+  @override
+  String get joinRequestsAdminError => '작업을 완료할 수 없습니다';
+
+  @override
+  String get requestJoinModeByCode => '초대 코드가 있어요';
+
+  @override
+  String get requestJoinModeByPhone => '구성원 전화번호를 알아요';
+
+  @override
+  String get requestJoinNoFamilySubmit => '요청 보내기';
+
+  @override
+  String get requestJoinByCodeHint => '초대 코드가 있는 경우 사용하세요.';
 
   @override
   String get conversationsSearchTooltip => '검색';

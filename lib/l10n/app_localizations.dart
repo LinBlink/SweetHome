@@ -130,6 +130,24 @@ abstract class AppLocalizations {
   /// **'Messages'**
   String get navMessages;
 
+  /// No description provided for @navContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get navContacts;
+
+  /// No description provided for @navMyHome.
+  ///
+  /// In en, this message translates to:
+  /// **'My Home'**
+  String get navMyHome;
+
+  /// No description provided for @navFamilyFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Feed'**
+  String get navFamilyFeed;
+
   /// No description provided for @navProfile.
   ///
   /// In en, this message translates to:
@@ -495,6 +513,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Family Members'**
   String get profileFamilyMembersRow;
+
+  /// No description provided for @myHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Home'**
+  String get myHomeTitle;
+
+  /// No description provided for @myHomeLocationEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Location'**
+  String get myHomeLocationEntry;
+
+  /// No description provided for @myHomeLocationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See where each family member is right now'**
+  String get myHomeLocationDesc;
+
+  /// No description provided for @myHomeJoinRequestsEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Requests'**
+  String get myHomeJoinRequestsEntry;
+
+  /// No description provided for @myHomeJoinRequestsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Review and approve requests to join this family'**
+  String get myHomeJoinRequestsDesc;
+
+  /// No description provided for @myHomeJoinRequestsBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No pending} =1{1 pending} other{{count} pending}}'**
+  String myHomeJoinRequestsBadge(int count);
+
+  /// No description provided for @familyFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Feed'**
+  String get familyFeedTitle;
+
+  /// No description provided for @familyFeedComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get familyFeedComingSoon;
+
+  /// No description provided for @familyFeedComingSoonDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Family updates and milestones are on the way.'**
+  String get familyFeedComingSoonDesc;
+
+  /// No description provided for @contactsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get contactsTitle;
+
+  /// No description provided for @contactsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members yet'**
+  String get contactsEmpty;
+
+  /// No description provided for @locationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Location'**
+  String get locationTitle;
+
+  /// No description provided for @locationOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get locationOnline;
+
+  /// No description provided for @locationOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent location'**
+  String get locationOffline;
+
+  /// No description provided for @locationUpdatedJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated just now'**
+  String get locationUpdatedJustNow;
+
+  /// No description provided for @locationUpdatedMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {minutes}m ago'**
+  String locationUpdatedMinutesAgo(int minutes);
+
+  /// No description provided for @locationBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery: {percent}%'**
+  String locationBattery(int percent);
+
+  /// No description provided for @locationBatteryUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery: unknown'**
+  String get locationBatteryUnknown;
+
+  /// No description provided for @locationCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'lng {lng}, lat {lat}'**
+  String locationCoordinates(String lng, String lat);
+
+  /// No description provided for @locationNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No location data yet'**
+  String get locationNoData;
+
+  /// No description provided for @locationNoDataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Family members need to enable location sharing for their position to show up here.'**
+  String get locationNoDataDesc;
+
+  /// No description provided for @locationTotalMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'{total} family members'**
+  String locationTotalMembers(int total);
+
+  /// No description provided for @locationOnlineCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{online}/{total} sharing location'**
+  String locationOnlineCount(int online, int total);
+
+  /// No description provided for @locationReportNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my location'**
+  String get locationReportNow;
+
+  /// No description provided for @locationReportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share location'**
+  String get locationReportFailed;
+
+  /// No description provided for @locationLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Locating…'**
+  String get locationLocating;
+
+  /// No description provided for @locationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission needed'**
+  String get locationPermissionTitle;
+
+  /// No description provided for @locationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To share your position with family members, allow Sweet Home to access your location.'**
+  String get locationPermissionBody;
+
+  /// No description provided for @locationPermissionGrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant permission'**
+  String get locationPermissionGrant;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied. Enable it in system settings to share your location.'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @locationPermissionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get locationPermissionOpenSettings;
+
+  /// No description provided for @locationGpsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS is off. Turn it on to share accurate location.'**
+  String get locationGpsOff;
+
+  /// No description provided for @locationGpsTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get a GPS fix in time. Try again outdoors or check your signal.'**
+  String get locationGpsTimeout;
+
+  /// No description provided for @locationGpsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location service isn\'t available on this device. Check system settings, mock-location app, or vendor privacy settings.'**
+  String get locationGpsUnavailable;
+
+  /// No description provided for @locationRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get locationRefresh;
+
+  /// No description provided for @joinRequestsAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Requests'**
+  String get joinRequestsAdminTitle;
+
+  /// No description provided for @joinRequestsAdminEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending requests right now.'**
+  String get joinRequestsAdminEmpty;
+
+  /// No description provided for @joinRequestsAdminReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get joinRequestsAdminReject;
+
+  /// No description provided for @joinRequestsAdminApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get joinRequestsAdminApprove;
+
+  /// No description provided for @joinRequestsAdminRelationLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Wants to be {relation} of {targetName}'**
+  String joinRequestsAdminRelationLine(String relation, String targetName);
+
+  /// No description provided for @joinRequestsAdminMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message: {message}'**
+  String joinRequestsAdminMessage(String message);
+
+  /// No description provided for @joinRequestsAdminRejectDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject this request?'**
+  String get joinRequestsAdminRejectDialogTitle;
+
+  /// No description provided for @joinRequestsAdminRejectDialogReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (optional)'**
+  String get joinRequestsAdminRejectDialogReason;
+
+  /// No description provided for @joinRequestsAdminRejectSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get joinRequestsAdminRejectSubmit;
+
+  /// No description provided for @joinRequestsAdminRejectCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get joinRequestsAdminRejectCancel;
+
+  /// No description provided for @joinRequestsAdminRejectSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request rejected'**
+  String get joinRequestsAdminRejectSuccess;
+
+  /// No description provided for @joinRequestsAdminApproveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request approved'**
+  String get joinRequestsAdminApproveSuccess;
+
+  /// No description provided for @joinRequestsAdminError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete the action'**
+  String get joinRequestsAdminError;
+
+  /// No description provided for @requestJoinModeByCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Have an invite code'**
+  String get requestJoinModeByCode;
+
+  /// No description provided for @requestJoinModeByPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Know a member\'s phone'**
+  String get requestJoinModeByPhone;
+
+  /// No description provided for @requestJoinNoFamilySubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get requestJoinNoFamilySubmit;
+
+  /// No description provided for @requestJoinByCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the family\'s invite code if you have one.'**
+  String get requestJoinByCodeHint;
 
   /// No description provided for @conversationsSearchTooltip.
   ///

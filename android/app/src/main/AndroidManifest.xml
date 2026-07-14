@@ -1,4 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Location permissions for the §6 "实时位置" feature.
+         ACCESS_BACKGROUND_LOCATION (Android 10+) needs a separate runtime
+         request with rationale — `geolocator` handles that automatically. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- Required to fetch OSM map tiles in the in-app map. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="sweethome_flutter"
         android:name="${applicationName}"

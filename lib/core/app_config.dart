@@ -9,7 +9,7 @@ class AppConfig {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     // defaultValue: 'https://sweethome.asia/api', // PROD
-    defaultValue: 'http://127.0.0.1:8080/v1',
+    defaultValue: 'http://192.168.2.114:8080/api/v1', // DEV
   );
 
   static String get wsUrl {

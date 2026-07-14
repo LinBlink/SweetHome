@@ -12,6 +12,9 @@ import 'services/chat_service.dart';
 import 'services/websocket_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chat/conversation_list_screen.dart';
+import 'screens/contacts_screen.dart';
+import 'screens/family_feed_screen.dart';
+import 'screens/my_home_screen.dart';
 import 'screens/profile_screen.dart';
 
 void main() async {
@@ -91,10 +94,20 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  // 5 tab indices, laid out as
+  //   [0] Messages     [1] Contacts    [2] MyHome (raised center)
+  //   [3] FamilyFeed   [4] Profile
+  // _kMyHomeIndex is the center slot — the nav row leaves a gap for
+  // it and the raised FAB sits on top of that gap.
+  static const int _kMyHomeIndex = 2;
+
   int _currentIndex = 0;
 
   static const _screens = [
     ConversationListScreen(),
+    ContactsScreen(),
+    MyHomeScreen(),
+    FamilyFeedScreen(),
     ProfileScreen(),
   ];
 
@@ -105,7 +118,38 @@ class _MainShellState extends State<MainShell> {
         index: _currentIndex,
         children: _screens,
       ),
+      // bottomNavigationBar is the visible bar with 4 regular tabs;
+      // the raised MyHome button is overlaid on top of it via
+      // floatingActionButtonLocation.centerDocked. FAB sits *above*
+      // the bar's top edge (negative offset), giving the WeChat /
+      // TikTok-style "raised center" look.
       bottomNavigationBar: _buildNavBar(),
+      floatingActionButton: _buildCenterFab(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  Widget _buildCenterFab() {
+    final l10n = AppLocalizations.of(context)!;
+    final isSelected = _currentIndex == _kMyHomeIndex;
+    return SizedBox(
+      width: 60,
+      height: 60,
+      child: FloatingActionButton(
+        // `centerDocked` leaves the FAB half-inside the bar; nudge
+        // it up so the circle sits clearly above the bar line.
+        onPressed: () => setState(() => _currentIndex = _kMyHomeIndex),
+        backgroundColor:
+            isSelected ? AppColors.primaryDark : AppColors.primary,
+        elevation: 4,
+        shape: const CircleBorder(),
+        tooltip: l10n.navMyHome,
+        child: Icon(
+          isSelected ? Icons.home_rounded : Icons.home_outlined,
+          color: Colors.white,
+          size: 28,
+        ),
+      ),
     );
   }
 
@@ -122,9 +166,11 @@ class _MainShellState extends State<MainShell> {
           ),
         ],
       ),
+      // Leave a notch for the raised center button.
       child: SafeArea(
+        top: false,
         child: SizedBox(
-          height: 60,
+          height: 70,
           child: Row(
             children: [
               Expanded(
@@ -139,11 +185,31 @@ class _MainShellState extends State<MainShell> {
               ),
               Expanded(
                 child: _buildNavItem(
+                  icon: Icons.contacts_outlined,
+                  activeIcon: Icons.contacts_rounded,
+                  label: l10n.navContacts,
+                  isSelected: _currentIndex == 1,
+                  onTap: () => setState(() => _currentIndex = 1),
+                ),
+              ),
+              // Empty slot for the raised center FAB.
+              const SizedBox(width: 60),
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.timeline_outlined,
+                  activeIcon: Icons.timeline_rounded,
+                  label: l10n.navFamilyFeed,
+                  isSelected: _currentIndex == 3,
+                  onTap: () => setState(() => _currentIndex = 3),
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person_rounded,
                   label: l10n.navProfile,
-                  isSelected: _currentIndex == 1,
-                  onTap: () => setState(() => _currentIndex = 1),
+                  isSelected: _currentIndex == 4,
+                  onTap: () => setState(() => _currentIndex = 4),
                 ),
               ),
             ],

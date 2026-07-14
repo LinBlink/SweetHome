@@ -21,6 +21,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navMessages => 'メッセージ';
 
   @override
+  String get navContacts => '連絡先';
+
+  @override
+  String get navMyHome => 'ホーム';
+
+  @override
+  String get navFamilyFeed => '家族フィード';
+
+  @override
   String get navProfile => 'マイページ';
 
   @override
@@ -199,13 +208,194 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileLogout => 'ログアウト';
 
   @override
-  String get profileLogoutConfirmMessage => '本当にログアウトしますか？';
+  String get profileLogoutConfirmMessage => 'ログアウトしてもよろしいですか？';
 
   @override
   String get profileLanguageRow => '言語';
 
   @override
   String get profileFamilyMembersRow => '家族メンバー';
+
+  @override
+  String get myHomeTitle => 'ホーム';
+
+  @override
+  String get myHomeLocationEntry => 'リアルタイム位置';
+
+  @override
+  String get myHomeLocationDesc => '家族の現在の位置を確認';
+
+  @override
+  String get myHomeJoinRequestsEntry => '参加申請';
+
+  @override
+  String get myHomeJoinRequestsDesc => '家族への参加申請を審査';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '未処理 $count 件',
+      one: '1 件未処理',
+      zero: '未処理なし',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => '家族フィード';
+
+  @override
+  String get familyFeedComingSoon => '近日公開';
+
+  @override
+  String get familyFeedComingSoonDesc => '家族の出来事を近々お届けします。';
+
+  @override
+  String get contactsTitle => '連絡先';
+
+  @override
+  String get contactsEmpty => '家族メンバーがいません';
+
+  @override
+  String get locationTitle => 'リアルタイム位置';
+
+  @override
+  String get locationOnline => 'オンライン';
+
+  @override
+  String get locationOffline => '位置情報なし';
+
+  @override
+  String get locationUpdatedJustNow => 'たった今更新';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes 分前に更新';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return 'バッテリー：$percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => 'バッテリー：不明';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return '経度 $lng、緯度 $lat';
+  }
+
+  @override
+  String get locationNoData => '位置情報なし';
+
+  @override
+  String get locationNoDataDesc => '家族が位置情報の共有を有効にすると、ここに表示されます。';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '家族 $total 名';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '位置共有中 $online/$total 名';
+  }
+
+  @override
+  String get locationReportNow => '自分の位置を共有';
+
+  @override
+  String get locationReportFailed => '位置情報を共有できませんでした';
+
+  @override
+  String get locationLocating => '位置情報を取得中…';
+
+  @override
+  String get locationPermissionTitle => '位置情報の許可が必要です';
+
+  @override
+  String get locationPermissionBody =>
+      '家族に位置を共有するには、Sweet Home による位置情報へのアクセスを許可してください。';
+
+  @override
+  String get locationPermissionGrant => '許可する';
+
+  @override
+  String get locationPermissionDenied => '権限が拒否されました。設定で有効にしてから再度お試しください。';
+
+  @override
+  String get locationPermissionOpenSettings => '設定を開く';
+
+  @override
+  String get locationGpsOff => 'GPS がオフです。オンにすると正確な位置を共有できます。';
+
+  @override
+  String get locationGpsTimeout => 'GPS を取得できませんでした。屋外でもう一度お試しください。';
+
+  @override
+  String get locationGpsUnavailable =>
+      'この端末では位置情報を取得できません。システム設定、開発者向けオプションの模擬位置アプリ、または各社のプライバシー設定を確認してください。';
+
+  @override
+  String get locationRefresh => '更新';
+
+  @override
+  String get joinRequestsAdminTitle => '参加申請';
+
+  @override
+  String get joinRequestsAdminEmpty => '現在、未処理の申請はありません。';
+
+  @override
+  String get joinRequestsAdminReject => '拒否';
+
+  @override
+  String get joinRequestsAdminApprove => '承認';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '$targetName の$relationになりたい';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return 'メッセージ：$message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => 'この申請を拒否しますか？';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => '理由（任意）';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => '拒否';
+
+  @override
+  String get joinRequestsAdminRejectCancel => 'キャンセル';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => '申請を拒否しました';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => '申請を承認しました';
+
+  @override
+  String get joinRequestsAdminError => '操作に失敗しました';
+
+  @override
+  String get requestJoinModeByCode => '招待コードを持っている';
+
+  @override
+  String get requestJoinModeByPhone => '家族の電話番号を知っている';
+
+  @override
+  String get requestJoinNoFamilySubmit => '申請を送信';
+
+  @override
+  String get requestJoinByCodeHint => '招待コードがある場合はこちら。';
 
   @override
   String get conversationsSearchTooltip => '検索';

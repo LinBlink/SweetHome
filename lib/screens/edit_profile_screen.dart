@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/error_messages.dart';
+import '../core/image_mime.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../providers/auth_provider.dart';
@@ -79,15 +80,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final bytes = await picked.readAsBytes();
       if (!mounted) return;
-      // `XFile.mimeType` is the real image MIME the picker detected
-      // (e.g. "image/jpeg"). Without forwarding it, the `http` package
-      // would default the multipart part's Content-Type to
-      // `application/octet-stream` and the backend's `FILE_TYPE_ILLEGAL`
-      // 400 would reject the upload.
+      // Sniff the file's magic bytes first — `XFile.mimeType` is
+      // unreliable on Android (frequently `null` for HEIC straight
+      // from the camera, some WebPs, or any file surfaced through a
+      // third-party picker), and the backend rejects non-`image/*`
+      // Content-Types with 400 `FILE_TYPE_ILLEGAL`. Fall back to the
+      // picker's claim, then to `image/jpeg` as a last resort — the
+      // backend's storage is keyed on the raw bytes, not the MIME,
+      // so even an incorrect-but-`image/*` label won't corrupt the
+      // avatar URL, just the served Content-Type.
+      final contentType =
+          detectImageMimeType(bytes) ?? picked.mimeType ?? 'image/jpeg';
       await context.read<AuthProvider>().uploadAvatar(
             bytes: bytes,
             filename: picked.name,
-            contentType: picked.mimeType,
+            contentType: contentType,
           );
     } on ApiException catch (e) {
       // Surface the server's message (e.g. 400 FILE_SIZE_ILLEGAL,

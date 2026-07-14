@@ -21,6 +21,15 @@ class AppLocalizationsMy extends AppLocalizations {
   String get navMessages => 'မက်ဆေ့ချ်များ';
 
   @override
+  String get navContacts => 'ဆက်သွယ်ရန်';
+
+  @override
+  String get navMyHome => 'ကျွန်မတို့အိမ်';
+
+  @override
+  String get navFamilyFeed => 'မိသားစု Feed';
+
+  @override
   String get navProfile => 'ကျွန်ုပ်';
 
   @override
@@ -202,17 +211,207 @@ class AppLocalizationsMy extends AppLocalizations {
   String get countryPickerTitle => 'နိုင်ငံ/ဒေသ ရွေးချယ်ပါ';
 
   @override
-  String get profileLogout => 'လော့ဂ်အောက်';
+  String get profileLogout => 'ထွက်ရန်';
 
   @override
-  String get profileLogoutConfirmMessage =>
-      'လက်ရှိအကောင့်မှ ထွက်မှာ သေချာပါသလား？';
+  String get profileLogoutConfirmMessage => 'ထွက်ရန် သေချာပါသလား?';
 
   @override
   String get profileLanguageRow => 'ဘာသာစကား';
 
   @override
   String get profileFamilyMembersRow => 'မိသားစုဝင်များ';
+
+  @override
+  String get myHomeTitle => 'ကျွန်မတို့အိမ်';
+
+  @override
+  String get myHomeLocationEntry => 'တည့်တည့်က တည်နေရာ';
+
+  @override
+  String get myHomeLocationDesc =>
+      'မိသားစုဝင်တစ်ယောက်ချင်းရဲ့ လက်ရှိတည်နေရာကို ကြည့်ရန်';
+
+  @override
+  String get myHomeJoinRequestsEntry => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
+
+  @override
+  String get myHomeJoinRequestsDesc =>
+      'မိသားစုသို့ ဝင်ရောက်ရန် လျှောက်လွှာများကို စစ်ဆေးပြီး အတည်ပြုရန်';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count စောင် စောင့်ဆိုင်းနေသည်',
+      one: '၁ စောင် စောင့်ဆိုင်းနေသည်',
+      zero: 'စောင့်ဆိုင်းနေသော လျှောက်လွှာမရှိပါ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => 'မိသားစု Feed';
+
+  @override
+  String get familyFeedComingSoon => 'မကြာမီ ထွက်ရှိလာမည်';
+
+  @override
+  String get familyFeedComingSoonDesc =>
+      'မိသားစု သတင်းများနှင့် မှတ်တိုင်များကို မကြာမီ ယူဆောင်လာပါမည်။';
+
+  @override
+  String get contactsTitle => 'ဆက်သွယ်ရန်';
+
+  @override
+  String get contactsEmpty => 'မိသားစုဝင် မရှိသေးပါ';
+
+  @override
+  String get locationTitle => 'တည့်တည့်က တည်နေရာ';
+
+  @override
+  String get locationOnline => 'အွန်လိုင်း';
+
+  @override
+  String get locationOffline => 'တည်နေရာ မရှိပါ';
+
+  @override
+  String get locationUpdatedJustNow => 'ယခုလေးတင် အပ်ဒိတ်လုပ်ပြီး';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes မိနစ် အကြာက အပ်ဒိတ်လုပ်ပြီး';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return 'ဘက်ထရီ: $percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => 'ဘက်ထရီ: မသိပါ';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return 'လေတိုင်အရှည် $lng၊ လေပြည့်အကျယ် $lat';
+  }
+
+  @override
+  String get locationNoData => 'တည်နေရာ ဒေတာ မရှိသေးပါ';
+
+  @override
+  String get locationNoDataDesc =>
+      'မိသားစုဝင်များ တည်နေရာ မျှဝေခြင်းကို ဖွင့်ထားမှ ဤနေရာတွင် ပြပါမည်။';
+
+  @override
+  String locationTotalMembers(int total) {
+    return 'မိသားစုဝင် $total ယောက်';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return 'တည်နေရာ မျှဝေနေသည် $online/$total';
+  }
+
+  @override
+  String get locationReportNow => 'ကျွန်မတို့ တည်နေရာ မျှဝေရန်';
+
+  @override
+  String get locationReportFailed => 'တည်နေရာ မျှဝေ၍ မရပါ';
+
+  @override
+  String get locationLocating => 'တည်နေရာ ရှာဖွေနေသည်…';
+
+  @override
+  String get locationPermissionTitle => 'တည်နေရာ ခွင့်ပြုချက် လိုအပ်သည်';
+
+  @override
+  String get locationPermissionBody =>
+      'မိသားစုနှင့် တည်နေရာ မျှဝေရန်အတွက် Sweet Home အား တည်နေရာ ဝင်ရောက်ခွင့် ပေးပါ။';
+
+  @override
+  String get locationPermissionGrant => 'ခွင့်ပြုရန်';
+
+  @override
+  String get locationPermissionDenied =>
+      'ခွင့်ပြုချက် ပယ်ချခံရသည်။ စနစ်ဆက်တင်တွင် ဖွင့်ပြီးမှ ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get locationPermissionOpenSettings => 'ဆက်တင်များ ဖွင့်ရန်';
+
+  @override
+  String get locationGpsOff =>
+      'GPS ပိတ်ထားသည်။ ဖွင့်ထားပါက တည်နေရာ တိကျစွာ မျှဝေနိုင်သည်။';
+
+  @override
+  String get locationGpsTimeout =>
+      'အချိန်မီ GPS တည်နေရာ ရယူ၍ မရပါ။ ပွင့်လင်နေရာတွင် ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get locationGpsUnavailable =>
+      'ဤစက်ပစ္စည်းတွင် တည်နေရာ ဝန်ဆောင်မှု မရနိုင်ပါ။ စနစ်ဆက်တင်၊ ဆော့ဝဲသမား ရွေးချယ်ချက်များရှိ သရုပ်ဆောင်တည်နေရာအက်ပ်၊ သို့မဟုတ် ထုတ်လုပ်သူ ကိုယ်ရေးကိုယ်တိုင် ဆက်တင်များကို စစ်ဆေးပါ။';
+
+  @override
+  String get locationRefresh => 'ပြန်လည်ရယူရန်';
+
+  @override
+  String get joinRequestsAdminTitle => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
+
+  @override
+  String get joinRequestsAdminEmpty =>
+      'လောလောနယ်တွင် စောင့်ဆိုင်းနေသော လျှောက်လွှာမရှိပါ။';
+
+  @override
+  String get joinRequestsAdminReject => 'ပယ်ချရန်';
+
+  @override
+  String get joinRequestsAdminApprove => 'အတည်ပြုရန်';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '$targetName ၏ $relation ဖြစ်လိုသည်';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return 'မက်ဆေ့ချ်: $message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => 'ဤလျှောက်လွှာကို ပယ်မည်လား?';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason =>
+      'အကြောင်းအရင်း (ရွေးချယ်ခွင့်)';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => 'ပယ်ချရန်';
+
+  @override
+  String get joinRequestsAdminRejectCancel => 'မလုပ်တော့ပါ';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => 'လျှောက်လွှာကို ပယ်ချလိုက်သည်';
+
+  @override
+  String get joinRequestsAdminApproveSuccess =>
+      'လျှောက်လွှာကို အတည်ပြုလိုက်သည်';
+
+  @override
+  String get joinRequestsAdminError => 'လုပ်ဆောင်မှု မအောင်မြင်ပါ';
+
+  @override
+  String get requestJoinModeByCode => 'ဖိတ်ကုဒ် ရှိသည်';
+
+  @override
+  String get requestJoinModeByPhone => 'မိသားစုဝင်တစ်ယောက်၏ ဖုန်းနံပါတ် သိသည်';
+
+  @override
+  String get requestJoinNoFamilySubmit => 'လျှောက်လွှာ ပို့ရန်';
+
+  @override
+  String get requestJoinByCodeHint => 'ဖိတ်ကုဒ် ရှိပါက ဤနေရာတွင် အသုံးပြုပါ။';
 
   @override
   String get conversationsSearchTooltip => 'ရှာဖွေရန်';

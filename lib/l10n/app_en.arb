@@ -6,6 +6,9 @@
   "appTagline": "The warmth of family, one tap away",
 
   "navMessages": "Messages",
+  "navContacts": "Contacts",
+  "navMyHome": "My Home",
+  "navFamilyFeed": "Family Feed",
   "navProfile": "Me",
 
   "commonCancel": "Cancel",
@@ -77,6 +80,91 @@
   "profileLogoutConfirmMessage": "Are you sure you want to log out?",
   "profileLanguageRow": "Language",
   "profileFamilyMembersRow": "Family Members",
+
+  "myHomeTitle": "My Home",
+  "myHomeLocationEntry": "Real-time Location",
+  "myHomeLocationDesc": "See where each family member is right now",
+  "myHomeJoinRequestsEntry": "Join Requests",
+  "myHomeJoinRequestsDesc": "Review and approve requests to join this family",
+  "myHomeJoinRequestsBadge": "{count, plural, =0{No pending} =1{1 pending} other{{count} pending}}",
+  "@myHomeJoinRequestsBadge": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "familyFeedTitle": "Family Feed",
+  "familyFeedComingSoon": "Coming soon",
+  "familyFeedComingSoonDesc": "Family updates and milestones are on the way.",
+
+  "contactsTitle": "Contacts",
+  "contactsEmpty": "No family members yet",
+
+  "locationTitle": "Real-time Location",
+  "locationOnline": "Online",
+  "locationOffline": "No recent location",
+  "locationUpdatedJustNow": "Updated just now",
+  "locationUpdatedMinutesAgo": "Updated {minutes}m ago",
+  "@locationUpdatedMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "locationBattery": "Battery: {percent}%",
+  "@locationBattery": {
+    "placeholders": { "percent": { "type": "int" } }
+  },
+  "locationBatteryUnknown": "Battery: unknown",
+  "locationCoordinates": "lng {lng}, lat {lat}",
+  "@locationCoordinates": {
+    "placeholders": {
+      "lng": { "type": "String" },
+      "lat": { "type": "String" }
+    }
+  },
+  "locationNoData": "No location data yet",
+  "locationNoDataDesc": "Family members need to enable location sharing for their position to show up here.",
+  "locationTotalMembers": "{total} family members",
+  "@locationTotalMembers": {
+    "placeholders": { "total": { "type": "int" } }
+  },
+  "locationOnlineCount": "{online}/{total} sharing location",
+  "@locationOnlineCount": {
+    "placeholders": { "online": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "locationReportNow": "Share my location",
+  "locationReportFailed": "Could not share location",
+  "locationLocating": "Locating…",
+  "locationPermissionTitle": "Location permission needed",
+  "locationPermissionBody": "To share your position with family members, allow Sweet Home to access your location.",
+  "locationPermissionGrant": "Grant permission",
+  "locationPermissionDenied": "Permission denied. Enable it in system settings to share your location.",
+  "locationPermissionOpenSettings": "Open settings",
+  "locationGpsOff": "GPS is off. Turn it on to share accurate location.",
+  "locationGpsTimeout": "Couldn't get a GPS fix in time. Try again outdoors or check your signal.",
+  "locationGpsUnavailable": "Location service isn't available on this device. Check system settings, mock-location app, or vendor privacy settings.",
+  "locationRefresh": "Refresh",
+
+  "joinRequestsAdminTitle": "Join Requests",
+  "joinRequestsAdminEmpty": "No pending requests right now.",
+  "joinRequestsAdminReject": "Reject",
+  "joinRequestsAdminApprove": "Approve",
+  "joinRequestsAdminRelationLine": "Wants to be {relation} of {targetName}",
+  "@joinRequestsAdminRelationLine": {
+    "placeholders": { "relation": { "type": "String" }, "targetName": { "type": "String" } }
+  },
+  "joinRequestsAdminMessage": "Message: {message}",
+  "@joinRequestsAdminMessage": {
+    "placeholders": { "message": { "type": "String" } }
+  },
+  "joinRequestsAdminRejectDialogTitle": "Reject this request?",
+  "joinRequestsAdminRejectDialogReason": "Reason (optional)",
+  "joinRequestsAdminRejectSubmit": "Reject",
+  "joinRequestsAdminRejectCancel": "Cancel",
+  "joinRequestsAdminRejectSuccess": "Request rejected",
+  "joinRequestsAdminApproveSuccess": "Request approved",
+  "joinRequestsAdminError": "Could not complete the action",
+
+  "requestJoinModeByCode": "Have an invite code",
+  "requestJoinModeByPhone": "Know a member's phone",
+  "requestJoinNoFamilySubmit": "Send request",
+  "requestJoinByCodeHint": "Use the family's invite code if you have one.",
 
   "conversationsSearchTooltip": "Search",
   "conversationsNewTooltip": "New conversation",

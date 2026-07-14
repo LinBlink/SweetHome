@@ -21,6 +21,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navMessages => 'Messages';
 
   @override
+  String get navContacts => 'Contacts';
+
+  @override
+  String get navMyHome => 'My Home';
+
+  @override
+  String get navFamilyFeed => 'Family Feed';
+
+  @override
   String get navProfile => 'Me';
 
   @override
@@ -213,6 +222,194 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileFamilyMembersRow => 'Family Members';
+
+  @override
+  String get myHomeTitle => 'My Home';
+
+  @override
+  String get myHomeLocationEntry => 'Real-time Location';
+
+  @override
+  String get myHomeLocationDesc => 'See where each family member is right now';
+
+  @override
+  String get myHomeJoinRequestsEntry => 'Join Requests';
+
+  @override
+  String get myHomeJoinRequestsDesc =>
+      'Review and approve requests to join this family';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pending',
+      one: '1 pending',
+      zero: 'No pending',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => 'Family Feed';
+
+  @override
+  String get familyFeedComingSoon => 'Coming soon';
+
+  @override
+  String get familyFeedComingSoonDesc =>
+      'Family updates and milestones are on the way.';
+
+  @override
+  String get contactsTitle => 'Contacts';
+
+  @override
+  String get contactsEmpty => 'No family members yet';
+
+  @override
+  String get locationTitle => 'Real-time Location';
+
+  @override
+  String get locationOnline => 'Online';
+
+  @override
+  String get locationOffline => 'No recent location';
+
+  @override
+  String get locationUpdatedJustNow => 'Updated just now';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return 'Updated ${minutes}m ago';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return 'Battery: $percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => 'Battery: unknown';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return 'lng $lng, lat $lat';
+  }
+
+  @override
+  String get locationNoData => 'No location data yet';
+
+  @override
+  String get locationNoDataDesc =>
+      'Family members need to enable location sharing for their position to show up here.';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '$total family members';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '$online/$total sharing location';
+  }
+
+  @override
+  String get locationReportNow => 'Share my location';
+
+  @override
+  String get locationReportFailed => 'Could not share location';
+
+  @override
+  String get locationLocating => 'Locating…';
+
+  @override
+  String get locationPermissionTitle => 'Location permission needed';
+
+  @override
+  String get locationPermissionBody =>
+      'To share your position with family members, allow Sweet Home to access your location.';
+
+  @override
+  String get locationPermissionGrant => 'Grant permission';
+
+  @override
+  String get locationPermissionDenied =>
+      'Permission denied. Enable it in system settings to share your location.';
+
+  @override
+  String get locationPermissionOpenSettings => 'Open settings';
+
+  @override
+  String get locationGpsOff =>
+      'GPS is off. Turn it on to share accurate location.';
+
+  @override
+  String get locationGpsTimeout =>
+      'Couldn\'t get a GPS fix in time. Try again outdoors or check your signal.';
+
+  @override
+  String get locationGpsUnavailable =>
+      'Location service isn\'t available on this device. Check system settings, mock-location app, or vendor privacy settings.';
+
+  @override
+  String get locationRefresh => 'Refresh';
+
+  @override
+  String get joinRequestsAdminTitle => 'Join Requests';
+
+  @override
+  String get joinRequestsAdminEmpty => 'No pending requests right now.';
+
+  @override
+  String get joinRequestsAdminReject => 'Reject';
+
+  @override
+  String get joinRequestsAdminApprove => 'Approve';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return 'Wants to be $relation of $targetName';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return 'Message: $message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => 'Reject this request?';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => 'Reason (optional)';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => 'Reject';
+
+  @override
+  String get joinRequestsAdminRejectCancel => 'Cancel';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => 'Request rejected';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => 'Request approved';
+
+  @override
+  String get joinRequestsAdminError => 'Could not complete the action';
+
+  @override
+  String get requestJoinModeByCode => 'Have an invite code';
+
+  @override
+  String get requestJoinModeByPhone => 'Know a member\'s phone';
+
+  @override
+  String get requestJoinNoFamilySubmit => 'Send request';
+
+  @override
+  String get requestJoinByCodeHint =>
+      'Use the family\'s invite code if you have one.';
 
   @override
   String get conversationsSearchTooltip => 'Search';

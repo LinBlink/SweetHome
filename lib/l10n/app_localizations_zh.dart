@@ -21,7 +21,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navMessages => '消息';
 
   @override
-  String get navProfile => '我';
+  String get navContacts => '联系人';
+
+  @override
+  String get navMyHome => '我的家';
+
+  @override
+  String get navFamilyFeed => '家庭动态';
+
+  @override
+  String get navProfile => '我的';
 
   @override
   String get commonCancel => '取消';
@@ -206,6 +215,186 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileFamilyMembersRow => '家庭成员';
+
+  @override
+  String get myHomeTitle => '我的家';
+
+  @override
+  String get myHomeLocationEntry => '实时位置';
+
+  @override
+  String get myHomeLocationDesc => '查看每个家庭成员的当前位置';
+
+  @override
+  String get myHomeJoinRequestsEntry => '加入申请';
+
+  @override
+  String get myHomeJoinRequestsDesc => '审核并批准加入本家庭的申请';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条待处理',
+      one: '1 条待处理',
+      zero: '暂无待处理',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => '家庭动态';
+
+  @override
+  String get familyFeedComingSoon => '即将上线';
+
+  @override
+  String get familyFeedComingSoonDesc => '家庭动态与里程碑即将推出。';
+
+  @override
+  String get contactsTitle => '联系人';
+
+  @override
+  String get contactsEmpty => '暂无家庭成员';
+
+  @override
+  String get locationTitle => '实时位置';
+
+  @override
+  String get locationOnline => '在线';
+
+  @override
+  String get locationOffline => '暂无位置';
+
+  @override
+  String get locationUpdatedJustNow => '刚刚更新';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes 分钟前更新';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return '电量：$percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => '电量：未知';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return '经度 $lng，纬度 $lat';
+  }
+
+  @override
+  String get locationNoData => '暂无位置数据';
+
+  @override
+  String get locationNoDataDesc => '家庭成员需要开启位置共享后，才能在此显示。';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '共 $total 位成员';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '$online/$total 位正在共享位置';
+  }
+
+  @override
+  String get locationReportNow => '分享我的位置';
+
+  @override
+  String get locationReportFailed => '位置分享失败';
+
+  @override
+  String get locationLocating => '正在定位…';
+
+  @override
+  String get locationPermissionTitle => '需要定位权限';
+
+  @override
+  String get locationPermissionBody => '如需向家庭成员共享你的位置，请允许过家家访问你的位置。';
+
+  @override
+  String get locationPermissionGrant => '授予权限';
+
+  @override
+  String get locationPermissionDenied => '权限被拒绝。请到系统设置中开启后，再尝试分享位置。';
+
+  @override
+  String get locationPermissionOpenSettings => '打开设置';
+
+  @override
+  String get locationGpsOff => 'GPS 已关闭。开启后可分享精确位置。';
+
+  @override
+  String get locationGpsTimeout => '无法及时获取 GPS 定位。请到开阔处或检查信号后重试。';
+
+  @override
+  String get locationGpsUnavailable =>
+      '设备当前无法获取位置。请检查系统设置、开发者选项的模拟位置应用，或厂商隐私设置。';
+
+  @override
+  String get locationRefresh => '刷新';
+
+  @override
+  String get joinRequestsAdminTitle => '加入申请';
+
+  @override
+  String get joinRequestsAdminEmpty => '暂无待处理的申请。';
+
+  @override
+  String get joinRequestsAdminReject => '拒绝';
+
+  @override
+  String get joinRequestsAdminApprove => '通过';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '想成为 $targetName 的$relation';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return '留言：$message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => '确认拒绝此申请？';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => '拒绝原因（选填）';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => '拒绝';
+
+  @override
+  String get joinRequestsAdminRejectCancel => '取消';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => '已拒绝';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => '已通过';
+
+  @override
+  String get joinRequestsAdminError => '操作失败';
+
+  @override
+  String get requestJoinModeByCode => '我有邀请码';
+
+  @override
+  String get requestJoinModeByPhone => '我认识某位成员的手机号';
+
+  @override
+  String get requestJoinNoFamilySubmit => '提交申请';
+
+  @override
+  String get requestJoinByCodeHint => '如已拿到邀请码，可使用邀请码加入。';
 
   @override
   String get conversationsSearchTooltip => '搜索';
@@ -400,7 +589,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get navMessages => '消息';
 
   @override
-  String get navProfile => '我';
+  String get navContacts => '联系人';
+
+  @override
+  String get navMyHome => '我的家';
+
+  @override
+  String get navFamilyFeed => '家庭动态';
+
+  @override
+  String get navProfile => '我的';
 
   @override
   String get commonCancel => '取消';
@@ -585,6 +783,186 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get profileFamilyMembersRow => '家庭成员';
+
+  @override
+  String get myHomeTitle => '我的家';
+
+  @override
+  String get myHomeLocationEntry => '实时位置';
+
+  @override
+  String get myHomeLocationDesc => '查看每个家庭成员的当前位置';
+
+  @override
+  String get myHomeJoinRequestsEntry => '加入申请';
+
+  @override
+  String get myHomeJoinRequestsDesc => '审核并批准加入本家庭的申请';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条待处理',
+      one: '1 条待处理',
+      zero: '暂无待处理',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => '家庭动态';
+
+  @override
+  String get familyFeedComingSoon => '即将上线';
+
+  @override
+  String get familyFeedComingSoonDesc => '家庭动态与里程碑即将推出。';
+
+  @override
+  String get contactsTitle => '联系人';
+
+  @override
+  String get contactsEmpty => '暂无家庭成员';
+
+  @override
+  String get locationTitle => '实时位置';
+
+  @override
+  String get locationOnline => '在线';
+
+  @override
+  String get locationOffline => '暂无位置';
+
+  @override
+  String get locationUpdatedJustNow => '刚刚更新';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes 分钟前更新';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return '电量：$percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => '电量：未知';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return '经度 $lng，纬度 $lat';
+  }
+
+  @override
+  String get locationNoData => '暂无位置数据';
+
+  @override
+  String get locationNoDataDesc => '家庭成员需要开启位置共享后，才能在此显示。';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '共 $total 位成员';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '$online/$total 位正在共享位置';
+  }
+
+  @override
+  String get locationReportNow => '分享我的位置';
+
+  @override
+  String get locationReportFailed => '位置分享失败';
+
+  @override
+  String get locationLocating => '正在定位…';
+
+  @override
+  String get locationPermissionTitle => '需要定位权限';
+
+  @override
+  String get locationPermissionBody => '如需向家庭成员共享你的位置，请允许过家家访问你的位置。';
+
+  @override
+  String get locationPermissionGrant => '授予权限';
+
+  @override
+  String get locationPermissionDenied => '权限被拒绝。请到系统设置中开启后，再尝试分享位置。';
+
+  @override
+  String get locationPermissionOpenSettings => '打开设置';
+
+  @override
+  String get locationGpsOff => 'GPS 已关闭。开启后可分享精确位置。';
+
+  @override
+  String get locationGpsTimeout => '无法及时获取 GPS 定位。请到开阔处或检查信号后重试。';
+
+  @override
+  String get locationGpsUnavailable =>
+      '设备当前无法获取位置。请检查系统设置、开发者选项的模拟位置应用，或厂商隐私设置。';
+
+  @override
+  String get locationRefresh => '刷新';
+
+  @override
+  String get joinRequestsAdminTitle => '加入申请';
+
+  @override
+  String get joinRequestsAdminEmpty => '暂无待处理的申请。';
+
+  @override
+  String get joinRequestsAdminReject => '拒绝';
+
+  @override
+  String get joinRequestsAdminApprove => '通过';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '想成为 $targetName 的$relation';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return '留言：$message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => '确认拒绝此申请？';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => '拒绝原因（选填）';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => '拒绝';
+
+  @override
+  String get joinRequestsAdminRejectCancel => '取消';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => '已拒绝';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => '已通过';
+
+  @override
+  String get joinRequestsAdminError => '操作失败';
+
+  @override
+  String get requestJoinModeByCode => '我有邀请码';
+
+  @override
+  String get requestJoinModeByPhone => '我认识某位成员的手机号';
+
+  @override
+  String get requestJoinNoFamilySubmit => '提交申请';
+
+  @override
+  String get requestJoinByCodeHint => '如已拿到邀请码，可使用邀请码加入。';
 
   @override
   String get conversationsSearchTooltip => '搜索';
@@ -779,7 +1157,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get navMessages => '消息';
 
   @override
-  String get navProfile => '我';
+  String get navContacts => '聯絡人';
+
+  @override
+  String get navMyHome => '我的家';
+
+  @override
+  String get navFamilyFeed => '家庭動態';
+
+  @override
+  String get navProfile => '我的';
 
   @override
   String get commonCancel => '取消';
@@ -964,6 +1351,186 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileFamilyMembersRow => '家庭成員';
+
+  @override
+  String get myHomeTitle => '我的家';
+
+  @override
+  String get myHomeLocationEntry => '即時位置';
+
+  @override
+  String get myHomeLocationDesc => '查看每個家庭成員的當前位置';
+
+  @override
+  String get myHomeJoinRequestsEntry => '加入申請';
+
+  @override
+  String get myHomeJoinRequestsDesc => '審核並批准加入本家庭的申請';
+
+  @override
+  String myHomeJoinRequestsBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 條待處理',
+      one: '1 條待處理',
+      zero: '暫無待處理',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyFeedTitle => '家庭動態';
+
+  @override
+  String get familyFeedComingSoon => '即將上線';
+
+  @override
+  String get familyFeedComingSoonDesc => '家庭動態與里程碑即將推出。';
+
+  @override
+  String get contactsTitle => '聯絡人';
+
+  @override
+  String get contactsEmpty => '暫無家庭成員';
+
+  @override
+  String get locationTitle => '即時位置';
+
+  @override
+  String get locationOnline => '在線';
+
+  @override
+  String get locationOffline => '暫無位置';
+
+  @override
+  String get locationUpdatedJustNow => '剛剛更新';
+
+  @override
+  String locationUpdatedMinutesAgo(int minutes) {
+    return '$minutes 分鐘前更新';
+  }
+
+  @override
+  String locationBattery(int percent) {
+    return '電量：$percent%';
+  }
+
+  @override
+  String get locationBatteryUnknown => '電量：未知';
+
+  @override
+  String locationCoordinates(String lng, String lat) {
+    return '經度 $lng，緯度 $lat';
+  }
+
+  @override
+  String get locationNoData => '暫無位置資料';
+
+  @override
+  String get locationNoDataDesc => '家庭成員需開啟位置共享後，才會在此顯示。';
+
+  @override
+  String locationTotalMembers(int total) {
+    return '共 $total 位成員';
+  }
+
+  @override
+  String locationOnlineCount(int online, int total) {
+    return '位置共享中 $online/$total 位';
+  }
+
+  @override
+  String get locationReportNow => '分享我的位置';
+
+  @override
+  String get locationReportFailed => '位置分享失敗';
+
+  @override
+  String get locationLocating => '正在定位…';
+
+  @override
+  String get locationPermissionTitle => '需要定位權限';
+
+  @override
+  String get locationPermissionBody => '如需向家庭成員共享你的位置，請允許過家家存取你的位置。';
+
+  @override
+  String get locationPermissionGrant => '授予權限';
+
+  @override
+  String get locationPermissionDenied => '權限被拒。請到系統設定中開啟後再嘗試分享位置。';
+
+  @override
+  String get locationPermissionOpenSettings => '打開設定';
+
+  @override
+  String get locationGpsOff => 'GPS 已關閉。開啟後可分享精確位置。';
+
+  @override
+  String get locationGpsTimeout => '無法及時取得 GPS 定位。請到開闊處或檢查訊號後重試。';
+
+  @override
+  String get locationGpsUnavailable =>
+      '裝置目前無法取得位置。請檢查系統設定、開發者選項的模擬位置應用，或廠商隱私設定。';
+
+  @override
+  String get locationRefresh => '重新整理';
+
+  @override
+  String get joinRequestsAdminTitle => '加入申請';
+
+  @override
+  String get joinRequestsAdminEmpty => '暫無待處理的申請。';
+
+  @override
+  String get joinRequestsAdminReject => '拒絕';
+
+  @override
+  String get joinRequestsAdminApprove => '通過';
+
+  @override
+  String joinRequestsAdminRelationLine(String relation, String targetName) {
+    return '想成為 $targetName 的$relation';
+  }
+
+  @override
+  String joinRequestsAdminMessage(String message) {
+    return '留言：$message';
+  }
+
+  @override
+  String get joinRequestsAdminRejectDialogTitle => '確認拒絕此申請？';
+
+  @override
+  String get joinRequestsAdminRejectDialogReason => '拒絕原因（選填）';
+
+  @override
+  String get joinRequestsAdminRejectSubmit => '拒絕';
+
+  @override
+  String get joinRequestsAdminRejectCancel => '取消';
+
+  @override
+  String get joinRequestsAdminRejectSuccess => '已拒絕';
+
+  @override
+  String get joinRequestsAdminApproveSuccess => '已通過';
+
+  @override
+  String get joinRequestsAdminError => '操作失敗';
+
+  @override
+  String get requestJoinModeByCode => '我有邀請碼';
+
+  @override
+  String get requestJoinModeByPhone => '我認識某位成員的手機號';
+
+  @override
+  String get requestJoinNoFamilySubmit => '提交申請';
+
+  @override
+  String get requestJoinByCodeHint => '如已拿到邀請碼，可使用邀請碼加入。';
 
   @override
   String get conversationsSearchTooltip => '搜尋';

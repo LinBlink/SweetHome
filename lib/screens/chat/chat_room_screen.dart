@@ -202,7 +202,15 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         left: 12,
         right: 12,
         top: 10,
-        bottom: 10 + MediaQuery.of(context).viewInsets.bottom,
+        // Note: do NOT add `MediaQuery.of(context).viewInsets.bottom`
+        // here. `Scaffold.resizeToAvoidBottomInset` is `true` by
+        // default and already resizes the body so the input bar sits
+        // just above the soft keyboard. Adding the keyboard height
+        // again as bottom padding double-resizes the body on Android,
+        // shoving the input bar toward the top of the screen and
+        // crushing the message list. `MediaQuery.padding.bottom`
+        // (system gesture inset) is the only extra inset worth adding.
+        bottom: 10 + MediaQuery.of(context).padding.bottom,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,

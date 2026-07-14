@@ -6,6 +6,8 @@ import '../core/kinship/kinship_graph.dart';
 import '../models/auth_models.dart';
 import '../models/chat_models.dart';
 import '../models/family_member_vm.dart';
+import '../models/join_request.dart';
+import '../models/location.dart';
 
 class MockDataSource {
   MockDataSource._();
@@ -270,4 +272,135 @@ class MockDataSource {
       senderGender: familyGraph.memberById(2)?.gender,
     );
   }
+
+  // -- §6 mock location fixtures -------------------------------------
+  // Five family members anchored around Beijing with offsets chosen
+  // so the map auto-fits to a single viewport. `updatedAt` varies
+  // across members so the freshness badge ("Online" / "Updated Xm
+  // ago") shows a non-uniform mix on the LocationScreen.
+
+  static FamilyLocations _familyLocationsFixture() {
+    final now = DateTime.now();
+    final List<_MockMemberLocation> mocks = [
+      _MockMemberLocation(
+        userId: 1,
+        username: '王建国',
+        lng: 116.3975,
+        lat: 39.9087,
+        battery: 78,
+        minutesAgo: 0,
+      ),
+      _MockMemberLocation(
+        userId: 2,
+        username: '张美玲',
+        lng: 116.4125,
+        lat: 39.9045,
+        battery: 64,
+        minutesAgo: 2,
+      ),
+      _MockMemberLocation(
+        userId: 3,
+        username: '王爷爷',
+        lng: 116.3855,
+        lat: 39.9213,
+        battery: 42,
+        minutesAgo: 5,
+      ),
+      _MockMemberLocation(
+        userId: 4,
+        username: '王小明',
+        lng: 116.4310,
+        lat: 39.9012,
+        battery: 91,
+        minutesAgo: 8,
+      ),
+      _MockMemberLocation(
+        userId: 5,
+        username: '王小雨',
+        lng: 116.4310,
+        lat: 39.9012,
+        battery: 88,
+        minutesAgo: 12, // intentionally past the 10-min freshness window
+      ),
+    ];
+    return FamilyLocations(
+      familyId: 1,
+      familyName: '王家',
+      onlineMemberCount: 4, // 王小雨 is past the 10-min window
+      totalMemberCount: 5,
+      familyMemberLocations: [
+        for (final m in mocks)
+          MemberLocation(
+            userId: m.userId,
+            username: m.username,
+            userAvatarUrl: null,
+            lng: m.lng,
+            lat: m.lat,
+            battery: m.battery,
+            updatedAt: now.subtract(Duration(minutes: m.minutesAgo)),
+          ),
+      ],
+    );
+  }
+
+  /// Mock-mode stub for `LocationService.fetchFamilyLocations`. The
+  /// screen should branch on `AppConfig.mockMode` and call this
+  /// instead of going through the HTTP client.
+  static FamilyLocations mockFamilyLocations() => _familyLocationsFixture();
+
+  // -- §3.5.2 mock join-request fixtures -----------------------------
+  // Two pending requests for the family admin to review.
+
+  static List<JoinRequest> _pendingJoinRequestsFixture() {
+    final now = DateTime.now();
+    return [
+      JoinRequest(
+        requestId: 1,
+        requesterName: '王小明',
+        requesterPhone: '+8613800138099',
+        requesterGender: 'male',
+        relationType: 'CHILD_OF',
+        targetMemberName: '王建国',
+        message: '爸，我账号搞丢了，重新申请一下',
+        createdAt: now.subtract(const Duration(hours: 1)),
+        status: 'pending',
+      ),
+      JoinRequest(
+        requestId: 2,
+        requesterName: '王小雨',
+        requesterPhone: '+8613800138100',
+        requesterGender: 'female',
+        relationType: 'SIBLING_OF',
+        targetMemberName: '王小明',
+        message: '我换号了，加我进家庭群',
+        createdAt: now.subtract(const Duration(minutes: 20)),
+        status: 'pending',
+      ),
+    ];
+  }
+
+  /// Mock-mode stub for `FamilyService.fetchJoinRequests`.
+  static List<JoinRequest> mockJoinRequests() =>
+      List.unmodifiable(_pendingJoinRequestsFixture());
+}
+
+/// Internal struct used only by the mock location fixture above —
+/// keeps the inline list tidy without polluting the public model
+/// surface.
+class _MockMemberLocation {
+  final int userId;
+  final String username;
+  final double lng;
+  final double lat;
+  final int battery;
+  final int minutesAgo;
+
+  const _MockMemberLocation({
+    required this.userId,
+    required this.username,
+    required this.lng,
+    required this.lat,
+    required this.battery,
+    required this.minutesAgo,
+  });
 }

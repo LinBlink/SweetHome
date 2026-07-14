@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/chat_provider.dart';
 import '../providers/locale_provider.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/language_picker.dart';
@@ -38,10 +39,24 @@ class ProfileScreen extends StatelessWidget {
             leading: const Icon(Icons.people_outline, color: AppColors.primary),
             title: Text(l10n.profileFamilyMembersRow),
             trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const FamilyMembersScreen()),
-            ),
+            onTap: () {
+              // ChatProvider lives below the root Navigator (created in
+              // AuthGate) and is used by the family-members screen to show
+              // the live online dot per member. A pushed route doesn't
+              // inherit that scope, so re-provide it explicitly — same
+              // pattern as conversation_list_screen's push to
+              // NewConversationScreen/ChatRoomScreen.
+              final chat = context.read<ChatProvider>();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: chat,
+                    child: const FamilyMembersScreen(),
+                  ),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.group_add_outlined, color: AppColors.primary),

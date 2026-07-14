@@ -3,15 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
+import '../core/error_messages.dart';
 import '../core/invite_expiry.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
 import '../l10n/app_localizations.dart';
+import '../models/api_exception.dart';
 import '../models/family_member_vm.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/locale_provider.dart';
 import '../widgets/avatar_widget.dart';
+import 'chat/chat_room_screen.dart';
 
 class FamilyMembersScreen extends StatefulWidget {
   const FamilyMembersScreen({super.key});
@@ -139,15 +142,22 @@ class _MemberTile extends StatelessWidget {
     final appLocale = context.watch<LocaleProvider>().locale;
     final auth = context.watch<AuthProvider>();
     final viewerGender = genderFromString(auth.currentUser?.gender);
+    final currentUserId = auth.currentUser?.userId;
     final avatarColor =
-        AppColors.avatarColorFor(member.userId, selfUserId: auth.currentUser?.userId);
+        AppColors.avatarColorFor(member.userId, selfUserId: currentUserId);
     final relationLabel = relationLabelFor(
       relationCode: member.relationCode,
       targetGender: member.gender,
       viewerGender: viewerGender,
       appLocale: appLocale,
     );
-    return Padding(
+    // Self has no one to chat with — render the row as a plain,
+    // non-interactive entry. Everyone else wraps the body in Material
+    // + InkWell so the Material ripple actually paints (an InkWell
+    // directly on a Padding in a ListView.separated silently no-ops
+    // because there's no `Material` ancestor at the tap surface).
+    final isSelf = currentUserId != null && member.userId == currentUserId;
+    final body = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
@@ -212,6 +222,52 @@ class _MemberTile extends StatelessWidget {
         ],
       ),
     );
+    if (isSelf) return body;
+    // Material wrapper is required — without it InkWell's ripple has
+    // nowhere to paint (ListView.separated's item surface isn't a
+    // Material ancestor at the row level).
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _startChat(context),
+        child: body,
+      ),
+    );
+  }
+
+  /// Same flow as `_NewConversationScreenState._startChat` — start (or
+  /// reuse) a 1:1 conversation with this member and push the chat
+  /// room, re-providing `ChatProvider` because the pushed route
+  /// doesn't inherit the provider scope from the family-members
+  /// screen (see the corresponding note on profile_screen.dart).
+  Future<void> _startChat(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final chat = context.read<ChatProvider>();
+    try {
+      final conv = await chat.startDirectConversation(member.userId);
+      chat.setActiveConversation(conv.id);
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(
+            value: chat,
+            child: ChatRoomScreen(
+              conversationId: conv.id,
+              conversationName: conv.name,
+            ),
+          ),
+        ),
+      );
+    } on ApiException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(localizeErrorMessage(e.message, l10n))),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(localizeErrorMessage(kNetworkErrorSentinel, l10n))),
+      );
+    }
   }
 }
 
