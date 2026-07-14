@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/location_provider.dart';
+import 'family_tree_screen.dart';
 import 'location_hub_screen.dart';
 
 /// "我的家" tab — the **sub-app entry hub** for the bottom nav.
@@ -24,6 +25,15 @@ class MyHomeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
+          _HubTile(
+            icon: Icons.account_tree_outlined,
+            title: l10n.myHomeFamilyTreeEntry,
+            subtitle: l10n.myHomeFamilyTreeDesc,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FamilyTreeScreen()),
+            ),
+          ),
           _HubTile(
             icon: Icons.location_on_outlined,
             title: l10n.locationHubTitle,

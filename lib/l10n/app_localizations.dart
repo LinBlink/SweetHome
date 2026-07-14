@@ -1546,6 +1546,60 @@ abstract class AppLocalizations {
   /// **'History of when family entered or left a fence'**
   String get myHomeFenceAlarmsDesc;
 
+  /// No description provided for @myHomeFamilyTreeEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Tree'**
+  String get myHomeFamilyTreeEntry;
+
+  /// No description provided for @myHomeFamilyTreeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A clean view of your whole family at a glance'**
+  String get myHomeFamilyTreeDesc;
+
+  /// No description provided for @familyTreeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Tree'**
+  String get familyTreeTitle;
+
+  /// No description provided for @familyTreeViewerYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get familyTreeViewerYou;
+
+  /// No description provided for @familyTreeViewerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get familyTreeViewerLabel;
+
+  /// No description provided for @familyTreeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members yet'**
+  String get familyTreeEmpty;
+
+  /// No description provided for @familyTreeEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Once your family joins, their relationships will appear here.'**
+  String get familyTreeEmptyDesc;
+
+  /// No description provided for @familyTreeOtherFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Other relatives'**
+  String get familyTreeOtherFamily;
+
+  /// No description provided for @familyTreeOtherFamilyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plus {count} more family members shown as a list'**
+  String familyTreeOtherFamilyDesc(Object count);
+
   /// No description provided for @locationHubTitle.
   ///
   /// In en, this message translates to:

@@ -781,6 +781,35 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myHomeFenceAlarmsDesc => '查看家人进出围栏的提醒';
 
   @override
+  String get myHomeFamilyTreeEntry => '族谱';
+
+  @override
+  String get myHomeFamilyTreeDesc => '一张图看清整个家族';
+
+  @override
+  String get familyTreeTitle => '族谱';
+
+  @override
+  String get familyTreeViewerYou => '你';
+
+  @override
+  String get familyTreeViewerLabel => '本人';
+
+  @override
+  String get familyTreeEmpty => '还没有家人';
+
+  @override
+  String get familyTreeEmptyDesc => '家人加入后，他们的关系会显示在这里。';
+
+  @override
+  String get familyTreeOtherFamily => '其他亲属';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '另有 $count 位家人以列表展示';
+  }
+
+  @override
   String get locationHubTitle => '实时位置';
 
   @override
@@ -1579,6 +1608,35 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get myHomeFenceAlarmsDesc => '查看家人进出围栏的提醒';
 
   @override
+  String get myHomeFamilyTreeEntry => '族谱';
+
+  @override
+  String get myHomeFamilyTreeDesc => '一张图看清整个家族';
+
+  @override
+  String get familyTreeTitle => '族谱';
+
+  @override
+  String get familyTreeViewerYou => '你';
+
+  @override
+  String get familyTreeViewerLabel => '本人';
+
+  @override
+  String get familyTreeEmpty => '还没有家人';
+
+  @override
+  String get familyTreeEmptyDesc => '家人加入后，他们的关系会显示在这里。';
+
+  @override
+  String get familyTreeOtherFamily => '其他亲属';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '另有 $count 位家人以列表展示';
+  }
+
+  @override
   String get locationHubTitle => '实时位置';
 
   @override
@@ -2375,6 +2433,35 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get myHomeFenceAlarmsDesc => '查看家人進出圍欄的提醒';
+
+  @override
+  String get myHomeFamilyTreeEntry => '族譜';
+
+  @override
+  String get myHomeFamilyTreeDesc => '一張圖看清整個家族';
+
+  @override
+  String get familyTreeTitle => '族譜';
+
+  @override
+  String get familyTreeViewerYou => '你';
+
+  @override
+  String get familyTreeViewerLabel => '本人';
+
+  @override
+  String get familyTreeEmpty => '還沒有家人';
+
+  @override
+  String get familyTreeEmptyDesc => '家人加入後，他們的關係會顯示在這裡。';
+
+  @override
+  String get familyTreeOtherFamily => '其他親屬';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '另有 $count 位家人以列表展示';
+  }
 
   @override
   String get locationHubTitle => '即時位置';

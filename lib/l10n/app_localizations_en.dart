@@ -809,6 +809,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'History of when family entered or left a fence';
 
   @override
+  String get myHomeFamilyTreeEntry => 'Family Tree';
+
+  @override
+  String get myHomeFamilyTreeDesc =>
+      'A clean view of your whole family at a glance';
+
+  @override
+  String get familyTreeTitle => 'Family Tree';
+
+  @override
+  String get familyTreeViewerYou => 'You';
+
+  @override
+  String get familyTreeViewerLabel => 'You';
+
+  @override
+  String get familyTreeEmpty => 'No family members yet';
+
+  @override
+  String get familyTreeEmptyDesc =>
+      'Once your family joins, their relationships will appear here.';
+
+  @override
+  String get familyTreeOtherFamily => 'Other relatives';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return 'Plus $count more family members shown as a list';
+  }
+
+  @override
   String get locationHubTitle => 'Real-time Location';
 
   @override

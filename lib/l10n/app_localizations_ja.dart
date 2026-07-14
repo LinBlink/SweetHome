@@ -784,6 +784,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String get myHomeFenceAlarmsDesc => '家族のエリア出入り履歴を確認';
 
   @override
+  String get myHomeFamilyTreeEntry => '家系図';
+
+  @override
+  String get myHomeFamilyTreeDesc => '家族全員を一目で確認';
+
+  @override
+  String get familyTreeTitle => '家系図';
+
+  @override
+  String get familyTreeViewerYou => '自分';
+
+  @override
+  String get familyTreeViewerLabel => '本人';
+
+  @override
+  String get familyTreeEmpty => '家族はまだいません';
+
+  @override
+  String get familyTreeEmptyDesc => '家族が参加すると、ここに親戚関係が表示されます。';
+
+  @override
+  String get familyTreeOtherFamily => 'その他の親戚';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '残り $count 名の家族を一覧で表示';
+  }
+
+  @override
   String get locationHubTitle => 'リアルタイム位置情報';
 
   @override

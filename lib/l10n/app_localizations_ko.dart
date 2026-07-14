@@ -786,6 +786,35 @@ class AppLocalizationsKo extends AppLocalizations {
   String get myHomeFenceAlarmsDesc => '가족의 펜스 출입 기록 확인';
 
   @override
+  String get myHomeFamilyTreeEntry => '가계도';
+
+  @override
+  String get myHomeFamilyTreeDesc => '가족을 한눈에 보기';
+
+  @override
+  String get familyTreeTitle => '가계도';
+
+  @override
+  String get familyTreeViewerYou => '나';
+
+  @override
+  String get familyTreeViewerLabel => '본인';
+
+  @override
+  String get familyTreeEmpty => '아직 가족이 없습니다';
+
+  @override
+  String get familyTreeEmptyDesc => '가족이 가입하면 관계가 여기에 표시됩니다.';
+
+  @override
+  String get familyTreeOtherFamily => '기타 친척';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '나머지 $count명의 가족은 목록으로 표시';
+  }
+
+  @override
   String get locationHubTitle => '실시간 위치';
 
   @override

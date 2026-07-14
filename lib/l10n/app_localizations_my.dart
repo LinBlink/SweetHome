@@ -812,6 +812,36 @@ class AppLocalizationsMy extends AppLocalizations {
       'မိသားစုဝင်များ၏ ဖင်း ဝင်/ထွက် မှတ်တမ်းများ';
 
   @override
+  String get myHomeFamilyTreeEntry => 'မိသားစု မျိုးရိုးစဉ်';
+
+  @override
+  String get myHomeFamilyTreeDesc => 'မိသားစုအားလုံးကို တစ်ကြည့်တည်း';
+
+  @override
+  String get familyTreeTitle => 'မိသားစု မျိုးရိုးစဉ်';
+
+  @override
+  String get familyTreeViewerYou => 'ကျွန်ုပ်';
+
+  @override
+  String get familyTreeViewerLabel => 'ကိုယ်တိုင်';
+
+  @override
+  String get familyTreeEmpty => 'မိသားစုဝင် မရှိသေးပါ';
+
+  @override
+  String get familyTreeEmptyDesc =>
+      'မိသားစုဝင်များ ပါဝင်လာသောအခါ ၎င်းတို့၏ ဆွေမျိုးဆက်ဆံရေးကို ဤနေရာတွင် ပြသပါမည်။';
+
+  @override
+  String get familyTreeOtherFamily => 'အခြား ဆွေမျိုးများ';
+
+  @override
+  String familyTreeOtherFamilyDesc(Object count) {
+    return '$count ဦးကို စာရင်းဖြင့် ပြသပါ';
+  }
+
+  @override
   String get locationHubTitle => 'လက်ရှိတည်နေရာ';
 
   @override
