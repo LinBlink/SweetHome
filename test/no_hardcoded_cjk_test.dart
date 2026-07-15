@@ -9,7 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 /// Allowed: the `lib/l10n/*.arb` translation tables (they ARE the
 /// Chinese/Japanese/Korean text, by design), the `mock_data.dart`
 /// fixture (user names + chat content for mock mode), the
-/// `kinship/terms/*.dart` per-locale term tables, and comments.
+/// `kinship/terms/*.dart` per-locale term tables, the
+/// `language_picker.dart` (each language's own-script name), the
+/// `core/time/app_time_formatter.dart` (zh-locale date patterns like
+/// `M月d日` — intl's `MMMd` symbol drops the `日` suffix once a time
+/// field is appended, so the literal pattern is used instead), and
+/// comments.
 ///
 /// If this test ever fails, the fix is one of:
 ///   1. Add a key to every locale's `lib/l10n/app_*.arb` and
@@ -33,6 +38,12 @@ void main() {
       // for ja). That's standard i18n practice — a Japanese user
       // picker should label Japanese in Japanese, not English.
       if (path.contains('language_picker.dart')) continue;
+      // `app_time_formatter.dart` embeds zh-locale date patterns
+      // (`M月d日` / `M月d日 HH:mm`) as DateFormat patterns. These are
+      // locale-natural formatting tokens, not translatable UI text —
+      // intl's built-in `MMMd` symbol drops the `日` suffix when a
+      // time field is appended, so the literal is unavoidable.
+      if (path.contains('core/time/app_time_formatter.dart')) continue;
       // Skip generated files.
       if (path.endsWith('.g.dart')) continue;
 

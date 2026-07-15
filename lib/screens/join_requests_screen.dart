@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
 import '../core/error_messages.dart';
+import '../core/time/app_time_formatter.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -295,7 +295,8 @@ class _RequestCard extends StatelessWidget {
                     size: 16, color: AppColors.textHint),
                 const SizedBox(width: 6),
                 Text(
-                  DateFormat('yyyy-MM-dd HH:mm').format(request.createdAt.toLocal()),
+                  AppTimeFormatter(Localizations.localeOf(context))
+                      .forRecordList(request.createdAt.toLocal()),
                   style: const TextStyle(
                       fontSize: 12, color: AppColors.textHint),
                 ),

@@ -697,6 +697,20 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get locationHistoryPlay => '再生';
+
+  @override
+  String get locationHistoryPause => '一時停止';
+
+  @override
+  String get locationHistoryReplay => 'もう一度再生';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => 'ジオフェンス';
 
   @override

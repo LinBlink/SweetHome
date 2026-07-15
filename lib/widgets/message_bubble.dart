@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/emoji_only_text.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
+import '../core/time/app_time_formatter.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chat_models.dart';
 import '../providers/auth_provider.dart';
@@ -23,6 +23,7 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMe = message.isMe;
     final senderRelationCode = message.senderRelationCode;
+    final locale = Localizations.localeOf(context);
     String? senderRelationLabel;
     if (senderRelationCode != null) {
       senderRelationLabel = relationLabelFor(
@@ -78,7 +79,7 @@ class MessageBubble extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _formatTime(message.sentAt),
+                        _formatTime(message.sentAt, locale),
                         style: const TextStyle(
                           fontSize: 10,
                           color: AppColors.textHint,
@@ -115,14 +116,9 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(DateTime dt, Locale locale) {
     final local = dt.toLocal();
-    final now = DateTime.now();
-    if (local.day == now.day) return DateFormat('HH:mm').format(local);
-    if (now.difference(local).inDays < 7) {
-      return DateFormat('E HH:mm').format(local);
-    }
-    return DateFormat('MM/dd HH:mm').format(local);
+    return AppTimeFormatter(locale).forMessageBubble(local);
   }
 }
 

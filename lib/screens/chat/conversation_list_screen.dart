@@ -8,7 +8,6 @@ import '../../providers/chat_provider.dart';
 import '../../widgets/conversation_tile.dart';
 import '../../widgets/error_banner.dart';
 import 'chat_room_screen.dart';
-import 'new_conversation_screen.dart';
 
 class ConversationListScreen extends StatefulWidget {
   const ConversationListScreen({super.key});
@@ -38,27 +37,6 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
             icon: const Icon(Icons.search_rounded),
             onPressed: () {},
             tooltip: l10n.conversationsSearchTooltip,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: _ComposeButton(
-              onPressed: () {
-                // ChatProvider lives below the root Navigator (created in
-                // AuthGate), so a pushed route can't inherit it — re-provide it
-                // explicitly, same as the ChatRoomScreen navigation below.
-                final chat = context.read<ChatProvider>();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChangeNotifierProvider.value(
-                      value: chat,
-                      child: const NewConversationScreen(),
-                    ),
-                  ),
-                );
-              },
-              tooltip: l10n.conversationsNewTooltip,
-            ),
           ),
         ],
       ),
@@ -142,48 +120,6 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
 /// Small circular "compose" button in the app bar — a paper-craft
 /// stamp, not the default Material + icon.
-class _ComposeButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String tooltip;
-  const _ComposeButton({required this.onPressed, required this.tooltip});
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: 36,
-          height: 36,
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryDark.withValues(alpha: 0.3),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          alignment: Alignment.center,
-          child: const Icon(
-            Icons.edit_outlined,
-            color: Colors.white,
-            size: 18,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _EmptyState extends StatelessWidget {
   final AppLocalizations l10n;
   const _EmptyState({required this.l10n});

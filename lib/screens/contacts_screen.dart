@@ -4,6 +4,8 @@ import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
 import '../core/home_widgets.dart';
+import '../core/kinship/kinship_graph.dart';
+import '../core/kinship/kinship_localizer.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../models/family_member_vm.dart';
@@ -16,9 +18,11 @@ import 'chat/chat_room_screen.dart';
 /// Bottom-nav "Contacts" tab — a streamlined "find someone to chat
 /// with" view of the family. Distinct from `FamilyMembersScreen`
 /// (which lives under the Profile tab and is admin-oriented —
-/// generates invite codes, shows the admin badge, shows kinship
-/// terms). Contacts strips all of that down to: name + avatar +
-/// online dot → tap to start a 1:1 chat.
+/// generates invite codes, shows the admin badge). Contacts
+/// shows: name + kinship term + avatar + online dot → tap to
+/// start a 1:1 chat. (Kinship term is rendered for every
+/// family-member row — the only kind of contact reachable
+/// through this surface right now.)
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});
 
@@ -179,6 +183,16 @@ class _ContactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final locale = Localizations.localeOf(context);
+    final viewerGender = auth.currentUser == null
+        ? null
+        : genderFromString(auth.currentUser!.gender);
+    final relation = relationLabelFor(
+      relationCode: member.relationCode,
+      targetGender: member.gender,
+      viewerGender: viewerGender,
+      appLocale: locale,
+    );
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -228,6 +242,16 @@ class _ContactTile extends StatelessWidget {
                         color: AppColors.ink,
                       ),
                     ),
+                    if (relation != null && relation.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        relation,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textHint,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

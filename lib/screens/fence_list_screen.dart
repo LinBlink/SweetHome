@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/time/app_time_formatter.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -448,8 +448,8 @@ class _FenceCard extends StatelessWidget {
                   if (m.userId == fence.setterUserId) setter = m;
                   if (m.userId == fence.targetUserId) target = m;
                 }
-                final createdStr = DateFormat('yyyy-MM-dd HH:mm')
-                    .format(fence.createdAt.toLocal());
+                final createdStr = AppTimeFormatter(Localizations.localeOf(context))
+                    .forRecordList(fence.createdAt.toLocal());
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

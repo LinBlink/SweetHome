@@ -698,6 +698,20 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get locationHistoryPlay => '재생';
+
+  @override
+  String get locationHistoryPause => '일시정지';
+
+  @override
+  String get locationHistoryReplay => '다시 재생';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => '지오펜스';
 
   @override

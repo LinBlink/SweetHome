@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
+import '../core/time/app_time_formatter.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chat_models.dart';
 import '../providers/auth_provider.dart';
@@ -67,7 +67,11 @@ class ConversationTile extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _formatTime(conversation.lastMessageAt, AppLocalizations.of(context)!),
+                          _formatTime(
+                            conversation.lastMessageAt,
+                            AppLocalizations.of(context)!,
+                            Localizations.localeOf(context),
+                          ),
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.inkFaint,
@@ -134,15 +138,14 @@ class ConversationTile extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime dt, AppLocalizations l10n) {
+  String _formatTime(DateTime dt, AppLocalizations l10n, Locale locale) {
     final local = dt.toLocal();
-    final now = DateTime.now();
-    final diff = now.difference(local);
-    if (diff.inMinutes < 1) return l10n.timeJustNow;
-    if (diff.inHours < 1) return l10n.timeMinutesAgo(diff.inMinutes);
-    if (local.day == now.day) return DateFormat('HH:mm').format(local);
-    if (diff.inDays == 1) return l10n.timeYesterday;
-    return DateFormat('MM/dd').format(local);
+    return AppTimeFormatter(locale).forConversationTile(
+      local,
+      timeJustNow: l10n.timeJustNow,
+      timeMinutesAgo: l10n.timeMinutesAgo,
+      timeYesterday: l10n.timeYesterday,
+    );
   }
 }
 

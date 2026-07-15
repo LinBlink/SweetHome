@@ -1,3 +1,5 @@
+import '../core/time/backend_time.dart';
+
 /// Geofence model — docs/api.md §6.4/§6.5/§6.6. The "setter" is the
 /// family member who created the fence (the one who gets the
 /// notification); "target" is the person whose location the fence
@@ -35,8 +37,8 @@ class Fence {
       fenceLng: (json['fenceLng'] as num).toDouble(),
       fenceLat: (json['fenceLat'] as num).toDouble(),
       fenceRange: (json['fenceRange'] as num).toDouble(),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: parseBackendTime(json['createdAt'] as String),
+      updatedAt: parseBackendTime(json['updatedAt'] as String),
     );
   }
 }
@@ -74,7 +76,7 @@ class FenceAlarm {
       fenceId: json['fenceId'] as int,
       fenceName: json['fenceName'] as String?,
       alarmType: json['alarmType'] as String? ?? 'STEPPED_OUTSIDE',
-      alarmedAt: DateTime.parse(json['alarmedAt'] as String),
+      alarmedAt: parseBackendTime(json['alarmedAt'] as String),
       targetUserId: json['targetUserId'] as int,
       targetUsername: json['targetUsername'] as String,
       targetUserAvatarUrl: json['targetUserAvatarUrl'] as String?,

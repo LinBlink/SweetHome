@@ -694,6 +694,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get locationHistoryPlay => '播放';
+
+  @override
+  String get locationHistoryPause => '暂停';
+
+  @override
+  String get locationHistoryReplay => '重新播放';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => '电子围栏';
 
   @override
@@ -1596,6 +1610,20 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get locationHistoryPlay => '播放';
+
+  @override
+  String get locationHistoryPause => '暂停';
+
+  @override
+  String get locationHistoryReplay => '重新播放';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => '电子围栏';
 
   @override
@@ -2495,6 +2523,20 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String locationHistoryBatteryLabel(Object percent) {
     return '電量 $percent%';
+  }
+
+  @override
+  String get locationHistoryPlay => '播放';
+
+  @override
+  String get locationHistoryPause => '暫停';
+
+  @override
+  String get locationHistoryReplay => '重新播放';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
   }
 
   @override

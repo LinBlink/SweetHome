@@ -1,3 +1,5 @@
+import '../core/time/backend_time.dart';
+
 /// API §6 payload shapes — see docs/api.md §6.1 (`POST /location/report`)
 /// and §6.2 (`GET /location/family`). The response includes a
 /// pre-bucketed online/total pair (10-minute Redis-TTL count) plus a
@@ -62,7 +64,7 @@ class MemberLocation {
       lng: (json['lng'] as num).toDouble(),
       lat: (json['lat'] as num).toDouble(),
       battery: json['battery'] as int? ?? -1,
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      updatedAt: parseBackendTime(json['updatedAt'] as String),
     );
   }
 
@@ -87,6 +89,10 @@ class MemberLocation {
 /// rule. `updateTime` is the local time the GPS fix was captured, not
 /// the time the HTTP request was sent — the server uses it for the
 /// 120s/600s staleness checks.
+///
+/// Serialized as UTC+8 wall-clock without a timezone suffix to match
+/// the backend's contract — see `parseBackendTime()` for the
+/// symmetric reader.
 class LocationReport {
   final double lng;
   final double lat;
@@ -101,11 +107,23 @@ class LocationReport {
   });
 
   Map<String, dynamic> toJson() => {
-    'lng': lng,
-    'lat': lat,
-    if (battery != null) 'battery': battery,
-    'updateTime': updateTime.toUtc().toIso8601String(),
-  };
+        'lng': lng,
+        'lat': lat,
+        if (battery != null) 'battery': battery,
+        'updateTime': _formatBackendTime(updateTime),
+      };
+
+  /// Emits an ISO-8601 string in UTC+8 wall-clock time with no TZ
+  /// suffix, matching the backend's contract (see `parseBackendTime`).
+  /// Example: `2026-07-14T16:00:00.000` (was `2026-07-14T08:00:00.000Z`
+  /// under the previous UTC contract).
+  static String _formatBackendTime(DateTime dt) {
+    final shifted = dt.toUtc().add(const Duration(hours: 8));
+    final base = shifted.toIso8601String();
+    // Strip trailing `Z` if present, then truncate to milliseconds.
+    final noZ = base.endsWith('Z') ? base.substring(0, base.length - 1) : base;
+    return noZ;
+  }
 }
 
 /// One point in a member's trajectory history — docs/api.md §6.3.
@@ -128,7 +146,7 @@ class LocationHistoryPoint {
       lng: (json['lng'] as num).toDouble(),
       lat: (json['lat'] as num).toDouble(),
       battery: json['battery'] as int? ?? -1,
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      updatedAt: parseBackendTime(json['updatedAt'] as String),
     );
   }
 }

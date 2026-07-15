@@ -1,4 +1,5 @@
 import '../core/kinship/kinship_graph.dart';
+import '../core/time/backend_time.dart';
 
 /// A family member as shown to the current viewer — `relationCode` is
 /// already relative to whoever requested this (see docs/api.md §3.2/§七).
@@ -94,7 +95,7 @@ class InviteCodeInfo {
   factory InviteCodeInfo.fromJson(Map<String, dynamic> json) {
     return InviteCodeInfo(
       inviteCode: json['inviteCode'] as String,
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      expiresAt: parseBackendTime(json['expiresAt'] as String),
     );
   }
 }

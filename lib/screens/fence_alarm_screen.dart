@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/time/app_time_formatter.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -231,8 +231,8 @@ class _AlarmCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         l10n.fenceAlarmTime(
-                          DateFormat('yyyy-MM-dd HH:mm')
-                              .format(alarm.alarmedAt.toLocal()),
+                          AppTimeFormatter(Localizations.localeOf(context))
+                              .forRecordList(alarm.alarmedAt.toLocal()),
                         ),
                         style: const TextStyle(
                           fontSize: 11,

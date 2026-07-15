@@ -105,11 +105,13 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// separate log widget.
   void debugLogRaw(String message) => _log(message);
 
-  /// Persisted on/off flag so the sharing toggle survives an app
-  /// restart (process kill, not just backgrounding) — without this
-  /// the toggle only lives as long as `LocationProvider` does, which
-  /// is the login session's in-memory lifetime, so a fresh cold start
-  /// always looked "off" even if the user had just turned it on.
+  /// Persisted on/off flag so the user's *deliberate* sharing choice
+  /// survives an app restart (process kill, not just backgrounding).
+  /// This key is only ever written from [toggleSharing] — programmatic
+  /// session ends (logout, hot reload, [dispose]) do NOT touch it, so
+  /// they cannot silently flip the toggle off on the user's next login
+  /// ("I installed the app and sharing was off even though I never
+  /// turned it off").
   static const String _kSharingPrefsKey = 'location_sharing_enabled';
 
   /// Call once right after construction (see `main.dart`) to resume
@@ -117,8 +119,15 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// setting before — a fresh install should land on a working
   /// family-location dashboard without making the user flip a
   /// switch first. Once the user explicitly turns it off,
-  /// `prefs.setBool(false)` is written and subsequent launches
-  /// honour that explicit choice.
+  /// `prefs.setBool(false)` is written by [toggleSharing] and
+  /// subsequent launches honour that explicit choice.
+  ///
+  /// Note: the `?? true` default + the rule that [stopSharing] never
+  /// persists means the only way `prefs.setBool(false)` ever gets
+  /// written is [toggleSharing] in the off-direction. Any other
+  /// caller ([dispose], logout, hot reload) leaves the flag alone
+  /// — so a fresh cold start that hasn't seen the user tap the
+  /// switch yet is always ON.
   Future<void> restoreSharingState() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(_kSharingPrefsKey) ?? true) {
@@ -143,11 +152,22 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     // First fix is mandatory.
     unawaited(_sampleAndReport());
     _timer = Timer.periodic(_kSampleInterval, (_) => _sampleAndReport());
+    // Persist "on" so an explicit previous off (where the user
+    // tapped the Switch off then back on) is forgotten — matches
+    // the user's mental model of "off → on = cleared my preference".
+    // Not persisted: a fresh start where the user never touched
+    // the toggle (default-ON path through [restoreSharingState]).
     unawaited(_persistSharingState(true));
   }
 
   /// Cancel the loop and detach the lifecycle hook. Safe to call
   /// multiple times.
+  ///
+  /// Does NOT touch SharedPreferences — persistence of the user's
+  /// off-intent is [toggleSharing]'s job, not this one's. That
+  /// keeps [dispose]'s `stopSharing()` (called on logout) from
+  /// silently flipping the next user into "off" on a device that
+  /// never recorded an explicit toggle.
   void stopSharing() {
     _timer?.cancel();
     _timer = null;
@@ -155,10 +175,6 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
     _status = LocationStatus.idle;
     WidgetsBinding.instance.removeObserver(this);
     notifyListeners();
-    // Also covers logout: `dispose()` calls `stopSharing()`, so a
-    // different user logging in later on the same device doesn't
-    // inherit a previous account's sharing preference.
-    unawaited(_persistSharingState(false));
   }
 
   /// Flip between [startSharing] and [stopSharing]. Bound to the
@@ -166,11 +182,22 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
   /// sample is in flight so the user can't toggle off mid-GPS-fix
   /// (which would orphan the in-flight `_sampleAndReport` future and
   /// surface a confusing half-applied report on next mount).
+  ///
+  /// This is the SINGLE point where the user's on/off intent is
+  /// persisted (in the off-direction): if the user taps the
+  /// Switch off, we write `prefs.setBool(false)` so a subsequent
+  /// cold start still respects their choice. In the on-direction,
+  /// we mirror that by writing `true` — that way an earlier
+  /// "explicit off" gets cleared. Logout / hot reload /
+  /// [dispose] never reach [stopSharing] through this method, so
+  /// they cannot accidentally turn sharing off.
   void toggleSharing() {
     if (_isAttempting) return;
     if (_isRunning) {
       stopSharing();
+      unawaited(_persistSharingState(false));
     } else {
+      unawaited(_persistSharingState(true));
       startSharing();
     }
   }

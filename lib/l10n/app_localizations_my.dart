@@ -718,6 +718,20 @@ class AppLocalizationsMy extends AppLocalizations {
   }
 
   @override
+  String get locationHistoryPlay => 'ဖွင့်ရန်';
+
+  @override
+  String get locationHistoryPause => 'ခေတ္တရပ်ရန်';
+
+  @override
+  String get locationHistoryReplay => 'ထပ်ဖွင့်ရန်';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => 'ဂျီယိုဖင်းများ';
 
   @override

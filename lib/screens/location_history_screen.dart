@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import '../core/address_resolver.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/time/app_time_formatter.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -33,12 +34,19 @@ class LocationHistoryScreen extends StatefulWidget {
   State<LocationHistoryScreen> createState() => _LocationHistoryScreenState();
 }
 
-class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
+class _LocationHistoryScreenState extends State<LocationHistoryScreen>
+    with TickerProviderStateMixin {
   late LocationService _service;
   late FamilyMemberVm? _member;
   DateTime _date = DateTime.now();
   Future<LocationHistory>? _future;
   final MapController _mapController = MapController();
+
+  /// Playback head. Drives which point is highlighted by the
+  /// extra marker on the map. Always 0 before the first playback
+  /// so the slider sits at the start of the trail.
+  AnimationController? _player;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -55,8 +63,54 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
 
   @override
   void dispose() {
+    _player?.dispose();
     _mapController.dispose();
     super.dispose();
+  }
+
+  /// Build (or rebuild) the playback controller for the given
+  /// points. Total duration scales with point count so even a
+  /// 50-point trail still finishes in 8-ish seconds at 150 ms/
+  /// frame, and a 5-point trail still plays in ~1 second instead
+  /// of sliding several seconds between frames.
+  void _ensurePlayer(int pointCount) {
+    if (pointCount <= 1) {
+      _player?.dispose();
+      _player = null;
+      return;
+    }
+    final target = Duration(milliseconds: (pointCount - 1) * 150);
+    final existing = _player;
+    if (existing != null && existing.duration == target) {
+      return;
+    }
+    existing?.dispose();
+    _player = AnimationController(vsync: this, duration: target)
+      ..addListener(() {
+        if (!mounted) return;
+        // (controller.value, 0..1) → (currentIndex, 0..pointCount-1).
+        final v = _player!.value.clamp(0.0, 1.0);
+        final max = pointCount - 1;
+        setState(() {
+          _currentIndex = (v * max).round();
+        });
+      });
+  }
+
+  void _togglePlayback(int pointCount) {
+    final p = _player;
+    if (p == null) return;
+    if (p.isAnimating) {
+      p.stop();
+      setState(() {}); // refresh icon state
+      return;
+    }
+    // End-of-trail → rewind to the start so "Replay" works.
+    if ((p.value >= 1.0) || _currentIndex >= pointCount - 1) {
+      _currentIndex = 0;
+      p.value = 0.0;
+    }
+    p.forward();
   }
 
   Future<LocationHistory> _fetch(int userId, DateTime date) {
@@ -256,6 +310,13 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
                     date: _date,
                   );
                 }
+                // Build (or rebuild) the playback controller for the
+                // current point count. Must run in build (not in
+                // didUpdateWidget) because [setState] here keeps the
+                // player sized to the new day after a date pick.
+                _ensurePlayer(data.locations.length);
+                final locale = Localizations.localeOf(context);
+                final playbackActive = _player?.isAnimating ?? false;
                 return Column(
                   children: [
                     SizedBox(
@@ -308,6 +369,23 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
                                       color: AppColors.primary,
                                     ),
                                   ),
+                                  // Playback head — only shown when the
+                                  // trail has enough points to be worth
+                                  // animating. Sits on top of the endpoint
+                                  // markers; we don't hide the endpoints
+                                  // because they carry the meaning of
+                                  // "where the day started / ended", which
+                                  // the playback dot doesn't.
+                                  if (_player != null)
+                                    Marker(
+                                      width: 28,
+                                      height: 28,
+                                      point: LatLng(
+                                        data.locations[_currentIndex].lat,
+                                        data.locations[_currentIndex].lng,
+                                      ),
+                                      child: const _PlaybackDot(),
+                                    ),
                                 ],
                               ),
                               const Positioned(
@@ -320,6 +398,15 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
                         ],
                       ),
                     ),
+                    if (_player != null)
+                      _PlaybackStrip(
+                        controller: _player!,
+                        currentIndex: _currentIndex,
+                        maxIndex: data.locations.length - 1,
+                        isPlaying: playbackActive,
+                        onToggle: () => _togglePlayback(data.locations.length),
+                        l10n: l10n,
+                      ),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
@@ -342,6 +429,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen> {
                           point: data.locations[i],
                           isFirst: i == 0,
                           isLast: i == data.locations.length - 1,
+                          locale: locale,
                           l10n: l10n,
                         ),
                       ),
@@ -434,7 +522,8 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              DateFormat('yyyy-MM-dd').format(date),
+              AppTimeFormatter(Localizations.localeOf(context))
+                  .forDateOnly(date),
               style: const TextStyle(fontSize: 11, color: AppColors.textHint),
             ),
             const SizedBox(height: 12),
@@ -454,17 +543,24 @@ class _HistoryTile extends StatelessWidget {
   final LocationHistoryPoint point;
   final bool isFirst;
   final bool isLast;
+  final Locale locale;
   final AppLocalizations l10n;
   const _HistoryTile({
     required this.point,
     required this.isFirst,
     required this.isLast,
+    required this.locale,
     required this.l10n,
   });
 
   @override
   Widget build(BuildContext context) {
-    final time = DateFormat('HH:mm').format(point.updatedAt.toLocal());
+    final time = AppTimeFormatter(locale).forTimeOnly(point.updatedAt.toLocal());
+    // Address line is rendered only for the first and last points
+    // (the endpoints the user is most likely to want to identify
+    // — "where did the day start?", "where did they end up?").
+    // Internal points rely on the polyline + endpoint markers.
+    final showAddress = isFirst || isLast;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -487,29 +583,210 @@ class _HistoryTile extends StatelessWidget {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  time,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                if (point.battery >= 0)
-                  Text(
-                    l10n.locationHistoryBatteryLabel(point.battery),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textHint,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      time,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
+                    if (point.battery >= 0)
+                      Text(
+                        l10n.locationHistoryBatteryLabel(point.battery),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textHint,
+                        ),
+                      ),
+                  ],
+                ),
+                if (showAddress) ...[
+                  const SizedBox(height: 4),
+                  _PointAddressLine(
+                    lng: point.lng,
+                    lat: point.lat,
+                    locale: locale,
+                    l10n: l10n,
                   ),
+                ],
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Reverse-geocoded single-line address for a trajectory point.
+/// Reuses [AddressResolver] (same as `_AddressLine` in
+/// `LocationScreen`) so the cache, in-flight dedup, and locale
+/// fallback all apply here too — visiting the live map first
+/// typically pre-warms the cache for the start/end of the trail.
+class _PointAddressLine extends StatelessWidget {
+  final double lng;
+  final double lat;
+  final Locale locale;
+  final AppLocalizations l10n;
+  const _PointAddressLine({
+    required this.lng,
+    required this.lat,
+    required this.locale,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: AddressResolver.resolve(lng, lat, locale),
+      initialData: AddressResolver.peek(lng, lat, locale),
+      builder: (context, snap) {
+        if (snap.hasData) {
+          return Text(
+            l10n.locationHistoryPointAddress(snap.data!),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          );
+        }
+        if (snap.connectionState == ConnectionState.waiting) {
+          return Row(
+            children: [
+              const SizedBox(
+                width: 10,
+                height: 10,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: AppColors.textHint,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.locationResolving,
+                style:
+                    const TextStyle(fontSize: 12, color: AppColors.textHint),
+              ),
+            ],
+          );
+        }
+        return Text(
+          l10n.locationAddressUnavailable,
+          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+        );
+      },
+    );
+  }
+}
+
+/// Play / pause control + scrubber for the trajectory. Bound to
+/// the same `AnimationController` that drives the playback-dot
+/// marker on the map — dragging the slider also moves the head.
+class _PlaybackStrip extends StatelessWidget {
+  final AnimationController controller;
+  final int currentIndex;
+  final int maxIndex;
+  final bool isPlaying;
+  final VoidCallback onToggle;
+  final AppLocalizations l10n;
+  const _PlaybackStrip({
+    required this.controller,
+    required this.currentIndex,
+    required this.maxIndex,
+    required this.isPlaying,
+    required this.onToggle,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final atEnd = currentIndex >= maxIndex;
+    final iconLabel = !isPlaying && atEnd
+        ? l10n.locationHistoryReplay
+        : (isPlaying ? l10n.locationHistoryPause : l10n.locationHistoryPlay);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      color: AppColors.surface,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: onToggle,
+                child: Icon(
+                  isPlaying
+                      ? Icons.pause_rounded
+                      : (atEnd ? Icons.replay_rounded : Icons.play_arrow_rounded),
+                  color: AppColors.primary,
+                  size: 24,
+                  semanticLabel: iconLabel,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: AppColors.surfaceVariant,
+                thumbColor: AppColors.primary,
+                overlayColor: AppColors.primary.withValues(alpha: 0.15),
+                trackHeight: 3,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+              ),
+              child: Slider(
+                value: controller.value.clamp(0.0, 1.0),
+                onChanged: (v) {
+                  controller.value = v;
+                  controller.stop();
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The playback head marker on the map. Distinct shape from
+/// the static endpoint dots so it reads as "moving" at a glance.
+class _PlaybackDot extends StatelessWidget {
+  const _PlaybackDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.primary, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryDark.withValues(alpha: 0.5),
+              blurRadius: 6,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
       ),
     );
   }

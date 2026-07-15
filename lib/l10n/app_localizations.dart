@@ -1384,6 +1384,30 @@ abstract class AppLocalizations {
   /// **'Battery {percent}%'**
   String locationHistoryBatteryLabel(Object percent);
 
+  /// No description provided for @locationHistoryPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get locationHistoryPlay;
+
+  /// No description provided for @locationHistoryPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get locationHistoryPause;
+
+  /// No description provided for @locationHistoryReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Replay'**
+  String get locationHistoryReplay;
+
+  /// No description provided for @locationHistoryPointAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'📍 {address}'**
+  String locationHistoryPointAddress(String address);
+
   /// No description provided for @fenceListTitle.
   ///
   /// In en, this message translates to:

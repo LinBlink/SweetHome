@@ -85,8 +85,11 @@ void main() {
       expect(json.containsKey('battery'), isFalse);
       expect(json['lng'], 116.3975);
       expect(json['lat'], 39.9087);
-      // updateTime is always UTC ISO-8601.
-      expect(json['updateTime'], '2026-07-13T10:00:00.000Z');
+      // updateTime is serialized as UTC+8 wall-clock ISO-8601 with
+      // no TZ suffix, matching the backend's contract — see
+      // `parseBackendTime` for the symmetric reader. `DateTime.utc(2026,
+      // 7, 13, 10, 0, 0)` is 10:00 UTC = 18:00 in Beijing.
+      expect(json['updateTime'], '2026-07-13T18:00:00.000');
     });
 
     test('includes battery when set', () {

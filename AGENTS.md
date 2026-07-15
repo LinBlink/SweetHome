@@ -59,6 +59,18 @@ flutter test                                                      # all tests
   display time with `relationLabelFor()` from `lib/core/kinship/kinship_localizer.dart`,
   reactively on the current `LocaleProvider` locale — don't bake a locale into
   the fetch or the label goes stale on language switch.
+- **Backend timestamps are UTC+8 wall-clock with no TZ suffix.** Every
+  `DateTime.parse(json[...])` in a model goes through
+  `parseBackendTime()` in `lib/core/time/backend_time.dart` — naive
+  strings get a `+08:00` offset re-attached so Dart treats the value
+  as a concrete instant (not as device-local). The symmetric writer,
+  `LocationReport.toJson`, emits the same shape (`2026-07-14T16:00:00.000`).
+  Every display call site must then call `.toLocal()` and route through
+  `AppTimeFormatter` (in the same folder) — never `DateFormat(...)`
+  directly, never without `.toLocal()`. zh / zh_Hans / zh_Hant get
+  `M月d日` / `M月d日 HH:mm`; everything else uses Latin numeric shapes
+  (`MM/dd HH:mm`, `yyyy-MM-dd HH:mm`). Tests: `backend_time_test.dart`,
+  `app_time_formatter_test.dart`.
 
 ## Architecture quick map
 

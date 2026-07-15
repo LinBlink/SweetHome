@@ -716,6 +716,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get locationHistoryPlay => 'Play';
+
+  @override
+  String get locationHistoryPause => 'Pause';
+
+  @override
+  String get locationHistoryReplay => 'Replay';
+
+  @override
+  String locationHistoryPointAddress(String address) {
+    return '📍 $address';
+  }
+
+  @override
   String get fenceListTitle => 'Geofences';
 
   @override

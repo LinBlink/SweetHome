@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/kinship/kinship_graph.dart';
+import '../core/time/backend_time.dart';
 
 enum MessageType {
   text,
@@ -107,7 +108,7 @@ class Conversation {
       // yet, so the backend returns a null lastMessageAt — fall back to "now"
       // rather than crashing the parse.
       lastMessageAt: json['lastMessageAt'] != null
-          ? DateTime.parse(json['lastMessageAt'] as String)
+          ? parseBackendTime(json['lastMessageAt'] as String)
           : DateTime.now(),
       unreadCount: json['unreadCount'] as int? ?? 0,
       memberCount: json['memberCount'] as int? ?? 0,
@@ -207,7 +208,7 @@ class Message {
       type: MessageType.fromApi(
         (json['messageType'] ?? json['type']) as String?,
       ),
-      sentAt: DateTime.parse(json['sentAt'] as String),
+      sentAt: parseBackendTime(json['sentAt'] as String),
       isMe: senderId == currentUserId,
       senderRelationCode: json['senderRelationCode'] as String?,
       senderGender:

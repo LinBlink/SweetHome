@@ -1,4 +1,5 @@
 import '../core/kinship/kinship_graph.dart';
+import '../core/time/backend_time.dart';
 
 /// A pending "申请加入家庭" submission as seen by the family admin —
 /// see docs/api.md §3.5.2. The `relationType` here is the *requester's*
@@ -42,7 +43,7 @@ class JoinRequest {
       relationType: json['relationType'] as String,
       targetMemberName: json['targetMemberName'] as String,
       message: json['message'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: parseBackendTime(json['createdAt'] as String),
       status: json['status'] as String? ?? 'pending',
     );
   }

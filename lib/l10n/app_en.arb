@@ -287,6 +287,15 @@
   "locationHistoryForDate": "{date}",
   "locationHistoryView": "View trajectory",
   "locationHistoryBatteryLabel": "Battery {percent}%",
+  "locationHistoryPlay": "Play",
+  "locationHistoryPause": "Pause",
+  "locationHistoryReplay": "Replay",
+  "locationHistoryPointAddress": "📍 {address}",
+  "@locationHistoryPointAddress": {
+    "placeholders": {
+      "address": { "type": "String" }
+    }
+  },
   "fenceListTitle": "Geofences",
   "fenceListEmpty": "No geofences yet",
   "fenceListGuardingGroup": "I'm watching",
