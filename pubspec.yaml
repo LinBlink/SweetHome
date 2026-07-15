@@ -19,7 +19,12 @@ dependencies:
   http_parser: ^4.0.2
   image_picker: ^1.1.2
   flutter_image_compress: ^2.4.0
+  just_audio: ^0.9.42
   latlong2: ^0.9.1
+  path_provider: ^2.1.5
+  record: ^7.0.0
+  video_compress: ^3.1.4
+  video_player: ^2.9.5
   web_socket_channel: ^3.0.1
   provider: ^6.1.2
   shared_preferences: ^2.3.2
@@ -30,6 +35,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+dependency_overrides:
+  record_linux: ^2.0.0
+  record_web: ^2.0.0
+  record_windows: ^2.0.0
 
 flutter:
   uses-material-design: true

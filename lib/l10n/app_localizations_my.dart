@@ -956,4 +956,192 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get profileJoinRequestsAdminOnly => 'အုပ်ချုပ်သူများသာ';
+
+  @override
+  String get familyFeedEmptyTitle => 'မပို့ရသေးပါ';
+
+  @override
+  String get familyFeedEmptyDesc =>
+      'မိသားစုအတွက် ပထမဆုံး အပ်ဒိတ်တစ်ခု တင်လိုက်ပါ။';
+
+  @override
+  String get familyFeedLoadMoreError => 'နောက်ထပ် မဆွဲနိုင်ပါ';
+
+  @override
+  String get familyFeedDeleteTitle => 'ဤအပ်ဒိတ်ကို ဖျက်မလား?';
+
+  @override
+  String get familyFeedDeleteBody =>
+      'ဖျက်ပြီးနောက် မိသားစုဝင်များအားလုံး မမြင်တွေ့နိုင်တော့ပါ။';
+
+  @override
+  String get familyFeedDeleteConfirm => 'ဖျက်မည်';
+
+  @override
+  String get familyFeedDeleted => 'အပ်ဒိတ် ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get familyFeedLikeTooltip => 'ကြိုက်တယ်';
+
+  @override
+  String get familyFeedUnlikeTooltip => 'ကြိုက်ပြီးပါပြီ';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ကြိုက်တယ် $count ခု',
+      zero: 'ကြိုက်တယ် 0 ခု',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return 'နောက်ထပ် $count ယောက်';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => 'မှတ်ချက်မရှိသေးပါ';
+
+  @override
+  String get familyFeedCommentsComingSoon =>
+      'မှတ်ချက် လုပ်ဆောင်ချက် မကြာမီ ထပ်ထည့်မည်';
+
+  @override
+  String get familyFeedPublishButton => 'တင်မည်';
+
+  @override
+  String get publishMomentTitle => 'အပ်ဒိတ်အသစ်';
+
+  @override
+  String get publishMomentContentLabel => 'ဘာဖြစ်နေလဲ?';
+
+  @override
+  String get publishMomentContentHint =>
+      'ဓာတ်ပုံတစ်ခုပဲ ဖြစ်ဖြစ်၊ စိတ်ခံစားချက်တစ်ခုပဲ ဖြစ်ဖြစ် မိသားစုနဲ့ ဝေမျှလိုက်ပါ။';
+
+  @override
+  String get publishMomentContentRequired =>
+      'စာတစ်ခုခု ရေးပါ သို့မဟုတ် ဓာတ်ပုံတစ်ခု ထည့်ပါ';
+
+  @override
+  String get publishMomentAddMedia => 'မီဒီယာ ထည့်မည်';
+
+  @override
+  String get publishMomentMediaTypeImage => 'ဓာတ်ပုံ';
+
+  @override
+  String get publishMomentMediaTypeVideo => 'ဗီဒီယို';
+
+  @override
+  String get publishMomentMediaTypeAudio => 'အသံ';
+
+  @override
+  String get publishMomentAddMediaSheet => 'ဤအပ်ဒိတ်ထဲ ထည့်မည်';
+
+  @override
+  String get publishMomentMaxMedia => 'ဖိုင် 9 ခုအထိ';
+
+  @override
+  String get publishMomentRemoveMedia => 'ဖယ်ရှားမည်';
+
+  @override
+  String get publishMomentRecordingHint => 'နှိပ်ပြီး အသံဖမ်းပါ';
+
+  @override
+  String get publishMomentRecordingStop => 'နှိပ်ပြီး ရပ်ပါ';
+
+  @override
+  String get publishMomentRecordingCancel => 'မလုပ်တော့ပါ';
+
+  @override
+  String get publishMomentRecordingTooShort => 'နည်းနည်းပို၍ ဖမ်းပါ';
+
+  @override
+  String get publishMomentRecordingFailed => 'အသံဖမ်းခြင်း မအောင်မြင်ပါ';
+
+  @override
+  String get publishMomentRecordingPermissionBody =>
+      'အသံဖမ်းရန် မိုက်ကရိုဖုန်းခွင့်ပြုချက် လိုအပ်ပါသည်';
+
+  @override
+  String get publishMomentPublish => 'တင်မည်';
+
+  @override
+  String get publishMomentPublishing => 'တင်နေသည်…';
+
+  @override
+  String get publishMomentSuccess => 'တင်ပြီးပါပြီ';
+
+  @override
+  String get publishMomentFailed => 'တင်မရပါ။ ထပ်ကြိုးစားပါ';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return 'အပ်လုဒ် လုပ်နေသည် $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => 'ဤအပ်ဒိတ်ကို ဖယ်ထုတ်မလား?';
+
+  @override
+  String get publishMomentDiscardBody => 'ပြင်ဆင်ထားသည်များ ဆုံးရှုံးပါမည်။';
+
+  @override
+  String get publishMomentDiscardConfirm => 'ဖယ်ထုတ်မည်';
+
+  @override
+  String get publishMomentDiscardCancel => 'ဆက်ပြင်ဆင်မည်';
+
+  @override
+  String get momentDetailTitle => 'အပ်ဒိတ်';
+
+  @override
+  String get momentDetailWhoLikedTitle => 'ကြိုက်သူများ';
+
+  @override
+  String get momentDetailNoLikes => 'ပထမဆုံး ကြိုက်တာက သင်ဖြစ်ပါစေ';
+
+  @override
+  String get momentDetailPlayVideo => 'ဗီဒီယို ဖွင့်မည်';
+
+  @override
+  String get momentDetailVideoLoadFailed => 'ဗီဒီယို မဆွဲနိုင်ပါ';
+
+  @override
+  String get momentDetailAudioPlay => 'ဖွင့်မည်';
+
+  @override
+  String get momentDetailAudioPause => 'ခဏရပ်မည်';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return 'မှတ်တမ်းတင်နေသည် $seconds စက္ကန့် — ရပ်ရန် တို့ပါ';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => 'ရပ်ပါ';
+
+  @override
+  String get publishMomentCompressing => 'ချုံ့နေသည်…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return 'ချုံ့ပြီးနောက် $size MB ရှိသေးသည် — ပိုတိုသော ဗီဒီယို ရွေးပါ။';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return 'ဗီဒီယို ချုံ့၍မရပါ ($size MB)။ ပိုသေးသော ဖိုင် ရွေးပါ။';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong =>
+      'ကြိုက်တယ် နှိပ်ပါ · ပြန်ဖြုတ်ရန် ကြာကြာနှိပ်ပါ';
+
+  @override
+  String get familyFeedLikeCancelFailed =>
+      'ကြိုက်တယ်များ ပြန်ဖြုတ်၍မရပါ — ထပ်ကြိုးစားပါ';
 }

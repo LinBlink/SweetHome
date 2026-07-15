@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/app_config.dart';
 import '../models/auth_models.dart';
 import 'api_client.dart';
+import 'upload_service.dart';
 
 class AuthService {
   AuthService._();
@@ -89,67 +89,71 @@ class AuthService {
     required Uint8List bytes,
     required String filename,
     String? contentType,
-  }) async {
-    final uri = Uri.parse('${AppConfig.apiBaseUrl}/users/upload/avatar');
-    final req = http.MultipartRequest('POST', uri);
-    req.headers['Authorization'] = 'Bearer ${current.token}';
-    req.files.add(http.MultipartFile.fromBytes(
-      'file',
-      bytes,
+  }) {
+    return _uploader(current).uploadAvatar(
+      current,
+      bytes: bytes,
       filename: filename,
-      contentType: _parseMediaType(contentType),
-    ));
-    final streamed = await req.send().timeout(const Duration(seconds: 30));
-    final resp = await http.Response.fromStream(streamed);
-    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
-    return data['addressReturn'] as String;
+      contentType: contentType,
+    );
   }
 
   /// `POST /users/upload/image` (docs/api.md §2.4) — multipart upload
   /// of a single chat image (field name `file`). Returns a public
   /// Cloudflare R2 URL that the caller should pass back as
   /// `Message.content` with `type = "image"` via §4.4 (REST) or §5.2
-  /// (WS). Same validation rules as `/users/upload/avatar` except the
-  /// size cap is 1 MB instead of 500 KB and the returned URL does NOT
-  /// also update `users.avatar_url` — uploading a chat image does not
-  /// accidentally change the user's avatar.
-  ///
-  /// [bytes] / [filename] / [contentType] follow the same shape as
-  /// [uploadAvatar]; the backend's `image/*` check is satisfied the
-  /// same way.
+  /// (WS). Does **not** update `users.avatar_url` — uploading a chat
+  /// image is not the same operation as replacing the avatar.
   static Future<String> uploadImage(
     AuthUser current, {
     required Uint8List bytes,
     required String filename,
     String? contentType,
-  }) async {
-    final uri = Uri.parse('${AppConfig.apiBaseUrl}/users/upload/image');
-    final req = http.MultipartRequest('POST', uri);
-    req.headers['Authorization'] = 'Bearer ${current.token}';
-    req.files.add(http.MultipartFile.fromBytes(
-      'file',
-      bytes,
+  }) {
+    return _uploader(current).uploadImage(
+      current,
+      bytes: bytes,
       filename: filename,
-      contentType: _parseMediaType(contentType),
-    ));
-    final streamed = await req.send().timeout(const Duration(seconds: 30));
-    final resp = await http.Response.fromStream(streamed);
-    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
-    return data['addressReturn'] as String;
+      contentType: contentType,
+    );
   }
 
-  /// Parses a `type/subtype` string into the `MediaType` the `http` package
-  /// wants. Returns `null` on missing / malformed input — `MultipartFile`
-  /// then falls back to its filename-extension guess (which already
-  /// produces `image/jpeg` etc. for picker output, so missing mimeType
-  /// isn't fatal — but the explicit form is the only way to guarantee
-  /// the backend's `image/*` check sees a real image MIME).
-  static MediaType? _parseMediaType(String? mime) {
-    if (mime == null) return null;
-    final slash = mime.indexOf('/');
-    if (slash <= 0 || slash == mime.length - 1) return null;
-    return MediaType(mime.substring(0, slash), mime.substring(slash + 1));
+  /// `POST /users/upload/video` (docs/api.md §2.5) — used by the
+  /// family-feed (§7) composer. Caller is responsible for the spec's
+  /// "前端必须保证上传前已将视频极致压缩为 mp4 格式" requirement;
+  /// the server does not transcode.
+  static Future<String> uploadVideo(
+    AuthUser current, {
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) {
+    return _uploader(current).uploadVideo(
+      current,
+      bytes: bytes,
+      filename: filename,
+      contentType: contentType,
+    );
   }
+
+  /// `POST /users/upload/audio` (docs/api.md §2.6) — family-feed
+  /// audio messages. Backend expects opus-encoded bytes per the
+  /// spec; no server-side transcoding.
+  static Future<String> uploadAudio(
+    AuthUser current, {
+    required Uint8List bytes,
+    required String filename,
+    String? contentType,
+  }) {
+    return _uploader(current).uploadAudio(
+      current,
+      bytes: bytes,
+      filename: filename,
+      contentType: contentType,
+    );
+  }
+
+  static UploadService _uploader(AuthUser current) => UploadService();
 
   /// `POST /auth/refresh` — see docs/api.md §1.3. Exchanges a still-valid
   /// refresh token for a new short-lived JWT; the refresh token itself is

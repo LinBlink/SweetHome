@@ -1,0 +1,26 @@
+[
+  {
+    "key": "familyFeedLikeTooltipLong",
+    "values": {
+      "en": "Tap to like · long-press to undo your likes",
+      "zh": "点一下赞 · 长按取消你点的赞",
+      "zh_Hans": "点一下赞 · 长按取消你点的赞",
+      "zh_Hant": "點讚 · 長按取消你點的讚",
+      "ja": "タップでいいね · 長押しで取り消し",
+      "ko": "탭하여 좋아요 · 길게 눌러 취소",
+      "my": "ကြိုက်တယ် နှိပ်ပါ · ပြန်ဖြုတ်ရန် ကြာကြာနှိပ်ပါ"
+    }
+  },
+  {
+    "key": "familyFeedLikeCancelFailed",
+    "values": {
+      "en": "Couldn't clear your likes — try again",
+      "zh": "取消点赞失败,请重试",
+      "zh_Hans": "取消点赞失败,请重试",
+      "zh_Hant": "取消讚失敗,請重試",
+      "ja": "いいねを取り消せませんでした — もう一度お試しください",
+      "ko": "좋아요를 취소하지 못했습니다 — 다시 시도해 주세요",
+      "my": "ကြိုက်တယ်များ ပြန်ဖြုတ်၍မရပါ — ထပ်ကြိုးစားပါ"
+    }
+  }
+]

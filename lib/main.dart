@@ -10,8 +10,10 @@ import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/location_provider.dart';
+import 'providers/moment_provider.dart';
 import 'services/chat_service.dart';
 import 'services/location_service.dart';
+import 'services/moment_service.dart';
 import 'services/websocket_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chat/conversation_list_screen.dart';
@@ -98,6 +100,18 @@ class AuthGate extends StatelessWidget {
                   service: LocationService(() => auth.currentUser!.token),
                   mockMode: AppConfig.mockMode,
                 )..restoreSharingState(),
+              ),
+              // Family-feed state (§7). Lives in the same auth-gated
+              // scope as ChatProvider / LocationProvider so a logout
+              // tears it down and a fresh login starts with a clean
+              // feed; `loadInitial()` runs eagerly to fill the first
+              // page before the user taps the Family Feed tab.
+              ChangeNotifierProvider(
+                create: (_) => MomentProvider(
+                  currentUser: auth.currentUser!,
+                  service: MomentService(
+                      () => auth.currentUser!.token),
+                )..loadInitial(),
               ),
             ],
             child: const MainShell(),

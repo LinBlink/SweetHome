@@ -918,6 +918,186 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileJoinRequestsAdminOnly => '仅管理员可见';
+
+  @override
+  String get familyFeedEmptyTitle => '还没有动态';
+
+  @override
+  String get familyFeedEmptyDesc => '发一条，让家里人多一点回忆。';
+
+  @override
+  String get familyFeedLoadMoreError => '加载更多失败';
+
+  @override
+  String get familyFeedDeleteTitle => '删除这条动态？';
+
+  @override
+  String get familyFeedDeleteBody => '删除后家里所有人都看不到。';
+
+  @override
+  String get familyFeedDeleteConfirm => '删除';
+
+  @override
+  String get familyFeedDeleted => '动态已删除';
+
+  @override
+  String get familyFeedLikeTooltip => '赞';
+
+  @override
+  String get familyFeedUnlikeTooltip => '已赞';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 人觉得很赞',
+      zero: '0 人觉得赞',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '还有 $count 人';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => '还没有评论';
+
+  @override
+  String get familyFeedCommentsComingSoon => '评论功能即将上线';
+
+  @override
+  String get familyFeedPublishButton => '发布';
+
+  @override
+  String get publishMomentTitle => '发动态';
+
+  @override
+  String get publishMomentContentLabel => '说点什么…';
+
+  @override
+  String get publishMomentContentHint => '一张照片，一段心情，都是家里的记忆。';
+
+  @override
+  String get publishMomentContentRequired => '写点儿内容或者加张照片再发布吧';
+
+  @override
+  String get publishMomentAddMedia => '添加';
+
+  @override
+  String get publishMomentMediaTypeImage => '照片';
+
+  @override
+  String get publishMomentMediaTypeVideo => '视频';
+
+  @override
+  String get publishMomentMediaTypeAudio => '语音';
+
+  @override
+  String get publishMomentAddMediaSheet => '添加到动态';
+
+  @override
+  String get publishMomentMaxMedia => '最多 9 个文件';
+
+  @override
+  String get publishMomentRemoveMedia => '移除';
+
+  @override
+  String get publishMomentRecordingHint => '点击开始录音';
+
+  @override
+  String get publishMomentRecordingStop => '点击结束';
+
+  @override
+  String get publishMomentRecordingCancel => '取消';
+
+  @override
+  String get publishMomentRecordingTooShort => '再长一点点吧';
+
+  @override
+  String get publishMomentRecordingFailed => '录音失败';
+
+  @override
+  String get publishMomentRecordingPermissionBody => '需要麦克风权限才能录制语音';
+
+  @override
+  String get publishMomentPublish => '发布';
+
+  @override
+  String get publishMomentPublishing => '发布中…';
+
+  @override
+  String get publishMomentSuccess => '发布成功';
+
+  @override
+  String get publishMomentFailed => '发布失败，请重试';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return '正在上传 $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => '放弃这条动态？';
+
+  @override
+  String get publishMomentDiscardBody => '当前编辑将丢失。';
+
+  @override
+  String get publishMomentDiscardConfirm => '放弃';
+
+  @override
+  String get publishMomentDiscardCancel => '继续编辑';
+
+  @override
+  String get momentDetailTitle => '动态详情';
+
+  @override
+  String get momentDetailWhoLikedTitle => '点赞列表';
+
+  @override
+  String get momentDetailNoLikes => '抢个沙发吧';
+
+  @override
+  String get momentDetailPlayVideo => '播放视频';
+
+  @override
+  String get momentDetailVideoLoadFailed => '视频加载失败';
+
+  @override
+  String get momentDetailAudioPlay => '播放';
+
+  @override
+  String get momentDetailAudioPause => '暂停';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return '录音中 $seconds 秒 — 点一下停止';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => '停止';
+
+  @override
+  String get publishMomentCompressing => '正在压缩…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return '压缩后仍有 $size MB，请选择更短的视频。';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return '视频压缩失败（$size MB），请选择更小的文件。';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong => '点一下赞 · 长按取消你点的赞';
+
+  @override
+  String get familyFeedLikeCancelFailed => '取消点赞失败,请重试';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1834,6 +2014,186 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get profileJoinRequestsAdminOnly => '仅管理员可见';
+
+  @override
+  String get familyFeedEmptyTitle => '还没有动态';
+
+  @override
+  String get familyFeedEmptyDesc => '发一条，让家里人多一点回忆。';
+
+  @override
+  String get familyFeedLoadMoreError => '加载更多失败';
+
+  @override
+  String get familyFeedDeleteTitle => '删除这条动态？';
+
+  @override
+  String get familyFeedDeleteBody => '删除后家里所有人都看不到。';
+
+  @override
+  String get familyFeedDeleteConfirm => '删除';
+
+  @override
+  String get familyFeedDeleted => '动态已删除';
+
+  @override
+  String get familyFeedLikeTooltip => '赞';
+
+  @override
+  String get familyFeedUnlikeTooltip => '已赞';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 人觉得很赞',
+      zero: '0 人觉得很赞',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '还有 $count 人';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => '还没有评论';
+
+  @override
+  String get familyFeedCommentsComingSoon => '评论功能即将上线';
+
+  @override
+  String get familyFeedPublishButton => '发布';
+
+  @override
+  String get publishMomentTitle => '发动态';
+
+  @override
+  String get publishMomentContentLabel => '说点什么…';
+
+  @override
+  String get publishMomentContentHint => '一张照片，一段心情，都是家里的记忆。';
+
+  @override
+  String get publishMomentContentRequired => '写点儿内容或者加张照片再发布吧';
+
+  @override
+  String get publishMomentAddMedia => '添加';
+
+  @override
+  String get publishMomentMediaTypeImage => '照片';
+
+  @override
+  String get publishMomentMediaTypeVideo => '视频';
+
+  @override
+  String get publishMomentMediaTypeAudio => '语音';
+
+  @override
+  String get publishMomentAddMediaSheet => '添加到动态';
+
+  @override
+  String get publishMomentMaxMedia => '最多 9 个文件';
+
+  @override
+  String get publishMomentRemoveMedia => '移除';
+
+  @override
+  String get publishMomentRecordingHint => '点击开始录音';
+
+  @override
+  String get publishMomentRecordingStop => '点击结束';
+
+  @override
+  String get publishMomentRecordingCancel => '取消';
+
+  @override
+  String get publishMomentRecordingTooShort => '再长一点点吧';
+
+  @override
+  String get publishMomentRecordingFailed => '录音失败';
+
+  @override
+  String get publishMomentRecordingPermissionBody => '需要麦克风权限才能录制语音';
+
+  @override
+  String get publishMomentPublish => '发布';
+
+  @override
+  String get publishMomentPublishing => '发布中…';
+
+  @override
+  String get publishMomentSuccess => '发布成功';
+
+  @override
+  String get publishMomentFailed => '发布失败，请重试';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return '正在上传 $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => '放弃这条动态？';
+
+  @override
+  String get publishMomentDiscardBody => '当前编辑将丢失。';
+
+  @override
+  String get publishMomentDiscardConfirm => '放弃';
+
+  @override
+  String get publishMomentDiscardCancel => '继续编辑';
+
+  @override
+  String get momentDetailTitle => '动态详情';
+
+  @override
+  String get momentDetailWhoLikedTitle => '点赞列表';
+
+  @override
+  String get momentDetailNoLikes => '抢个沙发吧';
+
+  @override
+  String get momentDetailPlayVideo => '播放视频';
+
+  @override
+  String get momentDetailVideoLoadFailed => '视频加载失败';
+
+  @override
+  String get momentDetailAudioPlay => '播放';
+
+  @override
+  String get momentDetailAudioPause => '暂停';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return '录音中 $seconds 秒 — 点一下停止';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => '停止';
+
+  @override
+  String get publishMomentCompressing => '正在压缩…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return '压缩后仍有 $size MB，请选择更短的视频。';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return '视频压缩失败（$size MB），请选择更小的文件。';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong => '点一下赞 · 长按取消你点的赞';
+
+  @override
+  String get familyFeedLikeCancelFailed => '取消点赞失败,请重试';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2750,4 +3110,184 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileJoinRequestsAdminOnly => '僅管理員可見';
+
+  @override
+  String get familyFeedEmptyTitle => '還沒有動態';
+
+  @override
+  String get familyFeedEmptyDesc => '發一條，讓家裡人多一點回憶。';
+
+  @override
+  String get familyFeedLoadMoreError => '載入更多失敗';
+
+  @override
+  String get familyFeedDeleteTitle => '刪除這條動態？';
+
+  @override
+  String get familyFeedDeleteBody => '刪除後家裡所有人都看不到。';
+
+  @override
+  String get familyFeedDeleteConfirm => '刪除';
+
+  @override
+  String get familyFeedDeleted => '動態已刪除';
+
+  @override
+  String get familyFeedLikeTooltip => '讚';
+
+  @override
+  String get familyFeedUnlikeTooltip => '已讚';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 人覺得很讚',
+      zero: '0 人覺得讚',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '還有 $count 人';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => '還沒有評論';
+
+  @override
+  String get familyFeedCommentsComingSoon => '評論功能即將上線';
+
+  @override
+  String get familyFeedPublishButton => '發佈';
+
+  @override
+  String get publishMomentTitle => '發動態';
+
+  @override
+  String get publishMomentContentLabel => '說點什麼…';
+
+  @override
+  String get publishMomentContentHint => '一張照片，一段心情，都是家裡的記憶。';
+
+  @override
+  String get publishMomentContentRequired => '寫點兒內容或者加張照片再發佈吧';
+
+  @override
+  String get publishMomentAddMedia => '新增';
+
+  @override
+  String get publishMomentMediaTypeImage => '照片';
+
+  @override
+  String get publishMomentMediaTypeVideo => '影片';
+
+  @override
+  String get publishMomentMediaTypeAudio => '語音';
+
+  @override
+  String get publishMomentAddMediaSheet => '新增到動態';
+
+  @override
+  String get publishMomentMaxMedia => '最多 9 個檔案';
+
+  @override
+  String get publishMomentRemoveMedia => '移除';
+
+  @override
+  String get publishMomentRecordingHint => '點擊開始錄音';
+
+  @override
+  String get publishMomentRecordingStop => '點擊結束';
+
+  @override
+  String get publishMomentRecordingCancel => '取消';
+
+  @override
+  String get publishMomentRecordingTooShort => '再長一點點吧';
+
+  @override
+  String get publishMomentRecordingFailed => '錄音失敗';
+
+  @override
+  String get publishMomentRecordingPermissionBody => '需要麥克風權限才能錄製語音';
+
+  @override
+  String get publishMomentPublish => '發佈';
+
+  @override
+  String get publishMomentPublishing => '發佈中…';
+
+  @override
+  String get publishMomentSuccess => '發佈成功';
+
+  @override
+  String get publishMomentFailed => '發佈失敗，請重試';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return '正在上傳 $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => '放棄這條動態？';
+
+  @override
+  String get publishMomentDiscardBody => '目前編輯將遺失。';
+
+  @override
+  String get publishMomentDiscardConfirm => '放棄';
+
+  @override
+  String get publishMomentDiscardCancel => '繼續編輯';
+
+  @override
+  String get momentDetailTitle => '動態詳情';
+
+  @override
+  String get momentDetailWhoLikedTitle => '點讚列表';
+
+  @override
+  String get momentDetailNoLikes => '搶個沙發吧';
+
+  @override
+  String get momentDetailPlayVideo => '播放影片';
+
+  @override
+  String get momentDetailVideoLoadFailed => '影片載入失敗';
+
+  @override
+  String get momentDetailAudioPlay => '播放';
+
+  @override
+  String get momentDetailAudioPause => '暫停';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return '錄音中 $seconds 秒 — 點一下停止';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => '停止';
+
+  @override
+  String get publishMomentCompressing => '正在壓縮…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return '壓縮後仍有 $size MB，請選擇更短的影片。';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return '影片壓縮失敗（$size MB），請選擇更小的檔案。';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong => '點讚 · 長按取消你點的讚';
+
+  @override
+  String get familyFeedLikeCancelFailed => '取消讚失敗,請重試';
 }

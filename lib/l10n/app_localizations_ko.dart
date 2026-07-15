@@ -923,4 +923,185 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get profileJoinRequestsAdminOnly => '관리자만';
+
+  @override
+  String get familyFeedEmptyTitle => '아직 게시글이 없어요';
+
+  @override
+  String get familyFeedEmptyDesc => '가족에 첫 게시글을 올려보세요.';
+
+  @override
+  String get familyFeedLoadMoreError => '더 불러오기 실패';
+
+  @override
+  String get familyFeedDeleteTitle => '이 게시글을 삭제할까요?';
+
+  @override
+  String get familyFeedDeleteBody => '삭제하면 가족 모두가 더 이상 볼 수 없어요.';
+
+  @override
+  String get familyFeedDeleteConfirm => '삭제';
+
+  @override
+  String get familyFeedDeleted => '게시글이 삭제되었어요';
+
+  @override
+  String get familyFeedLikeTooltip => '좋아요';
+
+  @override
+  String get familyFeedUnlikeTooltip => '좋아요 취소';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '좋아요 $count개',
+      zero: '좋아요 0개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '$count명 더';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => '아직 댓글이 없어요';
+
+  @override
+  String get familyFeedCommentsComingSoon => '댓글 기능은 곧 추가돼요';
+
+  @override
+  String get familyFeedPublishButton => '게시';
+
+  @override
+  String get publishMomentTitle => '새 게시글';
+
+  @override
+  String get publishMomentContentLabel => '무슨 일이 있나요?';
+
+  @override
+  String get publishMomentContentHint => '사진이든 마음이든, 가족과 나눠보세요.';
+
+  @override
+  String get publishMomentContentRequired => '내용을 입력하거나 사진을 첨부해 주세요';
+
+  @override
+  String get publishMomentAddMedia => '미디어 추가';
+
+  @override
+  String get publishMomentMediaTypeImage => '사진';
+
+  @override
+  String get publishMomentMediaTypeVideo => '동영상';
+
+  @override
+  String get publishMomentMediaTypeAudio => '음성';
+
+  @override
+  String get publishMomentAddMediaSheet => '게시글에 추가';
+
+  @override
+  String get publishMomentMaxMedia => '최대 9개 파일';
+
+  @override
+  String get publishMomentRemoveMedia => '제거';
+
+  @override
+  String get publishMomentRecordingHint => '눌러서 녹음';
+
+  @override
+  String get publishMomentRecordingStop => '눌러서 종료';
+
+  @override
+  String get publishMomentRecordingCancel => '취소';
+
+  @override
+  String get publishMomentRecordingTooShort => '조금만 더 길게 녹음해 주세요';
+
+  @override
+  String get publishMomentRecordingFailed => '녹음에 실패했어요';
+
+  @override
+  String get publishMomentRecordingPermissionBody =>
+      '음성을 추가하려면 마이크 접근 권한이 필요해요';
+
+  @override
+  String get publishMomentPublish => '게시';
+
+  @override
+  String get publishMomentPublishing => '게시 중…';
+
+  @override
+  String get publishMomentSuccess => '게시 완료';
+
+  @override
+  String get publishMomentFailed => '게시하지 못했어요. 다시 시도해 주세요';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return '업로드 중 $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => '이 게시글을 버릴까요?';
+
+  @override
+  String get publishMomentDiscardBody => '작성한 내용은 사라져요.';
+
+  @override
+  String get publishMomentDiscardConfirm => '버리기';
+
+  @override
+  String get publishMomentDiscardCancel => '계속 작성';
+
+  @override
+  String get momentDetailTitle => '게시글';
+
+  @override
+  String get momentDetailWhoLikedTitle => '좋아요';
+
+  @override
+  String get momentDetailNoLikes => '첫 좋아요를 남겨보세요';
+
+  @override
+  String get momentDetailPlayVideo => '동영상 재생';
+
+  @override
+  String get momentDetailVideoLoadFailed => '동영상을 불러오지 못했어요';
+
+  @override
+  String get momentDetailAudioPlay => '재생';
+
+  @override
+  String get momentDetailAudioPause => '일시정지';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return '녹음 중 $seconds초 — 탭하여 중지';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => '중지';
+
+  @override
+  String get publishMomentCompressing => '압축 중…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return '압축 후에도 $size MB 입니다. 더 짧은 영상을 선택해 주세요.';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return '비디오를 압축하지 못했습니다 ($size MB). 더 작은 파일을 선택해 주세요.';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong => '탭하여 좋아요 · 길게 눌러 취소';
+
+  @override
+  String get familyFeedLikeCancelFailed => '좋아요를 취소하지 못했습니다 — 다시 시도해 주세요';
 }

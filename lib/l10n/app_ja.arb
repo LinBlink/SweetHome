@@ -284,5 +284,102 @@
   "locationHubFenceDesc": "安全エリアを設定し、出入り時に通知を受け取る",
   "locationHubFenceAlarmsDesc": "家族のエリア出入り履歴を確認",
   "profileJoinRequestsRow": "参加申請",
-  "profileJoinRequestsAdminOnly": "管理者のみ"
+  "profileJoinRequestsAdminOnly": "管理者のみ",
+
+  "familyFeedEmptyTitle": "まだ投稿がありません",
+  "familyFeedEmptyDesc": "最初の投稿を家族にシェアしましょう。",
+  "familyFeedLoadMoreError": "もっと読み込めませんでした",
+  "familyFeedDeleteTitle": "この投稿を削除しますか？",
+  "familyFeedDeleteBody": "削除すると、家族の誰もが見られなくなります。",
+  "familyFeedDeleteConfirm": "削除",
+  "familyFeedDeleted": "投稿を削除しました",
+  "familyFeedLikeTooltip": "いいね",
+  "familyFeedUnlikeTooltip": "いいね済み",
+  "familyFeedLikeCount": "{count, plural, =0{0 いいね} other{いいね {count}件}}",
+  "familyFeedMoreLikers": "他 {count} 名",
+  "familyFeedNoCommentsYet": "まだコメントはありません",
+  "familyFeedCommentsComingSoon": "コメント機能は近日公開",
+  "familyFeedPublishButton": "投稿",
+  "publishMomentTitle": "新しい投稿",
+  "publishMomentContentLabel": "いま何してる？",
+  "publishMomentContentHint": "写真でも気持ちでも、家族の思い出を残しましょう。",
+  "publishMomentContentRequired": "内容を入力するか、写真を追加してください",
+  "publishMomentAddMedia": "メディアを追加",
+  "publishMomentMediaTypeImage": "写真",
+  "publishMomentMediaTypeVideo": "動画",
+  "publishMomentMediaTypeAudio": "音声",
+  "publishMomentAddMediaSheet": "投稿に追加",
+  "publishMomentMaxMedia": "最大9ファイルまで",
+  "publishMomentRemoveMedia": "削除",
+  "publishMomentRecordingHint": "タップして録音",
+  "publishMomentRecordingStop": "タップで停止",
+  "publishMomentRecordingCancel": "キャンセル",
+  "publishMomentRecordingTooShort": "もう少し長めに録音してください",
+  "publishMomentRecordingFailed": "録音を保存できませんでした",
+  "publishMomentRecordingPermissionBody": "音声を追加するにはマイクへのアクセス許可が必要です",
+  "publishMomentPublish": "投稿",
+  "publishMomentPublishing": "投稿中…",
+  "publishMomentSuccess": "投稿しました",
+  "publishMomentFailed": "投稿に失敗しました。もう一度お試しください",
+  "publishMomentUploading": "アップロード中 {current}/{total}…",
+  "publishMomentDiscardTitle": "この投稿を破棄しますか？",
+  "publishMomentDiscardBody": "編集中の内容は失われます。",
+  "publishMomentDiscardConfirm": "破棄",
+  "publishMomentDiscardCancel": "編集を続ける",
+  "momentDetailTitle": "投稿",
+  "momentDetailWhoLikedTitle": "いいね",
+  "momentDetailNoLikes": "最初のいいねをしよう",
+  "momentDetailPlayVideo": "動画を再生",
+  "momentDetailVideoLoadFailed": "動画を読み込めませんでした",
+  "momentDetailAudioPlay": "再生",
+  "momentDetailAudioPause": "一時停止",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "録音中 {seconds} 秒 — タップで停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "圧縮しています…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "圧縮しても {size} MB です。短い動画を選んでください。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "ビデオを圧縮できませんでした（{size} MB）。小さいファイルを選んでください。"
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "録音中 {seconds} 秒 — タップで停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "圧縮しています…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "圧縮しても {size} MB です。短い動画を選んでください。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "ビデオを圧縮できませんでした（{size} MB）。小さいファイルを選んでください。"
+,"familyFeedLikeTooltipLong": "タップでいいね · 長押しで取り消し",
+"familyFeedLikeCancelFailed": "いいねを取り消せませんでした — もう一度お試しください"
 }

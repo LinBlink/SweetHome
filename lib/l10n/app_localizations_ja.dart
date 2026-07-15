@@ -921,4 +921,185 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileJoinRequestsAdminOnly => '管理者のみ';
+
+  @override
+  String get familyFeedEmptyTitle => 'まだ投稿がありません';
+
+  @override
+  String get familyFeedEmptyDesc => '最初の投稿を家族にシェアしましょう。';
+
+  @override
+  String get familyFeedLoadMoreError => 'もっと読み込めませんでした';
+
+  @override
+  String get familyFeedDeleteTitle => 'この投稿を削除しますか？';
+
+  @override
+  String get familyFeedDeleteBody => '削除すると、家族の誰もが見られなくなります。';
+
+  @override
+  String get familyFeedDeleteConfirm => '削除';
+
+  @override
+  String get familyFeedDeleted => '投稿を削除しました';
+
+  @override
+  String get familyFeedLikeTooltip => 'いいね';
+
+  @override
+  String get familyFeedUnlikeTooltip => 'いいね済み';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'いいね $count件',
+      zero: '0 いいね',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '他 $count 名';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => 'まだコメントはありません';
+
+  @override
+  String get familyFeedCommentsComingSoon => 'コメント機能は近日公開';
+
+  @override
+  String get familyFeedPublishButton => '投稿';
+
+  @override
+  String get publishMomentTitle => '新しい投稿';
+
+  @override
+  String get publishMomentContentLabel => 'いま何してる？';
+
+  @override
+  String get publishMomentContentHint => '写真でも気持ちでも、家族の思い出を残しましょう。';
+
+  @override
+  String get publishMomentContentRequired => '内容を入力するか、写真を追加してください';
+
+  @override
+  String get publishMomentAddMedia => 'メディアを追加';
+
+  @override
+  String get publishMomentMediaTypeImage => '写真';
+
+  @override
+  String get publishMomentMediaTypeVideo => '動画';
+
+  @override
+  String get publishMomentMediaTypeAudio => '音声';
+
+  @override
+  String get publishMomentAddMediaSheet => '投稿に追加';
+
+  @override
+  String get publishMomentMaxMedia => '最大9ファイルまで';
+
+  @override
+  String get publishMomentRemoveMedia => '削除';
+
+  @override
+  String get publishMomentRecordingHint => 'タップして録音';
+
+  @override
+  String get publishMomentRecordingStop => 'タップで停止';
+
+  @override
+  String get publishMomentRecordingCancel => 'キャンセル';
+
+  @override
+  String get publishMomentRecordingTooShort => 'もう少し長めに録音してください';
+
+  @override
+  String get publishMomentRecordingFailed => '録音を保存できませんでした';
+
+  @override
+  String get publishMomentRecordingPermissionBody =>
+      '音声を追加するにはマイクへのアクセス許可が必要です';
+
+  @override
+  String get publishMomentPublish => '投稿';
+
+  @override
+  String get publishMomentPublishing => '投稿中…';
+
+  @override
+  String get publishMomentSuccess => '投稿しました';
+
+  @override
+  String get publishMomentFailed => '投稿に失敗しました。もう一度お試しください';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return 'アップロード中 $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => 'この投稿を破棄しますか？';
+
+  @override
+  String get publishMomentDiscardBody => '編集中の内容は失われます。';
+
+  @override
+  String get publishMomentDiscardConfirm => '破棄';
+
+  @override
+  String get publishMomentDiscardCancel => '編集を続ける';
+
+  @override
+  String get momentDetailTitle => '投稿';
+
+  @override
+  String get momentDetailWhoLikedTitle => 'いいね';
+
+  @override
+  String get momentDetailNoLikes => '最初のいいねをしよう';
+
+  @override
+  String get momentDetailPlayVideo => '動画を再生';
+
+  @override
+  String get momentDetailVideoLoadFailed => '動画を読み込めませんでした';
+
+  @override
+  String get momentDetailAudioPlay => '再生';
+
+  @override
+  String get momentDetailAudioPause => '一時停止';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return '録音中 $seconds 秒 — タップで停止';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => '停止';
+
+  @override
+  String get publishMomentCompressing => '圧縮しています…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return '圧縮しても $size MB です。短い動画を選んでください。';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return 'ビデオを圧縮できませんでした（$size MB）。小さいファイルを選んでください。';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong => 'タップでいいね · 長押しで取り消し';
+
+  @override
+  String get familyFeedLikeCancelFailed => 'いいねを取り消せませんでした — もう一度お試しください';
 }

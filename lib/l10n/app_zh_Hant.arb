@@ -284,5 +284,102 @@
   "locationHubFenceDesc": "設定安全活動範圍，進入或離開時收到提醒",
   "locationHubFenceAlarmsDesc": "查看家人進出圍欄的提醒",
   "profileJoinRequestsRow": "加入申請",
-  "profileJoinRequestsAdminOnly": "僅管理員可見"
+  "profileJoinRequestsAdminOnly": "僅管理員可見",
+
+  "familyFeedEmptyTitle": "還沒有動態",
+  "familyFeedEmptyDesc": "發一條，讓家裡人多一點回憶。",
+  "familyFeedLoadMoreError": "載入更多失敗",
+  "familyFeedDeleteTitle": "刪除這條動態？",
+  "familyFeedDeleteBody": "刪除後家裡所有人都看不到。",
+  "familyFeedDeleteConfirm": "刪除",
+  "familyFeedDeleted": "動態已刪除",
+  "familyFeedLikeTooltip": "讚",
+  "familyFeedUnlikeTooltip": "已讚",
+  "familyFeedLikeCount": "{count, plural, =0{0 人覺得讚} other{{count} 人覺得很讚}}",
+  "familyFeedMoreLikers": "還有 {count} 人",
+  "familyFeedNoCommentsYet": "還沒有評論",
+  "familyFeedCommentsComingSoon": "評論功能即將上線",
+  "familyFeedPublishButton": "發佈",
+  "publishMomentTitle": "發動態",
+  "publishMomentContentLabel": "說點什麼…",
+  "publishMomentContentHint": "一張照片，一段心情，都是家裡的記憶。",
+  "publishMomentContentRequired": "寫點兒內容或者加張照片再發佈吧",
+  "publishMomentAddMedia": "新增",
+  "publishMomentMediaTypeImage": "照片",
+  "publishMomentMediaTypeVideo": "影片",
+  "publishMomentMediaTypeAudio": "語音",
+  "publishMomentAddMediaSheet": "新增到動態",
+  "publishMomentMaxMedia": "最多 9 個檔案",
+  "publishMomentRemoveMedia": "移除",
+  "publishMomentRecordingHint": "點擊開始錄音",
+  "publishMomentRecordingStop": "點擊結束",
+  "publishMomentRecordingCancel": "取消",
+  "publishMomentRecordingTooShort": "再長一點點吧",
+  "publishMomentRecordingFailed": "錄音失敗",
+  "publishMomentRecordingPermissionBody": "需要麥克風權限才能錄製語音",
+  "publishMomentPublish": "發佈",
+  "publishMomentPublishing": "發佈中…",
+  "publishMomentSuccess": "發佈成功",
+  "publishMomentFailed": "發佈失敗，請重試",
+  "publishMomentUploading": "正在上傳 {current}/{total}…",
+  "publishMomentDiscardTitle": "放棄這條動態？",
+  "publishMomentDiscardBody": "目前編輯將遺失。",
+  "publishMomentDiscardConfirm": "放棄",
+  "publishMomentDiscardCancel": "繼續編輯",
+  "momentDetailTitle": "動態詳情",
+  "momentDetailWhoLikedTitle": "點讚列表",
+  "momentDetailNoLikes": "搶個沙發吧",
+  "momentDetailPlayVideo": "播放影片",
+  "momentDetailVideoLoadFailed": "影片載入失敗",
+  "momentDetailAudioPlay": "播放",
+  "momentDetailAudioPause": "暫停",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "錄音中 {seconds} 秒 — 點一下停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "正在壓縮…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "壓縮後仍有 {size} MB，請選擇更短的影片。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "影片壓縮失敗（{size} MB），請選擇更小的檔案。"
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "錄音中 {seconds} 秒 — 點一下停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "正在壓縮…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "壓縮後仍有 {size} MB，請選擇更短的影片。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "影片壓縮失敗（{size} MB），請選擇更小的檔案。"
+,"familyFeedLikeTooltipLong": "點讚 · 長按取消你點的讚",
+"familyFeedLikeCancelFailed": "取消讚失敗,請重試"
 }

@@ -1,0 +1,1144 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+
+import '../core/app_colors.dart';
+import '../core/avatar_label.dart';
+import '../core/error_messages.dart';
+import '../core/time/app_time_formatter.dart';
+import '../l10n/app_localizations.dart';
+import '../models/api_exception.dart';
+import '../models/moment.dart';
+import '../providers/moment_provider.dart';
+import '_web_image_stub.dart' if (dart.library.html) '_web_image_web.dart';
+import 'avatar_widget.dart';
+
+/// A single row in the family-feed list. Renders the author strip
+/// (avatar + name + "liked by" + timestamp), an optional text body,
+/// a media grid, and a footer with the like button + like count.
+///
+/// Tapping the like button delegates to [MomentProvider.toggleLike];
+/// tapping an image tile opens a full-screen viewer; video/audio
+/// starts inline so a user can scrub a clip without leaving the feed.
+class MomentCard extends StatelessWidget {
+  final Moment moment;
+  final bool isMine;
+  final VoidCallback? onDeleteTap;
+  final VoidCallback? onTap;
+
+  const MomentCard({
+    super.key,
+    required this.moment,
+    required this.isMine,
+    this.onDeleteTap,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    final time = AppTimeFormatter(locale)
+        .forRecordList(moment.createdAt.toLocal());
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.divider, width: 0.6),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 4,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _AuthorRow(
+              moment: moment,
+              timeText: time,
+              isMine: isMine,
+              onDeleteTap: onDeleteTap,
+            ),
+            if (moment.content != null && moment.content!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              SelectableText(
+                moment.content!,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppColors.textPrimary,
+                  height: 1.5,
+                ),
+              ),
+            ],
+            if (moment.media.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _MediaGrid(media: moment.media),
+            ],
+            const SizedBox(height: 10),
+            _LikeRow(momentId: moment.id),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthorRow extends StatelessWidget {
+  final Moment moment;
+  final String timeText;
+  final bool isMine;
+  final VoidCallback? onDeleteTap;
+
+  const _AuthorRow({
+    required this.moment,
+    required this.timeText,
+    required this.isMine,
+    this.onDeleteTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        AvatarWidget(
+          label: memberAvatarLabel(moment.username),
+          color: AppColors.avatarColorFor(moment.userId),
+          imageUrl: moment.userAvatarUrl,
+          radius: 20,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                moment.username,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 1),
+              Text(
+                timeText,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textHint,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isMine)
+          IconButton(
+            tooltip: l10n.familyFeedDeleteTitle,
+            onPressed: onDeleteTap,
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              size: 20,
+              color: AppColors.textHint,
+            ),
+            visualDensity: VisualDensity.compact,
+          ),
+      ],
+    );
+  }
+}
+
+class _LikeRow extends StatelessWidget {
+  final int momentId;
+  const _LikeRow({required this.momentId});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.watch<MomentProvider>();
+    final count = provider.likeCountOf(momentId);
+    final mineActive = provider.hasMyLike(momentId);
+    final color = likeHeartColor(count);
+    final filled = count > 0;
+    final iconData = filled
+        ? Icons.favorite_rounded
+        : Icons.favorite_border_rounded;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        IconButton(
+          tooltip: mineActive
+              ? l10n.familyFeedLikeTooltipLong
+              : l10n.familyFeedLikeTooltip,
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            provider.addLike(momentId);
+          },
+          onLongPress: mineActive
+              ? () => _onLongPress(context, provider, l10n)
+              : null,
+          icon: Icon(iconData, color: color, size: 22),
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          count == 0
+              ? ''
+              : l10n.familyFeedLikeCount(count),
+          style: TextStyle(
+            fontSize: 13,
+            color: color,
+            fontWeight: filled ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onLongPress(
+    BuildContext context,
+    MomentProvider provider,
+    AppLocalizations l10n,
+  ) async {
+    HapticFeedback.heavyImpact();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await provider.cancelLike(momentId);
+    } on ApiException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            localizeErrorMessage(e.message, l10n),
+          ),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.familyFeedLikeCancelFailed)),
+      );
+    }
+  }
+}
+
+/// Heart color stops by [count]. Steps chosen so a single family
+/// member gives a soft warm hint and a packed thread reads as a
+/// deep red — the gradient matches the family's brand primary at the
+/// low end and reserves saturated red for "this moment got real love".
+Color likeHeartColor(int count) {
+  if (count <= 0) return AppColors.textHint;
+  if (count == 1) return AppColors.primary;
+  if (count <= 4) return AppColors.accent;
+  if (count <= 9) return Colors.red.shade500;
+  if (count <= 29) return Colors.red.shade700;
+  return Colors.pink.shade400;
+}
+
+/// Up to 9 media tiles in a 1/3 grid. Single-media moments get one
+/// full-width row; 2/4 get 2-col; 3/6/9 get 3-col; 5/7/8 fall back
+/// to 3-col with a "more" overlay on overflow (we keep the spec's
+/// 9-item cap as the editor's responsibility, so we don't try to
+/// guard at the renderer layer).
+class _MediaGrid extends StatelessWidget {
+  final List<MomentMedia> media;
+  const _MediaGrid({required this.media});
+
+  @override
+  Widget build(BuildContext context) {
+    if (media.isEmpty) return const SizedBox.shrink();
+    if (media.length == 1) {
+      return _MediaTile(media: media.first, aspectRatio: 4 / 3);
+    }
+    final cols = media.length == 2 || media.length == 4 ? 2 : 3;
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: cols,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+        childAspectRatio: 1,
+      ),
+      itemCount: media.length,
+      itemBuilder: (ctx, i) => _MediaTile(media: media[i], aspectRatio: 1),
+    );
+  }
+}
+
+/// One tile in the media grid. Renders inline for audio (just_audio)
+/// and video (video_player),[image tiles fall through to the
+/// network image with tap-to-lightbox.
+class _MediaTile extends StatelessWidget {
+  final MomentMedia media;
+  final double aspectRatio;
+  const _MediaTile({required this.media, this.aspectRatio = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (media.type) {
+      case MomentMediaType.image:
+        return AspectRatio(
+          aspectRatio: aspectRatio,
+          child: _MomentsImageTile(url: media.url),
+        );
+      case MomentMediaType.video:
+        return AspectRatio(
+          aspectRatio: aspectRatio,
+          child: _MomentsVideoTile(url: media.url),
+        );
+      case MomentMediaType.audio:
+        return _MomentsAudioTile(url: media.url);
+    }
+  }
+}
+
+class _MomentsImageTile extends StatelessWidget {
+  final String url;
+  const _MomentsImageTile({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    final placeholder = Container(
+      color: AppColors.surfaceVariant,
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.broken_image_outlined,
+        size: 32,
+        color: AppColors.textHint,
+      ),
+    );
+    Widget img;
+    if (kIsWeb) {
+      img = buildPlatformImage(
+        url: url,
+        size: 600,
+        fallback: placeholder,
+      );
+    } else {
+      img = Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => placeholder,
+        loadingBuilder: (ctx, child, progress) =>
+            progress == null ? child : placeholder,
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => _MomentsFullscreenImage(url: url),
+          ),
+        ),
+        child: img,
+      ),
+    );
+  }
+}
+
+/// Tap-to-play inline video preview. Initializes a single
+/// `VideoPlayerController` per URL — same URL twice in the feed
+/// would currently spawn two controllers; acceptable for a family
+/// feed (where the same moment isn't on-screen twice) and avoids
+/// the manager indirection overhead.
+class _MomentsVideoTile extends StatefulWidget {
+  final String url;
+  const _MomentsVideoTile({required this.url});
+
+  @override
+  State<_MomentsVideoTile> createState() => _MomentsVideoTileState();
+}
+
+class _MomentsVideoTileState extends State<_MomentsVideoTile> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller = c;
+    try {
+      await c.initialize();
+      // Freeze on first frame so the in-card thumbnail stays
+      // stable while the user decides whether to open fullscreen.
+      await c.pause();
+      await c.seekTo(Duration.zero);
+      if (!mounted) return;
+      setState(() => _initialized = true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (_failed) {
+      return _failedTile(l10n.momentDetailVideoLoadFailed);
+    }
+    final c = _controller;
+    final aspectRatio =
+        (c != null && c.value.aspectRatio > 0) ? c.value.aspectRatio : 16 / 9;
+    final thumbnail = _initialized && c != null
+        ? AspectRatio(
+            aspectRatio: aspectRatio,
+            child: VideoPlayer(c),
+          )
+        : AspectRatio(
+            aspectRatio: aspectRatio,
+            child: Container(
+              color: AppColors.surfaceVariant,
+              alignment: Alignment.center,
+              child: const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => _MomentsFullscreenVideo(url: widget.url),
+          ));
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            thumbnail,
+            // Persistent tap affordance so the user can tell the
+            // tile is interactive before the controller finishes
+            // loading. The fullscreen route plays the clip; this
+            // overlay just signals "tap me".
+            Container(
+              width: 56,
+              height: 56,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black54,
+              ),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 36,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _failedTile(String msg) => Container(
+        color: AppColors.surfaceVariant,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.movie_filter_outlined,
+              size: 28,
+              color: AppColors.textHint,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              msg,
+              style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+            ),
+          ],
+        ),
+      );
+}
+
+/// Inline audio clip with play/pause + scrubber. Uses `just_audio`
+/// which supports opussy HTTP streaming across all platforms. The
+/// controller is created once on first build and reused — multiple
+/// cards with the same URL each get their own controller instance,
+/// which keeps the UI thread safe even when the feed scrolls
+/// quickly past dozens of audio tiles.
+class _MomentsAudioTile extends StatefulWidget {
+  final String url;
+  const _MomentsAudioTile({required this.url});
+
+  @override
+  State<_MomentsAudioTile> createState() => _MomentsAudioTileState();
+}
+
+class _MomentsAudioTileState extends State<_MomentsAudioTile> {
+  AudioPlayer? _player;
+  Duration? _duration;
+  Duration _position = Duration.zero;
+  bool _ready = false;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final p = AudioPlayer();
+    _player = p;
+    try {
+      _duration = await p.setUrl(widget.url);
+      p.positionStream.listen((d) {
+        if (!mounted) return;
+        setState(() => _position = d);
+      });
+      p.playerStateStream.listen((s) {
+        if (!mounted) return;
+        if (s.processingState == ProcessingState.completed) {
+          setState(() => _position = Duration.zero);
+        }
+      });
+      if (!mounted) return;
+      setState(() => _ready = true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _player?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (_failed) {
+      return _failedTile(l10n.momentDetailVideoLoadFailed);
+    }
+    if (!_ready || _player == null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.linen,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Row(
+          children: [
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 12),
+            Text('…',
+                style: TextStyle(color: AppColors.textHint, fontSize: 14)),
+          ],
+        ),
+      );
+    }
+    final playing = _player!.playing;
+    final dur = _duration ?? Duration.zero;
+    final pos = _position;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.linen,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: playing ? l10n.momentDetailAudioPause : l10n.momentDetailAudioPlay,
+            onPressed: () {
+              if (playing) {
+                _player!.pause();
+              } else {
+                _player!.play();
+              }
+              setState(() {});
+            },
+            icon: Icon(
+              playing
+                  ? Icons.pause_circle_filled_rounded
+                  : Icons.play_circle_fill_rounded,
+              size: 32,
+              color: AppColors.primary,
+            ),
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SliderTheme(
+                  data: SliderThemeData(
+                    activeTrackColor: AppColors.primary,
+                    inactiveTrackColor: AppColors.surfaceVariant,
+                    thumbColor: AppColors.primary,
+                    trackHeight: 3,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
+                  ),
+                  child: Slider(
+                    value: pos.inMilliseconds
+                        .toDouble()
+                        .clamp(0, dur.inMilliseconds.toDouble()),
+                    min: 0,
+                    max: dur.inMilliseconds.toDouble().clamp(1, double.infinity),
+                    onChanged: (v) {
+                      _player!.seek(Duration(milliseconds: v.toInt()));
+                    },
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _format(pos),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textHint,
+                      ),
+                    ),
+                    Text(
+                      _format(dur),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textHint,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _failedTile(String msg) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.linen,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.mic_none_rounded,
+              color: AppColors.textHint,
+              size: 22,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                msg,
+                style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  String _format(Duration d) {
+    final m = d.inMinutes.toString().padLeft(1, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+}
+
+/// Full-screen image lightbox. The image is laid out against the
+/// full screen via [SizedBox.expand] so [BoxFit.contain] computes
+/// against the viewport (instead of the image's natural pixel size,
+/// which previously left the picture unscaled and pushed it to one
+/// corner instead of centering it). [InteractiveViewer] then owns
+/// the pinch-zoom + pan; a translucent tap layer on top dismisses
+/// the lightbox when the user wants to return to the feed.
+class _MomentsFullscreenImage extends StatelessWidget {
+  final String url;
+  const _MomentsFullscreenImage({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    final Widget image;
+    if (kIsWeb) {
+      image = buildPlatformImage(
+        url: url,
+        size: size.width,
+        fallback: const Center(
+          child: Icon(Icons.broken_image_outlined, size: 64),
+        ),
+      );
+    } else {
+      image = Image.network(
+        url,
+        fit: BoxFit.contain,
+        gaplessPlayback: true,
+        loadingBuilder: (ctx, child, progress) {
+          if (progress == null) return child;
+          return const Center(
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (_, _, _) => const Center(
+          child: Icon(Icons.broken_image_outlined, size: 64),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            tooltip: 'Close',
+            icon: const Icon(Icons.close_rounded),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => Navigator.of(context).maybePop(),
+            child: SizedBox.expand(
+              child: InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 5.0,
+                clipBehavior: Clip.hardEdge,
+                panEnabled: true,
+                scaleEnabled: true,
+                child: SizedBox(
+                  width: size.width,
+                  height: size.height,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      width: size.width,
+                      height: size.height,
+                      child: image,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Full-screen video player pushed when a user taps an inline
+/// `_MomentsVideoTile`. Mirrors the system player: black backdrop,
+/// the clip fitted to the screen via its native aspect ratio, a
+/// translucent overlay of play/pause + scrubber + close that
+/// auto-hides after three seconds of no interaction. Tapping
+/// anywhere on the surface toggles the controls back.
+class _MomentsFullscreenVideo extends StatefulWidget {
+  final String url;
+  const _MomentsFullscreenVideo({required this.url});
+
+  @override
+  State<_MomentsFullscreenVideo> createState() =>
+      _MomentsFullscreenVideoState();
+}
+
+class _MomentsFullscreenVideoState extends State<_MomentsFullscreenVideo> {
+  VideoPlayerController? _controller;
+  bool _ready = false;
+  bool _failed = false;
+  bool _showControls = true;
+  Timer? _hideControlsTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller = c;
+    try {
+      await c.initialize();
+      await c.setLooping(false);
+      if (!mounted) return;
+      setState(() => _ready = true);
+      // Auto-play on open — the user just asked for fullscreen.
+      await c.play();
+      _scheduleHide();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _hideControlsTimer?.cancel();
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _scheduleHide() {
+    _hideControlsTimer?.cancel();
+    _hideControlsTimer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      if ((_controller?.value.isPlaying ?? false)) {
+        setState(() => _showControls = false);
+      }
+    });
+  }
+
+  void _toggleControls() {
+    setState(() => _showControls = !_showControls);
+    if (_showControls) _scheduleHide();
+  }
+
+  void _togglePlay() {
+    final c = _controller;
+    if (c == null) return;
+    if (c.value.isPlaying) {
+      c.pause();
+      setState(() => _showControls = true);
+    } else {
+      c.play();
+      _scheduleHide();
+    }
+    setState(() {});
+  }
+
+  Future<void> _seekRelative(Duration delta) async {
+    final c = _controller;
+    if (c == null) return;
+    final target = c.value.position + delta;
+    final clamped =
+        target < Duration.zero ? Duration.zero : target > c.value.duration
+            ? c.value.duration
+            : target;
+    await c.seekTo(clamped);
+    setState(() {});
+    if (!c.value.isPlaying) setState(() => _showControls = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (_failed) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.movie_filter_outlined,
+                size: 56,
+                color: Colors.white54,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                l10n.momentDetailVideoLoadFailed,
+                style: const TextStyle(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    final c = _controller;
+    if (!_ready || c == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final aspect = c.value.aspectRatio == 0 ? 16 / 9 : c.value.aspectRatio;
+    final value = c.value;
+    final position = value.position;
+    final duration = value.duration;
+    final playing = value.isPlaying;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggleControls,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Center(
+              child: AspectRatio(
+                aspectRatio: aspect,
+                child: VideoPlayer(c),
+              ),
+            ),
+            if (_showControls) ...[
+              // top scrim gradient for the close button
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black54,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+                child: SizedBox.expand(),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: IconButton(
+                      tooltip: 'Close',
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                  ),
+                ),
+              ),
+              // bottom controls
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _VideoControlsBar(
+                  playing: playing,
+                  position: position,
+                  duration: duration,
+                  onPlayPause: _togglePlay,
+                  onSeekStart: () => _hideControlsTimer?.cancel(),
+                  onSeekChange: (v) async {
+                    final d = duration.inMilliseconds == 0
+                        ? Duration.zero
+                        : Duration(
+                            milliseconds:
+                                duration.inMilliseconds * (v / 1000).toInt(),
+                          );
+                    await c.seekTo(d);
+                  },
+                  onBackward: () => _seekRelative(
+                    const Duration(seconds: -10),
+                  ),
+                  onForward: () => _seekRelative(
+                    const Duration(seconds: 10),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact play/pause + scrubber + skip-10s triplet that lives
+/// at the bottom of [MomentsFullscreenVideo]. Renders the seek
+/// bar via [Slider]; trimming the `value` range so the thumb
+/// always lands on a valid millisecond.
+class _VideoControlsBar extends StatelessWidget {
+  final bool playing;
+  final Duration position;
+  final Duration duration;
+  final VoidCallback onPlayPause;
+  final VoidCallback onSeekStart;
+  final ValueChanged<double> onSeekChange;
+  final VoidCallback onBackward;
+  final VoidCallback onForward;
+
+  const _VideoControlsBar({
+    required this.playing,
+    required this.position,
+    required this.duration,
+    required this.onPlayPause,
+    required this.onSeekStart,
+    required this.onSeekChange,
+    required this.onBackward,
+    required this.onForward,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        8,
+        16,
+        16 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.black87, Colors.transparent],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: Colors.white,
+              inactiveTrackColor: Colors.white24,
+              thumbColor: Colors.white,
+              trackHeight: 3,
+              thumbShape:
+                  const RoundSliderThumbShape(enabledThumbRadius: 7),
+              overlayShape:
+                  const RoundSliderOverlayShape(overlayRadius: 14),
+            ),
+            child: Slider(
+              min: 0,
+              max: duration.inMilliseconds.toDouble().clamp(1, 1e9),
+              value: position.inMilliseconds
+                  .toDouble()
+                  .clamp(0, duration.inMilliseconds.toDouble()),
+              onChangeStart: (_) => onSeekStart(),
+              onChanged: onSeekChange,
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                tooltip: '−10 s',
+                onPressed: onBackward,
+                icon: const Icon(
+                  Icons.replay_10_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    tooltip: playing ? 'Pause' : 'Play',
+                    iconSize: 44,
+                    onPressed: onPlayPause,
+                    icon: Icon(
+                      playing
+                          ? Icons.pause_circle_filled_rounded
+                          : Icons.play_circle_fill_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: '+10 s',
+                onPressed: onForward,
+                icon: const Icon(
+                  Icons.forward_10_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _format(position),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  _format(duration),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _format(Duration d) {
+    final m = d.inMinutes.toString();
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+}

@@ -284,5 +284,102 @@
   "locationHubFenceDesc": "안전 영역을 설정하고 출입 알림 받기",
   "locationHubFenceAlarmsDesc": "가족의 펜스 출입 기록 확인",
   "profileJoinRequestsRow": "가입 요청",
-  "profileJoinRequestsAdminOnly": "관리자만"
+  "profileJoinRequestsAdminOnly": "관리자만",
+
+  "familyFeedEmptyTitle": "아직 게시글이 없어요",
+  "familyFeedEmptyDesc": "가족에 첫 게시글을 올려보세요.",
+  "familyFeedLoadMoreError": "더 불러오기 실패",
+  "familyFeedDeleteTitle": "이 게시글을 삭제할까요?",
+  "familyFeedDeleteBody": "삭제하면 가족 모두가 더 이상 볼 수 없어요.",
+  "familyFeedDeleteConfirm": "삭제",
+  "familyFeedDeleted": "게시글이 삭제되었어요",
+  "familyFeedLikeTooltip": "좋아요",
+  "familyFeedUnlikeTooltip": "좋아요 취소",
+  "familyFeedLikeCount": "{count, plural, =0{좋아요 0개} other{좋아요 {count}개}}",
+  "familyFeedMoreLikers": "{count}명 더",
+  "familyFeedNoCommentsYet": "아직 댓글이 없어요",
+  "familyFeedCommentsComingSoon": "댓글 기능은 곧 추가돼요",
+  "familyFeedPublishButton": "게시",
+  "publishMomentTitle": "새 게시글",
+  "publishMomentContentLabel": "무슨 일이 있나요?",
+  "publishMomentContentHint": "사진이든 마음이든, 가족과 나눠보세요.",
+  "publishMomentContentRequired": "내용을 입력하거나 사진을 첨부해 주세요",
+  "publishMomentAddMedia": "미디어 추가",
+  "publishMomentMediaTypeImage": "사진",
+  "publishMomentMediaTypeVideo": "동영상",
+  "publishMomentMediaTypeAudio": "음성",
+  "publishMomentAddMediaSheet": "게시글에 추가",
+  "publishMomentMaxMedia": "최대 9개 파일",
+  "publishMomentRemoveMedia": "제거",
+  "publishMomentRecordingHint": "눌러서 녹음",
+  "publishMomentRecordingStop": "눌러서 종료",
+  "publishMomentRecordingCancel": "취소",
+  "publishMomentRecordingTooShort": "조금만 더 길게 녹음해 주세요",
+  "publishMomentRecordingFailed": "녹음에 실패했어요",
+  "publishMomentRecordingPermissionBody": "음성을 추가하려면 마이크 접근 권한이 필요해요",
+  "publishMomentPublish": "게시",
+  "publishMomentPublishing": "게시 중…",
+  "publishMomentSuccess": "게시 완료",
+  "publishMomentFailed": "게시하지 못했어요. 다시 시도해 주세요",
+  "publishMomentUploading": "업로드 중 {current}/{total}…",
+  "publishMomentDiscardTitle": "이 게시글을 버릴까요?",
+  "publishMomentDiscardBody": "작성한 내용은 사라져요.",
+  "publishMomentDiscardConfirm": "버리기",
+  "publishMomentDiscardCancel": "계속 작성",
+  "momentDetailTitle": "게시글",
+  "momentDetailWhoLikedTitle": "좋아요",
+  "momentDetailNoLikes": "첫 좋아요를 남겨보세요",
+  "momentDetailPlayVideo": "동영상 재생",
+  "momentDetailVideoLoadFailed": "동영상을 불러오지 못했어요",
+  "momentDetailAudioPlay": "재생",
+  "momentDetailAudioPause": "일시정지",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "녹음 중 {seconds}초 — 탭하여 중지",
+"publishMomentRecordingStopInline": "중지",
+"publishMomentCompressing": "압축 중…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "압축 후에도 {size} MB 입니다. 더 짧은 영상을 선택해 주세요.",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "비디오를 압축하지 못했습니다 ({size} MB). 더 작은 파일을 선택해 주세요."
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "녹음 중 {seconds}초 — 탭하여 중지",
+"publishMomentRecordingStopInline": "중지",
+"publishMomentCompressing": "압축 중…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "압축 후에도 {size} MB 입니다. 더 짧은 영상을 선택해 주세요.",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "비디오를 압축하지 못했습니다 ({size} MB). 더 작은 파일을 선택해 주세요."
+,"familyFeedLikeTooltipLong": "탭하여 좋아요 · 길게 눌러 취소",
+"familyFeedLikeCancelFailed": "좋아요를 취소하지 못했습니다 — 다시 시도해 주세요"
 }

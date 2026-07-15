@@ -1815,6 +1815,330 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Admin only'**
   String get profileJoinRequestsAdminOnly;
+
+  /// No description provided for @familyFeedEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No moments yet'**
+  String get familyFeedEmptyTitle;
+
+  /// No description provided for @familyFeedEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Post the first update for your family.'**
+  String get familyFeedEmptyDesc;
+
+  /// No description provided for @familyFeedLoadMoreError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load more'**
+  String get familyFeedLoadMoreError;
+
+  /// No description provided for @familyFeedDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this update?'**
+  String get familyFeedDeleteTitle;
+
+  /// No description provided for @familyFeedDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This update will be removed for everyone.'**
+  String get familyFeedDeleteBody;
+
+  /// No description provided for @familyFeedDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get familyFeedDeleteConfirm;
+
+  /// No description provided for @familyFeedDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Update deleted'**
+  String get familyFeedDeleted;
+
+  /// No description provided for @familyFeedLikeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get familyFeedLikeTooltip;
+
+  /// No description provided for @familyFeedUnlikeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get familyFeedUnlikeTooltip;
+
+  /// No description provided for @familyFeedLikeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 likes} =1{1 like} other{{count} likes}}'**
+  String familyFeedLikeCount(int count);
+
+  /// No description provided for @familyFeedMoreLikers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} more'**
+  String familyFeedMoreLikers(Object count);
+
+  /// No description provided for @familyFeedNoCommentsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get familyFeedNoCommentsYet;
+
+  /// No description provided for @familyFeedCommentsComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments are on the way'**
+  String get familyFeedCommentsComingSoon;
+
+  /// No description provided for @familyFeedPublishButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get familyFeedPublishButton;
+
+  /// No description provided for @publishMomentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New update'**
+  String get publishMomentTitle;
+
+  /// No description provided for @publishMomentContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s happening?'**
+  String get publishMomentContentLabel;
+
+  /// No description provided for @publishMomentContentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a thought, a photo, or a moment from your day.'**
+  String get publishMomentContentHint;
+
+  /// No description provided for @publishMomentContentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write something or add a photo'**
+  String get publishMomentContentRequired;
+
+  /// No description provided for @publishMomentAddMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Add media'**
+  String get publishMomentAddMedia;
+
+  /// No description provided for @publishMomentMediaTypeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get publishMomentMediaTypeImage;
+
+  /// No description provided for @publishMomentMediaTypeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get publishMomentMediaTypeVideo;
+
+  /// No description provided for @publishMomentMediaTypeAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get publishMomentMediaTypeAudio;
+
+  /// No description provided for @publishMomentAddMediaSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to your post'**
+  String get publishMomentAddMediaSheet;
+
+  /// No description provided for @publishMomentMaxMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 9 files per post'**
+  String get publishMomentMaxMedia;
+
+  /// No description provided for @publishMomentRemoveMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get publishMomentRemoveMedia;
+
+  /// No description provided for @publishMomentRecordingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to record'**
+  String get publishMomentRecordingHint;
+
+  /// No description provided for @publishMomentRecordingStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to stop'**
+  String get publishMomentRecordingStop;
+
+  /// No description provided for @publishMomentRecordingCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get publishMomentRecordingCancel;
+
+  /// No description provided for @publishMomentRecordingTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold for a bit longer'**
+  String get publishMomentRecordingTooShort;
+
+  /// No description provided for @publishMomentRecordingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t record audio'**
+  String get publishMomentRecordingFailed;
+
+  /// No description provided for @publishMomentRecordingPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow microphone access to add a voice clip'**
+  String get publishMomentRecordingPermissionBody;
+
+  /// No description provided for @publishMomentPublish.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get publishMomentPublish;
+
+  /// No description provided for @publishMomentPublishing.
+  ///
+  /// In en, this message translates to:
+  /// **'Posting…'**
+  String get publishMomentPublishing;
+
+  /// No description provided for @publishMomentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted'**
+  String get publishMomentSuccess;
+
+  /// No description provided for @publishMomentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t post — try again'**
+  String get publishMomentFailed;
+
+  /// No description provided for @publishMomentUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading {current}/{total}…'**
+  String publishMomentUploading(Object current, Object total);
+
+  /// No description provided for @publishMomentDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this post?'**
+  String get publishMomentDiscardTitle;
+
+  /// No description provided for @publishMomentDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your changes will be lost.'**
+  String get publishMomentDiscardBody;
+
+  /// No description provided for @publishMomentDiscardConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get publishMomentDiscardConfirm;
+
+  /// No description provided for @publishMomentDiscardCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get publishMomentDiscardCancel;
+
+  /// No description provided for @momentDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get momentDetailTitle;
+
+  /// No description provided for @momentDetailWhoLikedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Likes'**
+  String get momentDetailWhoLikedTitle;
+
+  /// No description provided for @momentDetailNoLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to like this'**
+  String get momentDetailNoLikes;
+
+  /// No description provided for @momentDetailPlayVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Play video'**
+  String get momentDetailPlayVideo;
+
+  /// No description provided for @momentDetailVideoLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load video'**
+  String get momentDetailVideoLoadFailed;
+
+  /// No description provided for @momentDetailAudioPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get momentDetailAudioPlay;
+
+  /// No description provided for @momentDetailAudioPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get momentDetailAudioPause;
+
+  /// No description provided for @publishMomentRecordingInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording {seconds}s — tap to stop'**
+  String publishMomentRecordingInProgress(int seconds);
+
+  /// No description provided for @publishMomentRecordingStopInline.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get publishMomentRecordingStopInline;
+
+  /// No description provided for @publishMomentCompressing.
+  ///
+  /// In en, this message translates to:
+  /// **'Compressing…'**
+  String get publishMomentCompressing;
+
+  /// No description provided for @publishMomentVideoTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Video is still {size} MB after compression — please pick a shorter clip.'**
+  String publishMomentVideoTooLarge(String size);
+
+  /// No description provided for @publishMomentVideoTooLargeRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t compress video ({size} MB). Try a smaller file.'**
+  String publishMomentVideoTooLargeRaw(String size);
+
+  /// No description provided for @familyFeedLikeTooltipLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to like · long-press to undo your likes'**
+  String get familyFeedLikeTooltipLong;
+
+  /// No description provided for @familyFeedLikeCancelFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t clear your likes — try again'**
+  String get familyFeedLikeCancelFailed;
 }
 
 class _AppLocalizationsDelegate

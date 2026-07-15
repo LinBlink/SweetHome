@@ -284,5 +284,102 @@
   "locationHubFenceDesc": "ဘေးကင်းရာ ဧရိယာ သတ်မှတ်ပြီး ဝင်/ထွက်ချိန်တွင် အကြောင်းကြားပါ",
   "locationHubFenceAlarmsDesc": "မိသားစုဝင်များ၏ ဖင်း ဝင်/ထွက် မှတ်တမ်းများ",
   "profileJoinRequestsRow": "ဝင်ရောက်ရန် လျှောက်လွှာများ",
-  "profileJoinRequestsAdminOnly": "အုပ်ချုပ်သူများသာ"
+  "profileJoinRequestsAdminOnly": "အုပ်ချုပ်သူများသာ",
+
+  "familyFeedEmptyTitle": "မပို့ရသေးပါ",
+  "familyFeedEmptyDesc": "မိသားစုအတွက် ပထမဆုံး အပ်ဒိတ်တစ်ခု တင်လိုက်ပါ။",
+  "familyFeedLoadMoreError": "နောက်ထပ် မဆွဲနိုင်ပါ",
+  "familyFeedDeleteTitle": "ဤအပ်ဒိတ်ကို ဖျက်မလား?",
+  "familyFeedDeleteBody": "ဖျက်ပြီးနောက် မိသားစုဝင်များအားလုံး မမြင်တွေ့နိုင်တော့ပါ။",
+  "familyFeedDeleteConfirm": "ဖျက်မည်",
+  "familyFeedDeleted": "အပ်ဒိတ် ဖျက်ပြီးပါပြီ",
+  "familyFeedLikeTooltip": "ကြိုက်တယ်",
+  "familyFeedUnlikeTooltip": "ကြိုက်ပြီးပါပြီ",
+  "familyFeedLikeCount": "{count, plural, =0{ကြိုက်တယ် 0 ခု} other{ကြိုက်တယ် {count} ခု}}",
+  "familyFeedMoreLikers": "နောက်ထပ် {count} ယောက်",
+  "familyFeedNoCommentsYet": "မှတ်ချက်မရှိသေးပါ",
+  "familyFeedCommentsComingSoon": "မှတ်ချက် လုပ်ဆောင်ချက် မကြာမီ ထပ်ထည့်မည်",
+  "familyFeedPublishButton": "တင်မည်",
+  "publishMomentTitle": "အပ်ဒိတ်အသစ်",
+  "publishMomentContentLabel": "ဘာဖြစ်နေလဲ?",
+  "publishMomentContentHint": "ဓာတ်ပုံတစ်ခုပဲ ဖြစ်ဖြစ်၊ စိတ်ခံစားချက်တစ်ခုပဲ ဖြစ်ဖြစ် မိသားစုနဲ့ ဝေမျှလိုက်ပါ။",
+  "publishMomentContentRequired": "စာတစ်ခုခု ရေးပါ သို့မဟုတ် ဓာတ်ပုံတစ်ခု ထည့်ပါ",
+  "publishMomentAddMedia": "မီဒီယာ ထည့်မည်",
+  "publishMomentMediaTypeImage": "ဓာတ်ပုံ",
+  "publishMomentMediaTypeVideo": "ဗီဒီယို",
+  "publishMomentMediaTypeAudio": "အသံ",
+  "publishMomentAddMediaSheet": "ဤအပ်ဒိတ်ထဲ ထည့်မည်",
+  "publishMomentMaxMedia": "ဖိုင် 9 ခုအထိ",
+  "publishMomentRemoveMedia": "ဖယ်ရှားမည်",
+  "publishMomentRecordingHint": "နှိပ်ပြီး အသံဖမ်းပါ",
+  "publishMomentRecordingStop": "နှိပ်ပြီး ရပ်ပါ",
+  "publishMomentRecordingCancel": "မလုပ်တော့ပါ",
+  "publishMomentRecordingTooShort": "နည်းနည်းပို၍ ဖမ်းပါ",
+  "publishMomentRecordingFailed": "အသံဖမ်းခြင်း မအောင်မြင်ပါ",
+  "publishMomentRecordingPermissionBody": "အသံဖမ်းရန် မိုက်ကရိုဖုန်းခွင့်ပြုချက် လိုအပ်ပါသည်",
+  "publishMomentPublish": "တင်မည်",
+  "publishMomentPublishing": "တင်နေသည်…",
+  "publishMomentSuccess": "တင်ပြီးပါပြီ",
+  "publishMomentFailed": "တင်မရပါ။ ထပ်ကြိုးစားပါ",
+  "publishMomentUploading": "အပ်လုဒ် လုပ်နေသည် {current}/{total}…",
+  "publishMomentDiscardTitle": "ဤအပ်ဒိတ်ကို ဖယ်ထုတ်မလား?",
+  "publishMomentDiscardBody": "ပြင်ဆင်ထားသည်များ ဆုံးရှုံးပါမည်။",
+  "publishMomentDiscardConfirm": "ဖယ်ထုတ်မည်",
+  "publishMomentDiscardCancel": "ဆက်ပြင်ဆင်မည်",
+  "momentDetailTitle": "အပ်ဒိတ်",
+  "momentDetailWhoLikedTitle": "ကြိုက်သူများ",
+  "momentDetailNoLikes": "ပထမဆုံး ကြိုက်တာက သင်ဖြစ်ပါစေ",
+  "momentDetailPlayVideo": "ဗီဒီယို ဖွင့်မည်",
+  "momentDetailVideoLoadFailed": "ဗီဒီယို မဆွဲနိုင်ပါ",
+  "momentDetailAudioPlay": "ဖွင့်မည်",
+  "momentDetailAudioPause": "ခဏရပ်မည်",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "မှတ်တမ်းတင်နေသည် {seconds} စက္ကန့် — ရပ်ရန် တို့ပါ",
+"publishMomentRecordingStopInline": "ရပ်ပါ",
+"publishMomentCompressing": "ချုံ့နေသည်…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "ချုံ့ပြီးနောက် {size} MB ရှိသေးသည် — ပိုတိုသော ဗီဒီယို ရွေးပါ။",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "ဗီဒီယို ချုံ့၍မရပါ ({size} MB)။ ပိုသေးသော ဖိုင် ရွေးပါ။"
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "မှတ်တမ်းတင်နေသည် {seconds} စက္ကန့် — ရပ်ရန် တို့ပါ",
+"publishMomentRecordingStopInline": "ရပ်ပါ",
+"publishMomentCompressing": "ချုံ့နေသည်…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "ချုံ့ပြီးနောက် {size} MB ရှိသေးသည် — ပိုတိုသော ဗီဒီယို ရွေးပါ။",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "ဗီဒီယို ချုံ့၍မရပါ ({size} MB)။ ပိုသေးသော ဖိုင် ရွေးပါ။"
+,"familyFeedLikeTooltipLong": "ကြိုက်တယ် နှိပ်ပါ · ပြန်ဖြုတ်ရန် ကြာကြာနှိပ်ပါ",
+"familyFeedLikeCancelFailed": "ကြိုက်တယ်များ ပြန်ဖြုတ်၍မရပါ — ထပ်ကြိုးစားပါ"
 }

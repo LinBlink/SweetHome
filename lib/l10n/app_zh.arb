@@ -284,5 +284,102 @@
   "locationHubFenceDesc": "设置安全活动范围，进入或离开时收到提醒",
   "locationHubFenceAlarmsDesc": "查看家人进出围栏的提醒",
   "profileJoinRequestsRow": "加入申请",
-  "profileJoinRequestsAdminOnly": "仅管理员可见"
+  "profileJoinRequestsAdminOnly": "仅管理员可见",
+
+  "familyFeedEmptyTitle": "还没有动态",
+  "familyFeedEmptyDesc": "发一条，让家里人多一点回忆。",
+  "familyFeedLoadMoreError": "加载更多失败",
+  "familyFeedDeleteTitle": "删除这条动态？",
+  "familyFeedDeleteBody": "删除后家里所有人都看不到。",
+  "familyFeedDeleteConfirm": "删除",
+  "familyFeedDeleted": "动态已删除",
+  "familyFeedLikeTooltip": "赞",
+  "familyFeedUnlikeTooltip": "已赞",
+  "familyFeedLikeCount": "{count, plural, =0{0 人觉得赞} other{{count} 人觉得很赞}}",
+  "familyFeedMoreLikers": "还有 {count} 人",
+  "familyFeedNoCommentsYet": "还没有评论",
+  "familyFeedCommentsComingSoon": "评论功能即将上线",
+  "familyFeedPublishButton": "发布",
+  "publishMomentTitle": "发动态",
+  "publishMomentContentLabel": "说点什么…",
+  "publishMomentContentHint": "一张照片，一段心情，都是家里的记忆。",
+  "publishMomentContentRequired": "写点儿内容或者加张照片再发布吧",
+  "publishMomentAddMedia": "添加",
+  "publishMomentMediaTypeImage": "照片",
+  "publishMomentMediaTypeVideo": "视频",
+  "publishMomentMediaTypeAudio": "语音",
+  "publishMomentAddMediaSheet": "添加到动态",
+  "publishMomentMaxMedia": "最多 9 个文件",
+  "publishMomentRemoveMedia": "移除",
+  "publishMomentRecordingHint": "点击开始录音",
+  "publishMomentRecordingStop": "点击结束",
+  "publishMomentRecordingCancel": "取消",
+  "publishMomentRecordingTooShort": "再长一点点吧",
+  "publishMomentRecordingFailed": "录音失败",
+  "publishMomentRecordingPermissionBody": "需要麦克风权限才能录制语音",
+  "publishMomentPublish": "发布",
+  "publishMomentPublishing": "发布中…",
+  "publishMomentSuccess": "发布成功",
+  "publishMomentFailed": "发布失败，请重试",
+  "publishMomentUploading": "正在上传 {current}/{total}…",
+  "publishMomentDiscardTitle": "放弃这条动态？",
+  "publishMomentDiscardBody": "当前编辑将丢失。",
+  "publishMomentDiscardConfirm": "放弃",
+  "publishMomentDiscardCancel": "继续编辑",
+  "momentDetailTitle": "动态详情",
+  "momentDetailWhoLikedTitle": "点赞列表",
+  "momentDetailNoLikes": "抢个沙发吧",
+  "momentDetailPlayVideo": "播放视频",
+  "momentDetailVideoLoadFailed": "视频加载失败",
+  "momentDetailAudioPlay": "播放",
+  "momentDetailAudioPause": "暂停",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "录音中 {seconds} 秒 — 点一下停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "正在压缩…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "压缩后仍有 {size} MB，请选择更短的视频。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "视频压缩失败（{size} MB），请选择更小的文件。"
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "录音中 {seconds} 秒 — 点一下停止",
+"publishMomentRecordingStopInline": "停止",
+"publishMomentCompressing": "正在压缩…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "压缩后仍有 {size} MB，请选择更短的视频。",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "视频压缩失败（{size} MB），请选择更小的文件。"
+,"familyFeedLikeTooltipLong": "点一下赞 · 长按取消你点的赞",
+"familyFeedLikeCancelFailed": "取消点赞失败,请重试"
 }

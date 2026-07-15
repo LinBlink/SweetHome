@@ -378,5 +378,102 @@
   "locationHubFenceDesc": "Set safe zones and get notified on entry or exit",
   "locationHubFenceAlarmsDesc": "History of when family entered or left a fence",
   "profileJoinRequestsRow": "Join Requests",
-  "profileJoinRequestsAdminOnly": "Admin only"
+  "profileJoinRequestsAdminOnly": "Admin only",
+
+  "familyFeedEmptyTitle": "No moments yet",
+  "familyFeedEmptyDesc": "Post the first update for your family.",
+  "familyFeedLoadMoreError": "Couldn't load more",
+  "familyFeedDeleteTitle": "Delete this update?",
+  "familyFeedDeleteBody": "This update will be removed for everyone.",
+  "familyFeedDeleteConfirm": "Delete",
+  "familyFeedDeleted": "Update deleted",
+  "familyFeedLikeTooltip": "Like",
+  "familyFeedUnlikeTooltip": "Liked",
+  "familyFeedLikeCount": "{count, plural, =0{0 likes} =1{1 like} other{{count} likes}}",
+  "familyFeedMoreLikers": "{count} more",
+  "familyFeedNoCommentsYet": "No comments yet",
+  "familyFeedCommentsComingSoon": "Comments are on the way",
+  "familyFeedPublishButton": "Post",
+  "publishMomentTitle": "New update",
+  "publishMomentContentLabel": "What's happening?",
+  "publishMomentContentHint": "Share a thought, a photo, or a moment from your day.",
+  "publishMomentContentRequired": "Please write something or add a photo",
+  "publishMomentAddMedia": "Add media",
+  "publishMomentMediaTypeImage": "Photo",
+  "publishMomentMediaTypeVideo": "Video",
+  "publishMomentMediaTypeAudio": "Voice",
+  "publishMomentAddMediaSheet": "Add to your post",
+  "publishMomentMaxMedia": "Up to 9 files per post",
+  "publishMomentRemoveMedia": "Remove",
+  "publishMomentRecordingHint": "Tap to record",
+  "publishMomentRecordingStop": "Tap to stop",
+  "publishMomentRecordingCancel": "Cancel",
+  "publishMomentRecordingTooShort": "Hold for a bit longer",
+  "publishMomentRecordingFailed": "Couldn't record audio",
+  "publishMomentRecordingPermissionBody": "Allow microphone access to add a voice clip",
+  "publishMomentPublish": "Post",
+  "publishMomentPublishing": "Posting…",
+  "publishMomentSuccess": "Posted",
+  "publishMomentFailed": "Couldn't post — try again",
+  "publishMomentUploading": "Uploading {current}/{total}…",
+  "publishMomentDiscardTitle": "Discard this post?",
+  "publishMomentDiscardBody": "Your changes will be lost.",
+  "publishMomentDiscardConfirm": "Discard",
+  "publishMomentDiscardCancel": "Keep editing",
+  "momentDetailTitle": "Update",
+  "momentDetailWhoLikedTitle": "Likes",
+  "momentDetailNoLikes": "Be the first to like this",
+  "momentDetailPlayVideo": "Play video",
+  "momentDetailVideoLoadFailed": "Couldn't load video",
+  "momentDetailAudioPlay": "Play",
+  "momentDetailAudioPause": "Pause",
+  "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "Recording {seconds}s — tap to stop",
+"publishMomentRecordingStopInline": "Stop",
+"publishMomentCompressing": "Compressing…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "Video is still {size} MB after compression — please pick a shorter clip.",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "Couldn't compress video ({size} MB). Try a smaller file."
+,"@publishMomentRecordingInProgress": {
+    "placeholders": {
+        "seconds": {"type":"int"}
+    }
+},
+"publishMomentRecordingInProgress": "Recording {seconds}s — tap to stop",
+"publishMomentRecordingStopInline": "Stop",
+"publishMomentCompressing": "Compressing…",
+"@publishMomentVideoTooLarge": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLarge": "Video is still {size} MB after compression — please pick a shorter clip.",
+"@publishMomentVideoTooLargeRaw": {
+    "placeholders": {
+        "size": {"type":"String"}
+    }
+},
+"publishMomentVideoTooLargeRaw": "Couldn't compress video ({size} MB). Try a smaller file."
+,"familyFeedLikeTooltipLong": "Tap to like · long-press to undo your likes",
+"familyFeedLikeCancelFailed": "Couldn't clear your likes — try again"
 }

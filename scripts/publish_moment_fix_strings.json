@@ -1,0 +1,65 @@
+[
+  {
+    "key": "publishMomentRecordingInProgress",
+    "placeholders": {"seconds": {"type": "int"}},
+    "values": {
+      "en": "Recording {seconds}s — tap to stop",
+      "zh": "录音中 {seconds} 秒 — 点一下停止",
+      "zh_Hans": "录音中 {seconds} 秒 — 点一下停止",
+      "zh_Hant": "錄音中 {seconds} 秒 — 點一下停止",
+      "ja": "録音中 {seconds} 秒 — タップで停止",
+      "ko": "녹음 중 {seconds}초 — 탭하여 중지",
+      "my": "မှတ်တမ်းတင်နေသည် {seconds} စက္ကန့် — ရပ်ရန် တို့ပါ"
+    }
+  },
+  {
+    "key": "publishMomentRecordingStopInline",
+    "values": {
+      "en": "Stop",
+      "zh": "停止",
+      "zh_Hans": "停止",
+      "zh_Hant": "停止",
+      "ja": "停止",
+      "ko": "중지",
+      "my": "ရပ်ပါ"
+    }
+  },
+  {
+    "key": "publishMomentCompressing",
+    "values": {
+      "en": "Compressing…",
+      "zh": "正在压缩…",
+      "zh_Hans": "正在压缩…",
+      "zh_Hant": "正在壓縮…",
+      "ja": "圧縮しています…",
+      "ko": "압축 중…",
+      "my": "ချုံ့နေသည်…"
+    }
+  },
+  {
+    "key": "publishMomentVideoTooLarge",
+    "placeholders": {"size": {"type": "String"}},
+    "values": {
+      "en": "Video is still {size} MB after compression — please pick a shorter clip.",
+      "zh": "压缩后仍有 {size} MB，请选择更短的视频。",
+      "zh_Hans": "压缩后仍有 {size} MB，请选择更短的视频。",
+      "zh_Hant": "壓縮後仍有 {size} MB，請選擇更短的影片。",
+      "ja": "圧縮しても {size} MB です。短い動画を選んでください。",
+      "ko": "압축 후에도 {size} MB 입니다. 더 짧은 영상을 선택해 주세요.",
+      "my": "ချုံ့ပြီးနောက် {size} MB ရှိသေးသည် — ပိုတိုသော ဗီဒီယို ရွေးပါ။"
+    }
+  },
+  {
+    "key": "publishMomentVideoTooLargeRaw",
+    "placeholders": {"size": {"type": "String"}},
+    "values": {
+      "en": "Couldn't compress video ({size} MB). Try a smaller file.",
+      "zh": "视频压缩失败（{size} MB），请选择更小的文件。",
+      "zh_Hans": "视频压缩失败（{size} MB），请选择更小的文件。",
+      "zh_Hant": "影片壓縮失敗（{size} MB），請選擇更小的檔案。",
+      "ja": "ビデオを圧縮できませんでした（{size} MB）。小さいファイルを選んでください。",
+      "ko": "비디오를 압축하지 못했습니다 ({size} MB). 더 작은 파일을 선택해 주세요.",
+      "my": "ဗီဒီယို ချုံ့၍မရပါ ({size} MB)။ ပိုသေးသော ဖိုင် ရွေးပါ။"
+    }
+  }
+]

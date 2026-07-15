@@ -954,4 +954,191 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileJoinRequestsAdminOnly => 'Admin only';
+
+  @override
+  String get familyFeedEmptyTitle => 'No moments yet';
+
+  @override
+  String get familyFeedEmptyDesc => 'Post the first update for your family.';
+
+  @override
+  String get familyFeedLoadMoreError => 'Couldn\'t load more';
+
+  @override
+  String get familyFeedDeleteTitle => 'Delete this update?';
+
+  @override
+  String get familyFeedDeleteBody =>
+      'This update will be removed for everyone.';
+
+  @override
+  String get familyFeedDeleteConfirm => 'Delete';
+
+  @override
+  String get familyFeedDeleted => 'Update deleted';
+
+  @override
+  String get familyFeedLikeTooltip => 'Like';
+
+  @override
+  String get familyFeedUnlikeTooltip => 'Liked';
+
+  @override
+  String familyFeedLikeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+      zero: '0 likes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String familyFeedMoreLikers(Object count) {
+    return '$count more';
+  }
+
+  @override
+  String get familyFeedNoCommentsYet => 'No comments yet';
+
+  @override
+  String get familyFeedCommentsComingSoon => 'Comments are on the way';
+
+  @override
+  String get familyFeedPublishButton => 'Post';
+
+  @override
+  String get publishMomentTitle => 'New update';
+
+  @override
+  String get publishMomentContentLabel => 'What\'s happening?';
+
+  @override
+  String get publishMomentContentHint =>
+      'Share a thought, a photo, or a moment from your day.';
+
+  @override
+  String get publishMomentContentRequired =>
+      'Please write something or add a photo';
+
+  @override
+  String get publishMomentAddMedia => 'Add media';
+
+  @override
+  String get publishMomentMediaTypeImage => 'Photo';
+
+  @override
+  String get publishMomentMediaTypeVideo => 'Video';
+
+  @override
+  String get publishMomentMediaTypeAudio => 'Voice';
+
+  @override
+  String get publishMomentAddMediaSheet => 'Add to your post';
+
+  @override
+  String get publishMomentMaxMedia => 'Up to 9 files per post';
+
+  @override
+  String get publishMomentRemoveMedia => 'Remove';
+
+  @override
+  String get publishMomentRecordingHint => 'Tap to record';
+
+  @override
+  String get publishMomentRecordingStop => 'Tap to stop';
+
+  @override
+  String get publishMomentRecordingCancel => 'Cancel';
+
+  @override
+  String get publishMomentRecordingTooShort => 'Hold for a bit longer';
+
+  @override
+  String get publishMomentRecordingFailed => 'Couldn\'t record audio';
+
+  @override
+  String get publishMomentRecordingPermissionBody =>
+      'Allow microphone access to add a voice clip';
+
+  @override
+  String get publishMomentPublish => 'Post';
+
+  @override
+  String get publishMomentPublishing => 'Posting…';
+
+  @override
+  String get publishMomentSuccess => 'Posted';
+
+  @override
+  String get publishMomentFailed => 'Couldn\'t post — try again';
+
+  @override
+  String publishMomentUploading(Object current, Object total) {
+    return 'Uploading $current/$total…';
+  }
+
+  @override
+  String get publishMomentDiscardTitle => 'Discard this post?';
+
+  @override
+  String get publishMomentDiscardBody => 'Your changes will be lost.';
+
+  @override
+  String get publishMomentDiscardConfirm => 'Discard';
+
+  @override
+  String get publishMomentDiscardCancel => 'Keep editing';
+
+  @override
+  String get momentDetailTitle => 'Update';
+
+  @override
+  String get momentDetailWhoLikedTitle => 'Likes';
+
+  @override
+  String get momentDetailNoLikes => 'Be the first to like this';
+
+  @override
+  String get momentDetailPlayVideo => 'Play video';
+
+  @override
+  String get momentDetailVideoLoadFailed => 'Couldn\'t load video';
+
+  @override
+  String get momentDetailAudioPlay => 'Play';
+
+  @override
+  String get momentDetailAudioPause => 'Pause';
+
+  @override
+  String publishMomentRecordingInProgress(int seconds) {
+    return 'Recording ${seconds}s — tap to stop';
+  }
+
+  @override
+  String get publishMomentRecordingStopInline => 'Stop';
+
+  @override
+  String get publishMomentCompressing => 'Compressing…';
+
+  @override
+  String publishMomentVideoTooLarge(String size) {
+    return 'Video is still $size MB after compression — please pick a shorter clip.';
+  }
+
+  @override
+  String publishMomentVideoTooLargeRaw(String size) {
+    return 'Couldn\'t compress video ($size MB). Try a smaller file.';
+  }
+
+  @override
+  String get familyFeedLikeTooltipLong =>
+      'Tap to like · long-press to undo your likes';
+
+  @override
+  String get familyFeedLikeCancelFailed =>
+      'Couldn\'t clear your likes — try again';
 }
