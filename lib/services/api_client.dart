@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../core/error_messages.dart';
 import '../models/api_exception.dart';
 
 /// Unwraps the backend's unified `{code, message, data}` response envelope.
@@ -25,7 +26,13 @@ class ApiClient {
       onUnauthorized?.call();
     }
     if (code != 200) {
-      throw ApiException(code, body['message'] as String? ?? '请求失败，请稍后重试');
+      // Service layer emits only the SENTINEL, not a hardcoded
+      // Chinese message. The UI layer routes the sentinel through
+      // `localizeErrorMessage` to render the active locale's text.
+      throw ApiException(
+        code,
+        body['message'] as String? ?? kNetworkErrorSentinel,
+      );
     }
     return body['data'];
   }

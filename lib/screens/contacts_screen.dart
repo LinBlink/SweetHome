@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/home_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../models/family_member_vm.dart';
@@ -80,54 +81,86 @@ class _ContactsScreenState extends State<ContactsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final currentUserId = context.watch<AuthProvider>().currentUser?.userId;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(l10n.contactsTitle)),
-      body: FutureBuilder<List<FamilyMemberVm>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          }
-          if (snapshot.hasError) {
-            return ErrorBanner(
-              message: localizeErrorMessage(
-                (snapshot.error is ApiException)
-                    ? (snapshot.error as ApiException).message
-                    : kNetworkErrorSentinel,
-                l10n,
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(title: l10n.contactsTitle),
+      body: PaperBackground(
+        child: FutureBuilder<List<FamilyMemberVm>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+            if (snapshot.hasError) {
+              return ErrorBanner(
+                message: localizeErrorMessage(
+                  (snapshot.error is ApiException)
+                      ? (snapshot.error as ApiException).message
+                      : kNetworkErrorSentinel,
+                  l10n,
+                ),
+                onDismiss: _refresh,
+              );
+            }
+            // Filter self out — chatting with yourself is meaningless
+            // and the family-member list always includes the current
+            // user.
+            final others = (snapshot.data ?? const [])
+                .where((m) => m.userId != currentUserId)
+                .toList();
+            if (others.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppColors.linen,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                            width: 1.2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.people_alt_rounded,
+                          size: 36,
+                          color: AppColors.primary.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        l10n.contactsEmpty,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.inkFaded,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: _refresh,
+              child: ListView.builder(
+                padding: const EdgeInsets.only(top: 6, bottom: 24),
+                itemCount: others.length,
+                itemBuilder: (_, i) => _ContactTile(
+                  member: others[i],
+                  onTap: () => _startChat(others[i]),
+                ),
               ),
-              onDismiss: _refresh,
             );
-          }
-          // Filter self out — chatting with yourself is meaningless
-          // and the family-member list always includes the current
-          // user.
-          final others = (snapshot.data ?? const [])
-              .where((m) => m.userId != currentUserId)
-              .toList();
-          if (others.isEmpty) {
-            return Center(
-              child: Text(
-                l10n.contactsEmpty,
-                style: const TextStyle(color: AppColors.textHint),
-              ),
-            );
-          }
-          return RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: _refresh,
-            child: ListView.separated(
-              itemCount: others.length,
-              separatorBuilder: (_, _) => const Divider(height: 1, indent: 70),
-              itemBuilder: (_, i) => _ContactTile(
-                member: others[i],
-                onTap: () => _startChat(others[i]),
-              ),
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -150,6 +183,8 @@ class _ContactTile extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        splashColor: AppColors.primary.withValues(alpha: 0.05),
+        highlightColor: AppColors.primary.withValues(alpha: 0.04),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
@@ -157,11 +192,21 @@ class _ContactTile extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  AvatarWidget(
-                    label: _label,
-                    color: _avatarColor,
-                    imageUrl: member.avatarUrl,
-                    radius: 26,
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _avatarColor.withValues(alpha: 0.35),
+                        width: 1.4,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(2),
+                    child: AvatarWidget(
+                      label: _label,
+                      color: _avatarColor,
+                      imageUrl: member.avatarUrl,
+                      radius: 26,
+                    ),
                   ),
                   Positioned(
                     right: -1,
@@ -170,19 +215,36 @@ class _ContactTile extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  member.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      member.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Icon(Icons.chevron_right,
-                  color: AppColors.textHint, size: 20),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.chat_bubble_rounded,
+                  color: AppColors.primary,
+                  size: 14,
+                ),
+              ),
             ],
           ),
         ),
@@ -208,7 +270,7 @@ class _OnlineDot extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.success,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.background, width: 2),
+                border: Border.all(color: AppColors.surface, width: 2),
               ),
             )
           : const SizedBox.shrink(),

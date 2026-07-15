@@ -95,7 +95,10 @@ class Conversation {
       id: json['id'] as int,
       name: json['name'] as String,
       isGroup: json['type'] == 'group',
-      avatarLabel: json['avatarLabel'] as String? ?? '家',
+      // Empty string → `AvatarWidget` falls back to its `?`
+      // placeholder, which is locale-neutral. Avoids a hardcoded
+      // Chinese character leaking into non-zh locales.
+      avatarLabel: json['avatarLabel'] as String? ?? '',
       avatarColor: Color(
           int.parse((json['avatarColor'] as String? ?? 'FFBF5E3B'), radix: 16)),
       avatarUrl: json['avatarUrl'] as String?,

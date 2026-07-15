@@ -237,7 +237,7 @@ class _JoinRequestsScreenState extends State<JoinRequestsScreen> {
 
 class _RequestCard extends StatelessWidget {
   final JoinRequest request;
-  final String relationLabel; // pre-localized (e.g. "child" / "孩子")
+  final String relationLabel; // pre-localized (e.g. 'child' / 'son')
   final VoidCallback onApprove;
   final VoidCallback onReject;
 

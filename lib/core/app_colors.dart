@@ -3,24 +3,58 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+  // ── Brand: warm terracotta (the "hearth" of the home) ────────────
   static const Color primary = Color(0xFFBF5E3B);
   static const Color primaryDark = Color(0xFF8C3A20);
   static const Color primaryLight = Color(0xFFE8927A);
 
   static const Color accent = Color(0xFFF4A261);
 
+  // ── Surfaces: warm cream paper ─────────────────────────────────────
   static const Color background = Color(0xFFFFF8F0);
   static const Color surface = Color(0xFFFFFAF5);
   static const Color surfaceVariant = Color(0xFFF5EDE3);
 
-  static const Color textPrimary = Color(0xFF3D2B1F);
-  static const Color textSecondary = Color(0xFF8B7355);
-  static const Color textHint = Color(0xFFBBA98A);
+  // ── "Wood & linen" — the furniture / shelves the app sits on ─────
+  /// Warm wooden tone used for the bottom-nav shelf and app-bar
+  /// trim — picks up the same hue family as [primary] but darker
+  /// and more saturated, so it reads as "the surface the app is
+  /// sitting on" rather than as another button color.
+  static const Color wood = Color(0xFF6E3B1F);
+  static const Color woodLight = Color(0xFF8B5A36);
 
+  /// A muted sage that pairs with the terracotta for tag/pill
+  /// backgrounds — gives the "kitchen herbs" / "garden" hint that
+  /// keeps the warm palette from collapsing into one tone.
+  static const Color sage = Color(0xFF7B9E87);
+  static const Color sageLight = Color(0xFFC9D7C7);
+
+  /// A pale linen / cream used for chip fills, soft-tinted surfaces
+  /// on top of [surface]. Slightly warmer than [background] so it
+  /// reads as "fabric" rather than "blank paper".
+  static const Color linen = Color(0xFFFCF1DE);
+  static const Color linenDeep = Color(0xFFF3E2C2);
+
+  /// The deep ink of body copy, brown rather than pure black so the
+  /// text feels like a fountain-pen on parchment.
+  static const Color ink = Color(0xFF3D2B1F);
+
+  /// Soft warm grey for secondary text — the "faded ink" of old
+  /// letters, where you can still read it but it isn't shouting.
+  static const Color inkFaded = Color(0xFF8B7355);
+  static const Color inkFaint = Color(0xFFBBA98A);
+
+  // ── Text — kept as aliases for existing call sites ──────────────
+  static const Color textPrimary = ink;
+  static const Color textSecondary = inkFaded;
+  static const Color textHint = inkFaint;
+
+  // ── Status ─────────────────────────────────────────────────────
   static const Color success = Color(0xFF6B8F71);
   static const Color warning = Color(0xFFF0C040);
   static const Color danger = Color(0xFFC0392B);
 
+  // ── Misc ───────────────────────────────────────────────────────
   static const Color divider = Color(0xFFEDE0D4);
   static const Color shadow = Color(0x1A3D2B1F);
 

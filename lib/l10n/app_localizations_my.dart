@@ -842,6 +842,49 @@ class AppLocalizationsMy extends AppLocalizations {
   }
 
   @override
+  String get appWindowTitle => 'Sweet Home';
+
+  @override
+  String get myHomeSectionFamilyTitle => 'မိသားစု';
+
+  @override
+  String get myHomeWelcomeTagline => 'မိသားစု နွေးထွေးမှု';
+
+  @override
+  String get greetingEarlyMorning => 'ညနေနောက်ကျပါပြီ';
+
+  @override
+  String get greetingMorning => 'မင်္ဂလာနံနက်ပါ';
+
+  @override
+  String get greetingNoon => 'ကြိုဆိုပါတယ်';
+
+  @override
+  String get greetingAfternoon => 'ကောင်းသော နေ့လည်ပါ';
+
+  @override
+  String get greetingEvening => 'ကောင်းသော ညနေပါ';
+
+  @override
+  String get greetingLateNight => 'ညနေနောက်ကျပါပြီ';
+
+  @override
+  String get profileSectionFamilyTitle => 'မိသားစု';
+
+  @override
+  String get profileSectionSettingsTitle => 'ဆက်တင်များ';
+
+  @override
+  String get profileFamilyMembersSubtitle => '�ိသားစုဝင်အားလုံး ကြည့်ရှုရန်';
+
+  @override
+  String get profileJoinFamilySubtitle =>
+      'ဖိတ်ကြားကုဒ်ဖြင့် အခြားမိသားစုသို့ ဝင်ရောက်ရန်';
+
+  @override
+  String get locationHubSectionTitle => 'လက်ရှိတည်နေရာ';
+
+  @override
   String get locationHubTitle => 'လက်ရှိတည်နေရာ';
 
   @override

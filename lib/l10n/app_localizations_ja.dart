@@ -813,6 +813,48 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get appWindowTitle => 'Sweet Home';
+
+  @override
+  String get myHomeSectionFamilyTitle => '家族';
+
+  @override
+  String get myHomeWelcomeTagline => '家族の温もりに包まれて';
+
+  @override
+  String get greetingEarlyMorning => '夜更かしですね';
+
+  @override
+  String get greetingMorning => 'おはようございます';
+
+  @override
+  String get greetingNoon => 'こんにちは';
+
+  @override
+  String get greetingAfternoon => 'こんにちは';
+
+  @override
+  String get greetingEvening => 'こんばんは';
+
+  @override
+  String get greetingLateNight => '夜更かしですね';
+
+  @override
+  String get profileSectionFamilyTitle => '家族';
+
+  @override
+  String get profileSectionSettingsTitle => '設定';
+
+  @override
+  String get profileFamilyMembersSubtitle => '家族のメンバー全員を表示';
+
+  @override
+  String get profileJoinFamilySubtitle => '招待コードで他の家族に参加';
+
+  @override
+  String get locationHubSectionTitle => 'リアルタイム位置情報';
+
+  @override
   String get locationHubTitle => 'リアルタイム位置情報';
 
   @override

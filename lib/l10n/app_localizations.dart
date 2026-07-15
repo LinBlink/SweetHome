@@ -1600,6 +1600,90 @@ abstract class AppLocalizations {
   /// **'Plus {count} more family members shown as a list'**
   String familyTreeOtherFamilyDesc(Object count);
 
+  /// No description provided for @appWindowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweet Home'**
+  String get appWindowTitle;
+
+  /// No description provided for @myHomeSectionFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get myHomeSectionFamilyTitle;
+
+  /// No description provided for @myHomeWelcomeTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Home is where the heart gathers'**
+  String get myHomeWelcomeTagline;
+
+  /// No description provided for @greetingEarlyMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s late'**
+  String get greetingEarlyMorning;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingNoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get greetingNoon;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get greetingEvening;
+
+  /// No description provided for @greetingLateNight.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s late'**
+  String get greetingLateNight;
+
+  /// No description provided for @profileSectionFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get profileSectionFamilyTitle;
+
+  /// No description provided for @profileSectionSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get profileSectionSettingsTitle;
+
+  /// No description provided for @profileFamilyMembersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View all family members'**
+  String get profileFamilyMembersSubtitle;
+
+  /// No description provided for @profileJoinFamilySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join another family with an invite code'**
+  String get profileJoinFamilySubtitle;
+
+  /// No description provided for @locationHubSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time Location'**
+  String get locationHubSectionTitle;
+
   /// No description provided for @locationHubTitle.
   ///
   /// In en, this message translates to:

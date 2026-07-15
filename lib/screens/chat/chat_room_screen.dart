@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/error_messages.dart';
+import '../../core/home_widgets.dart';
 import '../../core/image_mime.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api_exception.dart';
@@ -149,36 +150,41 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.conversationName),
-            Consumer<ChatProvider>(
-              builder: (context, chat, child) {
-                final count = chat.messagesFor(widget.conversationId).length;
-                return Text(
-                  count > 0 ? l10n.chatRoomMessageCount(count) : l10n.chatRoomDefaultSubtitle,
-                  style: const TextStyle(fontSize: 11, color: Colors.white70),
-                );
-              },
-            ),
-          ],
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(
+        title: widget.conversationName,
+        subtitle: Consumer<ChatProvider>(
+          builder: (context, chat, child) {
+            final count = chat.messagesFor(widget.conversationId).length;
+            final text = count > 0
+                ? l10n.chatRoomMessageCount(count)
+                : l10n.chatRoomDefaultSubtitle;
+            return Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.inkFaded,
+                fontWeight: FontWeight.w500,
+              ),
+            );
+          },
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_horiz),
+            icon: const Icon(Icons.more_horiz_rounded),
             tooltip: l10n.chatRoomMoreTooltip,
             onPressed: () {},
           ),
         ],
       ),
-      body: Column(
+      body: PaperBackground(
+        child: Column(
         children: [
           Consumer<ChatProvider>(
             builder: (ctx, chat, _) {
@@ -195,6 +201,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           Expanded(child: _buildMessageList(l10n)),
           _buildInputBar(l10n),
         ],
+      ),
       ),
     );
   }

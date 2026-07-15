@@ -34,62 +34,68 @@ class ConversationTile extends StatelessWidget {
       );
     }
     final l10n = AppLocalizations.of(context)!;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            _buildAvatar(),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          relationLabel != null
-                              ? '${conversation.name} · $relationLabel'
-                              : conversation.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: AppColors.primary.withValues(alpha: 0.05),
+        highlightColor: AppColors.primary.withValues(alpha: 0.04),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              _buildAvatar(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            relationLabel != null
+                                ? '${conversation.name} · $relationLabel'
+                                : conversation.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _formatTime(conversation.lastMessageAt, AppLocalizations.of(context)!),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textHint,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _LastMessagePreview(
-                          conversation: conversation,
-                          l10n: l10n,
-                        ),
-                      ),
-                      if (conversation.unreadCount > 0) ...[
                         const SizedBox(width: 8),
-                        _UnreadBadge(count: conversation.unreadCount),
+                        Text(
+                          _formatTime(conversation.lastMessageAt, AppLocalizations.of(context)!),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.inkFaint,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _LastMessagePreview(
+                            conversation: conversation,
+                            l10n: l10n,
+                          ),
+                        ),
+                        if (conversation.unreadCount > 0) ...[
+                          const SizedBox(width: 8),
+                          _UnreadBadge(count: conversation.unreadCount),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -233,13 +239,20 @@ class _UnreadBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.danger,
         borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.danger.withValues(alpha: 0.4),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         count > 99 ? '99+' : '$count',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 11,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
         textAlign: TextAlign.center,
       ),

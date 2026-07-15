@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../core/app_config.dart';
+import '../core/error_messages.dart';
 import '../models/chat_models.dart';
 import '../data/mock_data.dart';
 
@@ -89,8 +90,15 @@ class WebSocketService {
     if (_disposed) return;
     _pingTimer?.cancel();
     if (_reconnectAttempts >= _maxAttempts) {
+      // Service-layer code emits only the error SENTINEL (no
+      // human-readable text). The UI layer runs it through
+      // `localizeErrorMessage` so the message renders in the
+      // active locale. Pushing a hardcoded Chinese string
+      // here would leak through to every non-zh locale that
+      // triggers this branch.
       _controller.add(const WsInboundMessage(
-          type: 'ERROR', data: {'code': 'CONNECTION_FAILED', 'message': '连接失败，请检查网络'}));
+          type: 'ERROR',
+          data: {'code': 'CONNECTION_FAILED', 'message': kNetworkErrorSentinel}));
       return;
     }
     final delay = Duration(

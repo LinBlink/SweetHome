@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
+import '../core/avatar_label.dart';
+import '../core/home_widgets.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
@@ -77,168 +79,191 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = context.watch<AuthProvider>().currentUser;
     final isAdmin = user?.role == 'admin';
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(l10n.navProfile)),
-      body: Column(
-        children: [
-          InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-            ),
-            child: _buildProfileHeader(
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(title: l10n.navProfile),
+      body: PaperBackground(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          children: [
+            _ProfileCard(
               name: user?.name ?? '',
               familyName: user?.familyName ?? '',
               avatarUrl: user?.avatarUrl,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ListTile(
-            leading: const Icon(Icons.people_outline, color: AppColors.primary),
-            title: Text(l10n.profileFamilyMembersRow),
-            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
-            onTap: () {
-              // ChatProvider lives below the root Navigator (created in
-              // AuthGate) and is used by the family-members screen to show
-              // the live online dot per member. A pushed route doesn't
-              // inherit that scope, so re-provide it explicitly — same
-              // pattern as conversation_list_screen's push to
-              // NewConversationScreen/ChatRoomScreen.
-              final chat = context.read<ChatProvider>();
-              Navigator.push(
+              onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider.value(
-                    value: chat,
-                    child: const FamilyMembersScreen(),
-                  ),
-                ),
-              );
-            },
-          ),
-          // Join Requests — admin-only (§3.5.2). Hidden entirely for
-          // regular members so they don't see a row they can never
-          // use.
-          if (isAdmin)
-            ListTile(
-              leading: const Icon(
-                Icons.group_add_outlined,
-                color: AppColors.primary,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
               ),
-              title: Text(l10n.profileJoinRequestsRow),
-              subtitle: Text(
-                l10n.profileJoinRequestsAdminOnly,
-                style: const TextStyle(fontSize: 11, color: AppColors.textHint),
-              ),
-              trailing: _pendingCount == null
-                  ? const Icon(Icons.chevron_right, color: AppColors.textHint)
-                  : FutureBuilder<int>(
-                      future: _pendingCount,
-                      builder: (_, snap) {
-                        final n = snap.data ?? 0;
-                        return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (n > 0) _PendingBadge(text: l10n.myHomeJoinRequestsBadge(n)),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.chevron_right,
-                              color: AppColors.textHint,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-              onTap: () async {
-                await Navigator.push(
+            ),
+            const SizedBox(height: 18),
+            HomeSectionHeader(
+              title: l10n.profileSectionFamilyTitle,
+              accentIcon: Icons.diversity_3_rounded,
+            ),
+            HomeCard(
+              padding: EdgeInsets.zero,
+              onTap: () {
+                final chat = context.read<ChatProvider>();
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const JoinRequestsScreen(),
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: chat,
+                      child: const FamilyMembersScreen(),
+                    ),
                   ),
                 );
-                // Refresh after the admin comes back — they may
-                // have approved/rejected some while away.
-                if (mounted) _refreshPending();
               },
-            ),
-          ListTile(
-            leading: const Icon(Icons.group_add_outlined, color: AppColors.primary),
-            title: Text(l10n.joinFamilyTitle),
-            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const JoinFamilyScreen()),
-            ),
-          ),
-          const Divider(height: 1, indent: 16, endIndent: 16),
-          _LanguageRow(l10n: l10n),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => _confirmLogout(context, l10n),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.danger),
-                  foregroundColor: AppColors.danger,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              child: HomeListItem(
+                leading: const _LeadingIcon(
+                  icon: Icons.people_alt_rounded,
+                  color: AppColors.primary,
                 ),
-                child: Text(l10n.profileLogout,
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                title: l10n.profileFamilyMembersRow,
+                subtitle: l10n.profileFamilyMembersSubtitle,
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.inkFaded,
+                  size: 20,
+                ),
+                showSeparator: false,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader({
-    required String name,
-    required String familyName,
-    String? avatarUrl,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primaryDark, AppColors.primary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        children: [
-          AvatarWidget(
-            label: name.isEmpty ? '家' : name[0],
-            color: AppColors.primaryDark,
-            imageUrl: avatarUrl,
-            radius: 40,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            name,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.home, color: Colors.white60, size: 14),
-              const SizedBox(width: 4),
-              Text(
-                familyName,
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
+            if (isAdmin) ...[
+              const SizedBox(height: 12),
+              HomeCard(
+                padding: EdgeInsets.zero,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const JoinRequestsScreen(),
+                    ),
+                  );
+                  if (mounted) _refreshPending();
+                },
+                child: HomeListItem(
+                  leading: const _LeadingIcon(
+                    icon: Icons.group_add_rounded,
+                    color: AppColors.accent,
+                  ),
+                  title: l10n.profileJoinRequestsRow,
+                  subtitle: l10n.profileJoinRequestsAdminOnly,
+                  trailing: _pendingCount == null
+                      ? const Icon(
+                          Icons.chevron_right,
+                          color: AppColors.inkFaded,
+                          size: 20,
+                        )
+                      : FutureBuilder<int>(
+                          future: _pendingCount,
+                          builder: (_, snap) {
+                            final n = snap.data ?? 0;
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (n > 0)
+                                  _PendingBadge(
+                                    text: l10n.myHomeJoinRequestsBadge(n),
+                                  ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: AppColors.inkFaded,
+                                  size: 20,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                  showSeparator: false,
+                ),
               ),
             ],
-          ),
-        ],
+            const SizedBox(height: 12),
+            HomeCard(
+              padding: EdgeInsets.zero,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const JoinFamilyScreen()),
+              ),
+              child: HomeListItem(
+                leading: const _LeadingIcon(
+                  icon: Icons.qr_code_2_rounded,
+                  color: AppColors.sage,
+                ),
+                title: l10n.joinFamilyTitle,
+                subtitle: l10n.profileJoinFamilySubtitle,
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.inkFaded,
+                  size: 20,
+                ),
+                showSeparator: false,
+              ),
+            ),
+            const SizedBox(height: 22),
+            HomeSectionHeader(
+              title: l10n.profileSectionSettingsTitle,
+              accentIcon: Icons.settings_rounded,
+            ),
+            HomeCard(
+              padding: EdgeInsets.zero,
+              onTap: () => showLanguagePickerSheet(context),
+              child: HomeListItem(
+                leading: const _LeadingIcon(
+                  icon: Icons.translate_rounded,
+                  color: AppColors.primaryDark,
+                ),
+                title: l10n.profileLanguageRow,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localeDisplayName(
+                        context.watch<LocaleProvider>().locale,
+                      ),
+                      style: const TextStyle(
+                        color: AppColors.inkFaded,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.inkFaded,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                showSeparator: false,
+              ),
+            ),
+            const SizedBox(height: 28),
+            // Logout — sits low on the profile, terracotta-outlined
+            // ghost button so it's clearly destructive but not loud.
+            OutlinedButton(
+              onPressed: () => _confirmLogout(context, l10n),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: AppColors.danger.withValues(alpha: 0.6),
+                  width: 1.4,
+                ),
+                foregroundColor: AppColors.danger,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: Text(
+                l10n.profileLogout,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -248,10 +273,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(l10n.profileLogout,
-            style: const TextStyle(color: AppColors.textPrimary)),
-        content: Text(l10n.profileLogoutConfirmMessage,
-            style: const TextStyle(color: AppColors.textSecondary)),
+        title: Text(
+          l10n.profileLogout,
+          style: const TextStyle(color: AppColors.ink),
+        ),
+        content: Text(
+          l10n.profileLogoutConfirmMessage,
+          style: const TextStyle(color: AppColors.inkFaded, height: 1.5),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -271,25 +300,127 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _LanguageRow extends StatelessWidget {
-  final AppLocalizations l10n;
-  const _LanguageRow({required this.l10n});
+/// A "letter-pressed" profile card at the top of the profile tab —
+/// wood-grain background, linen border, ink-stamp feel.
+class _ProfileCard extends StatelessWidget {
+  final String name;
+  final String familyName;
+  final String? avatarUrl;
+  final VoidCallback onTap;
+  const _ProfileCard({
+    required this.name,
+    required this.familyName,
+    required this.avatarUrl,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final current = context.watch<LocaleProvider>().locale;
-    return ListTile(
-      leading: const Icon(Icons.language, color: AppColors.primary),
-      title: Text(l10n.profileLanguageRow),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(localeDisplayName(current), style: const TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(width: 4),
-          const Icon(Icons.chevron_right, color: AppColors.textHint),
-        ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.wood, AppColors.woodLight],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.wood.withValues(alpha: 0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.linen, width: 3),
+                ),
+                padding: const EdgeInsets.all(2),
+                child: AvatarWidget(
+                  label: name.isEmpty
+                      ? '?'
+                      : memberAvatarLabel(name),
+                  color: AppColors.primary,
+                  imageUrl: avatarUrl,
+                  radius: 32,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.cottage_rounded,
+                          color: Color(0xCCEFE0D0),
+                          size: 13,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          familyName,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xCCEFE0D0),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.edit_outlined,
+                color: Color(0xCCEFE0D0),
+                size: 20,
+              ),
+            ],
+          ),
+        ),
       ),
-      onTap: () => showLanguagePickerSheet(context),
+    );
+  }
+}
+
+class _LeadingIcon extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  const _LeadingIcon({required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      alignment: Alignment.center,
+      child: Icon(icon, color: color, size: 20),
     );
   }
 }
@@ -308,6 +439,13 @@ class _PendingBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.danger,
         borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.danger.withValues(alpha: 0.35),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         text,

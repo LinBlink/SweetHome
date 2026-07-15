@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/home_widgets.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
 import '../l10n/app_localizations.dart';
@@ -53,18 +54,19 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
     final l10n = AppLocalizations.of(context)!;
     final me = context.watch<AuthProvider>().currentUser;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(l10n.familyTreeTitle),
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(
+        title: l10n.familyTreeTitle,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: _refresh,
             tooltip: l10n.locationRefresh,
           ),
         ],
       ),
-      body: FutureBuilder<List<FamilyMemberVm>>(
+      body: PaperBackground(
+        child: FutureBuilder<List<FamilyMemberVm>>(
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting &&
@@ -133,6 +135,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
             onRefresh: _refresh,
           );
         },
+        ),
       ),
     );
   }
@@ -196,42 +199,54 @@ class _FamilyTreeCanvas extends StatelessWidget {
   Widget _buildCanvas(
     BuildContext context,
     double canvasWidth,
-    _MemberBuckets b,
+    FamilyTreeBuckets b,
   ) {
-    final rows = <_RowLayout>[];
-
-    if (b.parents.isNotEmpty) {
-      rows.add(_layoutRow(
-        members: b.parents,
-        canvasWidth: canvasWidth,
-        align: _RowAlign.symmetric,
-      ));
-    }
-    rows.add(_layoutRow(
+    // Lay out each row by SEMANTIC ROLE (parents / middle / children),
+    // not by list position. The middle row is mandatory (SELF is
+    // always in it); the other two are optional — and the previous
+    // implementation crashed or hid the children row whenever
+    // parents was empty, because the connector code did
+    // `rows[1] / rows[2]` regardless of which row was actually
+    // there. Tracking rows by role instead fixes the "no parents
+    // ⇒ no children" regression.
+    final parentsRow = b.parents.isNotEmpty
+        ? _layoutRow(
+            members: b.parents,
+            canvasWidth: canvasWidth,
+            align: _RowAlign.symmetric,
+          )
+        : null;
+    final middleRow = _layoutRow(
       members: b.middle,
       canvasWidth: canvasWidth,
       align: _RowAlign.viewerCentered,
-    ));
-    if (b.children.isNotEmpty) {
-      rows.add(_layoutRow(
-        members: b.children,
-        canvasWidth: canvasWidth,
-        align: _RowAlign.groupCentered,
-      ));
-    }
+    );
+    final childrenRow = b.children.isNotEmpty
+        ? _layoutRow(
+            members: b.children,
+            canvasWidth: canvasWidth,
+            align: _RowAlign.groupCentered,
+          )
+        : null;
 
     // Stagger the rows vertically and patch each entry's `top` so
     // the `Positioned` widgets place the cards at the right Y.
     // The connectors reference these top values too, so they all
     // stay in sync.
+    final presentRows = <_RowLayout>[
+      ?parentsRow,
+      middleRow,
+      ?childrenRow,
+    ];
     var runningTop = 0.0;
-    for (var i = 0; i < rows.length; i++) {
-      final row = rows[i];
-      rows[i] = row.copyWith(
+    for (var i = 0; i < presentRows.length; i++) {
+      final row = presentRows[i];
+      presentRows[i] = row.copyWith(
         rowTopY: runningTop,
         rowBottomY: runningTop + _cardHeight,
         entries: [
-          for (final e in row.entries) e.copyWith(rect: e.rect.copyWith(top: runningTop)),
+          for (final e in row.entries)
+            e.copyWith(rect: e.rect.copyWith(top: runningTop)),
         ],
       );
       runningTop += _cardHeight + _rowVerticalSpacing;
@@ -239,76 +254,75 @@ class _FamilyTreeCanvas extends StatelessWidget {
 
     final totalHeight = runningTop + _vGap;
 
+    final viewer = middleRow.positionOf(
+      b.middle.firstWhere(
+        (m) => m.relationCode == 'SELF',
+        orElse: () => b.middle.first,
+      ).userId,
+    );
+    _CardRect? spouse;
+    for (final m in b.middle) {
+      if (m.relationCode == 'S') {
+        spouse = middleRow.positionOf(m.userId);
+        break;
+      }
+    }
+
+    // The parent→middle drop and the middle→children drop are
+    // independent. Either may be drawn alone, depending on which
+    // rows are present. (Before, the children drop was gated on
+    // `rows.length >= 3`, so a childless-without-parents family
+    // hid the children row entirely.)
     final connectors = _ConnectorLayout(
-      parentCouple: b.parents.length >= 2
+      parentCouple: (parentsRow != null && b.parents.length >= 2)
           ? _CoupleMidpoint(
-              left: rows[0].positionOf(b.parents.first.userId),
-              right: rows[0].positionOf(b.parents.last.userId),
+              left: parentsRow.positionOf(b.parents.first.userId),
+              right: parentsRow.positionOf(b.parents.last.userId),
             )
           : null,
-      parentSingle: b.parents.length == 1
-          ? rows[0].positionOf(b.parents.first.userId)
+      parentSingle: (parentsRow != null && b.parents.length == 1)
+          ? parentsRow.positionOf(b.parents.first.userId)
           : null,
-      parentRowBottomY: rows.first.rowBottomY,
-      middleRowTopY: rows[1].rowTopY,
-      middleRowBottomY: rows[1].rowBottomY,
-      viewerPos: rows[1].positionOf(
-        b.middle.firstWhere(
-          (m) => m.relationCode == 'SELF',
-          orElse: () => b.middle.first,
-        ).userId,
-      ),
-      spousePos: () {
-        for (final m in b.middle) {
-          if (m.relationCode == 'S') return rows[1].positionOf(m.userId);
-        }
-        return null;
-      }(),
-      childrenRowTopY: rows.length >= 3 ? rows[2].rowTopY : 0.0,
-      childrenPositions: rows.length >= 3
+      parentsRowBottomY: parentsRow?.rowBottomY,
+      middleRowTopY: middleRow.rowTopY,
+      middleRowBottomY: middleRow.rowBottomY,
+      viewerPos: viewer,
+      spousePos: spouse,
+      childrenRowTopY: childrenRow?.rowTopY,
+      childrenPositions: childrenRow != null
           ? [
-              for (final m in b.children) rows[2].positionOf(m.userId),
+              for (final m in b.children) childrenRow.positionOf(m.userId),
             ]
           : const [],
-      hasChildrenRow: rows.length >= 3,
       leftSiblingBracketX: () {
         // The leftmost siblings (anything in `middle` that comes
         // before SELF in the sorted order) get a short bracket
         // that reaches up to the parents' drop-line.
-        if (b.parents.isEmpty) return null;
-        final leftSibs = [
-          for (final m in b.middle) rows[1].positionOf(m.userId),
-          if (rows[1].viewerIndexInRow >= 0)
-            for (int i = 0; i < rows[1].viewerIndexInRow; i++)
-              rows[1].positionOf(b.middle[i].userId),
-        ];
+        if (parentsRow == null) return null;
+        if (middleRow.viewerIndexInRow < 0) return null;
+        final leftSibs = <_CardRect>[];
+        for (int i = 0; i < middleRow.viewerIndexInRow; i++) {
+          if (b.middle[i].relationCode == 'S') continue;
+          leftSibs.add(middleRow.positionOf(b.middle[i].userId));
+        }
         if (leftSibs.isEmpty) return null;
         return leftSibs
             .map((p) => p.left + p.width / 2)
             .reduce((a, b) => a < b ? a : b);
       }(),
       rightSiblingBracketX: () {
-        // Mirror of the above for siblings to the right of SELF
-        // (siblings-in-law, spouse-of-siblings — these drop into
-        // the right side of the middle row).
-        if (b.parents.isEmpty) return null;
-        if (rows[1].viewerIndexInRow < 0) return null;
+        // Mirror of the above — siblings after SELF (excluding S).
+        if (parentsRow == null) return null;
+        if (middleRow.viewerIndexInRow < 0) return null;
         final rightSibs = <_CardRect>[];
-        for (int i = rows[1].viewerIndexInRow + 1; i < b.middle.length; i++) {
+        for (int i = middleRow.viewerIndexInRow + 1; i < b.middle.length; i++) {
           if (b.middle[i].relationCode == 'S') continue;
-          rightSibs.add(rows[1].positionOf(b.middle[i].userId));
+          rightSibs.add(middleRow.positionOf(b.middle[i].userId));
         }
         if (rightSibs.isEmpty) return null;
         return rightSibs
             .map((p) => p.left + p.width / 2)
             .reduce((a, b) => a > b ? a : b);
-      }(),
-      viewerIndexInMiddle: rows[1].viewerIndexInRow,
-      middleSpouseIndex: () {
-        for (int i = 0; i < b.middle.length; i++) {
-          if (b.middle[i].relationCode == 'S') return i;
-        }
-        return -1;
       }(),
     );
 
@@ -324,7 +338,7 @@ class _FamilyTreeCanvas extends StatelessWidget {
                   painter: _FamilyTreePainter(c: connectors),
                 ),
               ),
-              for (final row in rows) ...[
+              for (final row in presentRows) ...[
                 for (final entry in row.entries)
                   Positioned(
                     left: entry.rect.left,
@@ -361,64 +375,7 @@ class _FamilyTreeCanvas extends StatelessWidget {
   /// Build the bucket map from each member's `relationCode`.
   /// Anything we can't place in a row gets dropped into `extended`
   /// and shown as a list below the canvas.
-  _MemberBuckets _bucket(List<FamilyMemberVm> all) {
-    final parents = <FamilyMemberVm>[];
-    final middle = <FamilyMemberVm>[];
-    final children = <FamilyMemberVm>[];
-    final extended = <FamilyMemberVm>[];
-
-    for (final m in all) {
-      switch (m.relationCode) {
-        case 'F':
-          // Father pinned to the left of Gen -1
-          parents.insert(0, m);
-          break;
-        case 'M':
-          parents.add(m);
-          break;
-        case 'SELF':
-        case 'S':
-        case 'eB':
-        case 'yB':
-        case 'eZ':
-        case 'yZ':
-          middle.add(m);
-          break;
-        case 'Son':
-        case 'Dau':
-          children.add(m);
-          break;
-        default:
-          extended.add(m);
-          break;
-      }
-    }
-
-    middle.sort((a, b) {
-      // SELF first, then S (spouse pinned adjacent), then siblings
-      // by relationCode so eB < yB < eZ < yZ in deterministic order.
-      int rank(FamilyMemberVm m) {
-        if (m.relationCode == 'SELF') return 0;
-        if (m.relationCode == 'S') return 1;
-        return 2;
-      }
-
-      final ra = rank(a);
-      final rb = rank(b);
-      if (ra != rb) return ra - rb;
-      if (ra == 2) return a.relationCode.compareTo(b.relationCode);
-      return 0;
-    });
-
-    children.sort((a, b) => a.relationCode.compareTo(b.relationCode));
-
-    return _MemberBuckets(
-      parents: parents,
-      middle: middle,
-      children: children,
-      extended: extended,
-    );
-  }
+  FamilyTreeBuckets _bucket(List<FamilyMemberVm> all) => bucketFamilyTreeMembers(all);
 
   /// Lay out a single row given the bucket contents. The actual
   /// x-position of every card is computed against [canvasWidth] —
@@ -429,22 +386,16 @@ class _FamilyTreeCanvas extends StatelessWidget {
     required _RowAlign align,
   }) {
     final count = members.length;
-    final rowWidth = count * _cardWidth + (count - 1) * _hGap;
-
     final entries = <_RowEntry>[];
     var viewerIndexInRow = -1;
-    var startX = (canvasWidth - rowWidth) / 2;
-    if (startX < 0) startX = 0; // overflow handled by SingleChildScrollView
-
     for (int i = 0; i < count; i++) {
-      final m = members[i];
-      if (m.relationCode == 'SELF') viewerIndexInRow = i;
+      if (members[i].relationCode == 'SELF') viewerIndexInRow = i;
       entries.add(
         _RowEntry(
-          member: m,
-          rect: _CardRect(
-            left: startX + i * (_cardWidth + _hGap),
-            top: 0, // filled in by caller once the row's Y is known
+          member: members[i],
+          rect: const _CardRect(
+            left: 0,
+            top: 0,
             width: _cardWidth,
             height: _cardHeight,
           ),
@@ -452,53 +403,96 @@ class _FamilyTreeCanvas extends StatelessWidget {
       );
     }
 
-    // Symmetric row (parents): keep Father left, Mother right; if
-    // only one parent, keep them centered.
-    if (align == _RowAlign.symmetric && count == 2) {
-      final totalGap = canvasWidth - 2 * _cardWidth;
-      final innerGap = totalGap * 0.18; // gap between them
-      entries[0] = entries[0].copyWith(
-        rect: _CardRect(
-          left: (canvasWidth - 2 * _cardWidth - innerGap) / 2,
-          top: 0,
-          width: _cardWidth,
-          height: _cardHeight,
-        ),
-      );
-      entries[1] = entries[1].copyWith(
-        rect: _CardRect(
-          left: entries[0].rect.left + _cardWidth + innerGap,
-          top: 0,
-          width: _cardWidth,
-          height: _cardHeight,
-        ),
-      );
-    } else if (align == _RowAlign.viewerCentered) {
-      // Center SELF (and its adjacent S) as the visual focal
-      // point; siblings fan out on either side.
+    // Default — evenly-spaced left-to-right, centered. Used by
+    // `groupCentered` (the children row).
+    if (align != _RowAlign.viewerCentered) {
+      final rowWidth = count * _cardWidth + (count - 1) * _hGap;
+      var startX = (canvasWidth - rowWidth) / 2;
+      if (startX < 0) startX = 0;
+      for (int i = 0; i < count; i++) {
+        entries[i] = entries[i].copyWith(
+          rect: _CardRect(
+            left: startX + i * (_cardWidth + _hGap),
+            top: 0,
+            width: _cardWidth,
+            height: _cardHeight,
+          ),
+        );
+      }
+      if (align == _RowAlign.symmetric && count == 2) {
+        // Symmetric — pull the pair slightly apart so the
+        // marriage line between them has room to breathe.
+        final totalGap = canvasWidth - 2 * _cardWidth;
+        final innerGap = totalGap * 0.18;
+        entries[0] = entries[0].copyWith(
+          rect: _CardRect(
+            left: (canvasWidth - 2 * _cardWidth - innerGap) / 2,
+            top: 0,
+            width: _cardWidth,
+            height: _cardHeight,
+          ),
+        );
+        entries[1] = entries[1].copyWith(
+          rect: _CardRect(
+            left: entries[0].rect.left + _cardWidth + innerGap,
+            top: 0,
+            width: _cardWidth,
+            height: _cardHeight,
+          ),
+        );
+      }
+    } else {
+      // Viewer-centered — SELF is the visual focal point of the
+      // middle row. Siblings fan out symmetrically: ~half on the
+      // left of SELF, ~half on the right of S (if S exists;
+      // otherwise on the right of SELF). Spouse always pins to
+      // SELF's right with a small marriage gap.
       final viewerIdx = viewerIndexInRow >= 0 ? viewerIndexInRow : 0;
-      // Pinned pair width (SELF + optional S)
       final spouseIdx = members.indexWhere((m) => m.relationCode == 'S');
-      final pairWidth =
-          spouseIdx >= 0 ? _cardWidth * 2 + _hGap : _cardWidth;
-      // total row width: left-sibs + pinned pair + right-sibs
-      final leftSibCount = viewerIdx;
-      final rightSibCount = count - viewerIdx - 1 - (spouseIdx >= 0 ? 1 : 0);
-      final leftWidth =
-          leftSibCount * _cardWidth +
-          (leftSibCount > 0 ? leftSibCount * _hGap : 0);
-      final rightWidth =
-          rightSibCount * _cardWidth +
-          (rightSibCount > 0 ? rightSibCount * _hGap : 0);
-      final totalWidth = leftWidth + pairWidth + rightWidth +
+      final hasSpouse = spouseIdx >= 0;
+
+      // Identify sibling indices (everyone except SELF and S).
+      final sibIndices = <int>[];
+      for (int i = 0; i < count; i++) {
+        if (i == viewerIdx) continue;
+        if (i == spouseIdx) continue;
+        sibIndices.add(i);
+      }
+      // Sort siblings by relationCode so the on-screen order is
+      // stable / deterministic.
+      sibIndices.sort((a, b) =>
+          members[a].relationCode.compareTo(members[b].relationCode));
+
+      // Split siblings left/right. An odd count puts the extra
+      // sibling on the right (since the spouse lives on the
+      // right and "right" is the modern-by-marriage side in
+      // traditional layouts).
+      final totalSibs = sibIndices.length;
+      final leftSibCount = totalSibs ~/ 2;
+      final rightSibCount = totalSibs - leftSibCount;
+      final leftSibIndices = sibIndices.sublist(0, leftSibCount);
+      final rightSibIndices = sibIndices.sublist(leftSibCount);
+
+      final leftWidth = leftSibCount > 0
+          ? leftSibCount * _cardWidth + (leftSibCount - 1) * _hGap
+          : 0.0;
+      final rightWidth = rightSibCount > 0
+          ? rightSibCount * _cardWidth + (rightSibCount - 1) * _hGap
+          : 0.0;
+      final pairWidth = hasSpouse
+          ? _cardWidth * 2 + _hGap
+          : _cardWidth;
+      final totalWidth = leftWidth +
+          pairWidth +
+          rightWidth +
           (leftSibCount > 0 ? _hGap : 0) +
           (rightSibCount > 0 ? _hGap : 0);
       var x = (canvasWidth - totalWidth) / 2;
       if (x < 0) x = 0;
 
-      // Left-side siblings
-      for (int i = 0; i < leftSibCount; i++) {
-        entries[i] = entries[i].copyWith(
+      // Left siblings: from x, going right.
+      for (int i = 0; i < leftSibIndices.length; i++) {
+        entries[leftSibIndices[i]] = entries[leftSibIndices[i]].copyWith(
           rect: _CardRect(
             left: x + i * (_cardWidth + _hGap),
             top: 0,
@@ -507,46 +501,40 @@ class _FamilyTreeCanvas extends StatelessWidget {
           ),
         );
       }
-      // SELF
-      var leftCursor = x + leftWidth + (leftSibCount > 0 ? _hGap : 0);
-      final viewerEntry = entries[viewerIdx];
-      entries[viewerIdx] = viewerEntry.copyWith(
+      var cursor = x + leftWidth + (leftSibCount > 0 ? _hGap : 0);
+      // SELF.
+      entries[viewerIdx] = entries[viewerIdx].copyWith(
         rect: _CardRect(
-          left: leftCursor,
+          left: cursor,
           top: 0,
           width: _cardWidth,
           height: _cardHeight,
         ),
       );
-      leftCursor += _cardWidth;
-      // Spouse (S) sits immediately to the right of SELF
-      if (spouseIdx >= 0) {
+      cursor += _cardWidth;
+      // Spouse (S).
+      if (hasSpouse) {
         entries[spouseIdx] = entries[spouseIdx].copyWith(
           rect: _CardRect(
-            left: leftCursor + _hGap,
+            left: cursor + _hGap,
             top: 0,
             width: _cardWidth,
             height: _cardHeight,
           ),
         );
-        leftCursor += _hGap + _cardWidth;
+        cursor += _hGap + _cardWidth;
       }
-      // Right-side siblings (siblings-in-law, spouse-of-siblings)
-      var rightCursor =
-          leftCursor + (rightSibCount > 0 ? _hGap : 0);
-      var rightSlots = 0;
-      for (int i = 0; i < count; i++) {
-        if (i == viewerIdx || i == spouseIdx) continue;
-        if (i < viewerIdx) continue; // already placed on the left
-        entries[i] = entries[i].copyWith(
+      // Right siblings.
+      cursor += (rightSibCount > 0 ? _hGap : 0);
+      for (int i = 0; i < rightSibIndices.length; i++) {
+        entries[rightSibIndices[i]] = entries[rightSibIndices[i]].copyWith(
           rect: _CardRect(
-            left: rightCursor + rightSlots * (_cardWidth + _hGap),
+            left: cursor + i * (_cardWidth + _hGap),
             top: 0,
             width: _cardWidth,
             height: _cardHeight,
           ),
         );
-        rightSlots++;
       }
     }
 
@@ -564,17 +552,85 @@ class _FamilyTreeCanvas extends StatelessWidget {
 
 enum _RowAlign { symmetric, viewerCentered, groupCentered }
 
-class _MemberBuckets {
+/// Public so widget tests can drive the layout without going
+/// through the full `FamilyTreeScreen` plumbing (which depends on
+/// `AuthProvider` and friends). Splitting the pure data transform
+/// from the rendering layer also lets us assert the exact row
+/// composition for each family shape.
+@visibleForTesting
+class FamilyTreeBuckets {
   final List<FamilyMemberVm> parents;
   final List<FamilyMemberVm> middle;
   final List<FamilyMemberVm> children;
   final List<FamilyMemberVm> extended;
-  const _MemberBuckets({
+  const FamilyTreeBuckets({
     required this.parents,
     required this.middle,
     required this.children,
     required this.extended,
   });
+}
+
+/// Public for the same reason as [FamilyTreeBuckets]. Pure function
+/// — no widget context, no async, easy to drive from a unit test.
+@visibleForTesting
+FamilyTreeBuckets bucketFamilyTreeMembers(List<FamilyMemberVm> all) {
+  final parents = <FamilyMemberVm>[];
+  final middle = <FamilyMemberVm>[];
+  final children = <FamilyMemberVm>[];
+  final extended = <FamilyMemberVm>[];
+
+  for (final m in all) {
+    switch (m.relationCode) {
+      case 'F':
+        // Father pinned to the left of Gen -1
+        parents.insert(0, m);
+        break;
+      case 'M':
+        parents.add(m);
+        break;
+      case 'SELF':
+      case 'S':
+      case 'eB':
+      case 'yB':
+      case 'eZ':
+      case 'yZ':
+        middle.add(m);
+        break;
+      case 'Son':
+      case 'Dau':
+        children.add(m);
+        break;
+      default:
+        extended.add(m);
+        break;
+    }
+  }
+
+  middle.sort((a, b) {
+    // SELF first, then S (spouse pinned adjacent), then siblings
+    // by relationCode so eB < yB < eZ < yZ in deterministic order.
+    int rank(FamilyMemberVm m) {
+      if (m.relationCode == 'SELF') return 0;
+      if (m.relationCode == 'S') return 1;
+      return 2;
+    }
+
+    final ra = rank(a);
+    final rb = rank(b);
+    if (ra != rb) return ra - rb;
+    if (ra == 2) return a.relationCode.compareTo(b.relationCode);
+    return 0;
+  });
+
+  children.sort((a, b) => a.relationCode.compareTo(b.relationCode));
+
+  return FamilyTreeBuckets(
+    parents: parents,
+    middle: middle,
+    children: children,
+    extended: extended,
+  );
 }
 
 class _CardRect {
@@ -651,38 +707,35 @@ class _CoupleMidpoint {
 
 /// Pre-computed positions / indices the painter needs to draw the
 /// connectors. Computing it once outside the painter keeps the
-/// `paint()` method pure and cheap to invoke.
+/// `paint()` method pure and cheap to invoke. Every row position
+/// is nullable — a family can be missing the parents row, the
+/// children row, or both — so the painter null-checks before
+/// drawing each line.
 class _ConnectorLayout {
   final _CoupleMidpoint? parentCouple; // for Gen -1 marriage line
   final _CardRect? parentSingle; // single parent (no marriage line)
-  final double parentRowBottomY;
+  final double? parentsRowBottomY;
   final double middleRowTopY;
   final double middleRowBottomY;
   final _CardRect viewerPos;
   final _CardRect? spousePos;
-  final double childrenRowTopY;
+  final double? childrenRowTopY;
   final List<_CardRect> childrenPositions;
-  final bool hasChildrenRow;
   final double? leftSiblingBracketX;
   final double? rightSiblingBracketX;
-  final int viewerIndexInMiddle;
-  final int middleSpouseIndex;
 
   const _ConnectorLayout({
     required this.parentCouple,
     required this.parentSingle,
-    required this.parentRowBottomY,
+    required this.parentsRowBottomY,
     required this.middleRowTopY,
     required this.middleRowBottomY,
     required this.viewerPos,
     required this.spousePos,
     required this.childrenRowTopY,
     required this.childrenPositions,
-    required this.hasChildrenRow,
     required this.leftSiblingBracketX,
     required this.rightSiblingBracketX,
-    required this.viewerIndexInMiddle,
-    required this.middleSpouseIndex,
   });
 }
 
@@ -718,7 +771,8 @@ class _FamilyTreePainter extends CustomPainter {
     }
 
     // 2. Drop from parents (or single parent) into the middle row.
-    if (c.parentCouple != null || c.parentSingle != null) {
+    if (c.parentsRowBottomY != null &&
+        (c.parentCouple != null || c.parentSingle != null)) {
       final startX = c.parentCouple?.x ?? c.parentSingle!.centerX;
       final startY = (c.parentCouple?.left.bottom ??
               c.parentSingle!.bottom) +
@@ -760,12 +814,12 @@ class _FamilyTreePainter extends CustomPainter {
     }
 
     // 4. Drop from middle row down to the children row.
-    if (c.hasChildrenRow && c.childrenPositions.isNotEmpty) {
+    if (c.childrenRowTopY != null && c.childrenPositions.isNotEmpty) {
       final startX = c.spousePos != null
           ? (c.viewerPos.centerX + c.spousePos!.centerX) / 2
           : c.viewerPos.centerX;
       final startY = c.viewerPos.bottom + _dropGap;
-      final endY = c.childrenRowTopY - _dropGap;
+      final endY = c.childrenRowTopY! - _dropGap;
       // Fan out from startX to every child center via a single
       // horizontal bus + vertical drops.
       final childCenters =

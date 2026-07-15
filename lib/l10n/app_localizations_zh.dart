@@ -810,6 +810,48 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get appWindowTitle => '过家家';
+
+  @override
+  String get myHomeSectionFamilyTitle => '家';
+
+  @override
+  String get myHomeWelcomeTagline => '家人闲坐,灯火可亲';
+
+  @override
+  String get greetingEarlyMorning => '夜深了';
+
+  @override
+  String get greetingMorning => '早安';
+
+  @override
+  String get greetingNoon => '中午好';
+
+  @override
+  String get greetingAfternoon => '下午好';
+
+  @override
+  String get greetingEvening => '晚上好';
+
+  @override
+  String get greetingLateNight => '夜深了';
+
+  @override
+  String get profileSectionFamilyTitle => '家 庭';
+
+  @override
+  String get profileSectionSettingsTitle => '设 置';
+
+  @override
+  String get profileFamilyMembersSubtitle => '查看所有家庭成员';
+
+  @override
+  String get profileJoinFamilySubtitle => '邀请码加入其它家庭';
+
+  @override
+  String get locationHubSectionTitle => '实时位置';
+
+  @override
   String get locationHubTitle => '实时位置';
 
   @override
@@ -1465,6 +1507,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationHistoryEmptyDesc => '该成员当天未上报过位置。';
 
   @override
+  String get profileMe => '我';
+
+  @override
   String get locationHistoryPickDate => '选择日期';
 
   @override
@@ -1635,6 +1680,48 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String familyTreeOtherFamilyDesc(Object count) {
     return '另有 $count 位家人以列表展示';
   }
+
+  @override
+  String get appWindowTitle => '过家家';
+
+  @override
+  String get myHomeSectionFamilyTitle => '家';
+
+  @override
+  String get myHomeWelcomeTagline => '家人闲坐,灯火可亲';
+
+  @override
+  String get greetingEarlyMorning => '夜深了';
+
+  @override
+  String get greetingMorning => '早安';
+
+  @override
+  String get greetingNoon => '中午好';
+
+  @override
+  String get greetingAfternoon => '下午好';
+
+  @override
+  String get greetingEvening => '晚上好';
+
+  @override
+  String get greetingLateNight => '夜深了';
+
+  @override
+  String get profileSectionFamilyTitle => '家 庭';
+
+  @override
+  String get profileSectionSettingsTitle => '设 置';
+
+  @override
+  String get profileFamilyMembersSubtitle => '查看所有家庭成员';
+
+  @override
+  String get profileJoinFamilySubtitle => '邀请码加入其它家庭';
+
+  @override
+  String get locationHubSectionTitle => '实时位置';
 
   @override
   String get locationHubTitle => '实时位置';
@@ -2292,6 +2379,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationHistoryEmptyDesc => '該成員當天未上報過位置。';
 
   @override
+  String get profileMe => '我';
+
+  @override
   String get locationHistoryPickDate => '選擇日期';
 
   @override
@@ -2462,6 +2552,48 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String familyTreeOtherFamilyDesc(Object count) {
     return '另有 $count 位家人以列表展示';
   }
+
+  @override
+  String get appWindowTitle => '過家家';
+
+  @override
+  String get myHomeSectionFamilyTitle => '家';
+
+  @override
+  String get myHomeWelcomeTagline => '家人閒坐,燈火可親';
+
+  @override
+  String get greetingEarlyMorning => '夜深了';
+
+  @override
+  String get greetingMorning => '早安';
+
+  @override
+  String get greetingNoon => '中午好';
+
+  @override
+  String get greetingAfternoon => '下午好';
+
+  @override
+  String get greetingEvening => '晚上好';
+
+  @override
+  String get greetingLateNight => '夜深了';
+
+  @override
+  String get profileSectionFamilyTitle => '家 庭';
+
+  @override
+  String get profileSectionSettingsTitle => '設 置';
+
+  @override
+  String get profileFamilyMembersSubtitle => '查看所有家庭成員';
+
+  @override
+  String get profileJoinFamilySubtitle => '邀請碼加入其他家庭';
+
+  @override
+  String get locationHubSectionTitle => '即時位置';
 
   @override
   String get locationHubTitle => '即時位置';

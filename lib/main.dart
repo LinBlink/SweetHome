@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'core/app_colors.dart';
+import 'core/home_widgets.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
@@ -41,7 +42,7 @@ class SweetHomeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
     return MaterialApp(
-      title: '过家家 · Sweet Home',
+      title: 'Sweet Home',
       theme: AppTheme.light(),
       debugShowCheckedModeBanner: false,
       locale: locale,
@@ -193,43 +194,77 @@ class _MainShellState extends State<MainShell> {
     final l10n = AppLocalizations.of(context)!;
     final isSelected = _currentIndex == _kMyHomeIndex;
     return SizedBox(
-      width: 60,
-      height: 60,
+      width: 64,
+      height: 64,
       child: FloatingActionButton(
         // `centerDocked` leaves the FAB half-inside the bar; nudge
         // it up so the circle sits clearly above the bar line.
         onPressed: () => _goTo(_kMyHomeIndex),
-        backgroundColor: isSelected ? AppColors.primaryDark : AppColors.primary,
-        elevation: 4,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         shape: const CircleBorder(),
         tooltip: l10n.navMyHome,
-        child: Icon(
-          isSelected ? Icons.home_rounded : Icons.home_outlined,
-          color: Colors.white,
-          size: 28,
+        child: Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isSelected
+                  ? [AppColors.primary, AppColors.primaryDark]
+                  : [AppColors.accent, AppColors.primary],
+            ),
+            border: Border.all(color: AppColors.linen, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryDark.withValues(alpha: 0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.cottage_rounded,
+            color: Colors.white,
+            size: 28,
+          ),
         ),
       ),
     );
   }
 
+  /// A wooden tray at the bottom of the screen — the "shelf" the
+  /// rest of the app is sitting on. Dark wood grain, white
+  /// labels, terracotta highlight bar under the active tab.
   Widget _buildNavBar() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+      decoration: const BoxDecoration(
+        color: AppColors.wood,
         boxShadow: [
+          // Soft inner highlight on the top edge so the bar reads
+          // as a wooden plank with a chamfered lip, not a flat
+          // strip.
+          BoxShadow(
+            color: Color(0x33FFFFFF),
+            blurRadius: 0,
+            offset: Offset(0, 1),
+            spreadRadius: -1,
+          ),
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+            blurRadius: 14,
+            offset: Offset(0, -2),
           ),
         ],
       ),
-      // Leave a notch for the raised center button.
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 70,
+          height: 72,
           child: Row(
             children: [
               Expanded(
@@ -244,15 +279,15 @@ class _MainShellState extends State<MainShell> {
               ),
               Expanded(
                 child: _buildNavItem(
-                  icon: Icons.contacts_outlined,
-                  activeIcon: Icons.contacts_rounded,
+                  icon: Icons.people_alt_outlined,
+                  activeIcon: Icons.people_alt_rounded,
                   label: l10n.navContacts,
                   isSelected: _currentIndex == 1,
                   onTap: () => _goTo(1),
                 ),
               ),
-              // Empty slot for the raised center FAB.
-              const SizedBox(width: 60),
+              // Notch for the raised center FAB.
+              const SizedBox(width: 64),
               Expanded(
                 child: _buildNavItem(
                   icon: Icons.timeline_outlined,
@@ -295,24 +330,29 @@ class _MainShellState extends State<MainShell> {
     required VoidCallback onTap,
     int badgeCount = 0,
   }) {
+    final fg = isSelected ? Colors.white : const Color(0xCCEFE0D0);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      highlightColor: Colors.transparent,
+      splashColor: AppColors.accent.withValues(alpha: 0.18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(
-                isSelected ? activeIcon : icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                size: 24,
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Icon(
+                  isSelected ? activeIcon : icon,
+                  color: fg,
+                  size: 23,
+                ),
               ),
               if (badgeCount > 0)
                 Positioned(
                   right: -8,
-                  top: -4,
+                  top: -2,
                   child: Container(
                     constraints: const BoxConstraints(minWidth: 16),
                     padding: const EdgeInsets.symmetric(
@@ -320,15 +360,16 @@ class _MainShellState extends State<MainShell> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.danger,
+                      color: AppColors.accent,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.wood, width: 1.4),
                     ),
                     child: Text(
                       badgeCount > 99 ? '99+' : '$badgeCount',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.wood,
                         fontSize: 9,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
@@ -339,9 +380,24 @@ class _MainShellState extends State<MainShell> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontSize: 10.5,
+              color: fg,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              letterSpacing: 0.2,
+            ),
+          ),
+          // Active-tab indicator: a small terracotta pill under the
+          // label — the same color as the FAB so the two feel like
+          // the same control.
+          const SizedBox(height: 2),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
+            height: 2.5,
+            width: isSelected ? 18 : 0,
+            decoration: BoxDecoration(
+              color: AppColors.accent,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
         ],
@@ -358,46 +414,75 @@ class _SplashScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.accent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Center(
-                child: Text(
-                  '家',
-                  style: TextStyle(
-                    fontSize: 40,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
+      body: Stack(
+        children: [
+          const Positioned.fill(child: PaperBackground(child: SizedBox.shrink())),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryDark.withValues(alpha: 0.35),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: AppColors.linen,
+                      width: 3,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.cottage_rounded,
+                      color: Colors.white,
+                      size: 48,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 28),
+                Text(
+                  l10n.brandName,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                    letterSpacing: 4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.appTagline,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.inkFaded,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                    strokeWidth: 2.4,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            Text(
-              l10n.brandName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                letterSpacing: 3,
-              ),
-            ),
-            const SizedBox(height: 40),
-            const CircularProgressIndicator(color: AppColors.primary),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -235,7 +235,7 @@ class ChatProvider extends ChangeNotifier {
       senderName: _currentUser.name,
       senderAvatarLabel: _currentUser.name.isNotEmpty
           ? _currentUser.name[0]
-          : '我',
+          : '',
       senderAvatarColor: AppColors.primary,
       content: content,
       type: MessageType.text,
@@ -417,7 +417,7 @@ class ChatProvider extends ChangeNotifier {
       senderName: _currentUser.name,
       senderAvatarLabel: _currentUser.name.isNotEmpty
           ? _currentUser.name[0]
-          : '我',
+          : '',
       senderAvatarColor: AppColors.primary,
       content: '',
       type: MessageType.image,

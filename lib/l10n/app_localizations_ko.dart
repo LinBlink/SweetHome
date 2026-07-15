@@ -815,6 +815,48 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get appWindowTitle => 'Sweet Home';
+
+  @override
+  String get myHomeSectionFamilyTitle => '가족';
+
+  @override
+  String get myHomeWelcomeTagline => '가족의 따스함이 함께하는 곳';
+
+  @override
+  String get greetingEarlyMorning => '늦은 시간이네요';
+
+  @override
+  String get greetingMorning => '좋은 아침입니다';
+
+  @override
+  String get greetingNoon => '안녕하세요';
+
+  @override
+  String get greetingAfternoon => '좋은 오후입니다';
+
+  @override
+  String get greetingEvening => '좋은 저녁입니다';
+
+  @override
+  String get greetingLateNight => '늦은 시간이네요';
+
+  @override
+  String get profileSectionFamilyTitle => '가족';
+
+  @override
+  String get profileSectionSettingsTitle => '설정';
+
+  @override
+  String get profileFamilyMembersSubtitle => '모든 가족 구성원 보기';
+
+  @override
+  String get profileJoinFamilySubtitle => '초대 코드로 다른 가족에 참여';
+
+  @override
+  String get locationHubSectionTitle => '실시간 위치';
+
+  @override
   String get locationHubTitle => '실시간 위치';
 
   @override

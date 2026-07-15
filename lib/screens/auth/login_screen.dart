@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/countries.dart';
 import '../../core/error_messages.dart';
+import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/error_banner.dart';
@@ -43,26 +44,28 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              const Align(
-                alignment: Alignment.centerRight,
-                child: LanguagePickerButton(),
-              ),
-              const SizedBox(height: 16),
-              _buildHeader(l10n),
-              const SizedBox(height: 48),
-              _buildForm(l10n),
-              const SizedBox(height: 32),
-              _buildLoginButton(),
-              const SizedBox(height: 20),
-              _buildRegisterLink(l10n),
-            ],
+      backgroundColor: Colors.transparent,
+      body: PaperBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                const Align(
+                  alignment: Alignment.centerRight,
+                  child: LanguagePickerButton(),
+                ),
+                const SizedBox(height: 24),
+                _buildHeader(l10n),
+                const SizedBox(height: 44),
+                _buildForm(l10n),
+                const SizedBox(height: 32),
+                _buildLoginButton(),
+                const SizedBox(height: 20),
+                _buildRegisterLink(l10n),
+              ],
+            ),
           ),
         ),
       ),
@@ -73,41 +76,38 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         Container(
-          width: 90,
-          height: 90,
+          width: 100,
+          height: 100,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [AppColors.primary, AppColors.accent],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
+            border: Border.all(color: AppColors.linen, width: 3),
           ),
-          child: const Center(
-            child: Text(
-              '家',
-              style: TextStyle(
-                fontSize: 44,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.cottage_rounded,
+            color: Colors.white,
+            size: 52,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 22),
         Text(
           l10n.brandName,
           style: const TextStyle(
-            fontSize: 30,
+            fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppColors.ink,
             letterSpacing: 4,
           ),
         ),
@@ -115,9 +115,9 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           l10n.appTagline,
           style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-            letterSpacing: 1,
+            fontSize: 13,
+            color: AppColors.inkFaded,
+            letterSpacing: 0.6,
           ),
         ),
       ],
@@ -146,15 +146,23 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _passwordCtrl,
                 obscureText: _obscurePassword,
+                style: const TextStyle(color: AppColors.ink),
                 decoration: InputDecoration(
                   labelText: l10n.commonPasswordLabel,
-                  prefixIcon: const Icon(Icons.lock_outline, color: AppColors.primary),
+                  labelStyle: const TextStyle(color: AppColors.inkFaded),
+                  prefixIcon: const Icon(
+                    Icons.lock_outline,
+                    color: AppColors.primary,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      color: AppColors.textSecondary,
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.inkFaded,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
                 validator: (v) {
@@ -175,18 +183,13 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (ctx, auth, _) {
         return SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
+          child: HomePrimaryButton(
+            label: auth.isLoading ? '...' : AppLocalizations.of(context)!.loginButton,
+            leadingIcon: auth.isLoading
+                ? null
+                : Icons.login_rounded,
             onPressed: auth.isLoading ? null : _submit,
-            child: auth.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(AppLocalizations.of(context)!.loginButton),
+            fullWidth: true,
           ),
         );
       },
@@ -197,13 +200,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(l10n.loginNoAccount, style: const TextStyle(color: AppColors.textSecondary)),
-        TextButton(
+        Text(
+          l10n.loginNoAccount,
+          style: const TextStyle(color: AppColors.inkFaded),
+        ),
+        HomeGhostButton(
+          label: l10n.loginRegisterNow,
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const RegisterScreen()),
           ),
-          child: Text(l10n.loginRegisterNow, style: const TextStyle(fontWeight: FontWeight.w600)),
         ),
       ],
     );

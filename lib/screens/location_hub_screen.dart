@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
+import '../core/home_widgets.dart';
 import '../data/mock_data.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
@@ -69,73 +70,83 @@ class _LocationHubScreenState extends State<LocationHubScreen> {
     // outside the original provider scope.
     final locationProvider = context.read<LocationProvider>();
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(l10n.locationHubTitle)),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children: [
-          _FeatureRow(
-            icon: Icons.location_on_outlined,
-            title: l10n.locationTitle,
-            subtitle: l10n.locationHubLiveMapDesc,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: locationProvider,
-                  child: const LocationScreen(),
-                ),
-              ),
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(title: l10n.locationHubTitle),
+      body: PaperBackground(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            HomeSectionHeader(
+              title: l10n.locationHubSectionTitle,
+              accentIcon: Icons.location_on_rounded,
             ),
-          ),
-          const SizedBox(height: 10),
-          _FeatureRow(
-            icon: Icons.timeline_outlined,
-            title: l10n.locationHistoryTitle,
-            subtitle: l10n.locationHubHistoryDesc,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const LocationHistoryScreen(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _FeatureRow(
-            icon: Icons.shield_outlined,
-            title: l10n.myHomeFenceEntry,
-            subtitle: l10n.locationHubFenceDesc,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const FenceListScreen()),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _FeatureRow(
-            icon: Icons.notifications_active_outlined,
-            title: l10n.myHomeFenceAlarmsEntry,
-            subtitle: l10n.locationHubFenceAlarmsDesc,
-            badge: _alarmCountFuture == null
-                ? null
-                : FutureBuilder<int>(
-                    future: _alarmCountFuture,
-                    builder: (_, snap) {
-                      final n = snap.data ?? 0;
-                      if (n == 0) return const SizedBox.shrink();
-                      return _Badge(text: '$n');
-                    },
-                  ),
-            onTap: () async {
-              await Navigator.push(
+            _FeatureRow(
+              icon: Icons.my_location_rounded,
+              title: l10n.locationTitle,
+              subtitle: l10n.locationHubLiveMapDesc,
+              color: AppColors.primary,
+              onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const FenceAlarmScreen(),
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: locationProvider,
+                    child: const LocationScreen(),
+                  ),
                 ),
-              );
-              if (mounted) _refreshAlarmCount();
-            },
-          ),
-        ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            _FeatureRow(
+              icon: Icons.timeline_rounded,
+              title: l10n.locationHistoryTitle,
+              subtitle: l10n.locationHubHistoryDesc,
+              color: AppColors.sage,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LocationHistoryScreen(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _FeatureRow(
+              icon: Icons.shield_rounded,
+              title: l10n.myHomeFenceEntry,
+              subtitle: l10n.locationHubFenceDesc,
+              color: AppColors.accent,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FenceListScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _FeatureRow(
+              icon: Icons.notifications_active_rounded,
+              title: l10n.myHomeFenceAlarmsEntry,
+              subtitle: l10n.locationHubFenceAlarmsDesc,
+              color: AppColors.primaryDark,
+              badge: _alarmCountFuture == null
+                  ? null
+                  : FutureBuilder<int>(
+                      future: _alarmCountFuture,
+                      builder: (_, snap) {
+                        final n = snap.data ?? 0;
+                        if (n == 0) return const SizedBox.shrink();
+                        return _Badge(text: '$n');
+                      },
+                    ),
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const FenceAlarmScreen(),
+                  ),
+                );
+                if (mounted) _refreshAlarmCount();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -148,6 +159,7 @@ class _FeatureRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final Color color;
   final Widget? badge;
   final VoidCallback onTap;
 
@@ -155,80 +167,81 @@ class _FeatureRow extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.color,
     required this.onTap,
     this.badge,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(14),
-      // InkWell ripple has nowhere to paint without a Material
-      // ancestor — see the equivalent note on FamilyMembersScreen.
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.divider),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, color: AppColors.primary, size: 22),
+    return HomeCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [color, color.withValues(alpha: 0.7)],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.30),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink,
                         ),
-                        ?badge,
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textHint,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                    ?badge,
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textHint,
-                size: 20,
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.inkFaded,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 4),
+          Icon(
+            Icons.arrow_forward_rounded,
+            color: color,
+            size: 18,
+          ),
+        ],
       ),
     );
   }
@@ -245,6 +258,13 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.danger,
         borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.danger.withValues(alpha: 0.35),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         text,

@@ -840,6 +840,49 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get appWindowTitle => 'Sweet Home';
+
+  @override
+  String get myHomeSectionFamilyTitle => 'Family';
+
+  @override
+  String get myHomeWelcomeTagline => 'Home is where the heart gathers';
+
+  @override
+  String get greetingEarlyMorning => 'It\'s late';
+
+  @override
+  String get greetingMorning => 'Good morning';
+
+  @override
+  String get greetingNoon => 'Good afternoon';
+
+  @override
+  String get greetingAfternoon => 'Good afternoon';
+
+  @override
+  String get greetingEvening => 'Good evening';
+
+  @override
+  String get greetingLateNight => 'It\'s late';
+
+  @override
+  String get profileSectionFamilyTitle => 'Family';
+
+  @override
+  String get profileSectionSettingsTitle => 'Settings';
+
+  @override
+  String get profileFamilyMembersSubtitle => 'View all family members';
+
+  @override
+  String get profileJoinFamilySubtitle =>
+      'Join another family with an invite code';
+
+  @override
+  String get locationHubSectionTitle => 'Real-time Location';
+
+  @override
   String get locationHubTitle => 'Real-time Location';
 
   @override

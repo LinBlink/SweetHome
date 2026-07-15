@@ -192,7 +192,7 @@ class _AvatarPicker extends StatelessWidget {
             alignment: Alignment.bottomRight,
             children: [
               AvatarWidget(
-                label: name.isEmpty ? '家' : name[0],
+                label: name.isEmpty ? '?' : name[0],
                 color: AppColors.primary,
                 imageUrl: avatarUrl,
                 radius: 48,

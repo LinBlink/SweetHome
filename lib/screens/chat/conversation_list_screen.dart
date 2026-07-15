@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/error_messages.dart';
+import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/chat_provider.dart';
 import '../../widgets/conversation_tile.dart';
@@ -29,64 +30,75 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(l10n.navMessages),
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(
+        title: l10n.navMessages,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search_rounded),
             onPressed: () {},
             tooltip: l10n.conversationsSearchTooltip,
           ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              // ChatProvider lives below the root Navigator (created in
-              // AuthGate), so a pushed route can't inherit it — re-provide it
-              // explicitly, same as the ChatRoomScreen navigation below.
-              final chat = context.read<ChatProvider>();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider.value(
-                    value: chat,
-                    child: const NewConversationScreen(),
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: _ComposeButton(
+              onPressed: () {
+                // ChatProvider lives below the root Navigator (created in
+                // AuthGate), so a pushed route can't inherit it — re-provide it
+                // explicitly, same as the ChatRoomScreen navigation below.
+                final chat = context.read<ChatProvider>();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: chat,
+                      child: const NewConversationScreen(),
+                    ),
                   ),
-                ),
-              );
-            },
-            tooltip: l10n.conversationsNewTooltip,
+                );
+              },
+              tooltip: l10n.conversationsNewTooltip,
+            ),
           ),
         ],
       ),
-      body: Consumer<ChatProvider>(
-        builder: (ctx, chat, _) {
-          Widget body = _buildBody(ctx, chat, l10n);
-          if (chat.connectionError != null) {
-            body = _ConnectionErrorBanner(
-              message: chat.connectionError!,
-              retryLabel: l10n.connectionErrorRetry,
-              onRetry: chat.reconnect,
-              onDismiss: chat.dismissConnectionError,
-              child: body,
-            );
-          }
-          if (chat.error != null) {
-            body = Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: ErrorBanner(
-                    message: localizeErrorMessage(chat.error!, l10n),
-                    onDismiss: chat.clearError,
-                  ),
+      body: PaperBackground(
+        child: Consumer<ChatProvider>(
+          builder: (ctx, chat, _) {
+            Widget body = _buildBody(ctx, chat, l10n);
+            if (chat.connectionError != null) {
+              body = _ConnectionErrorBanner(
+                // `connectionError` is a sentinel/code, not
+                // pre-localized text — `localizeErrorMessage`
+                // is what maps it to the active locale's
+                // display string.
+                message: localizeErrorMessage(
+                  chat.connectionError!,
+                  l10n,
                 ),
-                Expanded(child: body),
-              ],
-            );
-          }
-          return body;
-        },
+                retryLabel: l10n.connectionErrorRetry,
+                onRetry: chat.reconnect,
+                onDismiss: chat.dismissConnectionError,
+                child: body,
+              );
+            }
+            if (chat.error != null) {
+              body = Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: ErrorBanner(
+                      message: localizeErrorMessage(chat.error!, l10n),
+                      onDismiss: chat.clearError,
+                    ),
+                  ),
+                  Expanded(child: body),
+                ],
+              );
+            }
+            return body;
+          },
+        ),
       ),
     );
   }
@@ -100,13 +112,9 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     if (chat.conversations.isEmpty) {
       return _EmptyState(l10n: l10n);
     }
-    return ListView.separated(
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 6, bottom: 24),
       itemCount: chat.conversations.length,
-      separatorBuilder: (context, index) => const Divider(
-        height: 1,
-        indent: 70,
-        endIndent: 0,
-      ),
       itemBuilder: (ctx, i) {
         final conv = chat.conversations[i];
         return ConversationTile(
@@ -132,6 +140,50 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
   }
 }
 
+/// Small circular "compose" button in the app bar — a paper-craft
+/// stamp, not the default Material + icon.
+class _ComposeButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String tooltip;
+  const _ComposeButton({required this.onPressed, required this.tooltip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          width: 36,
+          height: 36,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryDark.withValues(alpha: 0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.edit_outlined,
+            color: Colors.white,
+            size: 18,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _EmptyState extends StatelessWidget {
   final AppLocalizations l10n;
   const _EmptyState({required this.l10n});
@@ -139,25 +191,50 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.chat_bubble_outline,
-              size: 72, color: AppColors.primaryLight.withValues(alpha: 0.6)),
-          const SizedBox(height: 16),
-          Text(
-            l10n.conversationsEmptyTitle,
-            style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.conversationsEmptySubtitle,
-            style: const TextStyle(fontSize: 14, color: AppColors.textHint),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: AppColors.linen,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  width: 1.2,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.forum_rounded,
+                size: 44,
+                color: AppColors.primary.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              l10n.conversationsEmptyTitle,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.conversationsEmptySubtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.inkFaded,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -184,30 +261,52 @@ class _ConnectionErrorBanner extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          color: AppColors.warning.withValues(alpha: 0.15),
+          decoration: BoxDecoration(
+            color: AppColors.warning.withValues(alpha: 0.12),
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.warning.withValues(alpha: 0.4),
+                width: 0.6,
+              ),
+            ),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
               const Icon(Icons.wifi_off, color: AppColors.warning, size: 16),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(message,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.textPrimary)),
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.ink,
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: onRetry,
                 style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(40, 28)),
-                child: Text(retryLabel,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.primary)),
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(40, 28),
+                ),
+                child: Text(
+                  retryLabel,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
+              const SizedBox(width: 4),
               GestureDetector(
                 onTap: onDismiss,
-                child: const Icon(Icons.close,
-                    color: AppColors.textSecondary, size: 16),
+                child: const Icon(
+                  Icons.close,
+                  color: AppColors.inkFaded,
+                  size: 16,
+                ),
               ),
             ],
           ),

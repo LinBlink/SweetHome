@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
+import '../core/home_widgets.dart';
 import '../l10n/app_localizations.dart';
 
 /// Placeholder for the "家庭动态" tab. Per BUGS_TO_FIX.md, the backend
@@ -14,35 +15,54 @@ class FamilyFeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(l10n.familyFeedTitle)),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.timeline_outlined,
-                size: 72,
-                color: AppColors.primaryLight.withValues(alpha: 0.6),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.familyFeedComingSoon,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+      backgroundColor: Colors.transparent,
+      appBar: HomeAppBar(title: l10n.familyFeedTitle),
+      body: PaperBackground(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: AppColors.linen,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      width: 1.2,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.timeline_rounded,
+                    size: 44,
+                    color: AppColors.primary.withValues(alpha: 0.6),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.familyFeedComingSoonDesc,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: AppColors.textHint),
-              ),
-            ],
+                const SizedBox(height: 18),
+                Text(
+                  l10n.familyFeedComingSoon,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.familyFeedComingSoonDesc,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.inkFaded,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
