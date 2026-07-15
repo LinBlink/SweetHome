@@ -614,10 +614,40 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatRoomSendImageTooltip => '画像を送信';
 
   @override
-  String get chatRoomImageUploading => '画像をアップロード中…';
+  String get chatRoomImageUploading => '画像アップロード中…';
 
   @override
   String get chatRoomImageUploadFailed => '画像を送信できませんでした';
+
+  @override
+  String get chatRoomEmojiTooltip => '絵文字ピッカーを開く';
+
+  @override
+  String get chatRoomKeyboardTooltip => 'キーボードを表示';
+
+  @override
+  String get emojiCategorySmileys => '顔文字・感情';
+
+  @override
+  String get emojiCategoryPeople => '人物・体のパーツ';
+
+  @override
+  String get emojiCategoryAnimals => '動物・自然';
+
+  @override
+  String get emojiCategoryFood => '食べ物・飲み物';
+
+  @override
+  String get emojiCategoryActivities => 'アクティビティ・スポーツ';
+
+  @override
+  String get emojiCategoryTravel => '旅行・場所';
+
+  @override
+  String get emojiCategoryObjects => '物';
+
+  @override
+  String get emojiCategorySymbols => '記号';
 
   @override
   String get chatMessageTypeImage => '[画像]';

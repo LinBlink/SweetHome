@@ -8,6 +8,7 @@ import '../../core/image_mime.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api_exception.dart';
 import '../../providers/chat_provider.dart';
+import '../../widgets/emoji_picker.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/message_bubble.dart';
 
@@ -27,9 +28,11 @@ class ChatRoomScreen extends StatefulWidget {
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final _textCtrl = TextEditingController();
+  final _textFocus = FocusNode();
   final _scrollCtrl = ScrollController();
   bool _canSend = false;
   bool _uploadingImage = false;
+  bool _showEmoji = false;
 
   @override
   void initState() {
@@ -37,6 +40,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _textCtrl.addListener(() {
       final canSend = _textCtrl.text.trim().isNotEmpty;
       if (canSend != _canSend) setState(() => _canSend = canSend);
+    });
+    // Hide the emoji picker as soon as the user focuses the text
+    // field (which brings the soft keyboard up). Without this, the
+    // picker would double-stack under the keyboard.
+    _textFocus.addListener(() {
+      if (_textFocus.hasFocus && _showEmoji) {
+        setState(() => _showEmoji = false);
+      }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final chat = context.read<ChatProvider>();
@@ -51,6 +62,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     // ChatProvider.clearActiveConversation.
     context.read<ChatProvider>().clearActiveConversation(widget.conversationId);
     _textCtrl.dispose();
+    _textFocus.dispose();
     _scrollCtrl.dispose();
     super.dispose();
   }
@@ -123,6 +135,37 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Cursor-aware emoji insertion. Replaces any selected text with
+  /// [emoji] and drops the caret just after the inserted character
+  /// so consecutive taps append without losing position. Emoji are
+  /// surrogate pairs in Dart's UTF-16 String — `replaceRange` /
+  /// index arithmetic work correctly because we never split a
+  /// pair: we always insert a complete grapheme sequence from the
+  /// curated list, and use `selection.baseOffset` /
+  /// `selection.extentOffset` (which Flutter already exposes in
+  /// UTF-16 code units).
+  void _insertEmoji(String emoji) {
+    final value = _textCtrl.value;
+    final text = value.text;
+    final start = value.selection.start.clamp(0, text.length);
+    final end = value.selection.end.clamp(0, text.length);
+    final newText = text.replaceRange(start, end, emoji);
+    _textCtrl.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: start + emoji.length),
+    );
+  }
+
+  void _toggleEmojiPicker() {
+    final wasShown = _showEmoji;
+    setState(() => _showEmoji = !_showEmoji);
+    if (!wasShown) {
+      // Hide the soft keyboard so the emoji picker doesn't stack
+      // underneath it. The user can re-focus by tapping the input.
+      _textFocus.unfocus();
+    }
   }
 
   void _scrollToBottom() {
@@ -200,6 +243,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
           Expanded(child: _buildMessageList(l10n)),
           _buildInputBar(l10n),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            alignment: Alignment.bottomCenter,
+            child: _showEmoji
+                ? EmojiPicker(onEmojiSelected: _insertEmoji)
+                : const SizedBox(width: double.infinity, height: 0),
+          ),
         ],
       ),
       ),
@@ -322,6 +373,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               ),
               child: TextField(
                 controller: _textCtrl,
+                focusNode: _textFocus,
                 maxLines: null,
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(
@@ -363,9 +415,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   )
                 : IconButton(
                     key: const ValueKey('emoji'),
-                    icon: const Icon(Icons.emoji_emotions_outlined,
-                        color: AppColors.textSecondary),
-                    onPressed: () {},
+                    icon: Icon(
+                      _showEmoji
+                          ? Icons.keyboard_alt_outlined
+                          : Icons.emoji_emotions_outlined,
+                      color: _showEmoji
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                    ),
+                    tooltip: _showEmoji
+                        ? l10n.chatRoomKeyboardTooltip
+                        : l10n.chatRoomEmojiTooltip,
+                    onPressed: _toggleEmojiPicker,
                   ),
           ),
         ],

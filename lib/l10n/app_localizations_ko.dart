@@ -621,6 +621,36 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chatRoomImageUploadFailed => '이미지를 보낼 수 없습니다';
 
   @override
+  String get chatRoomEmojiTooltip => '이모지 선택기 열기';
+
+  @override
+  String get chatRoomKeyboardTooltip => '키보드 표시';
+
+  @override
+  String get emojiCategorySmileys => '스마일 · 감정';
+
+  @override
+  String get emojiCategoryPeople => '사람 · 몸';
+
+  @override
+  String get emojiCategoryAnimals => '동물 · 자연';
+
+  @override
+  String get emojiCategoryFood => '음식 · 음료';
+
+  @override
+  String get emojiCategoryActivities => '활동 · 스포츠';
+
+  @override
+  String get emojiCategoryTravel => '여행 · 장소';
+
+  @override
+  String get emojiCategoryObjects => '사물';
+
+  @override
+  String get emojiCategorySymbols => '기호';
+
+  @override
   String get chatMessageTypeImage => '[이미지]';
 
   @override

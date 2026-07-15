@@ -617,6 +617,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatRoomImageUploadFailed => '图片发送失败';
 
   @override
+  String get chatRoomEmojiTooltip => '打开表情';
+
+  @override
+  String get chatRoomKeyboardTooltip => '显示键盘';
+
+  @override
+  String get emojiCategorySmileys => '表情与情绪';
+
+  @override
+  String get emojiCategoryPeople => '人物与手势';
+
+  @override
+  String get emojiCategoryAnimals => '动物与自然';
+
+  @override
+  String get emojiCategoryFood => '美食与饮品';
+
+  @override
+  String get emojiCategoryActivities => '活动与运动';
+
+  @override
+  String get emojiCategoryTravel => '旅行与地点';
+
+  @override
+  String get emojiCategoryObjects => '物品';
+
+  @override
+  String get emojiCategorySymbols => '符号';
+
+  @override
   String get chatMessageTypeImage => '[图片]';
 
   @override
@@ -1489,6 +1519,36 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get chatRoomImageUploadFailed => '图片发送失败';
 
   @override
+  String get chatRoomEmojiTooltip => '打开表情';
+
+  @override
+  String get chatRoomKeyboardTooltip => '显示键盘';
+
+  @override
+  String get emojiCategorySmileys => '表情与情绪';
+
+  @override
+  String get emojiCategoryPeople => '人物与手势';
+
+  @override
+  String get emojiCategoryAnimals => '动物与自然';
+
+  @override
+  String get emojiCategoryFood => '美食与饮品';
+
+  @override
+  String get emojiCategoryActivities => '活动与运动';
+
+  @override
+  String get emojiCategoryTravel => '旅行与地点';
+
+  @override
+  String get emojiCategoryObjects => '物品';
+
+  @override
+  String get emojiCategorySymbols => '符号';
+
+  @override
   String get chatMessageTypeImage => '[图片]';
 
   @override
@@ -2359,6 +2419,36 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get chatRoomImageUploadFailed => '圖片發送失敗';
+
+  @override
+  String get chatRoomEmojiTooltip => '打開表情';
+
+  @override
+  String get chatRoomKeyboardTooltip => '顯示鍵盤';
+
+  @override
+  String get emojiCategorySmileys => '表情與情緒';
+
+  @override
+  String get emojiCategoryPeople => '人物與手勢';
+
+  @override
+  String get emojiCategoryAnimals => '動物與自然';
+
+  @override
+  String get emojiCategoryFood => '美食與飲品';
+
+  @override
+  String get emojiCategoryActivities => '活動與運動';
+
+  @override
+  String get emojiCategoryTravel => '旅行與地點';
+
+  @override
+  String get emojiCategoryObjects => '物品';
+
+  @override
+  String get emojiCategorySymbols => '符號';
 
   @override
   String get chatMessageTypeImage => '[圖片]';

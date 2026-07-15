@@ -634,10 +634,40 @@ class AppLocalizationsMy extends AppLocalizations {
   String get chatRoomSendImageTooltip => 'ပုံပို့ရန်';
 
   @override
-  String get chatRoomImageUploading => 'ပုံ တင်နေသည်…';
+  String get chatRoomImageUploading => 'ပုံတင်နေသည်…';
 
   @override
   String get chatRoomImageUploadFailed => 'ပုံပို့၍ မရပါ';
+
+  @override
+  String get chatRoomEmojiTooltip => 'အီမိုဂျီ ရွေးချယ်စရာကို ဖွင့်ရန်';
+
+  @override
+  String get chatRoomKeyboardTooltip => 'ကီးဘုတ်ကို ပြရန်';
+
+  @override
+  String get emojiCategorySmileys => 'ပြုံးပျော်ခြင်းနှင့် ခံစားချက်';
+
+  @override
+  String get emojiCategoryPeople => 'လူနှင့် ကိုယ်ထည်';
+
+  @override
+  String get emojiCategoryAnimals => 'တိရစ္ဆာန်နှင့် သဘာဝ';
+
+  @override
+  String get emojiCategoryFood => 'အစားအစာနှင့် အဖျော်ယမကာ';
+
+  @override
+  String get emojiCategoryActivities => 'လှုပ်ရှားမှုနှင့် အားကစား';
+
+  @override
+  String get emojiCategoryTravel => 'ခရီးသွားနှင့် နေရာများ';
+
+  @override
+  String get emojiCategoryObjects => 'အရာဝတ္ထုများ';
+
+  @override
+  String get emojiCategorySymbols => 'သင်္ကေတများ';
 
   @override
   String get chatMessageTypeImage => '[ပုံ]';

@@ -1246,6 +1246,66 @@ abstract class AppLocalizations {
   /// **'Couldn\'t send image'**
   String get chatRoomImageUploadFailed;
 
+  /// No description provided for @chatRoomEmojiTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open emoji picker'**
+  String get chatRoomEmojiTooltip;
+
+  /// No description provided for @chatRoomKeyboardTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show keyboard'**
+  String get chatRoomKeyboardTooltip;
+
+  /// No description provided for @emojiCategorySmileys.
+  ///
+  /// In en, this message translates to:
+  /// **'Smileys & emotion'**
+  String get emojiCategorySmileys;
+
+  /// No description provided for @emojiCategoryPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People & body'**
+  String get emojiCategoryPeople;
+
+  /// No description provided for @emojiCategoryAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals & nature'**
+  String get emojiCategoryAnimals;
+
+  /// No description provided for @emojiCategoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & drink'**
+  String get emojiCategoryFood;
+
+  /// No description provided for @emojiCategoryActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities & sports'**
+  String get emojiCategoryActivities;
+
+  /// No description provided for @emojiCategoryTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel & places'**
+  String get emojiCategoryTravel;
+
+  /// No description provided for @emojiCategoryObjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Objects'**
+  String get emojiCategoryObjects;
+
+  /// No description provided for @emojiCategorySymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbols'**
+  String get emojiCategorySymbols;
+
   /// No description provided for @chatMessageTypeImage.
   ///
   /// In en, this message translates to:

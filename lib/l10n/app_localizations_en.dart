@@ -638,6 +638,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatRoomImageUploadFailed => 'Couldn\'t send image';
 
   @override
+  String get chatRoomEmojiTooltip => 'Open emoji picker';
+
+  @override
+  String get chatRoomKeyboardTooltip => 'Show keyboard';
+
+  @override
+  String get emojiCategorySmileys => 'Smileys & emotion';
+
+  @override
+  String get emojiCategoryPeople => 'People & body';
+
+  @override
+  String get emojiCategoryAnimals => 'Animals & nature';
+
+  @override
+  String get emojiCategoryFood => 'Food & drink';
+
+  @override
+  String get emojiCategoryActivities => 'Activities & sports';
+
+  @override
+  String get emojiCategoryTravel => 'Travel & places';
+
+  @override
+  String get emojiCategoryObjects => 'Objects';
+
+  @override
+  String get emojiCategorySymbols => 'Symbols';
+
+  @override
   String get chatMessageTypeImage => '[Image]';
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/emoji_only_text.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
 import '../l10n/app_localizations.dart';
@@ -159,12 +160,19 @@ class _BubbleContent extends StatelessWidget {
           isMe: isMe,
         );
       case MessageType.text:
+        // Emoji-only messages get a much larger font so the bubble
+        // doesn't look like an empty bubble with a tiny pixel — see
+        // `emoji_only_text.dart` for the detection heuristic.
+        final isEmojiBurst = isEmojiOnlyText(message.content);
         return ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.65,
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: EdgeInsets.symmetric(
+              horizontal: isEmojiBurst ? 12 : 14,
+              vertical: isEmojiBurst ? 8 : 10,
+            ),
             decoration: BoxDecoration(
               color: isMe ? AppColors.primary : AppColors.surface,
               borderRadius: BorderRadius.only(
@@ -187,9 +195,9 @@ class _BubbleContent extends StatelessWidget {
             child: Text(
               message.content,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: isEmojiBurst ? 32 : 15,
                 color: isMe ? Colors.white : AppColors.textPrimary,
-                height: 1.45,
+                height: isEmojiBurst ? 1.2 : 1.45,
               ),
             ),
           ),
