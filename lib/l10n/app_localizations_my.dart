@@ -1144,4 +1144,22 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get familyFeedLikeCancelFailed =>
       'ကြိုက်တယ်များ ပြန်ဖြုတ်၍မရပါ — ထပ်ကြိုးစားပါ';
+
+  @override
+  String get conversationsSearchHint => 'မက်ဆေ့ချ်များနှင့် ချက်တင်များ ရှာပါ';
+
+  @override
+  String get conversationsSearchEmptyHint =>
+      'သိမ်းထားသော မက်ဆေ့ချ်များကို ရှာဖွေရန် စာလုံးရိုက်ထည့်ပါ။';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '\"$query\" အတွက် ရလဒ်မရှိပါ။';
+  }
+
+  @override
+  String get profileThemeRow => 'အပြင်အဆင်';
+
+  @override
+  String get profileThemeSheetTitle => 'အပြင်အဆင် ရွေးပါ';
 }

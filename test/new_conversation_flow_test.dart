@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sweethome_flutter/data/mock_data.dart';
 import 'package:sweethome_flutter/models/chat_models.dart';
 import 'package:sweethome_flutter/providers/chat_provider.dart';
@@ -31,6 +32,14 @@ class _NoopWs extends WebSocketService {
 // the NewConversationScreen can navigate into (see _startChat). The navigation
 // itself is a thin wrapper that re-provides ChatProvider to the pushed route.
 void main() {
+  // `ChatProvider`'s constructor hydrates from SharedPreferences on
+  // init — without a binding this throws, so initialize it for the
+  // test scope up front and pre-seed the SharedPreferences mock with
+  // an empty map (otherwise the platform-channel `getAll` call from
+  // the cache misses its mock implementation).
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues(<String, Object>{});
+
   ChatProvider newProvider() => ChatProvider(
         ws: _NoopWs(),
         chatService: ChatService(() => MockDataSource.mockUser.token),

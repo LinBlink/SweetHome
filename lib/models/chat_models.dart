@@ -271,3 +271,19 @@ class WsInboundMessage {
   final Map<String, dynamic> data;
   const WsInboundMessage({required this.type, required this.data});
 }
+
+/// One row of `ChatProvider.searchMessages` output. A hit is either a
+/// [conversation] whose display name matches the query (with [message]
+/// = `null`, signalling "open this conversation") or a [message] hit
+/// inside an already-cached conversation (with [conversation] populated
+/// so the result list can show the avatar + name next to the matched
+/// snippet).
+class ChatSearchHit {
+  final Conversation conversation;
+  final Message? message;
+
+  const ChatSearchHit({
+    required this.conversation,
+    required this.message,
+  });
+}

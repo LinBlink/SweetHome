@@ -1098,6 +1098,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get familyFeedLikeCancelFailed => '取消点赞失败,请重试';
+
+  @override
+  String get conversationsSearchHint => '搜索消息和聊天';
+
+  @override
+  String get conversationsSearchEmptyHint => '输入关键词搜索已保存的消息。';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '没有找到匹配「$query」的结果。';
+  }
+
+  @override
+  String get profileThemeRow => '主题';
+
+  @override
+  String get profileThemeSheetTitle => '选择主题';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2194,6 +2211,23 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get familyFeedLikeCancelFailed => '取消点赞失败,请重试';
+
+  @override
+  String get conversationsSearchHint => '搜索消息和聊天';
+
+  @override
+  String get conversationsSearchEmptyHint => '输入关键词搜索已保存的消息。';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '没有找到匹配「$query」的结果。';
+  }
+
+  @override
+  String get profileThemeRow => '主题';
+
+  @override
+  String get profileThemeSheetTitle => '选择主题';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3290,4 +3324,21 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get familyFeedLikeCancelFailed => '取消讚失敗,請重試';
+
+  @override
+  String get conversationsSearchHint => '搜尋訊息和聊天';
+
+  @override
+  String get conversationsSearchEmptyHint => '輸入關鍵字搜尋已儲存的訊息。';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '沒有找到符合「$query」的結果。';
+  }
+
+  @override
+  String get profileThemeRow => '主題';
+
+  @override
+  String get profileThemeSheetTitle => '選擇主題';
 }

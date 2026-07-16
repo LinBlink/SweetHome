@@ -382,4 +382,14 @@
 "publishMomentVideoTooLargeRaw": "ဗီဒီယို ချုံ့၍မရပါ ({size} MB)။ ပိုသေးသော ဖိုင် ရွေးပါ။"
 ,"familyFeedLikeTooltipLong": "ကြိုက်တယ် နှိပ်ပါ · ပြန်ဖြုတ်ရန် ကြာကြာနှိပ်ပါ",
 "familyFeedLikeCancelFailed": "ကြိုက်တယ်များ ပြန်ဖြုတ်၍မရပါ — ထပ်ကြိုးစားပါ"
+,"conversationsSearchHint": "မက်ဆေ့ချ်များနှင့် ချက်တင်များ ရှာပါ",
+"conversationsSearchEmptyHint": "သိမ်းထားသော မက်ဆေ့ချ်များကို ရှာဖွေရန် စာလုံးရိုက်ထည့်ပါ။",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "\"{query}\" အတွက် ရလဒ်မရှိပါ။"
+,"profileThemeRow": "အပြင်အဆင်",
+"profileThemeSheetTitle": "အပြင်အဆင် ရွေးပါ"
 }

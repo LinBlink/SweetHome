@@ -2139,6 +2139,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t clear your likes — try again'**
   String get familyFeedLikeCancelFailed;
+
+  /// No description provided for @conversationsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search messages and chats'**
+  String get conversationsSearchHint;
+
+  /// No description provided for @conversationsSearchEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a keyword to search your saved messages.'**
+  String get conversationsSearchEmptyHint;
+
+  /// No description provided for @conversationsSearchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches for \"{query}\".'**
+  String conversationsSearchNoResults(String query);
+
+  /// No description provided for @profileThemeRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get profileThemeRow;
+
+  /// No description provided for @profileThemeSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a theme'**
+  String get profileThemeSheetTitle;
 }
 
 class _AppLocalizationsDelegate

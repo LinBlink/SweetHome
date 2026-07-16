@@ -382,4 +382,14 @@
 "publishMomentVideoTooLargeRaw": "视频压缩失败（{size} MB），请选择更小的文件。"
 ,"familyFeedLikeTooltipLong": "点一下赞 · 长按取消你点的赞",
 "familyFeedLikeCancelFailed": "取消点赞失败,请重试"
+,"conversationsSearchHint": "搜索消息和聊天",
+"conversationsSearchEmptyHint": "输入关键词搜索已保存的消息。",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "没有找到匹配「{query}」的结果。"
+,"profileThemeRow": "主题",
+"profileThemeSheetTitle": "选择主题"
 }

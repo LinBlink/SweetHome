@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/app_config.dart';
+import '../core/app_palette.dart';
 import '../core/avatar_label.dart';
 import '../core/home_widgets.dart';
 import '../data/mock_data.dart';
@@ -9,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/locale_provider.dart';
+import '../providers/theme_provider.dart';
 import '../services/family_service.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/language_picker.dart';
@@ -208,6 +210,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             HomeCard(
               padding: EdgeInsets.zero,
+              onTap: () => showThemePickerSheet(context),
+              child: HomeListItem(
+                leading: const _LeadingIcon(
+                  icon: Icons.palette_rounded,
+                  color: AppColors.primaryDark,
+                ),
+                title: l10n.profileThemeRow,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _paletteDisplayName(
+                        context.watch<ThemeProvider>().palette,
+                      ),
+                      style: const TextStyle(
+                        color: AppColors.inkFaded,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.inkFaded,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                showSeparator: false,
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeCard(
+              padding: EdgeInsets.zero,
               onTap: () => showLanguagePickerSheet(context),
               child: HomeListItem(
                 leading: const _LeadingIcon(
@@ -295,6 +330,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Text(l10n.profileLogout),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bottom-sheet theme picker. Shows each preset as a circle
+/// swatch next to its localized name; tapping commits the
+/// selection. The currently active preset is marked with a ring.
+void showThemePickerSheet(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  final provider = context.read<ThemeProvider>();
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (ctx) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Text(
+              l10n.profileThemeSheetTitle,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 4),
+            for (final p in AppPalette.presets)
+              ListTile(
+                leading: _ThemeSwatch(
+                  palette: p,
+                  selected: p.id == provider.palette.id,
+                ),
+                title: Text(_paletteDisplayName(p)),
+                trailing: p.id == provider.palette.id
+                    ? const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.primary,
+                      )
+                    : null,
+                onTap: () {
+                  provider.setPalette(p);
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+String _paletteDisplayName(AppPalette p) {
+  switch (p.id) {
+    case 'terracotta':
+      return 'Terracotta';
+    case 'ocean':
+      return 'Ocean';
+    case 'forest':
+      return 'Forest';
+    case 'lavender':
+      return 'Lavender';
+    case 'slate':
+      return 'Slate';
+    default:
+      return p.id;
+  }
+}
+
+class _ThemeSwatch extends StatelessWidget {
+  final AppPalette palette;
+  final bool selected;
+  const _ThemeSwatch({required this.palette, required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [palette.primaryLight, palette.primary],
+        ),
+        border: Border.all(
+          color: selected ? AppColors.ink : AppColors.divider,
+          width: selected ? 2 : 1,
+        ),
       ),
     );
   }

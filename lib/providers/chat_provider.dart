@@ -9,6 +9,7 @@ import '../models/api_exception.dart';
 import '../models/chat_models.dart';
 import '../models/auth_models.dart';
 import '../services/auth_service.dart';
+import '../services/chat_local_cache.dart';
 import '../services/chat_service.dart';
 import '../services/websocket_service.dart';
 
@@ -17,6 +18,7 @@ class ChatProvider extends ChangeNotifier {
   final ChatService _chatService;
   final AuthUser _currentUser;
   final Future<bool> Function()? _onUnauthorized;
+  final ChatLocalCache _cache = ChatLocalCache();
 
   List<Conversation> _conversations = [];
   final Map<int, List<Message>> _messages = {};
@@ -61,6 +63,12 @@ class ChatProvider extends ChangeNotifier {
        _onUnauthorized = onUnauthorized {
     _ws.connect();
     _wsSub = _ws.stream.listen(_handleWsMessage);
+    // Hydrate from local cache before the first network fetch — the
+    // chat list renders instantly on cold start, and the message
+    // bubbles inside a reopened chat room populate from cache before
+    // the server reply lands. `loadConversations()` will overwrite
+    // this with fresh server data when it returns.
+    _restoreFromCache();
   }
 
   /// Routes [e] to either a display-only error or, for expired/invalid
@@ -100,6 +108,43 @@ class ChatProvider extends ChangeNotifier {
       _isLoadingConversations = false;
       notifyListeners();
     }
+    _persistCache();
+  }
+
+  /// Read the on-disk blob at construction time and seed in-memory
+  /// state. Runs once in the constructor (synchronous from the
+  /// provider's perspective — only the SharedPreferences `getString`
+  /// is async, and that returns the cached value immediately on
+  /// subsequent launches).
+  void _restoreFromCache() {
+    _cache.load(currentUserId: _currentUser.userId).then((cached) {
+      if (cached == null) return;
+      // Don't overwrite a fresh server load if one's already
+      // completed — the cache hydration only matters when the
+      // provider started with an empty in-memory state.
+      if (_conversations.isEmpty && cached.conversations.isNotEmpty) {
+        _conversations = cached.conversations;
+        notifyListeners();
+      }
+      var changed = false;
+      for (final entry in cached.messagesByConversation.entries) {
+        if (_messages[entry.key] == null && entry.value.isNotEmpty) {
+          _messages[entry.key] = entry.value;
+          changed = true;
+        }
+      }
+      if (changed) notifyListeners();
+    });
+  }
+
+  /// Snapshot the current conversations + message map to disk.
+  /// Called after every successful server round-trip and after every
+  /// WS frame so the cache stays within a few seconds of truth.
+  void _persistCache() {
+    _cache.save(
+      conversations: _conversations,
+      messagesByConversation: _messages,
+    );
   }
 
   /// Starts (or reuses) a direct conversation with [targetUserId] — see
@@ -197,6 +242,7 @@ class ChatProvider extends ChangeNotifier {
       notifyListeners();
     }
     if (!loadMore) _syncReadState(conversationId);
+    _persistCache();
   }
 
   /// Syncs the read cursor to the backend — WS `READ` frame for real-time
@@ -347,6 +393,7 @@ class ChatProvider extends ChangeNotifier {
         if (m.conversationId == _activeConversationId) {
           _syncReadState(m.conversationId);
         }
+        _persistCache();
 
       case 'USER_STATUS':
         final userId = msg.data['userId'] as int?;
@@ -386,6 +433,7 @@ class ChatProvider extends ChangeNotifier {
         lastMessageType: type,
       );
     }
+    _persistCache();
   }
 
   /// `POST /users/upload/image` (docs/api.md §2.4) → `SEND_MESSAGE`
@@ -539,6 +587,42 @@ class ChatProvider extends ChangeNotifier {
     _connectionError = null;
     _ws.connect();
     notifyListeners();
+  }
+
+  /// Substring search across cached conversations and cached
+  /// messages. Whitespace-insensitive on both sides. Returns matches
+  /// sorted by recency (newest message first, then conversation-
+  /// name hits by `lastMessageAt`).
+  List<ChatSearchHit> searchMessages(String raw) {
+    final q = raw.trim().toLowerCase();
+    if (q.isEmpty) return [];
+    final hits = <ChatSearchHit>[];
+    // 1) Conversations whose name matches.
+    for (final c in _conversations) {
+      if (c.name.toLowerCase().contains(q)) {
+        hits.add(ChatSearchHit(conversation: c, message: null));
+      }
+    }
+    // 2) Messages (only what's already in cache) whose content
+    //    matches. Skip voice / image messages — they have no text
+    //    to search.
+    for (final entry in _messages.entries) {
+      for (final m in entry.value) {
+        if (m.type != MessageType.text) continue;
+        if (m.content.toLowerCase().contains(q)) {
+          final idx = _conversations.indexWhere((c) => c.id == m.conversationId);
+          if (idx >= 0) {
+            hits.add(ChatSearchHit(conversation: _conversations[idx], message: m));
+          }
+        }
+      }
+    }
+    hits.sort((a, b) {
+      final at = a.message?.sentAt ?? a.conversation.lastMessageAt;
+      final bt = b.message?.sentAt ?? b.conversation.lastMessageAt;
+      return bt.compareTo(at);
+    });
+    return hits;
   }
 
   /// Lossy re-encode aimed at the §2.4 1 MB cap. Caps the longer

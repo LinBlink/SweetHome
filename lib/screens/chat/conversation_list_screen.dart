@@ -8,6 +8,7 @@ import '../../providers/chat_provider.dart';
 import '../../widgets/conversation_tile.dart';
 import '../../widgets/error_banner.dart';
 import 'chat_room_screen.dart';
+import 'search_messages_screen.dart';
 
 class ConversationListScreen extends StatefulWidget {
   const ConversationListScreen({super.key});
@@ -35,7 +36,14 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ChangeNotifierProvider.value(
+                  value: context.read<ChatProvider>(),
+                  child: const SearchMessagesScreen(),
+                ),
+              ));
+            },
             tooltip: l10n.conversationsSearchTooltip,
           ),
         ],

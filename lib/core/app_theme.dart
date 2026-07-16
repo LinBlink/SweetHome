@@ -1,45 +1,38 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'app_palette.dart';
 
 class AppTheme {
   AppTheme._();
 
   /// The "过家家 · Sweet Home" theme.
   ///
-  /// Most of the screen chrome is replaced by custom home widgets
-  /// (see `lib/core/home_widgets.dart`) — `HomeAppBar`,
-  /// `HomeCard`, `HomePrimaryButton`, `HomeListItem`. This theme
-  /// is the residual Material defaults: the color scheme, the
-  /// shape of inputs/dividers, and a few component styles that
-  /// Flutter still uses internally (e.g. switches, checkboxes).
-  /// Anything that previously rendered as a flat blue-grey
-  /// Material surface is now warm cream with a terracotta
-  /// accent.
-  static ThemeData light() {
+  /// [palette] drives the brand identity (primary / primaryDark /
+  /// primaryLight / accent); paper / wood / ink / divider stay
+  /// constant so the app's "feel" doesn't change when the user
+  /// picks a different accent. The palette is registered into
+  /// the resulting [ThemeData] via `extensions:` so widgets can
+  /// read it with `Theme.of(context).extension<AppPalette>()!`
+  /// (or the `BrandColors.of(context)` shortcut).
+  static ThemeData build(AppPalette palette) {
     return ThemeData(
       useMaterial3: true,
+      extensions: <ThemeExtension<dynamic>>[palette],
       colorScheme: ColorScheme.light(
-        primary: AppColors.primary,
+        primary: palette.primary,
         onPrimary: Colors.white,
-        primaryContainer: AppColors.primaryLight,
-        onPrimaryContainer: AppColors.primaryDark,
-        secondary: AppColors.accent,
+        primaryContainer: palette.primaryLight,
+        onPrimaryContainer: palette.primaryDark,
+        secondary: palette.accent,
         onSecondary: Colors.white,
         surface: AppColors.surface,
         onSurface: AppColors.ink,
         surfaceContainerHighest: AppColors.surfaceVariant,
         error: AppColors.danger,
         outline: AppColors.divider,
-        // M3 paints the system "status" bar tint from this; we
-        // want it to follow the cream background, not a default
-        // purple.
         surfaceTint: AppColors.surface,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      // App bars are drawn by HomeAppBar directly; this only
-      // affects any stray Scaffold that still uses Material's
-      // default bar. Color it cream so it doesn't suddenly flash
-      // a default-blue M3 surface in transition.
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
@@ -55,11 +48,9 @@ class AppTheme {
         iconTheme: IconThemeData(color: AppColors.ink),
         actionsIconTheme: IconThemeData(color: AppColors.ink),
       ),
-      // Bottom navigation is hand-drawn in MainShell (a wooden
-      // tray). Theme defaults apply only as a fallback.
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.wood,
-        indicatorColor: AppColors.primaryLight.withValues(alpha: 0.4),
+        indicatorColor: palette.primaryLight.withValues(alpha: 0.4),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(color: Colors.white);
@@ -88,7 +79,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
           side: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.10),
+            color: palette.primary.withValues(alpha: 0.10),
             width: 0.8,
           ),
         ),
@@ -108,7 +99,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
+          borderSide: BorderSide(color: palette.primary, width: 1.6),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -120,12 +111,8 @@ class AppTheme {
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        // Material elevated buttons are no longer the default
-        // primary action — HomePrimaryButton is. This style only
-        // affects the rare screens that still construct an
-        // ElevatedButton directly. Match the home pill vibe.
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: palette.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
@@ -141,7 +128,7 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: palette.primary,
           textStyle: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -152,7 +139,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.ink,
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.4)),
+          side: BorderSide(color: palette.primary.withValues(alpha: 0.4)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -165,7 +152,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.10),
+            color: palette.primary.withValues(alpha: 0.10),
             width: 0.8,
           ),
         ),
@@ -204,7 +191,7 @@ class AppTheme {
           return AppColors.surface;
         }),
         trackColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) return AppColors.primary;
+          if (s.contains(WidgetState.selected)) return palette.primary;
           return AppColors.divider;
         }),
         trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
@@ -213,14 +200,14 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.6), width: 1.4),
+        side: BorderSide(color: palette.primary.withValues(alpha: 0.6), width: 1.4),
         fillColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) return AppColors.primary;
+          if (s.contains(WidgetState.selected)) return palette.primary;
           return Colors.transparent;
         }),
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.primary,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: palette.primary,
         linearTrackColor: AppColors.linenDeep,
         circularTrackColor: AppColors.linenDeep,
       ),

@@ -1104,4 +1104,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get familyFeedLikeCancelFailed => '좋아요를 취소하지 못했습니다 — 다시 시도해 주세요';
+
+  @override
+  String get conversationsSearchHint => '메시지와 채팅 검색';
+
+  @override
+  String get conversationsSearchEmptyHint => '키워드를 입력해 저장된 메시지를 검색하세요.';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '\"$query\"와 일치하는 결과가 없습니다.';
+  }
+
+  @override
+  String get profileThemeRow => '테마';
+
+  @override
+  String get profileThemeSheetTitle => '테마 선택';
 }

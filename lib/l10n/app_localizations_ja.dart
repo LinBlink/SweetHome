@@ -1102,4 +1102,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get familyFeedLikeCancelFailed => 'いいねを取り消せませんでした — もう一度お試しください';
+
+  @override
+  String get conversationsSearchHint => 'メッセージとチャットを検索';
+
+  @override
+  String get conversationsSearchEmptyHint => 'キーワードを入力して保存済みメッセージを検索。';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return '「$query」に一致する結果はありません。';
+  }
+
+  @override
+  String get profileThemeRow => 'テーマ';
+
+  @override
+  String get profileThemeSheetTitle => 'テーマを選択';
 }

@@ -382,4 +382,14 @@
 "publishMomentVideoTooLargeRaw": "ビデオを圧縮できませんでした（{size} MB）。小さいファイルを選んでください。"
 ,"familyFeedLikeTooltipLong": "タップでいいね · 長押しで取り消し",
 "familyFeedLikeCancelFailed": "いいねを取り消せませんでした — もう一度お試しください"
+,"conversationsSearchHint": "メッセージとチャットを検索",
+"conversationsSearchEmptyHint": "キーワードを入力して保存済みメッセージを検索。",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "「{query}」に一致する結果はありません。"
+,"profileThemeRow": "テーマ",
+"profileThemeSheetTitle": "テーマを選択"
 }

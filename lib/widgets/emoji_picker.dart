@@ -13,6 +13,12 @@ import '../l10n/app_localizations.dart';
 /// the chat room's TextEditingController is responsible for
 /// cursor-aware insertion (see ChatRoomScreen._insertEmoji).
 ///
+/// Categories are arranged as pages in a horizontal [PageView] —
+/// the user can swipe left/right between them, or tap the bottom
+/// tab bar to jump. `PageController` and the tab-bar's selected
+/// index are kept in sync both ways via [_onPageChanged] /
+/// [_select].
+///
 /// Why not a 3rd-party package? Two reasons:
 ///   1. The four leading Flutter emoji picker packages each add
 ///      ~300-500 KB and pull in dependencies we don't otherwise
@@ -35,9 +41,33 @@ class EmojiPicker extends StatefulWidget {
 }
 
 class _EmojiPickerState extends State<EmojiPicker> {
+  late final PageController _pageController;
   int _categoryIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _select(int i) {
+    if (_categoryIndex == i) return;
+    setState(() => _categoryIndex = i);
+    _pageController.animateToPage(
+      i,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+    HapticFeedback.selectionClick();
+  }
+
+  void _onPageChanged(int i) {
     if (_categoryIndex == i) return;
     setState(() => _categoryIndex = i);
     HapticFeedback.selectionClick();
@@ -51,7 +81,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final category = _kCategories[_categoryIndex];
     final tooltips = <String>[
       l10n.emojiCategorySmileys,
       l10n.emojiCategoryPeople,
@@ -70,7 +99,16 @@ class _EmojiPickerState extends State<EmojiPicker> {
       ),
       child: Column(
         children: [
-          Expanded(child: _EmojiGrid(emojis: category.emojis, onTap: _tap)),
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              physics: const BouncingScrollPhysics(),
+              onPageChanged: _onPageChanged,
+              itemCount: _kCategories.length,
+              itemBuilder: (ctx, i) =>
+                  _EmojiGrid(emojis: _kCategories[i].emojis, onTap: _tap),
+            ),
+          ),
           _CategoryBar(
             currentIndex: _categoryIndex,
             tooltips: tooltips,

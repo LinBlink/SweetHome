@@ -382,4 +382,14 @@
 "publishMomentVideoTooLargeRaw": "影片壓縮失敗（{size} MB），請選擇更小的檔案。"
 ,"familyFeedLikeTooltipLong": "點讚 · 長按取消你點的讚",
 "familyFeedLikeCancelFailed": "取消讚失敗,請重試"
+,"conversationsSearchHint": "搜尋訊息和聊天",
+"conversationsSearchEmptyHint": "輸入關鍵字搜尋已儲存的訊息。",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "沒有找到符合「{query}」的結果。"
+,"profileThemeRow": "主題",
+"profileThemeSheetTitle": "選擇主題"
 }

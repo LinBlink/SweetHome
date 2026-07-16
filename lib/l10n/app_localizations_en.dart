@@ -1141,4 +1141,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyFeedLikeCancelFailed =>
       'Couldn\'t clear your likes — try again';
+
+  @override
+  String get conversationsSearchHint => 'Search messages and chats';
+
+  @override
+  String get conversationsSearchEmptyHint =>
+      'Type a keyword to search your saved messages.';
+
+  @override
+  String conversationsSearchNoResults(String query) {
+    return 'No matches for \"$query\".';
+  }
+
+  @override
+  String get profileThemeRow => 'Theme';
+
+  @override
+  String get profileThemeSheetTitle => 'Pick a theme';
 }

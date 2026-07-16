@@ -476,4 +476,14 @@
 "publishMomentVideoTooLargeRaw": "Couldn't compress video ({size} MB). Try a smaller file."
 ,"familyFeedLikeTooltipLong": "Tap to like · long-press to undo your likes",
 "familyFeedLikeCancelFailed": "Couldn't clear your likes — try again"
+,"conversationsSearchHint": "Search messages and chats",
+"conversationsSearchEmptyHint": "Type a keyword to search your saved messages.",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "No matches for \"{query}\"."
+,"profileThemeRow": "Theme",
+"profileThemeSheetTitle": "Pick a theme"
 }

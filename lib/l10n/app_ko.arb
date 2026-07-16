@@ -382,4 +382,14 @@
 "publishMomentVideoTooLargeRaw": "비디오를 압축하지 못했습니다 ({size} MB). 더 작은 파일을 선택해 주세요."
 ,"familyFeedLikeTooltipLong": "탭하여 좋아요 · 길게 눌러 취소",
 "familyFeedLikeCancelFailed": "좋아요를 취소하지 못했습니다 — 다시 시도해 주세요"
+,"conversationsSearchHint": "메시지와 채팅 검색",
+"conversationsSearchEmptyHint": "키워드를 입력해 저장된 메시지를 검색하세요.",
+"@conversationsSearchNoResults": {
+    "placeholders": {
+        "query": {"type":"String"}
+    }
+},
+"conversationsSearchNoResults": "\"{query}\"와 일치하는 결과가 없습니다."
+,"profileThemeRow": "테마",
+"profileThemeSheetTitle": "테마 선택"
 }

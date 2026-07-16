@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/app_config.dart';
 import 'core/app_theme.dart';
 import 'core/app_colors.dart';
+import 'core/brand_colors.dart';
 import 'core/home_widgets.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
@@ -11,6 +12,7 @@ import 'providers/chat_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/moment_provider.dart';
+import 'providers/theme_provider.dart';
 import 'services/chat_service.dart';
 import 'services/location_service.dart';
 import 'services/moment_service.dart';
@@ -25,12 +27,14 @@ import 'screens/profile_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final localeProvider = LocaleProvider();
-  await localeProvider.restore();
+  final themeProvider = ThemeProvider();
+  await Future.wait([localeProvider.restore(), themeProvider.restore()]);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider.value(value: localeProvider),
+        ChangeNotifierProvider.value(value: themeProvider),
       ],
       child: const SweetHomeApp(),
     ),
@@ -43,9 +47,10 @@ class SweetHomeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
+    final palette = context.watch<ThemeProvider>().palette;
     return MaterialApp(
       title: 'Sweet Home',
-      theme: AppTheme.light(),
+      theme: AppTheme.build(palette),
       debugShowCheckedModeBanner: false,
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -227,13 +232,13 @@ class _MainShellState extends State<MainShell> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isSelected
-                  ? [AppColors.primary, AppColors.primaryDark]
-                  : [AppColors.accent, AppColors.primary],
+                  ? [context.brandPrimary, context.brandPrimaryDark]
+                  : [context.brandAccent, context.brandPrimary],
             ),
             border: Border.all(color: AppColors.linen, width: 3),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryDark.withValues(alpha: 0.4),
+                color: context.brandPrimaryDark.withValues(alpha: 0.4),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -348,7 +353,7 @@ class _MainShellState extends State<MainShell> {
     return InkWell(
       onTap: onTap,
       highlightColor: Colors.transparent,
-      splashColor: AppColors.accent.withValues(alpha: 0.18),
+      splashColor: context.brandAccent.withValues(alpha: 0.18),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -374,7 +379,7 @@ class _MainShellState extends State<MainShell> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.accent,
+                      color: context.brandAccent,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppColors.wood, width: 1.4),
                     ),
@@ -410,7 +415,7 @@ class _MainShellState extends State<MainShell> {
             height: 2.5,
             width: isSelected ? 18 : 0,
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: context.brandAccent,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
