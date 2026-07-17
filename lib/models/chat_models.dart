@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/time/backend_time.dart';
@@ -26,7 +28,8 @@ enum MessageType {
     }
   }
 
-  /// Inverse of [fromApi] — wire value for outbound WS frames and REST bodies.
+  /// Inverse of [fromApi] — wire value for outbound WebSocket frames
+  /// (`§5.2` uses uppercase: `TEXT` / `IMAGE` / `VOICE` / `SYSTEM`).
   String get apiValue {
     switch (this) {
       case MessageType.text:
@@ -37,6 +40,24 @@ enum MessageType {
         return 'VOICE';
       case MessageType.system:
         return 'SYSTEM';
+    }
+  }
+
+  /// REST wire value for `§4.4` `POST /conversations/{id}/messages`.
+  /// The HTTP path uses **lowercase** (`text` / `image` / `voice` /
+  /// `system`) per `API.md §4.4` — distinct from the WebSocket path's
+  /// uppercase `messageType`. Reusing [apiValue] here would produce
+  /// `400 INVALID_MESSAGE_TYPE` server-side.
+  String get restValue {
+    switch (this) {
+      case MessageType.text:
+        return 'text';
+      case MessageType.image:
+        return 'image';
+      case MessageType.voice:
+        return 'voice';
+      case MessageType.system:
+        return 'system';
     }
   }
 }
@@ -250,19 +271,22 @@ class WsOutboundMessage {
   final Map<String, dynamic> payload;
   const WsOutboundMessage({required this.type, required this.payload});
 
+  /// Serializes the frame to a JSON string. Uses [jsonEncode] rather
+  /// than hand-rolled string interpolation so quotes, backslashes,
+  /// newlines, and control characters in user-supplied `content`
+  /// are escaped correctly. A naïve `replaceAll('"', '\\"')` would
+  /// emit invalid JSON for any message containing a backslash, a
+  /// newline, or an emoji surrogate pair.
+  ///
+  /// Outbound frames are flat (`type` + payload keys at the top
+  /// level), not wrapped in a `data` envelope — only inbound
+  /// frames use `data: {...}` (see [WsInboundMessage]).
   String toJsonString() {
-    final buf = StringBuffer('{');
-    buf.write('"type":"$type"');
-    payload.forEach((k, v) {
-      buf.write(',"$k":');
-      if (v is String) {
-        buf.write('"${v.replaceAll('"', '\\"')}"');
-      } else {
-        buf.write('$v');
-      }
-    });
-    buf.write('}');
-    return buf.toString();
+    final envelope = <String, dynamic>{
+      'type': type,
+      ...payload,
+    };
+    return jsonEncode(envelope);
   }
 }
 

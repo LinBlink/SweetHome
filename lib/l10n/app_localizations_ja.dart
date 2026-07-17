@@ -966,6 +966,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String momentDetailLikedTimes(int count) {
+    return 'いいね $count 回';
+  }
+
+  @override
   String get familyFeedNoCommentsYet => 'まだコメントはありません';
 
   @override
@@ -1119,4 +1124,28 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileThemeSheetTitle => 'テーマを選択';
+
+  @override
+  String get momentCommentSectionTitle => 'コメント';
+
+  @override
+  String get momentCommentEmpty => 'まだコメントはありません';
+
+  @override
+  String get momentCommentInputHint => 'コメントを入力...';
+
+  @override
+  String get momentCommentSend => '送信';
+
+  @override
+  String get momentCommentDeleteTitle => 'このコメントを削除しますか？';
+
+  @override
+  String get momentCommentDeleteBody => 'このコメントはすべての家族から削除されます。';
+
+  @override
+  String get momentCommentDeleteFailed => 'コメントを削除できませんでした';
+
+  @override
+  String get chatMessageTooLong => 'メッセージが長すぎます（最大2000文字）';
 }

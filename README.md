@@ -52,4 +52,3 @@ flutter build web --dart-define=API_BASE_URL=https://api.sweethome.example.com/a
 ## 后端文档
 
 - API 接口规范：[docs/api.md](docs/api.md)
-- MySQL 建表方案：[docs/schema.sql](docs/schema.sql)

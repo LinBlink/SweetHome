@@ -1003,6 +1003,11 @@ class AppLocalizationsMy extends AppLocalizations {
   }
 
   @override
+  String momentDetailLikedTimes(int count) {
+    return 'ကြိုက်တယ် $count ကြိမ်';
+  }
+
+  @override
   String get familyFeedNoCommentsYet => 'မှတ်ချက်မရှိသေးပါ';
 
   @override
@@ -1162,4 +1167,30 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get profileThemeSheetTitle => 'အပြင်အဆင် ရွေးပါ';
+
+  @override
+  String get momentCommentSectionTitle => 'မှတ်ချက်များ';
+
+  @override
+  String get momentCommentEmpty => 'မှတ်ချက်မရှိသေးပါ';
+
+  @override
+  String get momentCommentInputHint => 'မှတ်ချက်ရေးပါ...';
+
+  @override
+  String get momentCommentSend => 'ပို့မည်';
+
+  @override
+  String get momentCommentDeleteTitle => 'ဤမှတ်ချက်ကို ဖျက်မှာလား?';
+
+  @override
+  String get momentCommentDeleteBody =>
+      'ဤမှတ်ချက်ကို မိသားစုအားလုံးထံမှ ဖျက်ပစ်ပါမည်။';
+
+  @override
+  String get momentCommentDeleteFailed => 'မှတ်ချက်ဖျက်၍မရပါ';
+
+  @override
+  String get chatMessageTooLong =>
+      'မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)';
 }

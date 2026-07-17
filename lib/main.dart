@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,8 @@ import 'providers/theme_provider.dart';
 import 'services/chat_service.dart';
 import 'services/location_service.dart';
 import 'services/moment_service.dart';
+import 'services/push_notification_router.dart';
+import 'services/push_service.dart';
 import 'services/websocket_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chat/conversation_list_screen.dart';
@@ -28,11 +32,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final localeProvider = LocaleProvider();
   final themeProvider = ThemeProvider();
+  final pushService = PushService();
+  // Kick off JPush setup in parallel with theme/locale restore. The
+  // service is no-op on web/desktop, so this is cheap regardless.
+  unawaited(pushService.restoreCachedRegistrationId());
+  unawaited(pushService.setup(production: !AppConfig.mockMode));
   await Future.wait([localeProvider.restore(), themeProvider.restore()]);
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider(push: pushService)),
         ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider.value(value: themeProvider),
       ],
@@ -40,6 +49,13 @@ void main() async {
     ),
   );
 }
+
+/// Shared navigator key for deep-link handling from outside the
+/// widget tree (notification taps, JPush callback fires). Held at
+/// file scope so [PushNotificationRouter] can resolve it without a
+/// BuildContext.
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 class SweetHomeApp extends StatelessWidget {
   const SweetHomeApp({super.key});
@@ -52,6 +68,7 @@ class SweetHomeApp extends StatelessWidget {
       title: 'Sweet Home',
       theme: AppTheme.build(palette),
       debugShowCheckedModeBanner: false,
+      navigatorKey: rootNavigatorKey,
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
@@ -65,13 +82,53 @@ class SweetHomeApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  PushNotificationRouter? _pushRouter;
+
+  @override
+  void initState() {
+    super.initState();
+    // Wire the JPush tap router to the same PushService the
+    // AuthProvider owns. Listens for the entire app lifetime —
+    // taps arriving during the unauthenticated splash window are
+    // parked until `flushPending()` runs from `didChangeDependencies`
+    // below once auth resolves.
+    final push = context.read<AuthProvider>().pushService;
+    if (push != null) {
+      _pushRouter = PushNotificationRouter(
+        onTap: push.onTap,
+        tokenProvider: () {
+          final user = context.read<AuthProvider>().currentUser;
+          return user?.token;
+        },
+        isAuthenticated: () => context.read<AuthProvider>().isAuthenticated,
+      )..start();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pushRouter?.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (ctx, auth, _) {
+        // After every rebuild triggered by auth state changing
+        // (login completes, restore-from-cache finishes), flush
+        // any push tap that arrived during the unauthenticated
+        // window. Idempotent — flushPending is a no-op if nothing
+        // is pending.
+        if (auth.isAuthenticated) _pushRouter?.flushPending();
         if (auth.isLoading) return const _SplashScreen();
         if (auth.isAuthenticated) {
           return MultiProvider(

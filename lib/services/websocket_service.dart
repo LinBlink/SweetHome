@@ -21,6 +21,15 @@ class WebSocketService {
   bool _isConnected = false;
   static const int _maxAttempts = 6;
 
+  /// Fires after the underlying socket successfully completes
+  /// `WebSocketChannel.ready` (and on every reconnect). Lets the
+  /// ChatProvider re-send its `JOIN_CONVERSATION` for the active
+  /// room so server-side active-room state stays in sync after
+  /// transient disconnects. Without this, the active-room state
+  /// would only have been advertised the first time the user
+  /// opened the conversation.
+  void Function()? onConnected;
+
   Stream<WsInboundMessage> get stream => _controller.stream;
 
   /// True once the current [_channel] has confirmed a live connection
@@ -58,6 +67,11 @@ class WebSocketService {
               _isConnected = true;
               _reconnectAttempts = 0;
               _startPing();
+              // Notify the ChatProvider so it can replay the active
+              // conversation's JOIN frame. Skipped on the very first
+              // connect (no active conversation yet) — the provider
+              // wires this up after construction.
+              onConnected?.call();
             })
             .catchError((_) {
               if (_disposed || _channel != channel) return;

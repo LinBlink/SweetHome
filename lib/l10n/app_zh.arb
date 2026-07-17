@@ -295,8 +295,9 @@
   "familyFeedDeleted": "动态已删除",
   "familyFeedLikeTooltip": "赞",
   "familyFeedUnlikeTooltip": "已赞",
-  "familyFeedLikeCount": "{count, plural, =0{0 人觉得赞} other{{count} 人觉得很赞}}",
+  "familyFeedLikeCount": "{count, plural, =0{还没有人点赞} other{被点赞 {count} 次}}",
   "familyFeedMoreLikers": "还有 {count} 人",
+  "momentDetailLikedTimes": "点赞 {count} 次",
   "familyFeedNoCommentsYet": "还没有评论",
   "familyFeedCommentsComingSoon": "评论功能即将上线",
   "familyFeedPublishButton": "发布",
@@ -391,5 +392,13 @@
 },
 "conversationsSearchNoResults": "没有找到匹配「{query}」的结果。"
 ,"profileThemeRow": "主题",
-"profileThemeSheetTitle": "选择主题"
+"profileThemeSheetTitle": "选择主题",
+"momentCommentSectionTitle": "评论",
+"momentCommentEmpty": "还没有评论，来抢沙发",
+"momentCommentInputHint": "说点什么...",
+"momentCommentSend": "发送",
+"momentCommentDeleteTitle": "删除这条评论？",
+"momentCommentDeleteBody": "该评论将对所有家庭成员删除。",
+"momentCommentDeleteFailed": "删除评论失败，请重试",
+"chatMessageTooLong": "消息过长（最多 2000 字）"
 }

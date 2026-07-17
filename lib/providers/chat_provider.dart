@@ -47,10 +47,21 @@ class ChatProvider extends ChangeNotifier {
   bool isLoadingMessages(int convId) => _loadingMessages[convId] ?? false;
   bool hasMore(int convId) => _cursors[convId] != null;
 
-  /// Live online status from WS `USER_STATUS` pushes — see docs/api.md §5.2.
-  /// Only reflects users the server has actually pushed a status for since
-  /// this session connected; unknown users default to offline.
+/// Live online status from WS `USER_STATUS` pushes — see docs/api.md §5.2.
+/// Only reflects users the server has actually pushed a status for since
+/// this session connected; unknown users default to offline.
   bool isUserOnline(int userId) => _onlineUserIds.contains(userId);
+
+  /// Seed the online-status set from a non-WS source (the §3.2
+  /// `GET /families/{id}/members` response's `isOnline` field, used
+  /// by `FamilyMembersScreen` to mark members online immediately on
+  /// first render rather than waiting for a WS `USER_STATUS` push).
+  /// Idempotent — `Set.add` returns false if already present, and we
+  /// skip the `notifyListeners()` call in that case so we don't
+  /// rebuild listeners on every screen entry.
+  void markUserOnline(int userId) {
+    if (_onlineUserIds.add(userId)) notifyListeners();
+  }
 
   ChatProvider({
     required WebSocketService ws,
@@ -63,6 +74,23 @@ class ChatProvider extends ChangeNotifier {
        _onUnauthorized = onUnauthorized {
     _ws.connect();
     _wsSub = _ws.stream.listen(_handleWsMessage);
+    // After every successful (re)connect — not just the first one —
+    // re-send `JOIN_CONVERSATION` for whatever room the user is in
+    // so the server's active-room bookkeeping catches up. Without
+    // this, the server thinks the user has "left" every room after
+    // a transient disconnect, even though our `_activeConversationId`
+    // is unchanged.
+    _ws.onConnected = () {
+      final active = _activeConversationId;
+      if (active != null) {
+        _ws.send(
+          WsOutboundMessage(
+            type: 'JOIN_CONVERSATION',
+            payload: {'conversationId': active},
+          ),
+        );
+      }
+    };
     // Hydrate from local cache before the first network fetch — the
     // chat list renders instantly on cold start, and the message
     // bubbles inside a reopened chat room populate from cache before
@@ -375,7 +403,12 @@ class ChatProvider extends ChangeNotifier {
         final existingIdx = _messages[m.conversationId]!.indexWhere(
           (x) => x.clientId == m.clientId,
         );
-        if (existingIdx >= 0) {
+        // Optimistic-message reconciliation: if we already have a row
+        // with the same clientId (i.e. this WS frame is the server's
+        // confirmation of a send we already showed), replace in place
+        // rather than appending a duplicate.
+        final isOwnOptimistic = existingIdx >= 0;
+        if (isOwnOptimistic) {
           _messages[m.conversationId]![existingIdx] = m;
         } else {
           _messages[m.conversationId]!.add(m);
@@ -385,6 +418,22 @@ class ChatProvider extends ChangeNotifier {
           m.content,
           type: m.type,
         );
+        // Bump the conversation's unread counter so the conversation
+        // list (and the bottom-nav badge) reflect messages that arrived
+        // while the user was looking at a different room or had the
+        // app in the background. Skip the bump for the user's own
+        // outgoing optimistic messages (they obviously read what they
+        // just sent) and for pushes to the currently-active room
+        // (`setActiveConversation` already zeroed it when the user
+        // opened it).
+        if (!isOwnOptimistic && m.conversationId != _activeConversationId) {
+          final idx = _conversations.indexWhere((c) => c.id == m.conversationId);
+          if (idx >= 0) {
+            _conversations[idx] = _conversations[idx].copyWith(
+              unreadCount: _conversations[idx].unreadCount + 1,
+            );
+          }
+        }
         notifyListeners();
         // The user is actively looking at this conversation right now —
         // advance the read cursor immediately instead of waiting for the

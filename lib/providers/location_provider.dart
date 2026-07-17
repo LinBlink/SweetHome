@@ -371,7 +371,13 @@ class LocationProvider extends ChangeNotifier with WidgetsBindingObserver {
           _log(
             'getLastKnownPosition: using cached fix (age=${age.inSeconds}s)',
           );
-          return LocationFix(position: lastKnown, capturedAt: DateTime.now());
+          // Preserve the actual fix timestamp rather than replacing it
+          // with `DateTime.now()`: §6.1 expects `updateTime` to reflect
+          // when the GPS sample was captured, so a stale-but-fresh
+          // cached fix reports its real capture time, not the moment we
+          // pulled it off the cache. Server-side `LOCATION_TIMESTAMP_STALE`
+          // validation then sees the truth.
+          return LocationFix(position: lastKnown, capturedAt: lastKnown.timestamp);
         }
         _log(
           'getLastKnownPosition: cached fix too stale (age=${age.inSeconds}s)',

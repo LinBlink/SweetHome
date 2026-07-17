@@ -56,13 +56,14 @@ class ChatService {
   }
 
   Future<void> markRead(int conversationId, int lastReadMessageId) async {
-    await http
+    final resp = await http
         .put(
           Uri.parse('${AppConfig.apiBaseUrl}/conversations/$conversationId/read'),
           headers: _headers,
           body: jsonEncode({'lastReadMessageId': lastReadMessageId}),
         )
         .timeout(const Duration(seconds: 10));
+    ApiClient.unwrap(resp);
   }
 
   Future<Message> sendMessage(
@@ -78,7 +79,7 @@ class ChatService {
           headers: _headers,
           body: jsonEncode({
             'content': content,
-            'type': type.apiValue,
+            'type': type.restValue,
             'clientId': clientId,
           }),
         )

@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- Required to fetch OSM map tiles in the in-app map. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Push notifications (§2.7). POST_NOTIFICATIONS is Android 13+ only;
+         the JPush SDK triggers its own runtime-permission prompt via
+         `applyPushAuthority()`. FOREGROUND_SERVICE is required by some
+         JPush features (smart push, geofence) on Android 9+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <application
         android:label="sweethome_flutter"
         android:name="${applicationName}"

@@ -70,6 +70,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Future<void> _sendMessage() async {
     final text = _textCtrl.text.trim();
     if (text.isEmpty) return;
+    // §4.4 server validation rejects > 2000 chars with
+    // `MESSAGE_TOO_LONG`; gate locally too so the user gets a
+    // localized snack instead of an opaque server message.
+    if (text.length > 2000) {
+      _showSnack(AppLocalizations.of(context)!.chatMessageTooLong);
+      return;
+    }
     _textCtrl.clear();
     setState(() => _canSend = false);
     await context.read<ChatProvider>().sendMessage(widget.conversationId, text);
@@ -375,6 +382,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 controller: _textCtrl,
                 focusNode: _textFocus,
                 maxLines: null,
+                maxLength: 2000,
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(
                     fontSize: 15, color: AppColors.textPrimary),
@@ -382,6 +390,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   hintText: l10n.chatRoomInputHint,
                   hintStyle: const TextStyle(color: AppColors.textHint),
                   border: InputBorder.none,
+                  counterText: '',
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),

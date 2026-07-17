@@ -297,6 +297,7 @@
   "familyFeedUnlikeTooltip": "ကြိုက်ပြီးပါပြီ",
   "familyFeedLikeCount": "{count, plural, =0{ကြိုက်တယ် 0 ခု} other{ကြိုက်တယ် {count} ခု}}",
   "familyFeedMoreLikers": "နောက်ထပ် {count} ယောက်",
+  "momentDetailLikedTimes": "ကြိုက်တယ် {count} ကြိမ်",
   "familyFeedNoCommentsYet": "မှတ်ချက်မရှိသေးပါ",
   "familyFeedCommentsComingSoon": "မှတ်ချက် လုပ်ဆောင်ချက် မကြာမီ ထပ်ထည့်မည်",
   "familyFeedPublishButton": "တင်မည်",
@@ -391,5 +392,13 @@
 },
 "conversationsSearchNoResults": "\"{query}\" အတွက် ရလဒ်မရှိပါ။"
 ,"profileThemeRow": "အပြင်အဆင်",
-"profileThemeSheetTitle": "အပြင်အဆင် ရွေးပါ"
+"profileThemeSheetTitle": "အပြင်အဆင် ရွေးပါ",
+"momentCommentSectionTitle": "မှတ်ချက်များ",
+"momentCommentEmpty": "မှတ်ချက်မရှိသေးပါ",
+"momentCommentInputHint": "မှတ်ချက်ရေးပါ...",
+"momentCommentSend": "ပို့မည်",
+"momentCommentDeleteTitle": "ဤမှတ်ချက်ကို ဖျက်မှာလား?",
+"momentCommentDeleteBody": "ဤမှတ်ချက်ကို မိသားစုအားလုံးထံမှ ဖျက်ပစ်ပါမည်။",
+"momentCommentDeleteFailed": "မှတ်ချက်ဖျက်၍မရပါ",
+"chatMessageTooLong": "မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)"
 }

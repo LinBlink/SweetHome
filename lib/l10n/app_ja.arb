@@ -297,6 +297,7 @@
   "familyFeedUnlikeTooltip": "いいね済み",
   "familyFeedLikeCount": "{count, plural, =0{0 いいね} other{いいね {count}件}}",
   "familyFeedMoreLikers": "他 {count} 名",
+  "momentDetailLikedTimes": "いいね {count} 回",
   "familyFeedNoCommentsYet": "まだコメントはありません",
   "familyFeedCommentsComingSoon": "コメント機能は近日公開",
   "familyFeedPublishButton": "投稿",
@@ -391,5 +392,13 @@
 },
 "conversationsSearchNoResults": "「{query}」に一致する結果はありません。"
 ,"profileThemeRow": "テーマ",
-"profileThemeSheetTitle": "テーマを選択"
+"profileThemeSheetTitle": "テーマを選択",
+"momentCommentSectionTitle": "コメント",
+"momentCommentEmpty": "まだコメントはありません",
+"momentCommentInputHint": "コメントを入力...",
+"momentCommentSend": "送信",
+"momentCommentDeleteTitle": "このコメントを削除しますか？",
+"momentCommentDeleteBody": "このコメントはすべての家族から削除されます。",
+"momentCommentDeleteFailed": "コメントを削除できませんでした",
+"chatMessageTooLong": "メッセージが長すぎます（最大2000文字）"
 }

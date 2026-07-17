@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/app_config.dart';
 import '../models/api_exception.dart';
 import '../models/auth_models.dart';
@@ -54,6 +58,27 @@ class MomentProvider extends ChangeNotifier {
   /// heart icon). Membership = "current user has liked this".
   final Set<int> _myLikes = {};
 
+  // ── comment state (§7.8/§7.9/§7.10) ─────────────────────────────
+  /// Per-moment comment lists keyed by momentId. The detail screen
+  /// lazy-loads each list the first time it opens; once cached it
+  /// stays until `clearCommentCache(momentId)` (used after a delete
+  /// so the soft-deleted row drops out of the next render).
+  final Map<int, List<MomentComment>> _comments = {};
+
+  /// Per-moment loading flag — separate from [_isInitialLoading]
+  /// (which is the feed-level spinner) so the detail screen can show
+  /// its own per-row indicator.
+  final Set<int> _commentsLoading = {};
+
+  List<MomentComment> commentsOf(int momentId) =>
+      List.unmodifiable(_comments[momentId] ?? const <MomentComment>[]);
+  bool isCommentsLoading(int momentId) => _commentsLoading.contains(momentId);
+
+  void clearCommentCache(int momentId) {
+    _comments.remove(momentId);
+    notifyListeners();
+  }
+
   List<Moment> get moments => List.unmodifiable(_moments);
   bool get isInitialLoading => _isInitialLoading;
   bool get isRefreshing => _isRefreshing;
@@ -76,6 +101,60 @@ class MomentProvider extends ChangeNotifier {
   /// re-tapping starts fresh from the cleared count.
   bool hasMyLike(int momentId) => _myLikes.contains(momentId);
 
+  /// How long a cached first page is trusted before `loadInitial()`
+  /// falls back to the backend again. Family-feed content doesn't
+  /// change second-to-second, so a short TTL is enough to avoid
+  /// re-querying on every screen visit/app relaunch while still
+  /// catching up reasonably quickly. Pull-to-refresh (`refresh()`)
+  /// always bypasses this and hits the network.
+  static const _cacheTtl = Duration(minutes: 3);
+
+  String get _cacheKey => 'moments_feed_cache_v1_${_currentUser.userId}';
+
+  /// Loads a still-fresh cached first page into [_moments], if any.
+  /// Returns `false` (and leaves state untouched) on a cache miss,
+  /// a stale entry, or any parse failure — callers fall through to
+  /// the normal network fetch in that case.
+  Future<bool> _hydrateFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_cacheKey);
+      if (raw == null) return false;
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final ts = DateTime.fromMillisecondsSinceEpoch(decoded['ts'] as int);
+      if (DateTime.now().difference(ts) > _cacheTtl) return false;
+      final list = (decoded['moments'] as List<dynamic>)
+          .map((e) => Moment.fromJson(e as Map<String, dynamic>))
+          .toList();
+      _moments
+        ..clear()
+        ..addAll(list);
+      _total = decoded['total'] as int? ?? list.length;
+      _hasMore = _moments.length < _total;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Persists the current feed snapshot so the next `loadInitial()`
+  /// (e.g. after an app relaunch) can paint instantly instead of
+  /// always round-tripping to the backend first.
+  Future<void> _writeCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        'ts': DateTime.now().millisecondsSinceEpoch,
+        'total': _total,
+        'moments': _moments.map((m) => m.toJson()).toList(),
+      });
+      await prefs.setString(_cacheKey, payload);
+    } catch (_) {
+      // best-effort — worst case the next loadInitial() just hits
+      // the network again.
+    }
+  }
+
   Future<void> loadInitial() async {
     if (AppConfig.mockMode) {
       // Per the chosen scope, no mock-data fixtures for moments —
@@ -88,6 +167,13 @@ class MomentProvider extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    if (await _hydrateFromCache()) {
+      _isInitialLoading = false;
+      _error = null;
+      notifyListeners();
+      _backfillLikeCounts(_moments);
+      return;
+    }
     _isInitialLoading = true;
     _error = null;
     notifyListeners();
@@ -98,6 +184,8 @@ class MomentProvider extends ChangeNotifier {
         ..addAll(_sortedDesc(page.moments));
       _total = page.total;
       _hasMore = _moments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      unawaited(_writeCache());
     } on ApiException catch (e) {
       _error = e.message;
     } catch (_) {
@@ -119,6 +207,8 @@ class MomentProvider extends ChangeNotifier {
         ..addAll(_sortedDesc(page.moments));
       _total = page.total;
       _hasMore = _moments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      unawaited(_writeCache());
     } on ApiException catch (e) {
       _error = e.message;
     } catch (_) {
@@ -140,6 +230,8 @@ class MomentProvider extends ChangeNotifier {
       _moments.addAll(_sortedDesc(page.moments));
       _sortInPlaceDesc();
       _hasMore = _moments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      unawaited(_writeCache());
     } on ApiException catch (e) {
       _loadMoreError = e.message;
     } catch (_) {
@@ -147,6 +239,31 @@ class MomentProvider extends ChangeNotifier {
     } finally {
       _isLoadingMore = false;
       notifyListeners();
+    }
+  }
+
+  /// §7.2's list response carries no per-moment like count (only
+  /// §7.6's dedicated `/like-count` endpoint does), so the feed would
+  /// otherwise render every heart as "0 likes" until the user
+  /// interacts with it. Kick off a best-effort fetch per moment right
+  /// after each page lands so counts backfill in as they resolve,
+  /// instead of staying blank. Fire-and-forget per moment (rather than
+  /// `Future.wait`) so the UI updates incrementally instead of waiting
+  /// on the slowest request.
+  void _backfillLikeCounts(List<Moment> moments) {
+    for (final m in moments) {
+      unawaited(_fetchAndSetLikeCount(m.id));
+    }
+  }
+
+  Future<void> _fetchAndSetLikeCount(int momentId) async {
+    try {
+      final count = await service.fetchLikeCount(momentId);
+      _likeCounts[momentId] = count;
+      notifyListeners();
+    } catch (_) {
+      // best-effort — the row just keeps showing 0 until a retry
+      // (next refresh/load-more) succeeds.
     }
   }
 
@@ -232,10 +349,13 @@ class MomentProvider extends ChangeNotifier {
     final removed = _moments.removeAt(idx);
     _likeCounts.remove(momentId);
     _myLikes.remove(momentId);
+    _comments.remove(momentId);
+    _commentsLoading.remove(momentId);
     _total = _total > 0 ? _total - 1 : 0;
     notifyListeners();
     try {
       await service.deleteMoment(momentId);
+      unawaited(_writeCache());
     } on ApiException catch (e) {
       _moments.insert(idx.clamp(0, _moments.length), removed);
       _total = _total + 1;
@@ -263,6 +383,87 @@ class MomentProvider extends ChangeNotifier {
       _likeCounts[momentId] = await service.fetchLikeCount(momentId);
       notifyListeners();
     } catch (_) {}
+  }
+
+  /// `GET /moment/comment/{momentId}` (§7.9). Loads the full list
+  /// (server returns oldest-first; no cursor) and caches it.
+  Future<List<MomentComment>> fetchComments(int momentId) async {
+    if (AppConfig.mockMode) {
+      // No mock comment fixtures today — keep an explicit empty list
+      // so the UI's "no comments yet" empty-state is visible in mock
+      // mode. Mirrors the family-feed empty behaviour for moments.
+      _comments[momentId] = const <MomentComment>[];
+      notifyListeners();
+      return _comments[momentId]!;
+    }
+    _commentsLoading.add(momentId);
+    notifyListeners();
+    try {
+      final list = await service.fetchComments(momentId);
+      _comments[momentId] = list;
+      return list;
+    } finally {
+      _commentsLoading.remove(momentId);
+      notifyListeners();
+    }
+  }
+
+  /// `POST /moment/comment/{momentId}` (§7.8). Server returns
+  /// `data: null`, so we refresh the cached list to pick up the
+  /// new row rather than guessing at the assigned id/timestamp.
+  /// On failure the cache is untouched — the input row was never
+  /// shown to the user optimistically, so there's nothing to roll
+  /// back.
+  Future<void> addComment(int momentId, String content) async {
+    if (AppConfig.mockMode) {
+      // Mock mode has no backend; reject so the UI can surface a
+      // localized message instead of pretending the post succeeded.
+      throw StateError('Comments are not available in mock mode.');
+    }
+    await service.addComment(momentId, content);
+    // Pull the updated list so the new row shows up with the
+    // server-assigned id, username, and timestamp.
+    final list = await service.fetchComments(momentId);
+    _comments[momentId] = list;
+    notifyListeners();
+  }
+
+  /// `DELETE /moment/comment/{commentId}` (§7.10). Soft-delete on
+  /// the server; the next list fetch filters the row out, so we
+  /// optimistically remove it from the cache for instant UI
+  /// feedback and re-fetch to confirm (in case the server-side
+  /// soft-delete condition doesn't match — e.g. the row was
+  /// already gone).
+  Future<void> deleteComment(int momentId, int commentId) async {
+    if (AppConfig.mockMode) return;
+    final list = _comments[momentId];
+    final idx = list?.indexWhere((c) => c.id == commentId) ?? -1;
+    if (idx >= 0) {
+      list!.removeAt(idx);
+      notifyListeners();
+    }
+    try {
+      await service.deleteComment(commentId);
+      try {
+        _comments[momentId] = await service.fetchComments(momentId);
+      } catch (_) {
+        // The list we already showed is still authoritative; just
+        // stop here.
+      }
+      notifyListeners();
+    } catch (_) {
+      // Re-insert the row so the UI reflects the failed delete.
+      if (idx >= 0) {
+        try {
+          final fresh = await service.fetchComments(momentId);
+          _comments[momentId] = fresh;
+        } catch (_) {
+          // give up — the cached optimistic state stays removed.
+        }
+      }
+      notifyListeners();
+      rethrow;
+    }
   }
 
   void clearError() {

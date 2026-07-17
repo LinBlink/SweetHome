@@ -29,6 +29,19 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // ─── JPush (§2.7) ────────────────────────────────────────
+        // Manifest placeholders read by the JPush plugin's
+        // Android-side manifest merger. The plugin's own
+        // AndroidManifest.xml contains
+        // `${JPUSH_PKGNAGE}`, `${JPUSH_APPKEY}`, `${JPUSH_CHANNEL}`
+        // and these values get substituted at build time. AppKey
+        // must be the same JIGUANG console app as the backend's
+        // `JPUSH_APP_KEY` (docs/API.md §2.7) or push delivery fails
+        // silently.
+        manifestPlaceholders["JPUSH_PKGNAME"] = "asia.sweethome"
+        manifestPlaceholders["JPUSH_APPKEY"] = "fcc5dc2e3bbda150d02bdc26"
+        manifestPlaceholders["JPUSH_CHANNEL"] = "developer-default"
     }
 
     buildTypes {

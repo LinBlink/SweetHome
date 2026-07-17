@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -328,12 +329,14 @@ class _MomentsImageTile extends StatelessWidget {
         fallback: placeholder,
       );
     } else {
-      img = Image.network(
-        url,
+      // Disk-cached via `cached_network_image` so re-scrolling the feed,
+      // reopening the detail screen, or relaunching the app doesn't
+      // redownload media that's already been viewed once.
+      img = CachedNetworkImage(
+        imageUrl: url,
         fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => placeholder,
-        loadingBuilder: (ctx, child, progress) =>
-            progress == null ? child : placeholder,
+        placeholder: (_, _) => placeholder,
+        errorWidget: (_, _, _) => placeholder,
       );
     }
     return ClipRRect(
@@ -351,11 +354,15 @@ class _MomentsImageTile extends StatelessWidget {
   }
 }
 
-/// Tap-to-play inline video preview. Initializes a single
-/// `VideoPlayerController` per URL — same URL twice in the feed
-/// would currently spawn two controllers; acceptable for a family
-/// feed (where the same moment isn't on-screen twice) and avoids
-/// the manager indirection overhead.
+/// Silent autoplay inline video preview — muted + looping as soon as
+/// it's ready, matching the muted-autoplay convention of most social
+/// feeds (WeChat Moments / Douyin) instead of a frozen first frame
+/// requiring a tap just to see it move. Tapping opens the fullscreen
+/// player, which restarts the clip from the beginning with sound.
+/// Initializes a single `VideoPlayerController` per URL — same URL
+/// twice in the feed would currently spawn two controllers;
+/// acceptable for a family feed (where the same moment isn't
+/// on-screen twice) and avoids the manager indirection overhead.
 class _MomentsVideoTile extends StatefulWidget {
   final String url;
   const _MomentsVideoTile({required this.url});
@@ -364,10 +371,20 @@ class _MomentsVideoTile extends StatefulWidget {
   State<_MomentsVideoTile> createState() => _MomentsVideoTileState();
 }
 
-class _MomentsVideoTileState extends State<_MomentsVideoTile> {
+class _MomentsVideoTileState extends State<_MomentsVideoTile>
+    with AutomaticKeepAliveClientMixin<_MomentsVideoTile> {
   VideoPlayerController? _controller;
   bool _initialized = false;
   bool _failed = false;
+  bool _muted = true;
+
+  // Keeps this tile's state (and its `VideoPlayerController`) alive when
+  // `ListView.builder` scrolls it out of the cache extent — without this,
+  // the element gets disposed and re-created on every scroll-back, which
+  // tears down the controller and re-fetches the video from the network
+  // from scratch each time.
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -380,16 +397,24 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile> {
     _controller = c;
     try {
       await c.initialize();
-      // Freeze on first frame so the in-card thumbnail stays
-      // stable while the user decides whether to open fullscreen.
-      await c.pause();
-      await c.seekTo(Duration.zero);
+      await c.setVolume(0);
+      await c.setLooping(true);
       if (!mounted) return;
       setState(() => _initialized = true);
+      await c.play();
     } catch (_) {
       if (!mounted) return;
       setState(() => _failed = true);
     }
+  }
+
+  Future<void> _toggleMute() async {
+    final c = _controller;
+    if (c == null) return;
+    final nextMuted = !_muted;
+    await c.setVolume(nextMuted ? 0 : 1);
+    if (!mounted) return;
+    setState(() => _muted = nextMuted);
   }
 
   @override
@@ -400,28 +425,35 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final l10n = AppLocalizations.of(context)!;
     if (_failed) {
       return _failedTile(l10n.momentDetailVideoLoadFailed);
     }
     final c = _controller;
-    final aspectRatio =
-        (c != null && c.value.aspectRatio > 0) ? c.value.aspectRatio : 16 / 9;
+    // Fills the tile via BoxFit.cover (like the image tiles) instead of
+    // an inner AspectRatio, which used to pillarbox portrait ("tall")
+    // videos against the Stack's bottomLeft alignment — the video's
+    // right edge landed mid-tile with a hard, unrounded cut instead of
+    // reaching the ClipRRect'd corner.
     final thumbnail = _initialized && c != null
-        ? AspectRatio(
-            aspectRatio: aspectRatio,
-            child: VideoPlayer(c),
-          )
-        : AspectRatio(
-            aspectRatio: aspectRatio,
-            child: Container(
-              color: AppColors.surfaceVariant,
-              alignment: Alignment.center,
-              child: const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2),
+        ? SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: c.value.size.width,
+                height: c.value.size.height,
+                child: VideoPlayer(c),
               ),
+            ),
+          )
+        : Container(
+            color: AppColors.surfaceVariant,
+            alignment: Alignment.center,
+            child: const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           );
     return ClipRRect(
@@ -435,24 +467,31 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile> {
           ));
         },
         child: Stack(
-          alignment: Alignment.center,
           children: [
-            thumbnail,
-            // Persistent tap affordance so the user can tell the
-            // tile is interactive before the controller finishes
-            // loading. The fullscreen route plays the clip; this
-            // overlay just signals "tap me".
-            Container(
-              width: 56,
-              height: 56,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black54,
-              ),
-              child: const Icon(
-                Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 36,
+            Positioned.fill(child: thumbnail),
+            // Mute toggle — tapping plays the inline preview with sound
+            // in place, without leaving the feed. Its own GestureDetector
+            // wins the tap over the tile's (Flutter resolves nested tap
+            // recognizers to the innermost one), same pattern as the
+            // delete IconButton inside MomentCard's own InkWell.
+            Positioned(
+              left: 6,
+              bottom: 6,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _toggleMute,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black45,
+                  ),
+                  child: Icon(
+                    _muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
               ),
             ),
           ],
@@ -496,12 +535,19 @@ class _MomentsAudioTile extends StatefulWidget {
   State<_MomentsAudioTile> createState() => _MomentsAudioTileState();
 }
 
-class _MomentsAudioTileState extends State<_MomentsAudioTile> {
+class _MomentsAudioTileState extends State<_MomentsAudioTile>
+    with AutomaticKeepAliveClientMixin<_MomentsAudioTile> {
   AudioPlayer? _player;
   Duration? _duration;
   Duration _position = Duration.zero;
   bool _ready = false;
   bool _failed = false;
+
+  // Same rationale as `_MomentsVideoTileState.wantKeepAlive`: without
+  // this, scrolling the clip off/on screen tears down and re-fetches
+  // the audio stream on every scroll-back.
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -540,6 +586,7 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final l10n = AppLocalizations.of(context)!;
     if (_failed) {
       return _failedTile(l10n.momentDetailVideoLoadFailed);
@@ -707,24 +754,23 @@ class _MomentsFullscreenImage extends StatelessWidget {
         ),
       );
     } else {
-      image = Image.network(
-        url,
+      // Same disk cache as the feed tile (`CachedNetworkImage` keys on
+      // URL), so opening the lightbox for an already-seen image is
+      // instant instead of a second network fetch.
+      image = CachedNetworkImage(
+        imageUrl: url,
         fit: BoxFit.contain,
-        gaplessPlayback: true,
-        loadingBuilder: (ctx, child, progress) {
-          if (progress == null) return child;
-          return const Center(
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
+        placeholder: (_, _) => const Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white,
             ),
-          );
-        },
-        errorBuilder: (_, _, _) => const Center(
+          ),
+        ),
+        errorWidget: (_, _, _) => const Center(
           child: Icon(Icons.broken_image_outlined, size: 64),
         ),
       );
@@ -807,6 +853,13 @@ class _MomentsFullscreenVideoState extends State<_MomentsFullscreenVideo> {
     try {
       await c.initialize();
       await c.setLooping(false);
+      // `video_player` streams progressively (ExoPlayer/AVPlayer buffer
+      // ahead rather than downloading the whole file first); this
+      // listener drives the position/duration bar live and surfaces
+      // `value.isBuffering` so a network stall is visibly a spinner,
+      // not a frozen player that looks like it's waiting on a full
+      // download.
+      c.addListener(_onControllerUpdate);
       if (!mounted) return;
       setState(() => _ready = true);
       // Auto-play on open — the user just asked for fullscreen.
@@ -818,9 +871,15 @@ class _MomentsFullscreenVideoState extends State<_MomentsFullscreenVideo> {
     }
   }
 
+  void _onControllerUpdate() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _hideControlsTimer?.cancel();
+    _controller?.removeListener(_onControllerUpdate);
     _controller?.dispose();
     super.dispose();
   }
@@ -933,6 +992,17 @@ class _MomentsFullscreenVideoState extends State<_MomentsFullscreenVideo> {
                 child: VideoPlayer(c),
               ),
             ),
+            if (value.isBuffering)
+              const Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             if (_showControls) ...[
               // top scrim gradient for the close button
               const DecoratedBox(

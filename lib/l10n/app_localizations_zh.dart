@@ -951,8 +951,8 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 人觉得很赞',
-      zero: '0 人觉得赞',
+      other: '被点赞 $count 次',
+      zero: '还没有人点赞',
     );
     return '$_temp0';
   }
@@ -960,6 +960,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return '还有 $count 人';
+  }
+
+  @override
+  String momentDetailLikedTimes(int count) {
+    return '点赞 $count 次';
   }
 
   @override
@@ -1115,6 +1120,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileThemeSheetTitle => '选择主题';
+
+  @override
+  String get momentCommentSectionTitle => '评论';
+
+  @override
+  String get momentCommentEmpty => '还没有评论，来抢沙发';
+
+  @override
+  String get momentCommentInputHint => '说点什么...';
+
+  @override
+  String get momentCommentSend => '发送';
+
+  @override
+  String get momentCommentDeleteTitle => '删除这条评论？';
+
+  @override
+  String get momentCommentDeleteBody => '该评论将对所有家庭成员删除。';
+
+  @override
+  String get momentCommentDeleteFailed => '删除评论失败，请重试';
+
+  @override
+  String get chatMessageTooLong => '消息过长（最多 2000 字）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2064,8 +2093,8 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 人觉得很赞',
-      zero: '0 人觉得很赞',
+      other: '被点赞 $count 次',
+      zero: '还没有人点赞',
     );
     return '$_temp0';
   }
@@ -2073,6 +2102,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String familyFeedMoreLikers(Object count) {
     return '还有 $count 人';
+  }
+
+  @override
+  String momentDetailLikedTimes(int count) {
+    return '点赞 $count 次';
   }
 
   @override
@@ -2228,6 +2262,30 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get profileThemeSheetTitle => '选择主题';
+
+  @override
+  String get momentCommentSectionTitle => '评论';
+
+  @override
+  String get momentCommentEmpty => '还没有评论，来抢沙发';
+
+  @override
+  String get momentCommentInputHint => '说点什么...';
+
+  @override
+  String get momentCommentSend => '发送';
+
+  @override
+  String get momentCommentDeleteTitle => '删除这条评论？';
+
+  @override
+  String get momentCommentDeleteBody => '该评论将对所有家庭成员删除。';
+
+  @override
+  String get momentCommentDeleteFailed => '删除评论失败，请重试';
+
+  @override
+  String get chatMessageTooLong => '消息过长（最多 2000 字）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3177,8 +3235,8 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 人覺得很讚',
-      zero: '0 人覺得讚',
+      other: '被點讚 $count 次',
+      zero: '還沒有人點讚',
     );
     return '$_temp0';
   }
@@ -3186,6 +3244,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String familyFeedMoreLikers(Object count) {
     return '還有 $count 人';
+  }
+
+  @override
+  String momentDetailLikedTimes(int count) {
+    return '點讚 $count 次';
   }
 
   @override
@@ -3341,4 +3404,28 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileThemeSheetTitle => '選擇主題';
+
+  @override
+  String get momentCommentSectionTitle => '評論';
+
+  @override
+  String get momentCommentEmpty => '還沒有評論，來搶沙發';
+
+  @override
+  String get momentCommentInputHint => '說點什麼...';
+
+  @override
+  String get momentCommentSend => '發送';
+
+  @override
+  String get momentCommentDeleteTitle => '刪除這條評論？';
+
+  @override
+  String get momentCommentDeleteBody => '該評論將對所有家庭成員刪除。';
+
+  @override
+  String get momentCommentDeleteFailed => '刪除評論失敗，請重試';
+
+  @override
+  String get chatMessageTooLong => '訊息過長（最多 2000 字）';
 }

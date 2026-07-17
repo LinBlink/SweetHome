@@ -391,6 +391,7 @@
   "familyFeedUnlikeTooltip": "Liked",
   "familyFeedLikeCount": "{count, plural, =0{0 likes} =1{1 like} other{{count} likes}}",
   "familyFeedMoreLikers": "{count} more",
+  "momentDetailLikedTimes": "Liked {count} times",
   "familyFeedNoCommentsYet": "No comments yet",
   "familyFeedCommentsComingSoon": "Comments are on the way",
   "familyFeedPublishButton": "Post",
@@ -428,6 +429,13 @@
   "momentDetailAudioPlay": "Play",
   "momentDetailAudioPause": "Pause",
   "@familyFeedLikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@momentDetailLikedTimes": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -485,5 +493,13 @@
 },
 "conversationsSearchNoResults": "No matches for \"{query}\"."
 ,"profileThemeRow": "Theme",
-"profileThemeSheetTitle": "Pick a theme"
+"profileThemeSheetTitle": "Pick a theme",
+"momentCommentSectionTitle": "Comments",
+"momentCommentEmpty": "Be the first to comment",
+"momentCommentInputHint": "Write a comment...",
+"momentCommentSend": "Send",
+"momentCommentDeleteTitle": "Delete this comment?",
+"momentCommentDeleteBody": "This comment will be removed for everyone.",
+"momentCommentDeleteFailed": "Couldn't delete the comment — please try again.",
+"chatMessageTooLong": "Message is too long (max 2000 characters)."
 }

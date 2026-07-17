@@ -1882,6 +1882,12 @@ abstract class AppLocalizations {
   /// **'{count} more'**
   String familyFeedMoreLikers(Object count);
 
+  /// No description provided for @momentDetailLikedTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked {count} times'**
+  String momentDetailLikedTimes(int count);
+
   /// No description provided for @familyFeedNoCommentsYet.
   ///
   /// In en, this message translates to:
@@ -2169,6 +2175,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a theme'**
   String get profileThemeSheetTitle;
+
+  /// No description provided for @momentCommentSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get momentCommentSectionTitle;
+
+  /// No description provided for @momentCommentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to comment'**
+  String get momentCommentEmpty;
+
+  /// No description provided for @momentCommentInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a comment...'**
+  String get momentCommentInputHint;
+
+  /// No description provided for @momentCommentSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get momentCommentSend;
+
+  /// No description provided for @momentCommentDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this comment?'**
+  String get momentCommentDeleteTitle;
+
+  /// No description provided for @momentCommentDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This comment will be removed for everyone.'**
+  String get momentCommentDeleteBody;
+
+  /// No description provided for @momentCommentDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete the comment — please try again.'**
+  String get momentCommentDeleteFailed;
+
+  /// No description provided for @chatMessageTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is too long (max 2000 characters).'**
+  String get chatMessageTooLong;
 }
 
 class _AppLocalizationsDelegate

@@ -150,4 +150,57 @@ class MomentService {
     final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
     return MomentLikeDetail.fromJson(data);
   }
+
+  /// `GET /moment/comment/{momentId}` — §7.9. Returns the moment's
+  /// full comment list ordered oldest-first (the server-side default,
+  /// deliberately opposite to the feed's newest-first so comment
+  /// threads read top-down chronologically).
+  Future<List<MomentComment>> fetchComments(int momentId) async {
+    final resp = await http
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}/moment/comment/$momentId'),
+          headers: _headers,
+        )
+        .timeout(const Duration(seconds: 10));
+    final data = ApiClient.unwrap(resp) as List<dynamic>;
+    return data
+        .map((e) => MomentComment.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// `POST /moment/comment/{momentId}` — §7.8. Server validates that
+  /// the body has a non-blank `content` (400 `COMMENT_CONTENT_EMPTY`
+  /// otherwise) and returns `data: null` on success. Caller is
+  /// expected to refresh the list (the server doesn't echo the new
+  /// row back).
+  Future<void> addComment(int momentId, String content) async {
+    final trimmed = content.trim();
+    if (trimmed.isEmpty) {
+      throw StateError(
+          'addComment requires non-blank content (server enforces §7.8 COMMENT_CONTENT_EMPTY)');
+    }
+    final resp = await http
+        .post(
+          Uri.parse('${AppConfig.apiBaseUrl}/moment/comment/$momentId'),
+          headers: _headers,
+          body: jsonEncode({'content': trimmed}),
+        )
+        .timeout(const Duration(seconds: 10));
+    ApiClient.unwrap(resp);
+  }
+
+  /// `DELETE /moment/comment/{commentId}` — §7.10. Only the comment
+  /// author may delete — server returns 403 `NOT_COMMENT_OWNER`
+  /// otherwise. Server performs a soft-delete (sets `deleted_at`),
+  /// but the next `GET /moment/comment/{momentId}` filters it out so
+  /// a list refresh is sufficient to update the UI.
+  Future<void> deleteComment(int commentId) async {
+    final resp = await http
+        .delete(
+          Uri.parse('${AppConfig.apiBaseUrl}/moment/comment/$commentId'),
+          headers: _headers,
+        )
+        .timeout(const Duration(seconds: 10));
+    ApiClient.unwrap(resp);
+  }
 }

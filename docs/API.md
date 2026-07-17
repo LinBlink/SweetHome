@@ -1,7 +1,7 @@
 # 过家家 · Sweet Home — 后端接口文档
 
 > 版本：v1.0  
-> 基础路径：`/api/v1`  
+> 基础路径：`/api`  
 > 协议：HTTP/1.1 + WebSocket
 
 ---

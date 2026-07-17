@@ -10,6 +10,7 @@ import '../models/family_member_vm.dart';
 import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/family_service.dart';
+import '../services/push_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   AuthUser? _currentUser;
@@ -21,7 +22,18 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   String? get error => _error;
 
-  AuthProvider() {
+  /// Injected at construction time from `main.dart` — the same singleton
+  /// also wired up at app startup (see `PushService.setup`). `null` is
+  /// allowed (e.g. tests / web) and degrades push registration/deregistration
+  /// to no-ops.
+  final PushService? _push;
+
+  /// Exposes the injected [PushService] so `main.dart` can wire up
+  /// [PushNotificationRouter] without reaching into a private field
+  /// across library boundaries.
+  PushService? get pushService => _push;
+
+  AuthProvider({PushService? push}) : _push = push {
     // One AuthProvider per app run (created once at root in main.dart)
     // — self-register so *any* service call anywhere that routes
     // through ApiClient.unwrap and hits a 401 flows through the same
@@ -50,6 +62,12 @@ class AuthProvider extends ChangeNotifier {
         _currentUser = fresh;
         await AuthService.persistUser(_currentUser!);
       } catch (_) {}
+      // Re-bind push for the restored session — we can't be sure
+      // the last `logout()` actually reached the server (a crashed
+      // app would skip it), so calling `registerForUser` again with
+      // the restored token is safe (the server upserts by token,
+      // see §2.7.1).
+      unawaited(_push?.registerForUser(_currentUser!));
     }
     _isLoading = false;
     notifyListeners();
@@ -76,6 +94,9 @@ class AuthProvider extends ChangeNotifier {
           _currentUser = fresh;
           await AuthService.persistUser(_currentUser!);
         } catch (_) {}
+        // §2.7.1: register this device's JPush registration ID with
+        // the new session so fence-alarm pushes can be delivered.
+        unawaited(_push?.registerForUser(_currentUser!));
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -124,6 +145,9 @@ class AuthProvider extends ChangeNotifier {
           _currentUser = fresh;
           await AuthService.persistUser(_currentUser!);
         } catch (_) {}
+        // §2.7.1: same as login — register the JPush token with the
+        // freshly-minted session.
+        unawaited(_push?.registerForUser(_currentUser!));
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -260,9 +284,18 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    final refresh = _currentUser?.refreshToken ?? '';
+    final user = _currentUser;
+    final refresh = user?.refreshToken ?? '';
     _currentUser = null;
     notifyListeners();
+    // §2.7.2: deregister the JPush token BEFORE wiping local credentials
+    // — the call needs the live JWT in its Authorization header. Wait
+    // for it (with a short timeout via the service's internal clock)
+    // before clearing local state, so a deregister-in-flight failure
+    // can't leak the user's push targets to the next login.
+    if (user != null) {
+      await _push?.deregisterForUser(user);
+    }
     if (!AppConfig.mockMode) {
       await AuthService.logout(refresh);
     }

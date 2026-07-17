@@ -968,6 +968,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String momentDetailLikedTimes(int count) {
+    return '좋아요 $count번';
+  }
+
+  @override
   String get familyFeedNoCommentsYet => '아직 댓글이 없어요';
 
   @override
@@ -1121,4 +1126,28 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get profileThemeSheetTitle => '테마 선택';
+
+  @override
+  String get momentCommentSectionTitle => '댓글';
+
+  @override
+  String get momentCommentEmpty => '아직 댓글이 없습니다';
+
+  @override
+  String get momentCommentInputHint => '댓글을 입력하세요...';
+
+  @override
+  String get momentCommentSend => '보내기';
+
+  @override
+  String get momentCommentDeleteTitle => '이 댓글을 삭제하시겠어요?';
+
+  @override
+  String get momentCommentDeleteBody => '이 댓글은 모든 가족에게서 삭제됩니다.';
+
+  @override
+  String get momentCommentDeleteFailed => '댓글 삭제에 실패했습니다';
+
+  @override
+  String get chatMessageTooLong => '메시지가 너무 깁니다 (최대 2000자)';
 }

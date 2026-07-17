@@ -297,6 +297,7 @@
   "familyFeedUnlikeTooltip": "좋아요 취소",
   "familyFeedLikeCount": "{count, plural, =0{좋아요 0개} other{좋아요 {count}개}}",
   "familyFeedMoreLikers": "{count}명 더",
+  "momentDetailLikedTimes": "좋아요 {count}번",
   "familyFeedNoCommentsYet": "아직 댓글이 없어요",
   "familyFeedCommentsComingSoon": "댓글 기능은 곧 추가돼요",
   "familyFeedPublishButton": "게시",
@@ -391,5 +392,13 @@
 },
 "conversationsSearchNoResults": "\"{query}\"와 일치하는 결과가 없습니다."
 ,"profileThemeRow": "테마",
-"profileThemeSheetTitle": "테마 선택"
+"profileThemeSheetTitle": "테마 선택",
+"momentCommentSectionTitle": "댓글",
+"momentCommentEmpty": "아직 댓글이 없습니다",
+"momentCommentInputHint": "댓글을 입력하세요...",
+"momentCommentSend": "보내기",
+"momentCommentDeleteTitle": "이 댓글을 삭제하시겠어요?",
+"momentCommentDeleteBody": "이 댓글은 모든 가족에게서 삭제됩니다.",
+"momentCommentDeleteFailed": "댓글 삭제에 실패했습니다",
+"chatMessageTooLong": "메시지가 너무 깁니다 (최대 2000자)"
 }

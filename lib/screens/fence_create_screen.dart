@@ -107,7 +107,6 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final me = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -158,9 +157,8 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
                     }),
                   );
                 }
-                final members = (snap.data ?? const <FamilyMemberVm>[])
-                    .where((m) => m.userId != me?.userId)
-                    .toList();
+                final members =
+                    (snap.data ?? const <FamilyMemberVm>[]).toList();
                 return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [

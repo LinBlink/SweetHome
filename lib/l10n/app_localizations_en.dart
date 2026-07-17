@@ -1001,6 +1001,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String momentDetailLikedTimes(int count) {
+    return 'Liked $count times';
+  }
+
+  @override
   String get familyFeedNoCommentsYet => 'No comments yet';
 
   @override
@@ -1159,4 +1164,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileThemeSheetTitle => 'Pick a theme';
+
+  @override
+  String get momentCommentSectionTitle => 'Comments';
+
+  @override
+  String get momentCommentEmpty => 'Be the first to comment';
+
+  @override
+  String get momentCommentInputHint => 'Write a comment...';
+
+  @override
+  String get momentCommentSend => 'Send';
+
+  @override
+  String get momentCommentDeleteTitle => 'Delete this comment?';
+
+  @override
+  String get momentCommentDeleteBody =>
+      'This comment will be removed for everyone.';
+
+  @override
+  String get momentCommentDeleteFailed =>
+      'Couldn\'t delete the comment — please try again.';
+
+  @override
+  String get chatMessageTooLong => 'Message is too long (max 2000 characters).';
 }

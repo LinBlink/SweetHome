@@ -295,8 +295,9 @@
   "familyFeedDeleted": "動態已刪除",
   "familyFeedLikeTooltip": "讚",
   "familyFeedUnlikeTooltip": "已讚",
-  "familyFeedLikeCount": "{count, plural, =0{0 人覺得讚} other{{count} 人覺得很讚}}",
+  "familyFeedLikeCount": "{count, plural, =0{還沒有人點讚} other{被點讚 {count} 次}}",
   "familyFeedMoreLikers": "還有 {count} 人",
+  "momentDetailLikedTimes": "點讚 {count} 次",
   "familyFeedNoCommentsYet": "還沒有評論",
   "familyFeedCommentsComingSoon": "評論功能即將上線",
   "familyFeedPublishButton": "發佈",
@@ -391,5 +392,13 @@
 },
 "conversationsSearchNoResults": "沒有找到符合「{query}」的結果。"
 ,"profileThemeRow": "主題",
-"profileThemeSheetTitle": "選擇主題"
+"profileThemeSheetTitle": "選擇主題",
+"momentCommentSectionTitle": "評論",
+"momentCommentEmpty": "還沒有評論，來搶沙發",
+"momentCommentInputHint": "說點什麼...",
+"momentCommentSend": "發送",
+"momentCommentDeleteTitle": "刪除這條評論？",
+"momentCommentDeleteBody": "該評論將對所有家庭成員刪除。",
+"momentCommentDeleteFailed": "刪除評論失敗，請重試",
+"chatMessageTooLong": "訊息過長（最多 2000 字）"
 }

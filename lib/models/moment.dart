@@ -50,6 +50,21 @@ class Moment {
           .toList(),
     );
   }
+
+  /// Round-trips through the same shape [Moment.fromJson] reads, so the
+  /// local feed cache (`MomentProvider`) can serialize/deserialize with
+  /// the same parser instead of maintaining a second cache-only schema.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'username': username,
+      'userAvatarUrl': userAvatarUrl,
+      'createdAt': createdAt.toIso8601String(),
+      'content': content,
+      'mediaFiles': media.map((m) => m.toJson()).toList(),
+    };
+  }
 }
 
 /// One media file attached to a moment — docs/api.md §7.1/§7.2.
@@ -75,6 +90,25 @@ class MomentMedia {
           ? parseBackendTime(json['createdAt'] as String)
           : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': _typeToWire(type),
+      'content': url,
+      'createdAt': createdAt?.toIso8601String(),
+    };
+  }
+
+  static String _typeToWire(MomentMediaType t) {
+    switch (t) {
+      case MomentMediaType.image:
+        return 'image';
+      case MomentMediaType.video:
+        return 'video';
+      case MomentMediaType.audio:
+        return 'audio';
+    }
   }
 
   static MomentMediaType _parseType(String? raw) {
@@ -156,6 +190,40 @@ class MomentPage {
   final int total;
 
   const MomentPage({required this.moments, required this.total});
+}
+
+/// One row from `GET /moment/comment/{momentId}` (§7.9). Server
+/// returns oldest-first (`created_at` ascending) so the detail
+/// screen just renders in received order. Per §7.10 only the
+/// comment author can delete (not the moment's publisher); the
+/// delete UI is gated on [userId] == current user.
+class MomentComment {
+  final int id;
+  final int userId;
+  final String username;
+  final String? userAvatarUrl;
+  final String content;
+  final DateTime createdAt;
+
+  const MomentComment({
+    required this.id,
+    required this.userId,
+    required this.username,
+    required this.userAvatarUrl,
+    required this.content,
+    required this.createdAt,
+  });
+
+  factory MomentComment.fromJson(Map<String, dynamic> json) {
+    return MomentComment(
+      id: json['id'] as int,
+      userId: json['userId'] as int,
+      username: json['username'] as String? ?? '',
+      userAvatarUrl: json['userAvatarUrl'] as String?,
+      content: json['content'] as String? ?? '',
+      createdAt: parseBackendTime(json['createdAt'] as String),
+    );
+  }
 }
 
 /// A single piece of media the user picked in the publish composer,

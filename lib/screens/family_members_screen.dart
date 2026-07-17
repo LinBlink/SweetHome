@@ -115,6 +115,18 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
             );
           }
           final members = snapshot.data ?? const [];
+          // Seed ChatProvider's online-status set from the §3.2
+          // REST `isOnline` field so the initial render doesn't
+          // show every member as offline until a `USER_STATUS`
+          // WS frame arrives. Subsequent WS frames still own the
+          // truth (a member can come online/offline between the
+          // member-list fetch and the chat connection), so this
+          // is additive — `_onlineUserIds.add` is a no-op if the
+          // id is already present.
+          final chat = context.read<ChatProvider>();
+          for (final m in members) {
+            if (m.isOnline) chat.markUserOnline(m.userId);
+          }
           return ListView.separated(
             itemCount: members.length,
             separatorBuilder: (_, _) => const Divider(height: 1, indent: 70),

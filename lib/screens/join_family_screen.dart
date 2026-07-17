@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/error_messages.dart';
 import '../l10n/app_localizations.dart';
+import '../models/api_exception.dart';
 import '../models/family_member_vm.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/error_banner.dart';
@@ -56,6 +57,12 @@ class _JoinFamilyScreenState extends State<JoinFamilyScreen> {
         relationType: selection.relationType.apiValue,
       );
       if (mounted) Navigator.pop(context);
+    } on ApiException catch (e) {
+      // Preserve the server's error message so the user sees
+      // domain-specific failures (`INVALID_RELATION_ANCHOR`,
+      // `NO_KNOWN_PARENT`, `SPOUSE_ALREADY_EXISTS`, etc.) instead of
+      // an opaque "network error" placeholder.
+      setState(() => _error = localizeErrorMessage(e.message, l10n));
     } catch (_) {
       setState(() => _error = localizeErrorMessage(kNetworkErrorSentinel, l10n));
     } finally {
