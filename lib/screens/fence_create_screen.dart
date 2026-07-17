@@ -118,7 +118,7 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
             child: Text(
               l10n.fenceCreateButton,
               style: TextStyle(
-                color: _saving ? AppColors.textHint : Colors.white,
+                color: _saving ? AppColors.textHint : AppColors.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -738,13 +738,6 @@ class _MomentsFullscreenImage extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            tooltip: 'Close',
-            icon: const Icon(Icons.close_rounded),
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-        ],
       ),
       body: Stack(
         fit: StackFit.expand,
