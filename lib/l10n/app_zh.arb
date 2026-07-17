@@ -400,5 +400,10 @@
 "momentCommentDeleteTitle": "删除这条评论？",
 "momentCommentDeleteBody": "该评论将对所有家庭成员删除。",
 "momentCommentDeleteFailed": "删除评论失败，请重试",
-"chatMessageTooLong": "消息过长（最多 2000 字）"
+"chatMessageTooLong": "消息过长（最多 2000 字）",
+"profileClearLocalChatRow": "删除本地聊天记录",
+"profileClearLocalChatSubtitle": "仅清除本机缓存的消息",
+"profileClearLocalChatConfirmTitle": "删除本地聊天记录？",
+"profileClearLocalChatConfirmBody": "仅清除本机缓存的消息，不会删除服务器上的记录，重新打开聊天会从服务器重新加载。",
+"profileClearLocalChatSuccess": "本地聊天记录已删除"
 }

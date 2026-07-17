@@ -117,6 +117,22 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Wipes every message this device has cached, both the in-memory
+  /// map and the on-disk `ChatLocalCache` blob — the settings-page
+  /// "clear local chat history" action. Purely local: nothing is
+  /// sent to the server, so a conversation's history reappears the
+  /// next time it's opened (re-fetched from `GET /messages`) or the
+  /// next `loadConversations()` repopulates the list. Conversation
+  /// metadata (`_conversations`) is left alone — the row list in
+  /// `ConversationListScreen` shouldn't disappear along with the
+  /// message bubbles.
+  Future<void> clearLocalChatHistory() async {
+    _messages.clear();
+    _cursors.clear();
+    await _cache.clear();
+    notifyListeners();
+  }
+
   Future<void> loadConversations() async {
     _isLoadingConversations = true;
     notifyListeners();

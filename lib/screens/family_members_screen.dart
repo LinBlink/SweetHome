@@ -59,7 +59,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                   const SizedBox(height: 6),
                   SelectableText(
                     info!.inviteCode,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 4,
@@ -110,7 +110,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }

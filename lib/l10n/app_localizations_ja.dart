@@ -1148,4 +1148,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatMessageTooLong => 'メッセージが長すぎます（最大2000文字）';
+
+  @override
+  String get profileClearLocalChatRow => 'ローカルのチャット履歴を削除';
+
+  @override
+  String get profileClearLocalChatSubtitle => 'この端末に保存されたメッセージのみ削除します';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => 'ローカルのチャット履歴を削除しますか？';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      'この端末に保存されたメッセージのみ削除されます。サーバー上のデータは削除されず、チャットを開くとサーバーから再読み込みされます。';
+
+  @override
+  String get profileClearLocalChatSuccess => 'ローカルのチャット履歴を削除しました';
 }

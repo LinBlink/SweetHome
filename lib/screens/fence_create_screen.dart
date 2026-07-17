@@ -139,7 +139,7 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
               future: _membersFuture,
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   );
                 }
@@ -249,7 +249,7 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
                     Center(
                       child: Text(
                         l10n.fenceRadiusLabel(_radiusMeters.round()),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
@@ -396,7 +396,7 @@ class _MapPicker extends StatelessWidget {
                   point: center!,
                   width: 36,
                   height: 36,
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on,
                     color: AppColors.primary,
                     size: 32,

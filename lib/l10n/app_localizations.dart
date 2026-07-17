@@ -2223,6 +2223,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message is too long (max 2000 characters).'**
   String get chatMessageTooLong;
+
+  /// No description provided for @profileClearLocalChatRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Local Chat History'**
+  String get profileClearLocalChatRow;
+
+  /// No description provided for @profileClearLocalChatSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only removes messages cached on this device'**
+  String get profileClearLocalChatSubtitle;
+
+  /// No description provided for @profileClearLocalChatConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear local chat history?'**
+  String get profileClearLocalChatConfirmTitle;
+
+  /// No description provided for @profileClearLocalChatConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This only clears messages cached on this device — nothing is deleted from the server, and reopening a chat will reload it from there.'**
+  String get profileClearLocalChatConfirmBody;
+
+  /// No description provided for @profileClearLocalChatSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Local chat history cleared'**
+  String get profileClearLocalChatSuccess;
 }
 
 class _AppLocalizationsDelegate

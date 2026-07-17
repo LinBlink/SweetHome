@@ -501,5 +501,10 @@
 "momentCommentDeleteTitle": "Delete this comment?",
 "momentCommentDeleteBody": "This comment will be removed for everyone.",
 "momentCommentDeleteFailed": "Couldn't delete the comment — please try again.",
-"chatMessageTooLong": "Message is too long (max 2000 characters)."
+"chatMessageTooLong": "Message is too long (max 2000 characters).",
+"profileClearLocalChatRow": "Clear Local Chat History",
+"profileClearLocalChatSubtitle": "Only removes messages cached on this device",
+"profileClearLocalChatConfirmTitle": "Clear local chat history?",
+"profileClearLocalChatConfirmBody": "This only clears messages cached on this device — nothing is deleted from the server, and reopening a chat will reload it from there.",
+"profileClearLocalChatSuccess": "Local chat history cleared"
 }

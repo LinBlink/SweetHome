@@ -195,7 +195,7 @@ class _Results extends StatelessWidget {
         // Message match — render an inline snippet with a highlight.
         final m = hit.message!;
         return InkWell(
-          onTap: () => _openChat(context, conv.id),
+          onTap: () => _openChat(context, conv.id, targetMessage: m),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
             child: Row(
@@ -254,7 +254,7 @@ class _Results extends StatelessWidget {
     );
   }
 
-  void _openChat(BuildContext context, int convId) {
+  void _openChat(BuildContext context, int convId, {Message? targetMessage}) {
     final chat = context.read<ChatProvider>();
     final conv = chat.conversations.firstWhere(
       (c) => c.id == convId,
@@ -267,6 +267,7 @@ class _Results extends StatelessWidget {
         child: ChatRoomScreen(
           conversationId: conv.id,
           conversationName: conv.name,
+          targetMessageClientId: targetMessage?.clientId,
         ),
       ),
     ));
@@ -301,7 +302,7 @@ class _Results extends StatelessWidget {
       }
       spans.add(TextSpan(
         text: content.substring(hit, hit + q.length),
-        style: const TextStyle(
+        style: TextStyle(
           backgroundColor: AppColors.linenDeep,
           fontWeight: FontWeight.w700,
           color: AppColors.primaryDark,

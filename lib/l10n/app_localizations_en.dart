@@ -1190,4 +1190,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatMessageTooLong => 'Message is too long (max 2000 characters).';
+
+  @override
+  String get profileClearLocalChatRow => 'Clear Local Chat History';
+
+  @override
+  String get profileClearLocalChatSubtitle =>
+      'Only removes messages cached on this device';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => 'Clear local chat history?';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      'This only clears messages cached on this device — nothing is deleted from the server, and reopening a chat will reload it from there.';
+
+  @override
+  String get profileClearLocalChatSuccess => 'Local chat history cleared';
 }

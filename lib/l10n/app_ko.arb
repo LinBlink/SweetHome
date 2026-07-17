@@ -400,5 +400,10 @@
 "momentCommentDeleteTitle": "이 댓글을 삭제하시겠어요?",
 "momentCommentDeleteBody": "이 댓글은 모든 가족에게서 삭제됩니다.",
 "momentCommentDeleteFailed": "댓글 삭제에 실패했습니다",
-"chatMessageTooLong": "메시지가 너무 깁니다 (최대 2000자)"
+"chatMessageTooLong": "메시지가 너무 깁니다 (최대 2000자)",
+"profileClearLocalChatRow": "로컬 채팅 기록 삭제",
+"profileClearLocalChatSubtitle": "이 기기에 저장된 메시지만 삭제돼요",
+"profileClearLocalChatConfirmTitle": "로컬 채팅 기록을 삭제할까요?",
+"profileClearLocalChatConfirmBody": "이 기기에 저장된 메시지만 삭제돼요. 서버의 기록은 삭제되지 않으며, 채팅방을 다시 열면 서버에서 다시 불러와요.",
+"profileClearLocalChatSuccess": "로컬 채팅 기록을 삭제했어요"
 }

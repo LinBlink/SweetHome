@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               },
               child: HomeListItem(
-                leading: const _LeadingIcon(
+                leading: _LeadingIcon(
                   icon: Icons.people_alt_rounded,
                   color: AppColors.primary,
                 ),
@@ -144,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (mounted) _refreshPending();
                 },
                 child: HomeListItem(
-                  leading: const _LeadingIcon(
+                  leading: _LeadingIcon(
                     icon: Icons.group_add_rounded,
                     color: AppColors.accent,
                   ),
@@ -212,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.zero,
               onTap: () => showThemePickerSheet(context),
               child: HomeListItem(
-                leading: const _LeadingIcon(
+                leading: _LeadingIcon(
                   icon: Icons.palette_rounded,
                   color: AppColors.primaryDark,
                 ),
@@ -245,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.zero,
               onTap: () => showLanguagePickerSheet(context),
               child: HomeListItem(
-                leading: const _LeadingIcon(
+                leading: _LeadingIcon(
                   icon: Icons.translate_rounded,
                   color: AppColors.primaryDark,
                 ),
@@ -269,6 +269,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       size: 20,
                     ),
                   ],
+                ),
+                showSeparator: false,
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeCard(
+              padding: EdgeInsets.zero,
+              onTap: () => _confirmClearLocalChatHistory(context, l10n),
+              child: HomeListItem(
+                leading: _LeadingIcon(
+                  icon: Icons.delete_sweep_rounded,
+                  color: AppColors.danger,
+                ),
+                title: l10n.profileClearLocalChatRow,
+                subtitle: l10n.profileClearLocalChatSubtitle,
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.inkFaded,
+                  size: 20,
                 ),
                 showSeparator: false,
               ),
@@ -299,6 +318,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmClearLocalChatHistory(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(
+          l10n.profileClearLocalChatConfirmTitle,
+          style: const TextStyle(color: AppColors.ink),
+        ),
+        content: Text(
+          l10n.profileClearLocalChatConfirmBody,
+          style: const TextStyle(color: AppColors.inkFaded, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final messenger = ScaffoldMessenger.of(context);
+              await context.read<ChatProvider>().clearLocalChatHistory();
+              messenger.showSnackBar(
+                SnackBar(content: Text(l10n.profileClearLocalChatSuccess)),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: Text(l10n.familyFeedDeleteConfirm),
+          ),
+        ],
       ),
     );
   }
@@ -370,7 +424,7 @@ void showThemePickerSheet(BuildContext context) {
                 ),
                 title: Text(_paletteDisplayName(p)),
                 trailing: p.id == provider.palette.id
-                    ? const Icon(
+                    ? Icon(
                         Icons.check_circle_rounded,
                         color: AppColors.primary,
                       )

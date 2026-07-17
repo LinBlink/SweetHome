@@ -1144,6 +1144,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatMessageTooLong => '消息过长（最多 2000 字）';
+
+  @override
+  String get profileClearLocalChatRow => '删除本地聊天记录';
+
+  @override
+  String get profileClearLocalChatSubtitle => '仅清除本机缓存的消息';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => '删除本地聊天记录？';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      '仅清除本机缓存的消息，不会删除服务器上的记录，重新打开聊天会从服务器重新加载。';
+
+  @override
+  String get profileClearLocalChatSuccess => '本地聊天记录已删除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2286,6 +2302,22 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get chatMessageTooLong => '消息过长（最多 2000 字）';
+
+  @override
+  String get profileClearLocalChatRow => '删除本地聊天记录';
+
+  @override
+  String get profileClearLocalChatSubtitle => '仅清除本机缓存的消息';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => '删除本地聊天记录？';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      '仅清除本机缓存的消息，不会删除服务器上的记录，重新打开聊天会从服务器重新加载。';
+
+  @override
+  String get profileClearLocalChatSuccess => '本地聊天记录已删除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3428,4 +3460,20 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get chatMessageTooLong => '訊息過長（最多 2000 字）';
+
+  @override
+  String get profileClearLocalChatRow => '刪除本機聊天記錄';
+
+  @override
+  String get profileClearLocalChatSubtitle => '僅清除本機快取的訊息';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => '刪除本機聊天記錄？';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      '僅清除本機快取的訊息，不會刪除伺服器上的記錄，重新開啟聊天會從伺服器重新載入。';
+
+  @override
+  String get profileClearLocalChatSuccess => '本機聊天記錄已刪除';
 }

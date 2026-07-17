@@ -501,7 +501,7 @@ class _SplashScreen extends StatelessWidget {
                   width: 96,
                   height: 96,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [AppColors.primary, AppColors.accent],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -547,7 +547,7 @@ class _SplashScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-                const SizedBox(
+                SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(

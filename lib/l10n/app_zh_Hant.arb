@@ -400,5 +400,10 @@
 "momentCommentDeleteTitle": "刪除這條評論？",
 "momentCommentDeleteBody": "該評論將對所有家庭成員刪除。",
 "momentCommentDeleteFailed": "刪除評論失敗，請重試",
-"chatMessageTooLong": "訊息過長（最多 2000 字）"
+"chatMessageTooLong": "訊息過長（最多 2000 字）",
+"profileClearLocalChatRow": "刪除本機聊天記錄",
+"profileClearLocalChatSubtitle": "僅清除本機快取的訊息",
+"profileClearLocalChatConfirmTitle": "刪除本機聊天記錄？",
+"profileClearLocalChatConfirmBody": "僅清除本機快取的訊息，不會刪除伺服器上的記錄，重新開啟聊天會從伺服器重新載入。",
+"profileClearLocalChatSuccess": "本機聊天記錄已刪除"
 }

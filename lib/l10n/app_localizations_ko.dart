@@ -1150,4 +1150,20 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatMessageTooLong => '메시지가 너무 깁니다 (최대 2000자)';
+
+  @override
+  String get profileClearLocalChatRow => '로컬 채팅 기록 삭제';
+
+  @override
+  String get profileClearLocalChatSubtitle => '이 기기에 저장된 메시지만 삭제돼요';
+
+  @override
+  String get profileClearLocalChatConfirmTitle => '로컬 채팅 기록을 삭제할까요?';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      '이 기기에 저장된 메시지만 삭제돼요. 서버의 기록은 삭제되지 않으며, 채팅방을 다시 열면 서버에서 다시 불러와요.';
+
+  @override
+  String get profileClearLocalChatSuccess => '로컬 채팅 기록을 삭제했어요';
 }

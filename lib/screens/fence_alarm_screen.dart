@@ -61,7 +61,7 @@ class _FenceAlarmScreenState extends State<FenceAlarmScreen> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }

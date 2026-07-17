@@ -1193,4 +1193,23 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get chatMessageTooLong =>
       'မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)';
+
+  @override
+  String get profileClearLocalChatRow => 'စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်မည်';
+
+  @override
+  String get profileClearLocalChatSubtitle =>
+      'ဤစက်ထဲ သိမ်းထားသော မက်ဆေ့ချ်များကိုသာ ဖျက်ပါမည်';
+
+  @override
+  String get profileClearLocalChatConfirmTitle =>
+      'စက်တွင်းစကားပြောမှတ်တမ်းကို ဖျက်မလား?';
+
+  @override
+  String get profileClearLocalChatConfirmBody =>
+      'ဤစက်ထဲ သိမ်းထားသော မက်ဆေ့ချ်များကိုသာ ဖျက်ပါမည်။ ဆာဗာပေါ်ရှိ မှတ်တမ်းများ မဖျက်ပါ၊ စကားပြောဝင်တိုင်း ဆာဗာမှ ပြန်လည်ရယူပါမည်။';
+
+  @override
+  String get profileClearLocalChatSuccess =>
+      'စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်ပြီးပါပြီ';
 }

@@ -100,7 +100,7 @@ class JoinFamilyFormState extends State<JoinFamilyForm> {
                 textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
                   labelText: l10n.registerInviteCodeLabel,
-                  prefixIcon: const Icon(Icons.vpn_key_outlined, color: AppColors.primary),
+                  prefixIcon: Icon(Icons.vpn_key_outlined, color: AppColors.primary),
                 ),
               ),
             ),

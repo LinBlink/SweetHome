@@ -284,7 +284,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen>
               future: _future,
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   );
                 }
@@ -365,7 +365,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen>
                                       data.locations.last.lat,
                                       data.locations.last.lng,
                                     ),
-                                    child: const _EndpointDot(
+                                    child: _EndpointDot(
                                       color: AppColors.primary,
                                     ),
                                   ),
@@ -455,7 +455,7 @@ class _PickMemberPrompt extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.history, size: 56, color: AppColors.primary),
+            Icon(Icons.history, size: 56, color: AppColors.primary),
             const SizedBox(height: 12),
             Text(
               l10n.locationHistoryTitle,

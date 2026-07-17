@@ -79,7 +79,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
@@ -116,7 +116,7 @@ class _NewConversationScreenState extends State<NewConversationScreen> {
               if (_starting)
                 Container(
                   color: Colors.black26,
-                  child: const Center(
+                  child: Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 ),

@@ -233,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: l10n.commonPasswordLabel,
-                        prefixIcon: const Icon(Icons.lock_outline,
+                        prefixIcon: Icon(Icons.lock_outline,
                             color: AppColors.primary),
                         suffixIcon: IconButton(
                           icon: Icon(

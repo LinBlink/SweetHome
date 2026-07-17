@@ -126,7 +126,7 @@ class RequestJoinFormState extends State<RequestJoinForm> {
           decoration: InputDecoration(
             labelText: l10n.registerNicknameLabel,
             prefixIcon:
-                const Icon(Icons.person_outline, color: AppColors.primary),
+                Icon(Icons.person_outline, color: AppColors.primary),
           ),
         ),
         const SizedBox(height: 12),
@@ -153,7 +153,7 @@ class RequestJoinFormState extends State<RequestJoinForm> {
           decoration: InputDecoration(
             labelText: l10n.commonPasswordLabel,
             prefixIcon:
-                const Icon(Icons.lock_outline, color: AppColors.primary),
+                Icon(Icons.lock_outline, color: AppColors.primary),
           ),
         ),
         const SizedBox(height: 16),
@@ -167,7 +167,7 @@ class RequestJoinFormState extends State<RequestJoinForm> {
           decoration: InputDecoration(
             hintText: '+8613800138000',
             prefixIcon:
-                const Icon(Icons.phone_outlined, color: AppColors.primary),
+                Icon(Icons.phone_outlined, color: AppColors.primary),
           ),
         ),
         const SizedBox(height: 6),

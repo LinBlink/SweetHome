@@ -60,7 +60,7 @@ class LanguagePickerButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.language, size: 18, color: AppColors.primary),
+            Icon(Icons.language, size: 18, color: AppColors.primary),
             const SizedBox(width: 4),
             Text(
               localeDisplayName(current),

@@ -400,5 +400,10 @@
 "momentCommentDeleteTitle": "ဤမှတ်ချက်ကို ဖျက်မှာလား?",
 "momentCommentDeleteBody": "ဤမှတ်ချက်ကို မိသားစုအားလုံးထံမှ ဖျက်ပစ်ပါမည်။",
 "momentCommentDeleteFailed": "မှတ်ချက်ဖျက်၍မရပါ",
-"chatMessageTooLong": "မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)"
+"chatMessageTooLong": "မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)",
+"profileClearLocalChatRow": "စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်မည်",
+"profileClearLocalChatSubtitle": "ဤစက်ထဲ သိမ်းထားသော မက်ဆေ့ချ်များကိုသာ ဖျက်ပါမည်",
+"profileClearLocalChatConfirmTitle": "စက်တွင်းစကားပြောမှတ်တမ်းကို ဖျက်မလား?",
+"profileClearLocalChatConfirmBody": "ဤစက်ထဲ သိမ်းထားသော မက်ဆေ့ချ်များကိုသာ ဖျက်ပါမည်။ ဆာဗာပေါ်ရှိ မှတ်တမ်းများ မဖျက်ပါ၊ စကားပြောဝင်တိုင်း ဆာဗာမှ ပြန်လည်ရယူပါမည်။",
+"profileClearLocalChatSuccess": "စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်ပြီးပါပြီ"
 }

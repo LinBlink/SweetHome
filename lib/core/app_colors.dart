@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
+import 'app_palette.dart';
 
 class AppColors {
   AppColors._();
 
-  // ── Brand: warm terracotta (the "hearth" of the home) ────────────
-  static const Color primary = Color(0xFFBF5E3B);
-  static const Color primaryDark = Color(0xFF8C3A20);
-  static const Color primaryLight = Color(0xFFE8927A);
+  // ── Brand: theme-driven (defaults to warm terracotta) ────────────
+  /// Backing store for the brand colors below. Defaults to
+  /// [AppPalette.terracotta] (matching [ThemeProvider]'s own default)
+  /// so anything that reads `AppColors.primary` before the app's
+  /// first frame — or from code with no [BuildContext] at all, like
+  /// `CustomPainter.paint` or the data layer — still gets a sane
+  /// color instead of null/crashing.
+  static AppPalette _palette = AppPalette.terracotta;
 
-  static const Color accent = Color(0xFFF4A261);
+  /// Called by [ThemeProvider] on restore and on every palette
+  /// change. This is what makes theme switching apply globally:
+  /// `context.brandPrimary` (via the `AppPalette` `ThemeExtension`)
+  /// only reaches widgets that explicitly read it, but the vast
+  /// majority of the app reads the static `AppColors.primary` family
+  /// directly (per this file's own convention of "reuse an AppColors
+  /// constant" instead of hardcoding colors) — including code that
+  /// has no `BuildContext` to read a `ThemeExtension` from at all
+  /// (`CustomPainter`s, `mock_data.dart`, `avatarColorFor` below).
+  /// Routing both through the same [AppPalette] keeps them in sync.
+  static void applyPalette(AppPalette palette) {
+    _palette = palette;
+  }
+
+  static Color get primary => _palette.primary;
+  static Color get primaryDark => _palette.primaryDark;
+  static Color get primaryLight => _palette.primaryLight;
+
+  static Color get accent => _palette.accent;
 
   // ── Surfaces: warm cream paper ─────────────────────────────────────
   static const Color background = Color(0xFFFFF8F0);

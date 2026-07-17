@@ -113,7 +113,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                               provider.publishTotal,
                             )
                           : l10n.publishMomentPublishing,
-                      style: const TextStyle(color: AppColors.primary),
+                      style: TextStyle(color: AppColors.primary),
                     )
                   : Text(
                       l10n.publishMomentPublish,
@@ -564,7 +564,7 @@ class _CompressingBanner extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
@@ -687,7 +687,7 @@ class _DraftPreview extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.mic_none_rounded,
                 size: 22,
                 color: AppColors.primary,
@@ -909,7 +909,7 @@ class _AddMediaButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.photo_outlined,
                         color: AppColors.primary,
                       ),
@@ -920,7 +920,7 @@ class _AddMediaButton extends StatelessWidget {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.movie_outlined,
                         color: AppColors.primary,
                       ),
@@ -932,7 +932,7 @@ class _AddMediaButton extends StatelessWidget {
                     ),
                     if (audioSupported)
                       ListTile(
-                        leading: const Icon(
+                        leading: Icon(
                           Icons.mic_none_rounded,
                           color: AppColors.primary,
                         ),
@@ -974,7 +974,7 @@ class _AddMediaButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               l10n.publishMomentAddMedia,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,

@@ -400,5 +400,10 @@
 "momentCommentDeleteTitle": "このコメントを削除しますか？",
 "momentCommentDeleteBody": "このコメントはすべての家族から削除されます。",
 "momentCommentDeleteFailed": "コメントを削除できませんでした",
-"chatMessageTooLong": "メッセージが長すぎます（最大2000文字）"
+"chatMessageTooLong": "メッセージが長すぎます（最大2000文字）",
+"profileClearLocalChatRow": "ローカルのチャット履歴を削除",
+"profileClearLocalChatSubtitle": "この端末に保存されたメッセージのみ削除します",
+"profileClearLocalChatConfirmTitle": "ローカルのチャット履歴を削除しますか？",
+"profileClearLocalChatConfirmBody": "この端末に保存されたメッセージのみ削除されます。サーバー上のデータは削除されず、チャットを開くとサーバーから再読み込みされます。",
+"profileClearLocalChatSuccess": "ローカルのチャット履歴を削除しました"
 }

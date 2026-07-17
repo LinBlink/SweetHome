@@ -141,7 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   controller: _nameCtrl,
                   decoration: InputDecoration(
                     labelText: l10n.editProfileNicknameLabel,
-                    prefixIcon: const Icon(Icons.person_outline, color: AppColors.primary),
+                    prefixIcon: Icon(Icons.person_outline, color: AppColors.primary),
                   ),
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? l10n.registerNicknameRequired : null,

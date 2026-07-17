@@ -71,7 +71,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting &&
               !snap.hasData) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
@@ -1038,7 +1038,7 @@ class _ExtendedList extends StatelessWidget {
                     ),
                     child: Text(
                       '${members.length}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,

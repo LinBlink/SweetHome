@@ -127,7 +127,7 @@ class _FenceListScreenState extends State<FenceListScreen> {
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
@@ -283,7 +283,7 @@ class _FenceGroupSection extends StatelessWidget {
                 ),
                 child: Text(
                   '${fences.length}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,

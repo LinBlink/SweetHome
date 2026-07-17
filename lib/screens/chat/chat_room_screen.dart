@@ -16,10 +16,18 @@ class ChatRoomScreen extends StatefulWidget {
   final int conversationId;
   final String conversationName;
 
+  /// The `clientId` of a message to scroll to and briefly highlight
+  /// on open — set when this screen is pushed from a chat-search hit
+  /// (search only ever matches messages already sitting in
+  /// `ChatProvider`'s in-memory cache, so no extra pagination is
+  /// needed to find it; see `SearchMessagesScreen._openChat`).
+  final String? targetMessageClientId;
+
   const ChatRoomScreen({
     super.key,
     required this.conversationId,
     required this.conversationName,
+    this.targetMessageClientId,
   });
 
   @override
@@ -33,6 +41,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   bool _canSend = false;
   bool _uploadingImage = false;
   bool _showEmoji = false;
+
+  /// One `GlobalKey` per message bubble currently built, keyed by
+  /// `clientId` — lets `_jumpToMessage` locate a bubble's render
+  /// object (via `Scrollable.ensureVisible`) once `ListView.builder`
+  /// has actually built it, since a lazy list won't have realized an
+  /// off-screen item's Element yet.
+  final Map<String, GlobalKey> _bubbleKeys = {};
+  String? _highlightClientId;
 
   @override
   void initState() {
@@ -52,7 +68,46 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final chat = context.read<ChatProvider>();
       chat.loadMessages(widget.conversationId);
+      final target = widget.targetMessageClientId;
+      if (target != null) _jumpToMessage(target);
     });
+  }
+
+  /// Scrolls the (`reverse: true`) message list to the bubble whose
+  /// `clientId` is [clientId] and flashes it briefly so the user can
+  /// spot it. Two-step because `ListView.builder` only realizes
+  /// items near the current viewport: first a coarse `jumpTo` using
+  /// an estimated per-bubble extent to force the target's region to
+  /// get built, then `Scrollable.ensureVisible` on its now-attached
+  /// `GlobalKey` for exact placement (bubbles have variable height,
+  /// so the estimate alone would rarely land precisely).
+  Future<void> _jumpToMessage(String clientId) async {
+    final chat = context.read<ChatProvider>();
+    final messages = chat.messagesFor(widget.conversationId);
+    final idx = messages.indexWhere((m) => m.clientId == clientId);
+    if (idx < 0) return;
+    final fromBottom = messages.length - 1 - idx;
+    if (!mounted) return;
+    setState(() => _highlightClientId = clientId);
+    if (_scrollCtrl.hasClients) {
+      final estimate = (fromBottom * 78.0)
+          .clamp(0.0, _scrollCtrl.position.maxScrollExtent);
+      _scrollCtrl.jumpTo(estimate);
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
+    final targetContext = _bubbleKeys[clientId]?.currentContext;
+    if (targetContext != null && targetContext.mounted) {
+      await Scrollable.ensureVisible(
+        targetContext,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        alignment: 0.5,
+      );
+    }
+    await Future.delayed(const Duration(milliseconds: 1200));
+    if (!mounted) return;
+    setState(() => _highlightClientId = null);
   }
 
   @override
@@ -269,7 +324,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       builder: (ctx, chat, _) {
         final messages = chat.messagesFor(widget.conversationId);
         if (chat.isLoadingMessages(widget.conversationId) && messages.isEmpty) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           );
         }
@@ -294,8 +349,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 (chat.isLoadingMessages(widget.conversationId) ? 1 : 0),
             itemBuilder: (ctx, i) {
               if (i == messages.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16),
+                return Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Center(
                     child: SizedBox(
                       width: 20,
@@ -312,7 +367,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               // last). With reverse: true, item i=0 paints at the visual
               // bottom — so the list's last element (newest) sits there.
               final msg = messages[messages.length - 1 - i];
-              return MessageBubble(message: msg);
+              final key =
+                  _bubbleKeys.putIfAbsent(msg.clientId, () => GlobalKey());
+              return AnimatedContainer(
+                key: key,
+                duration: const Duration(milliseconds: 300),
+                color: _highlightClientId == msg.clientId
+                    ? AppColors.accent.withValues(alpha: 0.22)
+                    : Colors.transparent,
+                child: MessageBubble(message: msg),
+              );
             },
           ),
         );
@@ -353,8 +417,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           // button. While an upload is in flight we swap to a small
           // spinner so the user sees the action was picked up.
           _uploadingImage
-              ? const Padding(
-                  padding: EdgeInsets.all(12),
+              ? Padding(
+                  padding: const EdgeInsets.all(12),
                   child: SizedBox(
                     width: 20,
                     height: 20,
@@ -365,7 +429,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   ),
                 )
               : IconButton(
-                  icon: const Icon(Icons.add_circle_outline,
+                  icon: Icon(Icons.add_circle_outline,
                       color: AppColors.primary),
                   onPressed: _pickAndSendImage,
                   tooltip: l10n.chatRoomSendImageTooltip,

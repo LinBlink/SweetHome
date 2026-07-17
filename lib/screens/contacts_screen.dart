@@ -92,7 +92,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               );
             }
@@ -263,7 +263,7 @@ class _ContactTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
+                child: Icon(
                   Icons.chat_bubble_rounded,
                   color: AppColors.primary,
                   size: 14,

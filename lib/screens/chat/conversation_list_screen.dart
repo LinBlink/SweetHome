@@ -91,7 +91,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
   Widget _buildBody(BuildContext context, ChatProvider chat, AppLocalizations l10n) {
     if (chat.isLoadingConversations) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
@@ -236,7 +236,7 @@ class _ConnectionErrorBanner extends StatelessWidget {
                 ),
                 child: Text(
                   retryLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
