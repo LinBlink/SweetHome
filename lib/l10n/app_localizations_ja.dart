@@ -978,6 +978,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get publishMomentCompressing => '圧縮しています…';
 
   @override
+  String get publishMomentMediaUploading => 'メディアをアップロード中…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return '圧縮しても $size MB です。短い動画を選んでください。';
   }

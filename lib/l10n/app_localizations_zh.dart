@@ -974,6 +974,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get publishMomentCompressing => '正在压缩…';
 
   @override
+  String get publishMomentMediaUploading => '媒体上传中…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return '压缩后仍有 $size MB，请选择更短的视频。';
   }
@@ -2113,6 +2116,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get publishMomentCompressing => '正在压缩…';
 
   @override
+  String get publishMomentMediaUploading => '媒体上传中…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return '压缩后仍有 $size MB，请选择更短的视频。';
   }
@@ -3250,6 +3256,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get publishMomentCompressing => '正在壓縮…';
+
+  @override
+  String get publishMomentMediaUploading => '媒體上傳中…';
 
   @override
   String publishMomentVideoTooLarge(String size) {

@@ -980,6 +980,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get publishMomentCompressing => '압축 중…';
 
   @override
+  String get publishMomentMediaUploading => '미디어 업로드 중…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return '압축 후에도 $size MB 입니다. 더 짧은 영상을 선택해 주세요.';
   }

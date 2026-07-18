@@ -854,19 +854,26 @@ class _FamilyTreePainter extends CustomPainter {
     // touched any card below it when there was more than one — or
     // even exactly one off-center — descendant; visually a
     // connector that "gave up" a few pixels short of the row.
+    //
+    // The trunk/drop segments start and end exactly at the row edges
+    // (`parentsRowBottomY` / `middleRowTopY`) rather than being
+    // inset by `_dropGap` — an inset there read as a floating gap
+    // between the line and the card it's supposed to touch. Only the
+    // horizontal bus is offset from the edges, and even then it's
+    // just centered in the middle of the inter-row space, not pinned
+    // near one edge.
     if (c.parentsRowBottomY != null &&
         (c.parentCouple != null || c.parentSingle != null) &&
         c.middleRowDropXs.isNotEmpty) {
       final startX = c.parentCouple?.x ?? c.parentSingle!.centerX;
-      final startY =
-          (c.parentCouple?.left.bottom ?? c.parentSingle!.bottom) + _dropGap;
-      final endY = c.middleRowTopY - _dropGap;
+      final startY = c.parentCouple?.left.bottom ?? c.parentSingle!.bottom;
+      final endY = c.middleRowTopY;
       _drawBusFanOut(
         canvas,
         paint,
         trunkX: startX,
         trunkY: startY,
-        busY: endY - _dropGap / 2,
+        busY: (startY + endY) / 2,
         endY: endY,
         targetXs: c.middleRowDropXs,
       );
@@ -891,18 +898,19 @@ class _FamilyTreePainter extends CustomPainter {
     // 4. Drop from middle row down to the children row (blood
     // children only — an in-law spouse is reached via the marriage
     // line in section 5 below, not a separate drop from this bus).
+    // Same edge-to-edge rationale as section 2 above.
     if (c.childrenRowTopY != null && c.childrenPositions.isNotEmpty) {
       final startX = c.spousePos != null
           ? (c.viewerPos.centerX + c.spousePos!.centerX) / 2
           : c.viewerPos.centerX;
-      final startY = c.viewerPos.bottom + _dropGap;
-      final endY = c.childrenRowTopY! - _dropGap;
+      final startY = c.viewerPos.bottom;
+      final endY = c.childrenRowTopY!;
       _drawBusFanOut(
         canvas,
         paint,
         trunkX: startX,
         trunkY: startY,
-        busY: endY - _dropGap / 2,
+        busY: (startY + endY) / 2,
         endY: endY,
         targetXs: c.childrenPositions.map((p) => p.centerX).toList(),
       );

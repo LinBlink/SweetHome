@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
@@ -84,10 +85,37 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     }
   }
 
+  bool get _anyDraftUploading =>
+      _drafts.any((d) => d.uploadStatus == MomentUploadStatus.uploading);
+
+  /// Kicks off §2.4/§2.5/§2.6 upload for [draft] the moment it's added
+  /// to the composer — the whole point being that by the time the
+  /// user finishes writing a caption and taps "发布", the media is
+  /// already sitting on the server and publish just has to stitch the
+  /// URLs together (see `MomentProvider.publish`). Tapping a failed
+  /// tile calls this again to retry, so this doesn't assume it's only
+  /// ever invoked once per draft.
+  Future<void> _startUpload(MomentDraft draft) async {
+    if (!mounted) return;
+    setState(() => draft.uploadStatus = MomentUploadStatus.uploading);
+    try {
+      final url = await context.read<MomentProvider>().uploadDraftMedia(draft);
+      if (!mounted || !_drafts.contains(draft)) return;
+      setState(() {
+        draft.remoteUrl = url;
+        draft.uploadStatus = MomentUploadStatus.done;
+      });
+    } catch (_) {
+      if (!mounted || !_drafts.contains(draft)) return;
+      setState(() => draft.uploadStatus = MomentUploadStatus.failed);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final provider = context.watch<MomentProvider>();
+    final anyUploading = _anyDraftUploading;
     return PopScope(
       canPop: !_hasUnsavedContent && !provider.isPublishing && !_isCompressingMedia,
       onPopInvokedWithResult: (didPop, _) async {
@@ -102,6 +130,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
             TextButton(
               onPressed: (provider.isPublishing ||
                       _isCompressingMedia ||
+                      anyUploading ||
                       !_hasUnsavedContent)
                   ? null
                   : _submit,
@@ -118,7 +147,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                   : Text(
                       l10n.publishMomentPublish,
                       style: TextStyle(
-                        color: _hasUnsavedContent
+                        color: (_hasUnsavedContent && !anyUploading)
                             ? AppColors.primary
                             : AppColors.textHint,
                         fontWeight: FontWeight.w700,
@@ -130,6 +159,8 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
         body: SafeArea(
           child: Column(
             children: [
+              if (anyUploading)
+                _CompressingBanner(label: l10n.publishMomentMediaUploading),
               if (_isRecording)
                 _RecordingBanner(
                   elapsedSec: _recordingElapsedSec,
@@ -167,6 +198,8 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                         _DraftsStrip(
                           drafts: _drafts,
                           onRemove: _onRemoveDraft,
+                          onReorder: _onReorderDrafts,
+                          onTapDraft: _onTapDraft,
                         ),
                       const SizedBox(height: 12),
                       if (_drafts.length < _maxMediaItems)
@@ -279,13 +312,19 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
       if (mounted) setState(() => _isCompressingMedia = false);
     }
     if (!mounted) return;
+    final added = <MomentDraft>[];
     setState(() {
       for (final f in compressed) {
         if (_drafts.length >= _maxMediaItems) break;
-        _drafts.add(MomentDraft.fromXFile(f, MomentDraftKind.photo));
+        final draft = MomentDraft.fromXFile(f, MomentDraftKind.photo);
+        _drafts.add(draft);
+        added.add(draft);
       }
       _hasUnsavedContent = true;
     });
+    for (final draft in added) {
+      unawaited(_startUpload(draft));
+    }
   }
 
   /// Image compression shim — re-encodes a picked JPEG/PNG into a
@@ -372,14 +411,16 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
       } catch (_) {}
       return;
     }
+    final draft = MomentDraft.fromXFile(
+      XFile(finalPath, name: raw.name),
+      MomentDraftKind.video,
+    );
     setState(() {
-      _drafts.add(MomentDraft.fromXFile(
-        XFile(finalPath, name: raw!.name),
-        MomentDraftKind.video,
-      ));
+      _drafts.add(draft);
       _hasUnsavedContent = true;
       _isCompressingMedia = false;
     });
+    unawaited(_startUpload(draft));
   }
 
   Future<void> _toggleRecording() async {
@@ -395,19 +436,22 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
           final durMs = DateTime.now().millisecondsSinceEpoch -
               (_recordingStartMs ?? 0);
           final durSec = (durMs / 1000).clamp(1, 600).toInt();
+          final draft = MomentDraft.fromAudio(
+            MomentRecordedAudio(
+              bytes: bytes,
+              filename: stopped.split(Platform.pathSeparator).last,
+              path: stopped,
+              durationSec: durSec,
+            ),
+          );
           setState(() {
-            _drafts.add(MomentDraft.fromAudio(
-              MomentRecordedAudio(
-                bytes: bytes,
-                filename: stopped.split(Platform.pathSeparator).last,
-                durationSec: durSec,
-              ),
-            ));
+            _drafts.add(draft);
             _isRecording = false;
             _hasUnsavedContent = true;
             _recordingStartMs = null;
             _recordingElapsedSec = 0;
           });
+          unawaited(_startUpload(draft));
           return;
         }
         setState(() {
@@ -475,6 +519,35 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     _drafts.removeAt(index);
     setState(() {});
     _onContentChanged();
+  }
+
+  /// Long-press-drag reorder handler (see `_DraggableDraftTile`).
+  /// [newIndex] is the target tile's index in the list *before* the
+  /// dragged item is removed — same convention as
+  /// `ReorderableListView.onReorder`, so the shift-by-one when moving
+  /// forward is handled the same way here.
+  void _onReorderDrafts(int oldIndex, int newIndex) {
+    if (oldIndex == newIndex) return;
+    setState(() {
+      final item = _drafts.removeAt(oldIndex);
+      final insertAt = oldIndex < newIndex ? newIndex - 1 : newIndex;
+      _drafts.insert(insertAt, item);
+    });
+  }
+
+  /// Tapping a tile previews it full-screen — unless the upload
+  /// failed, in which case tapping retries instead (a second
+  /// affordance for the same tile would be one tap too many on a
+  /// small thumbnail).
+  void _onTapDraft(MomentDraft draft) {
+    if (draft.uploadStatus == MomentUploadStatus.failed) {
+      unawaited(_startUpload(draft));
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (_) => _DraftPreviewScreen(draft: draft),
+    ));
   }
 
   void _toastFromException(
@@ -619,49 +692,165 @@ class _BlinkingDotState extends State<_BlinkingDot>
 class _DraftsStrip extends StatelessWidget {
   final List<MomentDraft> drafts;
   final ValueChanged<int> onRemove;
-  const _DraftsStrip({required this.drafts, required this.onRemove});
+  final void Function(int oldIndex, int newIndex) onReorder;
+  final ValueChanged<MomentDraft> onTapDraft;
+  const _DraftsStrip({
+    required this.drafts,
+    required this.onRemove,
+    required this.onReorder,
+    required this.onTapDraft,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         for (var i = 0; i < drafts.length; i++)
-          SizedBox(
-            width: 84,
-            height: 84,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _DraftPreview(draft: drafts[i]),
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: Material(
-                    color: Colors.black.withValues(alpha: 0.65),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: () => onRemove(i),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Icon(
-                          Icons.close_rounded,
-                          size: 16,
-                          color: Colors.white,
-                          semanticLabel: l10n.publishMomentRemoveMedia,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          _DraggableDraftTile(
+            key: ValueKey(drafts[i].id),
+            index: i,
+            draft: drafts[i],
+            onRemove: () => onRemove(i),
+            onTap: () => onTapDraft(drafts[i]),
+            onReorder: onReorder,
           ),
       ],
     );
+  }
+}
+
+/// One tile in the composer's media strip — a thumbnail the user can
+/// tap (preview, or retry if the upload failed), remove via the
+/// corner button, and long-press to drag into a new position. Built
+/// on [LongPressDraggable]/[DragTarget] rather than
+/// `ReorderableListView` so the strip can stay a wrapping grid
+/// instead of a single horizontally-scrolling row.
+class _DraggableDraftTile extends StatelessWidget {
+  final int index;
+  final MomentDraft draft;
+  final VoidCallback onRemove;
+  final VoidCallback onTap;
+  final void Function(int oldIndex, int newIndex) onReorder;
+
+  const _DraggableDraftTile({
+    required super.key,
+    required this.index,
+    required this.draft,
+    required this.onRemove,
+    required this.onTap,
+    required this.onReorder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tile = SizedBox(
+      width: 84,
+      height: 84,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: GestureDetector(onTap: onTap, child: _DraftPreview(draft: draft)),
+          ),
+          if (draft.uploadStatus != MomentUploadStatus.done)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: _UploadStatusOverlay(status: draft.uploadStatus),
+              ),
+            ),
+          Positioned(
+            right: -4,
+            top: -4,
+            child: Material(
+              color: Colors.black.withValues(alpha: 0.65),
+              shape: const CircleBorder(),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: onRemove,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: Colors.white,
+                    semanticLabel: l10n.publishMomentRemoveMedia,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (details) => details.data != index,
+      onAcceptWithDetails: (details) => onReorder(details.data, index),
+      builder: (context, candidateData, rejectedData) {
+        final isDropTarget = candidateData.isNotEmpty;
+        return LongPressDraggable<int>(
+          data: index,
+          feedback: Material(
+            color: Colors.transparent,
+            child: Opacity(opacity: 0.85, child: tile),
+          ),
+          childWhenDragging: Opacity(opacity: 0.3, child: tile),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: isDropTarget
+                  ? Border.all(color: AppColors.primary, width: 2)
+                  : null,
+            ),
+            child: tile,
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Dims the thumbnail while its upload is in flight (spinner) or
+/// shows a retry affordance if it failed — tapping the tile while
+/// failed calls `_onTapDraft`'s retry branch instead of opening the
+/// preview.
+class _UploadStatusOverlay extends StatelessWidget {
+  final MomentUploadStatus status;
+  const _UploadStatusOverlay({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (status) {
+      case MomentUploadStatus.uploading:
+        return Container(
+          color: Colors.black.withValues(alpha: 0.35),
+          alignment: Alignment.center,
+          child: const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white,
+            ),
+          ),
+        );
+      case MomentUploadStatus.failed:
+        return Container(
+          color: Colors.black.withValues(alpha: 0.45),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.refresh_rounded,
+            color: Colors.white,
+            size: 26,
+          ),
+        );
+      case MomentUploadStatus.done:
+        return const SizedBox.shrink();
+    }
   }
 }
 
@@ -861,6 +1050,259 @@ class _DraftVideoTileState extends State<_DraftVideoTile> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Full-screen preview for a not-yet-published draft, opened by
+/// tapping its thumbnail in the composer. Always renders from the
+/// local file/bytes (never the upload URL) so it works instantly
+/// even while the upload is still in flight or has failed.
+class _DraftPreviewScreen extends StatelessWidget {
+  final MomentDraft draft;
+  const _DraftPreviewScreen({required this.draft});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (draft.kind) {
+      case MomentDraftKind.photo:
+        return _DraftImagePreview(draft: draft);
+      case MomentDraftKind.video:
+        return _DraftVideoPreview(draft: draft);
+      case MomentDraftKind.audio:
+        return _DraftAudioPreview(draft: draft);
+    }
+  }
+}
+
+class _DraftImagePreview extends StatelessWidget {
+  final MomentDraft draft;
+  const _DraftImagePreview({required this.draft});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = draft.fromPicked!;
+    final image = kIsWeb
+        ? Image.network(f.path, fit: BoxFit.contain)
+        : Image.file(File(f.path), fit: BoxFit.contain);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          minScale: 1.0,
+          maxScale: 5.0,
+          child: image,
+        ),
+      ),
+    );
+  }
+}
+
+class _DraftVideoPreview extends StatefulWidget {
+  final MomentDraft draft;
+  const _DraftVideoPreview({required this.draft});
+
+  @override
+  State<_DraftVideoPreview> createState() => _DraftVideoPreviewState();
+}
+
+class _DraftVideoPreviewState extends State<_DraftVideoPreview> {
+  VideoPlayerController? _controller;
+  bool _ready = false;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final f = widget.draft.fromPicked;
+    if (f == null) {
+      if (mounted) setState(() => _failed = true);
+      return;
+    }
+    final c = kIsWeb
+        ? VideoPlayerController.networkUrl(Uri.parse(f.path))
+        : VideoPlayerController.file(File(f.path));
+    _controller = c;
+    try {
+      await c.initialize();
+      await c.setLooping(true);
+      if (!mounted) return;
+      setState(() => _ready = true);
+      await c.play();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _togglePlay() {
+    final c = _controller;
+    if (c == null) return;
+    setState(() {
+      if (c.value.isPlaying) {
+        c.pause();
+      } else {
+        c.play();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    Widget body;
+    if (_failed) {
+      body = Text(
+        l10n.momentDetailVideoLoadFailed,
+        style: const TextStyle(color: Colors.white70),
+      );
+    } else if (!_ready || _controller == null) {
+      body = const SizedBox(
+        width: 28,
+        height: 28,
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+      );
+    } else {
+      final c = _controller!;
+      body = GestureDetector(
+        onTap: _togglePlay,
+        child: AspectRatio(
+          aspectRatio: c.value.aspectRatio == 0 ? 16 / 9 : c.value.aspectRatio,
+          child: VideoPlayer(c),
+        ),
+      );
+    }
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Center(child: body),
+    );
+  }
+}
+
+class _DraftAudioPreview extends StatefulWidget {
+  final MomentDraft draft;
+  const _DraftAudioPreview({required this.draft});
+
+  @override
+  State<_DraftAudioPreview> createState() => _DraftAudioPreviewState();
+}
+
+class _DraftAudioPreviewState extends State<_DraftAudioPreview> {
+  AudioPlayer? _player;
+  bool _ready = false;
+  bool _failed = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final a = widget.draft.fromRecorded;
+    if (a == null) {
+      if (mounted) setState(() => _failed = true);
+      return;
+    }
+    final p = AudioPlayer();
+    _player = p;
+    try {
+      final dur = await p.setFilePath(a.path);
+      _duration = dur ?? Duration.zero;
+      p.positionStream.listen((d) {
+        if (!mounted) return;
+        setState(() => _position = d);
+      });
+      if (!mounted) return;
+      setState(() => _ready = true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _player?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    Widget body;
+    if (_failed) {
+      body = Text(
+        l10n.momentDetailAudioLoadFailed,
+        style: TextStyle(color: AppColors.textHint),
+      );
+    } else if (!_ready || _player == null) {
+      body = const CircularProgressIndicator();
+    } else {
+      final maxMs =
+          _duration.inMilliseconds.toDouble().clamp(1, double.infinity).toDouble();
+      body = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.mic_rounded, size: 48, color: AppColors.primary),
+          const SizedBox(height: 16),
+          IconButton(
+            iconSize: 56,
+            color: AppColors.primary,
+            icon: Icon(
+              _player!.playing
+                  ? Icons.pause_circle_filled_rounded
+                  : Icons.play_circle_fill_rounded,
+            ),
+            onPressed: () {
+              setState(() {
+                if (_player!.playing) {
+                  _player!.pause();
+                } else {
+                  _player!.play();
+                }
+              });
+            },
+          ),
+          SizedBox(
+            width: 240,
+            child: Slider(
+              value: _position.inMilliseconds.toDouble().clamp(0, maxMs).toDouble(),
+              min: 0,
+              max: maxMs,
+              onChanged: (v) => _player!.seek(Duration(milliseconds: v.toInt())),
+              activeColor: AppColors.primary,
+            ),
+          ),
+        ],
+      );
+    }
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(title: Text(l10n.publishMomentMediaTypeAudio)),
+      body: Center(child: body),
     );
   }
 }

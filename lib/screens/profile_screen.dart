@@ -508,14 +508,14 @@ class _ProfileCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.wood, AppColors.woodLight],
+              colors: [AppColors.primaryDark, AppColors.primary],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.wood.withValues(alpha: 0.35),
+                color: AppColors.primaryDark.withValues(alpha: 0.35),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -559,7 +559,7 @@ class _ProfileCard extends StatelessWidget {
                       children: [
                         const Icon(
                           Icons.cottage_rounded,
-                          color: Color(0xCCEFE0D0),
+                          color: Colors.white70,
                           size: 13,
                         ),
                         const SizedBox(width: 4),
@@ -567,7 +567,7 @@ class _ProfileCard extends StatelessWidget {
                           familyName,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Color(0xCCEFE0D0),
+                            color: Colors.white70,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

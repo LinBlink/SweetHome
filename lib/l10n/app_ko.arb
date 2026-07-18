@@ -315,6 +315,7 @@
 "publishMomentRecordingInProgress": "녹음 중 {seconds}초 — 탭하여 중지",
 "publishMomentRecordingStopInline": "중지",
 "publishMomentCompressing": "압축 중…",
+"publishMomentMediaUploading": "미디어 업로드 중…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
@@ -335,6 +336,7 @@
 "publishMomentRecordingInProgress": "녹음 중 {seconds}초 — 탭하여 중지",
 "publishMomentRecordingStopInline": "중지",
 "publishMomentCompressing": "압축 중…",
+"publishMomentMediaUploading": "미디어 업로드 중…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}

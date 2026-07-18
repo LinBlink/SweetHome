@@ -1017,6 +1017,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishMomentCompressing => 'Compressing…';
 
   @override
+  String get publishMomentMediaUploading => 'Uploading media…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return 'Video is still $size MB after compression — please pick a shorter clip.';
   }

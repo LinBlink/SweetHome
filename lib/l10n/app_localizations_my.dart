@@ -1013,6 +1013,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get publishMomentCompressing => 'ချုံ့နေသည်…';
 
   @override
+  String get publishMomentMediaUploading => 'မီဒီယာ အပ်လုဒ်လုပ်နေသည်…';
+
+  @override
   String publishMomentVideoTooLarge(String size) {
     return 'ချုံ့ပြီးနောက် $size MB ရှိသေးသည် — ပိုတိုသော ဗီဒီယို ရွေးပါ။';
   }

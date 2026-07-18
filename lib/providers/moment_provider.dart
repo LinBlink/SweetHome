@@ -522,10 +522,15 @@ class MomentProvider extends ChangeNotifier {
   int get publishTotal => _publishTotal;
   String? get publishError => _publishError;
 
-  /// Publish a new family moment. Order: upload every draft through
-  /// §2.4/§2.5/§2.6 (in input order) so we can show per-file
-  /// progress, then fire §7.1 once with the full URL list. The
-  /// optimistic first-page refresh happens on success.
+  /// Publish a new family moment. Each draft is uploaded through
+  /// §2.4/§2.5/§2.6 as soon as it's added to the composer (see
+  /// `PublishMomentScreen._startUpload`), so by the time the user
+  /// taps "发布" most/all drafts already carry a [MomentDraft.remoteUrl]
+  /// and this just stitches the URL list together. Any draft that
+  /// hasn't finished (still uploading, or a retry never landed) is
+  /// uploaded here as a fallback so publish always succeeds once
+  /// called — the composer's Publish button is expected to stay
+  /// disabled while uploads are in flight, so this path is rarely hit.
   Future<void> publish({
     String? content,
     required List<MomentDraft> drafts,
@@ -538,17 +543,20 @@ class MomentProvider extends ChangeNotifier {
     }
     _isPublishing = true;
     _publishError = null;
-    _publishUploaded = 0;
+    _publishUploaded = drafts.where((d) => d.remoteUrl != null).length;
     _publishTotal = drafts.length;
     notifyListeners();
 
     final wireMedia = <Map<String, String>>[];
     try {
       for (final draft in drafts) {
-        final url = await _upload(draft);
+        final url = draft.remoteUrl ?? await _upload(draft);
         wireMedia.add({'type': _wireType(draft.kind), 'content': url});
-        _publishUploaded++;
-        notifyListeners();
+        if (draft.remoteUrl == null) {
+          draft.remoteUrl = url;
+          _publishUploaded++;
+          notifyListeners();
+        }
       }
       final trimmed = content?.trim();
       await service.publishMoment(
@@ -570,6 +578,15 @@ class MomentProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Kicks off the §2.4/§2.5/§2.6 upload for one draft. Called by the
+  /// composer the moment a photo/video/audio clip is added, so upload
+  /// latency is hidden behind the time the user spends writing a
+  /// caption or picking more media instead of stacking up after they
+  /// tap "发布". Doesn't touch [MomentDraft.remoteUrl] itself — the
+  /// caller (composer) owns writing the result back so it can also
+  /// track per-draft UI state (spinner vs. failed vs. done).
+  Future<String> uploadDraftMedia(MomentDraft draft) => _upload(draft);
 
   Future<String> _upload(MomentDraft draft) async {
     if (draft.fromPicked != null) {
@@ -615,40 +632,70 @@ class MomentProvider extends ChangeNotifier {
 /// endpoint selector and the §7.1 `media[].type` value).
 enum MomentDraftKind { photo, video, audio }
 
+/// Per-draft upload progress, driven by the composer as it kicks off
+/// (and retries) `MomentProvider.uploadDraftMedia` for each draft
+/// right after it's added — instead of waiting for the user to tap
+/// "发布".
+enum MomentUploadStatus { uploading, done, failed }
+
 /// One pending piece of media in the publish composer. Exactly one
 /// of [fromPicked] / [fromRecorded] is non-null per draft.
+///
+/// Deliberately *not* `const`/immutable: [uploadStatus] and
+/// [remoteUrl] are mutated in place by the composer as the
+/// fire-and-forget upload it kicks off on add resolves, so the same
+/// instance can be looked up by identity in the (possibly reordered,
+/// possibly-since-removed) `_drafts` list without needing a
+/// synchronized index.
 class MomentDraft {
+  final String id;
   final MomentDraftKind kind;
   final XFile? fromPicked;
   final MomentRecordedAudio? fromRecorded;
+  MomentUploadStatus uploadStatus;
+  String? remoteUrl;
 
-  const MomentDraft._({
+  MomentDraft._({
+    required this.id,
     required this.kind,
     this.fromPicked,
     this.fromRecorded,
-  }) : assert(fromPicked != null || fromRecorded != null,
+  })  : uploadStatus = MomentUploadStatus.uploading,
+        assert(fromPicked != null || fromRecorded != null,
             'MomentDraft requires one source');
 
   factory MomentDraft.fromXFile(XFile file, MomentDraftKind kind) {
-    return MomentDraft._(kind: kind, fromPicked: file);
+    return MomentDraft._(id: _newId(), kind: kind, fromPicked: file);
   }
 
   factory MomentDraft.fromAudio(MomentRecordedAudio audio) {
-    return MomentDraft._(kind: MomentDraftKind.audio, fromRecorded: audio);
+    return MomentDraft._(
+      id: _newId(),
+      kind: MomentDraftKind.audio,
+      fromRecorded: audio,
+    );
   }
+
+  static int _idSeq = 0;
+  static String _newId() => 'draft_${_idSeq++}';
 }
 
 /// Locally-recorded audio clip ready for §2.6 upload. The recorder
 /// writes opus bytes ([bytes]) and a hint filename; [durationSec]
-/// is purely for the composer's UI display.
+/// is purely for the composer's UI display. [path] is the temp file
+/// the recorder wrote to — kept around (rather than only the decoded
+/// [bytes]) so the composer's preview can hand it straight to
+/// `just_audio` instead of re-writing the bytes to a fresh temp file.
 class MomentRecordedAudio {
   final Uint8List bytes;
   final String filename;
+  final String path;
   final int? durationSec;
 
   const MomentRecordedAudio({
     required this.bytes,
     required this.filename,
+    required this.path,
     this.durationSec,
   });
 }

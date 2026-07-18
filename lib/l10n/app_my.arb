@@ -315,6 +315,7 @@
 "publishMomentRecordingInProgress": "မှတ်တမ်းတင်နေသည် {seconds} စက္ကန့် — ရပ်ရန် တို့ပါ",
 "publishMomentRecordingStopInline": "ရပ်ပါ",
 "publishMomentCompressing": "ချုံ့နေသည်…",
+"publishMomentMediaUploading": "မီဒီယာ အပ်လုဒ်လုပ်နေသည်…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
@@ -335,6 +336,7 @@
 "publishMomentRecordingInProgress": "မှတ်တမ်းတင်နေသည် {seconds} စက္ကန့် — ရပ်ရန် တို့ပါ",
 "publishMomentRecordingStopInline": "ရပ်ပါ",
 "publishMomentCompressing": "ချုံ့နေသည်…",
+"publishMomentMediaUploading": "မီဒီယာ အပ်လုဒ်လုပ်နေသည်…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}

@@ -399,6 +399,7 @@
 "publishMomentRecordingInProgress": "Recording {seconds}s — tap to stop",
 "publishMomentRecordingStopInline": "Stop",
 "publishMomentCompressing": "Compressing…",
+"publishMomentMediaUploading": "Uploading media…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
@@ -419,6 +420,7 @@
 "publishMomentRecordingInProgress": "Recording {seconds}s — tap to stop",
 "publishMomentRecordingStopInline": "Stop",
 "publishMomentCompressing": "Compressing…",
+"publishMomentMediaUploading": "Uploading media…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}

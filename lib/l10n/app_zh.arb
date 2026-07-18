@@ -315,6 +315,7 @@
 "publishMomentRecordingInProgress": "录音中 {seconds} 秒 — 点一下停止",
 "publishMomentRecordingStopInline": "停止",
 "publishMomentCompressing": "正在压缩…",
+"publishMomentMediaUploading": "媒体上传中…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
@@ -335,6 +336,7 @@
 "publishMomentRecordingInProgress": "录音中 {seconds} 秒 — 点一下停止",
 "publishMomentRecordingStopInline": "停止",
 "publishMomentCompressing": "正在压缩…",
+"publishMomentMediaUploading": "媒体上传中…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}

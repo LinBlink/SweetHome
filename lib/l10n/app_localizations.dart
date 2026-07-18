@@ -1918,6 +1918,12 @@ abstract class AppLocalizations {
   /// **'Compressing…'**
   String get publishMomentCompressing;
 
+  /// No description provided for @publishMomentMediaUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading media…'**
+  String get publishMomentMediaUploading;
+
   /// No description provided for @publishMomentVideoTooLarge.
   ///
   /// In en, this message translates to:

@@ -315,6 +315,7 @@
 "publishMomentRecordingInProgress": "録音中 {seconds} 秒 — タップで停止",
 "publishMomentRecordingStopInline": "停止",
 "publishMomentCompressing": "圧縮しています…",
+"publishMomentMediaUploading": "メディアをアップロード中…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
@@ -335,6 +336,7 @@
 "publishMomentRecordingInProgress": "録音中 {seconds} 秒 — タップで停止",
 "publishMomentRecordingStopInline": "停止",
 "publishMomentCompressing": "圧縮しています…",
+"publishMomentMediaUploading": "メディアをアップロード中…",
 "@publishMomentVideoTooLarge": {
     "placeholders": {
         "size": {"type":"String"}
