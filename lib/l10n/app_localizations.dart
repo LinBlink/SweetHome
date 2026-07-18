@@ -1750,6 +1750,12 @@ abstract class AppLocalizations {
   /// **'Up to 9 files per post'**
   String get publishMomentMaxMedia;
 
+  /// No description provided for @publishMomentReorderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Press and hold, then drag to reorder'**
+  String get publishMomentReorderHint;
+
   /// No description provided for @publishMomentRemoveMedia.
   ///
   /// In en, this message translates to:
@@ -1845,6 +1851,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep editing'**
   String get publishMomentDiscardCancel;
+
+  /// No description provided for @publishMomentDraftSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get publishMomentDraftSaveAction;
+
+  /// No description provided for @publishMomentDraftRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft restored'**
+  String get publishMomentDraftRestored;
+
+  /// No description provided for @publishMomentDraftClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear draft'**
+  String get publishMomentDraftClear;
 
   /// No description provided for @momentDetailTitle.
   ///

@@ -886,6 +886,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get publishMomentMaxMedia => '最多 9 个文件';
 
   @override
+  String get publishMomentReorderHint => '长按并拖动可调整顺序';
+
+  @override
   String get publishMomentRemoveMedia => '移除';
 
   @override
@@ -934,6 +937,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get publishMomentDiscardCancel => '继续编辑';
+
+  @override
+  String get publishMomentDraftSaveAction => '存为草稿';
+
+  @override
+  String get publishMomentDraftRestored => '已恢复草稿';
+
+  @override
+  String get publishMomentDraftClear => '清除草稿';
 
   @override
   String get momentDetailTitle => '动态详情';
@@ -2028,6 +2040,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get publishMomentMaxMedia => '最多 9 个文件';
 
   @override
+  String get publishMomentReorderHint => '长按并拖动可调整顺序';
+
+  @override
   String get publishMomentRemoveMedia => '移除';
 
   @override
@@ -2076,6 +2091,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get publishMomentDiscardCancel => '继续编辑';
+
+  @override
+  String get publishMomentDraftSaveAction => '存为草稿';
+
+  @override
+  String get publishMomentDraftRestored => '已恢复草稿';
+
+  @override
+  String get publishMomentDraftClear => '清除草稿';
 
   @override
   String get momentDetailTitle => '动态详情';
@@ -3170,6 +3194,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get publishMomentMaxMedia => '最多 9 個檔案';
 
   @override
+  String get publishMomentReorderHint => '長按並拖動可調整順序';
+
+  @override
   String get publishMomentRemoveMedia => '移除';
 
   @override
@@ -3218,6 +3245,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get publishMomentDiscardCancel => '繼續編輯';
+
+  @override
+  String get publishMomentDraftSaveAction => '存為草稿';
+
+  @override
+  String get publishMomentDraftRestored => '已恢復草稿';
+
+  @override
+  String get publishMomentDraftClear => '清除草稿';
 
   @override
   String get momentDetailTitle => '動態詳情';

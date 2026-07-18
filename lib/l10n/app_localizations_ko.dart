@@ -891,6 +891,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get publishMomentMaxMedia => '최대 9개 파일';
 
   @override
+  String get publishMomentReorderHint => '길게 눌러서 드래그하면 순서를 바꿀 수 있어요';
+
+  @override
   String get publishMomentRemoveMedia => '제거';
 
   @override
@@ -940,6 +943,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get publishMomentDiscardCancel => '계속 작성';
+
+  @override
+  String get publishMomentDraftSaveAction => '임시저장';
+
+  @override
+  String get publishMomentDraftRestored => '임시 저장된 글을 불러왔어요';
+
+  @override
+  String get publishMomentDraftClear => '임시저장 삭제';
 
   @override
   String get momentDetailTitle => '게시글';

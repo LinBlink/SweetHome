@@ -928,6 +928,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publishMomentMaxMedia => 'Up to 9 files per post';
 
   @override
+  String get publishMomentReorderHint => 'Press and hold, then drag to reorder';
+
+  @override
   String get publishMomentRemoveMedia => 'Remove';
 
   @override
@@ -977,6 +980,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get publishMomentDiscardCancel => 'Keep editing';
+
+  @override
+  String get publishMomentDraftSaveAction => 'Save draft';
+
+  @override
+  String get publishMomentDraftRestored => 'Draft restored';
+
+  @override
+  String get publishMomentDraftClear => 'Clear draft';
 
   @override
   String get momentDetailTitle => 'Update';

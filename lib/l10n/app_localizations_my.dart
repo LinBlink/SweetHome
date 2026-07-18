@@ -924,6 +924,10 @@ class AppLocalizationsMy extends AppLocalizations {
   String get publishMomentMaxMedia => 'ဖိုင် 9 ခုအထိ';
 
   @override
+  String get publishMomentReorderHint =>
+      'အစီအစဉ်ပြောင်းရန် နှိပ်ထားပြီး ဖိဆွဲပါ';
+
+  @override
   String get publishMomentRemoveMedia => 'ဖယ်ရှားမည်';
 
   @override
@@ -973,6 +977,15 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get publishMomentDiscardCancel => 'ဆက်ပြင်ဆင်မည်';
+
+  @override
+  String get publishMomentDraftSaveAction => 'မူကြမ်းအဖြစ်သိမ်းမည်';
+
+  @override
+  String get publishMomentDraftRestored => 'မူကြမ်းကို ပြန်လည်ရယူပြီးပါပြီ';
+
+  @override
+  String get publishMomentDraftClear => 'မူကြမ်းကို ဖျက်မည်';
 
   @override
   String get momentDetailTitle => 'အပ်ဒိတ်';

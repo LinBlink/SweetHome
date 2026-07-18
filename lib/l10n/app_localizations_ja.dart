@@ -889,6 +889,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get publishMomentMaxMedia => '最大9ファイルまで';
 
   @override
+  String get publishMomentReorderHint => '長押ししてドラッグすると順番を変更できます';
+
+  @override
   String get publishMomentRemoveMedia => '削除';
 
   @override
@@ -938,6 +941,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get publishMomentDiscardCancel => '編集を続ける';
+
+  @override
+  String get publishMomentDraftSaveAction => '下書きに保存';
+
+  @override
+  String get publishMomentDraftRestored => '下書きを復元しました';
+
+  @override
+  String get publishMomentDraftClear => '下書きを削除';
 
   @override
   String get momentDetailTitle => '投稿';

@@ -15,8 +15,11 @@ import '../core/app_colors.dart';
 import '../core/error_messages.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
+import '../providers/auth_provider.dart';
 import '../providers/moment_provider.dart';
+import '../services/moment_draft_store.dart';
 import '../widgets/error_banner.dart';
+import '../widgets/fullscreen_video_player.dart';
 
 /// Composer screen for the family-feed (§7.1 publish flow).
 ///
@@ -35,6 +38,8 @@ import '../widgets/error_banner.dart';
 /// While a recording is in flight the composer surfaces a live
 /// banner at the top with a blinking red dot and an elapsed-second
 /// counter, so the user always knows audio capture is live.
+enum _ExitChoice { cancel, saveDraft, discard }
+
 class PublishMomentScreen extends StatefulWidget {
   const PublishMomentScreen({super.key});
 
@@ -58,11 +63,13 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
   int? _recordingStartMs;
   int _recordingElapsedSec = 0;
   Timer? _elapsedTimer;
+  bool _draftRestored = false;
 
   @override
   void initState() {
     super.initState();
     _contentCtrl.addListener(_onContentChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeRestoreDraft());
   }
 
   @override
@@ -87,6 +94,136 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
 
   bool get _anyDraftUploading =>
       _drafts.any((d) => d.uploadStatus == MomentUploadStatus.uploading);
+
+  int? get _userId => context.read<AuthProvider>().currentUser?.userId;
+
+  /// Restores a previously-saved draft, if any, into the composer.
+  /// Media can only be restored on native platforms — on web,
+  /// `image_picker`'s `XFile.path` is a `blob:` URL scoped to the
+  /// page's lifetime, so it's already invalid the moment the app is
+  /// reloaded; only the caption text survives there.
+  Future<void> _maybeRestoreDraft() async {
+    final userId = _userId;
+    if (userId == null) return;
+    final snapshot = await MomentDraftStore.load(userId);
+    if (snapshot == null || !mounted) return;
+    final restored = <MomentDraft>[];
+    if (!kIsWeb) {
+      for (final m in snapshot.media) {
+        final draft = _draftFromSnapshot(m);
+        if (draft != null) restored.add(draft);
+      }
+    }
+    if (snapshot.content.trim().isEmpty && restored.isEmpty) return;
+    setState(() {
+      _contentCtrl.text = snapshot.content;
+      _drafts.addAll(restored);
+      _draftRestored = true;
+    });
+    _onContentChanged();
+    for (final d in restored) {
+      if (d.uploadStatus != MomentUploadStatus.done) {
+        unawaited(_startUpload(d));
+      }
+    }
+  }
+
+  /// Rebuilds one [MomentDraft] from its persisted snapshot, or
+  /// `null` if there's nothing usable left (the local file is gone
+  /// and it was never successfully uploaded, so there's no way to
+  /// recover the media).
+  MomentDraft? _draftFromSnapshot(MomentDraftMediaSnapshot m) {
+    final path = m.localPath;
+    final hasFile = path != null && File(path).existsSync();
+    if (!hasFile && m.remoteUrl == null) return null;
+    MomentDraft draft;
+    switch (m.kind) {
+      case 'photo':
+      case 'video':
+        final safePath = hasFile ? path : (path ?? '');
+        final name = safePath.split(Platform.pathSeparator).last;
+        draft = MomentDraft.fromXFile(
+          XFile(safePath, name: name.isEmpty ? 'media' : name),
+          m.kind == 'photo' ? MomentDraftKind.photo : MomentDraftKind.video,
+        );
+        break;
+      case 'audio':
+        Uint8List bytes;
+        try {
+          bytes = hasFile ? File(path).readAsBytesSync() : Uint8List(0);
+        } catch (_) {
+          bytes = Uint8List(0);
+        }
+        final safePath = path ?? '';
+        draft = MomentDraft.fromAudio(MomentRecordedAudio(
+          bytes: bytes,
+          filename: safePath.isEmpty
+              ? 'voice.opus'
+              : safePath.split(Platform.pathSeparator).last,
+          path: safePath,
+          durationSec: m.durationSec,
+        ));
+        break;
+      default:
+        return null;
+    }
+    if (m.remoteUrl != null) {
+      draft.remoteUrl = m.remoteUrl;
+      draft.uploadStatus = MomentUploadStatus.done;
+    } else if (!hasFile) {
+      // Never finished uploading and the local file is gone too.
+      return null;
+    }
+    return draft;
+  }
+
+  String _snapshotKind(MomentDraftKind kind) => switch (kind) {
+        MomentDraftKind.photo => 'photo',
+        MomentDraftKind.video => 'video',
+        MomentDraftKind.audio => 'audio',
+      };
+
+  Future<void> _saveDraft() async {
+    final userId = _userId;
+    if (userId == null) return;
+    final content = _contentCtrl.text;
+    if (content.trim().isEmpty && _drafts.isEmpty) {
+      await MomentDraftStore.clear(userId);
+      return;
+    }
+    await MomentDraftStore.save(
+      userId,
+      MomentDraftSnapshot(
+        content: content,
+        media: [
+          for (final d in _drafts)
+            MomentDraftMediaSnapshot(
+              kind: _snapshotKind(d.kind),
+              localPath: d.fromPicked?.path ?? d.fromRecorded?.path,
+              remoteUrl: d.remoteUrl,
+              durationSec: d.fromRecorded?.durationSec,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _clearSavedDraft() async {
+    final userId = _userId;
+    if (userId == null) return;
+    await MomentDraftStore.clear(userId);
+  }
+
+  Future<void> _onClearRestoredDraft() async {
+    await _clearSavedDraft();
+    if (!mounted) return;
+    setState(() {
+      _contentCtrl.clear();
+      _drafts.clear();
+      _draftRestored = false;
+    });
+    _onContentChanged();
+  }
 
   /// Kicks off §2.4/§2.5/§2.6 upload for [draft] the moment it's added
   /// to the composer — the whole point being that by the time the
@@ -159,6 +296,11 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
         body: SafeArea(
           child: Column(
             children: [
+              if (_draftRestored)
+                _DraftRestoredBanner(
+                  onClear: _onClearRestoredDraft,
+                  onDismiss: () => setState(() => _draftRestored = false),
+                ),
               if (anyUploading)
                 _CompressingBanner(label: l10n.publishMomentMediaUploading),
               if (_isRecording)
@@ -201,6 +343,27 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                           onReorder: _onReorderDrafts,
                           onTapDraft: _onTapDraft,
                         ),
+                      if (_drafts.length > 1) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.drag_indicator_rounded,
+                              size: 14,
+                              color: AppColors.textHint,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              l10n.publishMomentReorderHint,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textHint,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       if (_drafts.length < _maxMediaItems)
                         _AddMediaButton(
@@ -244,6 +407,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
       return;
     }
     messenger.showSnackBar(SnackBar(content: Text(l10n.publishMomentSuccess)));
+    await _clearSavedDraft();
     _contentCtrl.clear();
     _drafts.clear();
     _hasUnsavedContent = false;
@@ -251,18 +415,22 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
   }
 
   Future<void> _confirmDiscard(AppLocalizations l10n) async {
-    final ok = await showDialog<bool>(
+    final choice = await showDialog<_ExitChoice>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.publishMomentDiscardTitle),
         content: Text(l10n.publishMomentDiscardBody),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => Navigator.pop(ctx, _ExitChoice.cancel),
             child: Text(l10n.publishMomentDiscardCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
+            onPressed: () => Navigator.pop(ctx, _ExitChoice.saveDraft),
+            child: Text(l10n.publishMomentDraftSaveAction),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, _ExitChoice.discard),
             child: Text(
               l10n.publishMomentDiscardConfirm,
               style: const TextStyle(color: Colors.red),
@@ -271,7 +439,13 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
         ],
       ),
     );
-    if (ok == true && mounted) Navigator.of(context).pop();
+    if (!mounted || choice == null || choice == _ExitChoice.cancel) return;
+    if (choice == _ExitChoice.saveDraft) {
+      await _saveDraft();
+    } else {
+      await _clearSavedDraft();
+    }
+    if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _pickImage() async {
@@ -603,6 +777,67 @@ class _RecordingBanner extends StatelessWidget {
             onPressed: onStop,
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: Text(l10n.publishMomentRecordingStopInline),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown when `_maybeRestoreDraft` finds and loads a saved draft, so
+/// the user knows why the composer isn't blank — with a way to wipe
+/// it back to a blank slate (`onClear`) or just dismiss the notice
+/// while keeping the restored content (`onDismiss`).
+class _DraftRestoredBanner extends StatelessWidget {
+  final VoidCallback onClear;
+  final VoidCallback onDismiss;
+  const _DraftRestoredBanner({required this.onClear, required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: AppColors.sage.withValues(alpha: 0.12),
+        border: Border(
+          bottom: BorderSide(color: AppColors.sage.withValues(alpha: 0.3)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.restore_rounded, size: 16, color: AppColors.sage),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.publishMomentDraftRestored,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onClear,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(40, 28),
+            ),
+            child: Text(
+              l10n.publishMomentDraftClear,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.danger,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onDismiss,
+            child: Icon(Icons.close, size: 16, color: AppColors.inkFaded),
           ),
         ],
       ),
@@ -1103,98 +1338,28 @@ class _DraftImagePreview extends StatelessWidget {
   }
 }
 
-class _DraftVideoPreview extends StatefulWidget {
+/// Full-screen draft video preview — same play/pause/scrubber/±10s
+/// experience as the published feed's fullscreen video
+/// ([FullscreenVideoPlayer]), just pointed at the local picked file
+/// instead of a network URL so it works before the upload finishes.
+class _DraftVideoPreview extends StatelessWidget {
   final MomentDraft draft;
   const _DraftVideoPreview({required this.draft});
 
-  @override
-  State<_DraftVideoPreview> createState() => _DraftVideoPreviewState();
-}
-
-class _DraftVideoPreviewState extends State<_DraftVideoPreview> {
-  VideoPlayerController? _controller;
-  bool _ready = false;
-  bool _failed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  Future<void> _init() async {
-    final f = widget.draft.fromPicked;
-    if (f == null) {
-      if (mounted) setState(() => _failed = true);
-      return;
-    }
-    final c = kIsWeb
+  Future<VideoPlayerController> _open() async {
+    final f = draft.fromPicked;
+    if (f == null) throw StateError('video draft missing a picked file');
+    return kIsWeb
         ? VideoPlayerController.networkUrl(Uri.parse(f.path))
         : VideoPlayerController.file(File(f.path));
-    _controller = c;
-    try {
-      await c.initialize();
-      await c.setLooping(true);
-      if (!mounted) return;
-      setState(() => _ready = true);
-      await c.play();
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _failed = true);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  void _togglePlay() {
-    final c = _controller;
-    if (c == null) return;
-    setState(() {
-      if (c.value.isPlaying) {
-        c.pause();
-      } else {
-        c.play();
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    Widget body;
-    if (_failed) {
-      body = Text(
-        l10n.momentDetailVideoLoadFailed,
-        style: const TextStyle(color: Colors.white70),
-      );
-    } else if (!_ready || _controller == null) {
-      body = const SizedBox(
-        width: 28,
-        height: 28,
-        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-      );
-    } else {
-      final c = _controller!;
-      body = GestureDetector(
-        onTap: _togglePlay,
-        child: AspectRatio(
-          aspectRatio: c.value.aspectRatio == 0 ? 16 / 9 : c.value.aspectRatio,
-          child: VideoPlayer(c),
-        ),
-      );
-    }
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Center(child: body),
+    return FullscreenVideoPlayer(
+      openController: _open,
+      loadFailedLabel: l10n.momentDetailVideoLoadFailed,
     );
   }
 }

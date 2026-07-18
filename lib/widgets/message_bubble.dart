@@ -357,39 +357,61 @@ class _FullImagePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
+    final size = MediaQuery.of(context).size;
+    final placeholder = const Center(
+      child: Icon(Icons.broken_image_outlined, color: Colors.white54, size: 64),
+    );
+
+    final Widget image;
     if (kIsWeb) {
-      body = Center(
-        child: InteractiveViewer(
-          maxScale: 5,
-          child: buildPlatformImage(
-            url: url,
-            size: MediaQuery.of(context).size.width.toDouble(),
-            fallback: const Center(child: Icon(Icons.broken_image_outlined)),
-          ),
-        ),
+      image = buildPlatformImage(
+        url: url,
+        size: size.width,
+        fallback: placeholder,
       );
     } else {
-      body = Center(
-        child: InteractiveViewer(
-          maxScale: 5,
-          child: Image.network(
-            url,
-            fit: BoxFit.contain,
-            errorBuilder: (_, _, _) =>
-                const Icon(Icons.broken_image_outlined, size: 64),
-          ),
-        ),
+      image = Image.network(
+        url,
+        fit: BoxFit.contain,
+        errorBuilder: (_, _, _) => placeholder,
       );
     }
+
     return Scaffold(
       backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: body,
+      // `InteractiveViewer`'s child must be sized to the viewport
+      // (not the image's own intrinsic pixel size) for `BoxFit.contain`
+      // to scale the picture up to fill the screen before pinch-zoom
+      // even starts — otherwise zooming only magnifies within the
+      // image's already-shrunk display size instead of the full
+      // screen. Same fix as `_MomentsFullscreenImage` in
+      // moment_card.dart.
+      body: SizedBox.expand(
+        child: InteractiveViewer(
+          minScale: 1.0,
+          maxScale: 5.0,
+          clipBehavior: Clip.hardEdge,
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: size.width,
+                height: size.height,
+                child: image,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
