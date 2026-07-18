@@ -87,9 +87,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get registerJoinFamilyTab => '既存の家族に参加';
 
   @override
-  String get registerRequestJoinTab => '招待コードを申請';
-
-  @override
   String get registerFamilyNameLabel => '家族名（例：王さん一家）';
 
   @override
@@ -141,58 +138,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get registerSubmitJoin => '登録して家族に参加';
 
   @override
-  String get requestJoinTargetPhoneLabel => '知っている家族メンバーの電話番号';
-
-  @override
-  String get requestJoinTargetPhoneRequired => '相手の電話番号を入力してください';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* 招待コードは不要です。すでにその家族に属している人の電話番号を入力するだけで、その家族の管理者が申請を審査します';
-
-  @override
-  String get requestJoinMessageLabel => '管理者へのメッセージ（任意）';
-
-  @override
-  String get requestJoinSubmit => '申請を送信';
-
-  @override
-  String get requestJoinSubmittedTitle => '申請を送信しました';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      '申請は家族の管理者に送信され、審査中です。承認されたら、先ほど入力した電話番号とパスワードでログインしてください';
-
-  @override
-  String get joinRequestsTitle => '参加申請';
-
-  @override
-  String get joinRequestsEmpty => '保留中の申請はありません';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '$targetNameの$relationになりたいと申請しています';
-  }
-
-  @override
-  String get relationNounChild => '子';
-
-  @override
-  String get relationNounParent => '親';
-
-  @override
-  String get relationNounSpouse => '配偶者';
-
-  @override
-  String get relationNounSibling => '兄弟姉妹';
-
-  @override
-  String get joinRequestsApprove => '承認';
-
-  @override
-  String get joinRequestsReject => '拒否';
-
-  @override
   String get phoneLabel => '電話番号';
 
   @override
@@ -224,24 +169,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get myHomeLocationDesc => '家族それぞれの現在地を確認';
-
-  @override
-  String get myHomeJoinRequestsEntry => '参加申請';
-
-  @override
-  String get myHomeJoinRequestsDesc => '家族への参加申請を審査';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '未処理 $count 件',
-      one: '1 件未処理',
-      zero: '未処理なし',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => '家族フィード';
@@ -381,61 +308,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationRefresh => '更新';
 
   @override
-  String get joinRequestsAdminTitle => '参加申請';
-
-  @override
-  String get joinRequestsAdminEmpty => '現在、未処理の申請はありません。';
-
-  @override
-  String get joinRequestsAdminReject => '拒否';
-
-  @override
-  String get joinRequestsAdminApprove => '承認';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '$targetName の$relationになりたい';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return 'メッセージ：$message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => 'この申請を拒否しますか？';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => '理由（任意）';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => '拒否';
-
-  @override
-  String get joinRequestsAdminRejectCancel => 'キャンセル';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => '申請を拒否しました';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => '申請を承認しました';
-
-  @override
-  String get joinRequestsAdminError => '操作に失敗しました';
-
-  @override
-  String get requestJoinModeByCode => '招待コードを持っている';
-
-  @override
-  String get requestJoinModeByPhone => '家族の電話番号を知っている';
-
-  @override
-  String get requestJoinNoFamilySubmit => '申請を送信';
-
-  @override
-  String get requestJoinByCodeHint => '招待コードがある場合はこちら。';
-
-  @override
   String get conversationsSearchTooltip => '検索';
 
   @override
@@ -446,6 +318,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get conversationsEmptySubtitle => '家族を招待してチャットを始めましょう';
+
+  @override
+  String get conversationSpouseLabel => '配偶者';
 
   @override
   String get connectionErrorRetry => '再試行';
@@ -917,12 +792,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get locationHubFenceAlarmsDesc => '家族のエリア出入り履歴を確認';
 
   @override
-  String get profileJoinRequestsRow => '参加申請';
-
-  @override
-  String get profileJoinRequestsAdminOnly => '管理者のみ';
-
-  @override
   String get familyFeedEmptyTitle => 'まだ投稿がありません';
 
   @override
@@ -963,6 +832,16 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return '他 $count 名';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return '$count件のコメント';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -1076,10 +955,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get momentDetailVideoLoadFailed => '動画を読み込めませんでした';
 
   @override
+  String get momentDetailAudioLoadFailed => '音声を読み込めませんでした';
+
+  @override
   String get momentDetailAudioPlay => '再生';
 
   @override
   String get momentDetailAudioPause => '一時停止';
+
+  @override
+  String get momentDetailLikeKing => 'いいね魔人';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -1126,6 +1011,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileThemeSheetTitle => 'テーマを選択';
 
   @override
+  String get profileAppearanceRow => '外観';
+
+  @override
+  String get profileAppearanceSheetTitle => '外観を選択';
+
+  @override
+  String get profileThemeModeSection => '外観';
+
+  @override
+  String get profileThemeModeSystem => 'システムに従う';
+
+  @override
+  String get profileThemeModeLight => 'ライト';
+
+  @override
+  String get profileThemeModeDark => 'ダーク';
+
+  @override
+  String get profileThemeColorSection => 'カラー';
+
+  @override
   String get momentCommentSectionTitle => 'コメント';
 
   @override
@@ -1150,12 +1056,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatMessageTooLong => 'メッセージが長すぎます（最大2000文字）';
 
   @override
-  String get profileClearLocalChatRow => 'ローカルのチャット履歴を削除';
-
-  @override
-  String get profileClearLocalChatSubtitle => 'この端末に保存されたメッセージのみ削除します';
-
-  @override
   String get profileClearLocalChatConfirmTitle => 'ローカルのチャット履歴を削除しますか？';
 
   @override
@@ -1164,4 +1064,86 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileClearLocalChatSuccess => 'ローカルのチャット履歴を削除しました';
+
+  @override
+  String get profileStorageRow => 'ストレージとキャッシュ';
+
+  @override
+  String get profileStorageSubtitle => 'ローカルキャッシュの使用量を確認・削除';
+
+  @override
+  String get profileExportChatRow => 'チャット履歴をエクスポート';
+
+  @override
+  String get profileExportChatSubtitle => 'ローカルのメッセージをテキストファイルに保存';
+
+  @override
+  String get chatExportTitle => 'チャット履歴をエクスポート';
+
+  @override
+  String get chatExportEmpty => 'エクスポートできるローカルのチャット履歴がありません';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '会話 $conversations 件、メッセージ $messages 件';
+  }
+
+  @override
+  String get chatExportCopy => 'すべてコピー';
+
+  @override
+  String get chatExportCopied => 'クリップボードにコピーしました';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return '保存先：$path';
+  }
+
+  @override
+  String get storageScreenTitle => 'ストレージとキャッシュ';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '合計 $size';
+  }
+
+  @override
+  String get storageImageCache => '画像キャッシュ';
+
+  @override
+  String get storageVideoCache => '動画キャッシュ';
+
+  @override
+  String get storageAudioCache => '音声キャッシュ';
+
+  @override
+  String get storageChatHistory => 'チャット履歴';
+
+  @override
+  String get storageSizeUnknown => '不明';
+
+  @override
+  String get storageClear => '削除';
+
+  @override
+  String get storageClearAll => 'すべてのキャッシュを削除';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '$categoryを削除しますか？';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody =>
+      'キャッシュファイルが削除され、次回必要になったときに再ダウンロードされます。';
+
+  @override
+  String get storageClearAllConfirmTitle => 'すべてのローカルキャッシュを削除しますか？';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      '画像・動画・音声キャッシュとローカルのチャット履歴が削除されます。メディアは必要に応じて再ダウンロードされ、チャット履歴はサーバーから再取得されます。';
+
+  @override
+  String get storageClearSuccess => 'キャッシュを削除しました';
 }

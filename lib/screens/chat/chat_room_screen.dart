@@ -268,7 +268,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 color: AppColors.inkFaded,
                 fontWeight: FontWeight.w500,
@@ -332,7 +332,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           return Center(
             child: Text(
               l10n.chatRoomEmptyHint,
-              style: const TextStyle(color: AppColors.textHint),
+              style: TextStyle(color: AppColors.textHint),
             ),
           );
         }
@@ -448,11 +448,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 maxLines: null,
                 maxLength: 2000,
                 textInputAction: TextInputAction.newline,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 15, color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   hintText: l10n.chatRoomInputHint,
-                  hintStyle: const TextStyle(color: AppColors.textHint),
+                  hintStyle: TextStyle(color: AppColors.textHint),
                   border: InputBorder.none,
                   counterText: '',
                   contentPadding:

@@ -16,6 +16,7 @@ import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../models/moment.dart';
 import '../providers/moment_provider.dart';
+import '../services/media_cache.dart';
 import '_web_image_stub.dart' if (dart.library.html) '_web_image_web.dart';
 import 'avatar_widget.dart';
 
@@ -54,11 +55,11 @@ class MomentCard extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.divider, width: 0.6),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
               color: AppColors.shadow,
               blurRadius: 4,
-              offset: Offset(0, 1),
+              offset: const Offset(0, 1),
             ),
           ],
         ),
@@ -75,7 +76,7 @@ class MomentCard extends StatelessWidget {
               const SizedBox(height: 10),
               SelectableText(
                 moment.content!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   color: AppColors.textPrimary,
                   height: 1.5,
@@ -87,7 +88,16 @@ class MomentCard extends StatelessWidget {
               _MediaGrid(media: moment.media),
             ],
             const SizedBox(height: 10),
-            _LikeRow(momentId: moment.id),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _LikeRow(momentId: moment.id),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _CommentPreview(momentId: moment.id),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -127,7 +137,7 @@ class _AuthorRow extends StatelessWidget {
             children: [
               Text(
                 moment.username,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -137,7 +147,7 @@ class _AuthorRow extends StatelessWidget {
               const SizedBox(height: 1),
               Text(
                 timeText,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   color: AppColors.textHint,
                 ),
@@ -149,7 +159,7 @@ class _AuthorRow extends StatelessWidget {
           IconButton(
             tooltip: l10n.familyFeedDeleteTitle,
             onPressed: onDeleteTap,
-            icon: const Icon(
+            icon: Icon(
               Icons.delete_outline_rounded,
               size: 20,
               color: AppColors.textHint,
@@ -235,6 +245,47 @@ class _LikeRow extends StatelessWidget {
   }
 }
 
+/// Bottom-right footer preview: comment count + the most recent
+/// comment's author/content, so a glance at the card tells you
+/// there's a live conversation without opening the detail screen.
+/// Backfilled per-moment by `MomentProvider._backfillComments`
+/// (mirrors the like-count backfill — §7.2's feed list carries no
+/// comment data). Hidden entirely until at least one comment exists.
+class _CommentPreview extends StatelessWidget {
+  final int momentId;
+  const _CommentPreview({required this.momentId});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.watch<MomentProvider>();
+    final count = provider.commentCountOf(momentId);
+    final latest = provider.latestCommentOf(momentId);
+    if (count == 0 || latest == null) return const SizedBox.shrink();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Icon(
+          Icons.mode_comment_outlined,
+          size: 13,
+          color: AppColors.textHint,
+        ),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            '${l10n.momentCardCommentCount(count)} · '
+            '${l10n.momentCardLatestComment(latest.content)}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: TextStyle(fontSize: 12, color: AppColors.textHint),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Heart color stops by [count]. Steps chosen so a single family
 /// member gives a soft warm hint and a packed thread reads as a
 /// deep red — the gradient matches the family's brand primary at the
@@ -315,7 +366,7 @@ class _MomentsImageTile extends StatelessWidget {
     final placeholder = Container(
       color: AppColors.surfaceVariant,
       alignment: Alignment.center,
-      child: const Icon(
+      child: Icon(
         Icons.broken_image_outlined,
         size: 32,
         color: AppColors.textHint,
@@ -334,6 +385,7 @@ class _MomentsImageTile extends StatelessWidget {
       // redownload media that's already been viewed once.
       img = CachedNetworkImage(
         imageUrl: url,
+        cacheManager: MediaCache.images,
         fit: BoxFit.cover,
         placeholder: (_, _) => placeholder,
         errorWidget: (_, _, _) => placeholder,
@@ -352,6 +404,25 @@ class _MomentsImageTile extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Resolves [url] through the same on-disk cache `CachedNetworkImage`
+/// uses for photos, then hands `video_player` the local file instead of
+/// the raw network URL. Without this, `VideoPlayerController.networkUrl`
+/// re-streams the clip from the network every time — including after
+/// simply closing and reopening the app, since nothing persists across
+/// process restarts otherwise.
+///
+/// Skipped on web: `video_player_web` throws `UnimplementedError` for
+/// `DataSourceType.file` (there's no filesystem to hand it a `File`
+/// from), so web falls back to the original network-streaming path —
+/// the browser's own HTTP cache is the best we get there.
+Future<VideoPlayerController> _cachedVideoController(String url) async {
+  if (kIsWeb) {
+    return VideoPlayerController.networkUrl(Uri.parse(url));
+  }
+  final file = await MediaCache.videos.getSingleFile(url);
+  return VideoPlayerController.file(file);
 }
 
 /// Silent autoplay inline video preview — muted + looping as soon as
@@ -393,9 +464,9 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile>
   }
 
   Future<void> _init() async {
-    final c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    _controller = c;
     try {
+      final c = await _cachedVideoController(widget.url);
+      _controller = c;
       await c.initialize();
       await c.setVolume(0);
       await c.setLooping(true);
@@ -506,7 +577,7 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.movie_filter_outlined,
               size: 28,
               color: AppColors.textHint,
@@ -514,7 +585,7 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile>
             const SizedBox(height: 4),
             Text(
               msg,
-              style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+              style: TextStyle(fontSize: 11, color: AppColors.textHint),
             ),
           ],
         ),
@@ -559,7 +630,22 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
     final p = AudioPlayer();
     _player = p;
     try {
-      _duration = await p.setUrl(widget.url);
+      if (kIsWeb) {
+        // No local filesystem on web — stream directly and let the
+        // browser's own HTTP cache handle repeat plays.
+        _duration = await p.setUrl(widget.url);
+      } else {
+        // Same on-disk cache as the video tile (`_cachedVideoController`)
+        // and photos (`CachedNetworkImage`), then play the local file.
+        // Deliberately not `LockCachingAudioSource`: on Android it plays
+        // through a local cleartext HTTP proxy on 127.0.0.1, which the
+        // OS blocks by default (`CleartextNotPermittedException`) unless
+        // the app ships a network-security-config carving out an
+        // exception — this sidesteps that entirely by never touching
+        // ExoPlayer's network layer for the cached path.
+        final file = await MediaCache.audio.getSingleFile(widget.url);
+        _duration = await p.setFilePath(file.path);
+      }
       p.positionStream.listen((d) {
         if (!mounted) return;
         setState(() => _position = d);
@@ -572,7 +658,8 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
       });
       if (!mounted) return;
       setState(() => _ready = true);
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('Moments audio load failed for ${widget.url}: $e\n$st');
       if (!mounted) return;
       setState(() => _failed = true);
     }
@@ -589,7 +676,7 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
     super.build(context); // required by AutomaticKeepAliveClientMixin
     final l10n = AppLocalizations.of(context)!;
     if (_failed) {
-      return _failedTile(l10n.momentDetailVideoLoadFailed);
+      return _failedTile(l10n.momentDetailAudioLoadFailed);
     }
     if (!_ready || _player == null) {
       return Container(
@@ -598,14 +685,14 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
           color: AppColors.linen,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 22,
               height: 22,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Text('…',
                 style: TextStyle(color: AppColors.textHint, fontSize: 14)),
           ],
@@ -676,14 +763,14 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
                   children: [
                     Text(
                       _format(pos),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textHint,
                       ),
                     ),
                     Text(
                       _format(dur),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textHint,
                       ),
@@ -706,7 +793,7 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.mic_none_rounded,
               color: AppColors.textHint,
               size: 22,
@@ -715,7 +802,7 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
             Expanded(
               child: Text(
                 msg,
-                style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+                style: TextStyle(fontSize: 12, color: AppColors.textHint),
               ),
             ),
           ],
@@ -759,6 +846,7 @@ class _MomentsFullscreenImage extends StatelessWidget {
       // instant instead of a second network fetch.
       image = CachedNetworkImage(
         imageUrl: url,
+        cacheManager: MediaCache.images,
         fit: BoxFit.contain,
         placeholder: (_, _) => const Center(
           child: SizedBox(
@@ -848,17 +936,16 @@ class _MomentsFullscreenVideoState extends State<_MomentsFullscreenVideo> {
   }
 
   Future<void> _init() async {
-    final c = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    _controller = c;
     try {
+      final c = await _cachedVideoController(widget.url);
+      _controller = c;
       await c.initialize();
       await c.setLooping(false);
-      // `video_player` streams progressively (ExoPlayer/AVPlayer buffer
-      // ahead rather than downloading the whole file first); this
-      // listener drives the position/duration bar live and surfaces
-      // `value.isBuffering` so a network stall is visibly a spinner,
-      // not a frozen player that looks like it's waiting on a full
-      // download.
+      // The inline feed tile (`_MomentsVideoTile`) already warmed the
+      // disk cache for this URL before this fullscreen view could be
+      // opened, so this normally plays straight from disk; this
+      // listener still drives the position/duration bar live and
+      // surfaces `value.isBuffering` for the cold-cache case.
       c.addListener(_onControllerUpdate);
       if (!mounted) return;
       setState(() => _ready = true);

@@ -127,5 +127,34 @@ void main() {
       expect(b.parents, isEmpty);
       expect(b.children, isEmpty);
     });
+
+    test('a child\'s spouse (Son.S/Dau.S) lands in the children row '
+        'next to their spouse, not in extended', () {
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '子', 'Son'),
+        vm(3, '儿媳', 'Son.S', g: Gender.female),
+        vm(4, '女', 'Dau', g: Gender.female),
+        vm(5, '女婿', 'Dau.S'),
+      ]);
+      expect(b.extended, isEmpty);
+      // Each blood child is immediately followed by their spouse so
+      // the row layout and the painter's adjacent-pair scan both
+      // treat them as a couple. Dau/Dau.S sort before Son/Son.S
+      // alphabetically.
+      expect(b.children.map((m) => m.userId), [4, 5, 2, 3]);
+    });
+
+    test('an in-law spouse with no matching blood child of that '
+        'gender falls back to extended instead of being dropped', () {
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '女', 'Dau', g: Gender.female),
+        // No 'Son' in this family, so this Son.S can't be paired.
+        vm(3, '儿媳', 'Son.S', g: Gender.female),
+      ]);
+      expect(b.children.map((m) => m.userId), [2]);
+      expect(b.extended.map((m) => m.userId), [3]);
+    });
   });
 }

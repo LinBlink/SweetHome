@@ -7,7 +7,6 @@ import '../models/auth_models.dart';
 import '../models/chat_models.dart';
 import '../models/family_member_vm.dart';
 import '../models/fence.dart';
-import '../models/join_request.dart';
 import '../models/location.dart';
 
 class MockDataSource {
@@ -609,40 +608,6 @@ class MockDataSource {
   static List<FenceAlarm> mockFenceAlarms() =>
       List.unmodifiable(_fenceAlarmFixture());
 
-  // -- §3.5.2 mock join-request fixtures -----------------------------
-  // Two pending requests for the family admin to review.
-
-  static List<JoinRequest> _pendingJoinRequestsFixture() {
-    final now = DateTime.now();
-    return [
-      JoinRequest(
-        requestId: 1,
-        requesterName: '王小明',
-        requesterPhone: '+8613800138099',
-        requesterGender: 'male',
-        relationType: 'CHILD_OF',
-        targetMemberName: '王建国',
-        message: '爸，我账号搞丢了，重新申请一下',
-        createdAt: now.subtract(const Duration(hours: 1)),
-        status: 'pending',
-      ),
-      JoinRequest(
-        requestId: 2,
-        requesterName: '王小雨',
-        requesterPhone: '+8613800138100',
-        requesterGender: 'female',
-        relationType: 'SIBLING_OF',
-        targetMemberName: '王小明',
-        message: '我换号了，加我进家庭群',
-        createdAt: now.subtract(const Duration(minutes: 20)),
-        status: 'pending',
-      ),
-    ];
-  }
-
-  /// Mock-mode stub for `FamilyService.fetchJoinRequests`.
-  static List<JoinRequest> mockJoinRequests() =>
-      List.unmodifiable(_pendingJoinRequestsFixture());
 }
 
 /// Internal struct used only by the mock location fixture above —

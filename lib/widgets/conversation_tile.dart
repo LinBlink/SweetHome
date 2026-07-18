@@ -24,8 +24,14 @@ class ConversationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final relationCode = conversation.relationCode;
+    final l10n = AppLocalizations.of(context)!;
     String? relationLabel;
-    if (relationCode != null) {
+    if (relationCode == 'S') {
+      // Spouse gets the plain, gender-neutral "配偶" label in the chat
+      // list instead of 丈夫/妻子 — unlike the family tree, this list
+      // is meant to read at a glance without needing gender context.
+      relationLabel = l10n.conversationSpouseLabel;
+    } else if (relationCode != null) {
       relationLabel = relationLabelFor(
         relationCode: relationCode,
         targetGender: conversation.otherUserGender,
@@ -33,7 +39,6 @@ class ConversationTile extends StatelessWidget {
         appLocale: context.watch<LocaleProvider>().locale,
       );
     }
-    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -57,7 +62,7 @@ class ConversationTile extends StatelessWidget {
                             relationLabel != null
                                 ? '${conversation.name} · $relationLabel'
                                 : conversation.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColors.ink,
@@ -72,7 +77,7 @@ class ConversationTile extends StatelessWidget {
                             AppLocalizations.of(context)!,
                             Localizations.localeOf(context),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppColors.inkFaint,
                             fontWeight: FontWeight.w500,
@@ -202,7 +207,7 @@ class _LastMessagePreview extends StatelessWidget {
     if (leading == null) {
       return Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           color: AppColors.textSecondary,
         ),
@@ -217,7 +222,7 @@ class _LastMessagePreview extends StatelessWidget {
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColors.textHint,
             ),

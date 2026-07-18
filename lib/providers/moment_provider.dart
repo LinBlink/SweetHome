@@ -74,6 +74,18 @@ class MomentProvider extends ChangeNotifier {
       List.unmodifiable(_comments[momentId] ?? const <MomentComment>[]);
   bool isCommentsLoading(int momentId) => _commentsLoading.contains(momentId);
 
+  /// Total comment count, or `0` before the backfill fetch resolves.
+  int commentCountOf(int momentId) => _comments[momentId]?.length ?? 0;
+
+  /// Most recent comment for the feed card's preview row, or `null`
+  /// if there are none (yet). §7.9 returns oldest-first, so the
+  /// latest comment is the last element.
+  MomentComment? latestCommentOf(int momentId) {
+    final list = _comments[momentId];
+    if (list == null || list.isEmpty) return null;
+    return list.last;
+  }
+
   void clearCommentCache(int momentId) {
     _comments.remove(momentId);
     notifyListeners();
@@ -163,6 +175,7 @@ class MomentProvider extends ChangeNotifier {
       _moments.clear();
       _likeCounts.clear();
       _myLikes.clear();
+      _comments.clear();
       _hasMore = false;
       notifyListeners();
       return;
@@ -172,6 +185,7 @@ class MomentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
       _backfillLikeCounts(_moments);
+      _backfillComments(_moments);
       return;
     }
     _isInitialLoading = true;
@@ -185,6 +199,7 @@ class MomentProvider extends ChangeNotifier {
       _total = page.total;
       _hasMore = _moments.length < page.total;
       _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
       unawaited(_writeCache());
     } on ApiException catch (e) {
       _error = e.message;
@@ -208,6 +223,7 @@ class MomentProvider extends ChangeNotifier {
       _total = page.total;
       _hasMore = _moments.length < page.total;
       _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
       unawaited(_writeCache());
     } on ApiException catch (e) {
       _error = e.message;
@@ -231,6 +247,7 @@ class MomentProvider extends ChangeNotifier {
       _sortInPlaceDesc();
       _hasMore = _moments.length < page.total;
       _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
       unawaited(_writeCache());
     } on ApiException catch (e) {
       _loadMoreError = e.message;
@@ -264,6 +281,29 @@ class MomentProvider extends ChangeNotifier {
     } catch (_) {
       // best-effort — the row just keeps showing 0 until a retry
       // (next refresh/load-more) succeeds.
+    }
+  }
+
+  /// Same rationale as [_backfillLikeCounts]: §7.2's list response
+  /// carries no comment data, so the feed card's "N comments · latest"
+  /// preview needs its own per-moment fetch. Piggybacks on the same
+  /// `_comments` cache the detail screen's comment section reads, so
+  /// once backfilled here the detail screen opens without a second
+  /// round-trip.
+  void _backfillComments(List<Moment> moments) {
+    for (final m in moments) {
+      unawaited(_fetchAndSetComments(m.id));
+    }
+  }
+
+  Future<void> _fetchAndSetComments(int momentId) async {
+    try {
+      final list = await service.fetchComments(momentId);
+      _comments[momentId] = list;
+      notifyListeners();
+    } catch (_) {
+      // best-effort — the preview row just stays hidden until a retry
+      // (next refresh/load-more, or opening the detail screen) succeeds.
     }
   }
 

@@ -33,16 +33,36 @@ class AppColors {
 
   static Color get accent => _palette.accent;
 
-  // ── Surfaces: warm cream paper ─────────────────────────────────────
-  static const Color background = Color(0xFFFFF8F0);
-  static const Color surface = Color(0xFFFFFAF5);
-  static const Color surfaceVariant = Color(0xFFF5EDE3);
+  // ── Dark mode ─────────────────────────────────────────────────────
+  /// Backing store for light/dark, mirroring [_palette] above: a
+  /// static flag so every `AppColors.xyz` getter — including calls
+  /// with no `BuildContext` — reflects the current mode. Set by
+  /// [ThemeProvider] on restore, on every explicit mode change, and
+  /// whenever the OS brightness flips while following "system".
+  static bool _isDark = false;
+
+  static void applyBrightness(bool isDark) {
+    _isDark = isDark;
+  }
+
+  static bool get isDark => _isDark;
+
+  // ── Surfaces: warm cream paper (light) / warm dark wood (dark) ───
+  static Color get background =>
+      _isDark ? const Color(0xFF1A1512) : const Color(0xFFFFF8F0);
+  static Color get surface =>
+      _isDark ? const Color(0xFF242019) : const Color(0xFFFFFAF5);
+  static Color get surfaceVariant =>
+      _isDark ? const Color(0xFF2E2820) : const Color(0xFFF5EDE3);
 
   // ── "Wood & linen" — the furniture / shelves the app sits on ─────
   /// Warm wooden tone used for the bottom-nav shelf and app-bar
   /// trim — picks up the same hue family as [primary] but darker
   /// and more saturated, so it reads as "the surface the app is
-  /// sitting on" rather than as another button color.
+  /// sitting on" rather than as another button color. Already dark
+  /// enough to read the same way against either background, so —
+  /// like the brand colors — it deliberately does not change with
+  /// light/dark mode.
   static const Color wood = Color(0xFF6E3B1F);
   static const Color woodLight = Color(0xFF8B5A36);
 
@@ -50,27 +70,35 @@ class AppColors {
   /// backgrounds — gives the "kitchen herbs" / "garden" hint that
   /// keeps the warm palette from collapsing into one tone.
   static const Color sage = Color(0xFF7B9E87);
-  static const Color sageLight = Color(0xFFC9D7C7);
+  static Color get sageLight =>
+      _isDark ? const Color(0xFF3A4A3E) : const Color(0xFFC9D7C7);
 
   /// A pale linen / cream used for chip fills, soft-tinted surfaces
   /// on top of [surface]. Slightly warmer than [background] so it
   /// reads as "fabric" rather than "blank paper".
-  static const Color linen = Color(0xFFFCF1DE);
-  static const Color linenDeep = Color(0xFFF3E2C2);
+  static Color get linen =>
+      _isDark ? const Color(0xFF3D2E1F) : const Color(0xFFFCF1DE);
+  static Color get linenDeep =>
+      _isDark ? const Color(0xFF4A3826) : const Color(0xFFF3E2C2);
 
   /// The deep ink of body copy, brown rather than pure black so the
-  /// text feels like a fountain-pen on parchment.
-  static const Color ink = Color(0xFF3D2B1F);
+  /// text feels like a fountain-pen on parchment. In dark mode this
+  /// flips to a warm off-white so text still reads as "ink" against
+  /// the dark paper instead of vanishing into it.
+  static Color get ink =>
+      _isDark ? const Color(0xFFEDE4D9) : const Color(0xFF3D2B1F);
 
   /// Soft warm grey for secondary text — the "faded ink" of old
   /// letters, where you can still read it but it isn't shouting.
-  static const Color inkFaded = Color(0xFF8B7355);
-  static const Color inkFaint = Color(0xFFBBA98A);
+  static Color get inkFaded =>
+      _isDark ? const Color(0xFFB8A890) : const Color(0xFF8B7355);
+  static Color get inkFaint =>
+      _isDark ? const Color(0xFF8A7860) : const Color(0xFFBBA98A);
 
   // ── Text — kept as aliases for existing call sites ──────────────
-  static const Color textPrimary = ink;
-  static const Color textSecondary = inkFaded;
-  static const Color textHint = inkFaint;
+  static Color get textPrimary => ink;
+  static Color get textSecondary => inkFaded;
+  static Color get textHint => inkFaint;
 
   // ── Status ─────────────────────────────────────────────────────
   static const Color success = Color(0xFF6B8F71);
@@ -78,8 +106,10 @@ class AppColors {
   static const Color danger = Color(0xFFC0392B);
 
   // ── Misc ───────────────────────────────────────────────────────
-  static const Color divider = Color(0xFFEDE0D4);
-  static const Color shadow = Color(0x1A3D2B1F);
+  static Color get divider =>
+      _isDark ? const Color(0xFF3D342A) : const Color(0xFFEDE0D4);
+  static Color get shadow =>
+      _isDark ? const Color(0x33000000) : const Color(0x1A3D2B1F);
 
   /// Background colors for the letter-fallback avatars shown to OTHER
   /// family members. Deliberately all cool hues (blue / green / teal /

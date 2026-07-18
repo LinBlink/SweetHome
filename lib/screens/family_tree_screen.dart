@@ -107,7 +107,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                         const SizedBox(height: 12),
                         Text(
                           l10n.familyTreeEmpty,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -117,7 +117,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                         Text(
                           l10n.familyTreeEmptyDesc,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                           ),
@@ -209,19 +209,19 @@ class _FamilyTreeCanvas extends StatelessWidget {
     // `rows[1] / rows[2]` regardless of which row was actually
     // there. Tracking rows by role instead fixes the "no parents
     // ⇒ no children" regression.
-    final parentsRow = b.parents.isNotEmpty
+    final parentsRowRaw = b.parents.isNotEmpty
         ? _layoutRow(
             members: b.parents,
             canvasWidth: canvasWidth,
             align: _RowAlign.symmetric,
           )
         : null;
-    final middleRow = _layoutRow(
+    final middleRowRaw = _layoutRow(
       members: b.middle,
       canvasWidth: canvasWidth,
       align: _RowAlign.viewerCentered,
     );
-    final childrenRow = b.children.isNotEmpty
+    final childrenRowRaw = b.children.isNotEmpty
         ? _layoutRow(
             members: b.children,
             canvasWidth: canvasWidth,
@@ -230,28 +230,53 @@ class _FamilyTreeCanvas extends StatelessWidget {
         : null;
 
     // Stagger the rows vertically and patch each entry's `top` so
-    // the `Positioned` widgets place the cards at the right Y.
-    // The connectors reference these top values too, so they all
-    // stay in sync.
-    final presentRows = <_RowLayout>[
-      ?parentsRow,
-      middleRow,
-      ?childrenRow,
-    ];
+    // the `Positioned` widgets place the cards at the right Y. Every
+    // downstream computation (viewer/spouse/children positions, the
+    // connector layout's row Y fields) MUST read from these stacked
+    // rows, not the `*Row` locals above — those still have every
+    // entry's `top` pinned at 0 (that's only assigned here), so using
+    // them for connector math draws every line as if the middle/
+    // children rows sat at the very top of the canvas, off from
+    // where their cards actually render whenever a parents row pushes
+    // them down. That mismatch was why the parent→middle and
+    // middle→children connectors went missing whenever a parents row
+    // was present.
+    _RowLayout? parentsRow;
     var runningTop = 0.0;
-    for (var i = 0; i < presentRows.length; i++) {
-      final row = presentRows[i];
-      presentRows[i] = row.copyWith(
+    if (parentsRowRaw != null) {
+      parentsRow = parentsRowRaw.copyWith(
         rowTopY: runningTop,
         rowBottomY: runningTop + _cardHeight,
         entries: [
-          for (final e in row.entries)
+          for (final e in parentsRowRaw.entries)
+            e.copyWith(rect: e.rect.copyWith(top: runningTop)),
+        ],
+      );
+      runningTop += _cardHeight + _rowVerticalSpacing;
+    }
+    final middleRow = middleRowRaw.copyWith(
+      rowTopY: runningTop,
+      rowBottomY: runningTop + _cardHeight,
+      entries: [
+        for (final e in middleRowRaw.entries)
+          e.copyWith(rect: e.rect.copyWith(top: runningTop)),
+      ],
+    );
+    runningTop += _cardHeight + _rowVerticalSpacing;
+    _RowLayout? childrenRow;
+    if (childrenRowRaw != null) {
+      childrenRow = childrenRowRaw.copyWith(
+        rowTopY: runningTop,
+        rowBottomY: runningTop + _cardHeight,
+        entries: [
+          for (final e in childrenRowRaw.entries)
             e.copyWith(rect: e.rect.copyWith(top: runningTop)),
         ],
       );
       runningTop += _cardHeight + _rowVerticalSpacing;
     }
 
+    final presentRows = <_RowLayout>[?parentsRow, middleRow, ?childrenRow];
     final totalHeight = runningTop + _vGap;
 
     final viewer = middleRow.positionOf(
@@ -273,6 +298,34 @@ class _FamilyTreeCanvas extends StatelessWidget {
     // rows are present. (Before, the children drop was gated on
     // `rows.length >= 3`, so a childless-without-parents family
     // hid the children row entirely.)
+    //
+    // Every entry in `b.children` gets a card in the row, but only
+    // *blood* children (Son/Dau) get a vertical drop line from the
+    // parents' generation — an in-law spouse (Son.S/Dau.S) married
+    // in, so their only connector is the marriage line to their own
+    // spouse, built into `childCoupleLines` below.
+    final bloodChildrenPositions = childrenRow != null
+        ? [
+            for (final m in b.children)
+              if (m.relationCode == 'Son' || m.relationCode == 'Dau')
+                childrenRow.positionOf(m.userId),
+          ]
+        : const <_CardRect>[];
+    final childCoupleLines = <_CoupleMidpoint>[];
+    if (childrenRow != null) {
+      for (var i = 0; i + 1 < b.children.length; i++) {
+        final a = b.children[i];
+        final bNext = b.children[i + 1];
+        final isCouple = (a.relationCode == 'Son' && bNext.relationCode == 'Son.S') ||
+            (a.relationCode == 'Dau' && bNext.relationCode == 'Dau.S');
+        if (!isCouple) continue;
+        childCoupleLines.add(_CoupleMidpoint(
+          left: childrenRow.positionOf(a.userId),
+          right: childrenRow.positionOf(bNext.userId),
+        ));
+      }
+    }
+
     final connectors = _ConnectorLayout(
       parentCouple: (parentsRow != null && b.parents.length >= 2)
           ? _CoupleMidpoint(
@@ -289,41 +342,18 @@ class _FamilyTreeCanvas extends StatelessWidget {
       viewerPos: viewer,
       spousePos: spouse,
       childrenRowTopY: childrenRow?.rowTopY,
-      childrenPositions: childrenRow != null
-          ? [
-              for (final m in b.children) childrenRow.positionOf(m.userId),
-            ]
-          : const [],
-      leftSiblingBracketX: () {
-        // The leftmost siblings (anything in `middle` that comes
-        // before SELF in the sorted order) get a short bracket
-        // that reaches up to the parents' drop-line.
-        if (parentsRow == null) return null;
-        if (middleRow.viewerIndexInRow < 0) return null;
-        final leftSibs = <_CardRect>[];
-        for (int i = 0; i < middleRow.viewerIndexInRow; i++) {
-          if (b.middle[i].relationCode == 'S') continue;
-          leftSibs.add(middleRow.positionOf(b.middle[i].userId));
-        }
-        if (leftSibs.isEmpty) return null;
-        return leftSibs
-            .map((p) => p.left + p.width / 2)
-            .reduce((a, b) => a < b ? a : b);
-      }(),
-      rightSiblingBracketX: () {
-        // Mirror of the above — siblings after SELF (excluding S).
-        if (parentsRow == null) return null;
-        if (middleRow.viewerIndexInRow < 0) return null;
-        final rightSibs = <_CardRect>[];
-        for (int i = middleRow.viewerIndexInRow + 1; i < b.middle.length; i++) {
-          if (b.middle[i].relationCode == 'S') continue;
-          rightSibs.add(middleRow.positionOf(b.middle[i].userId));
-        }
-        if (rightSibs.isEmpty) return null;
-        return rightSibs
-            .map((p) => p.left + p.width / 2)
-            .reduce((a, b) => a > b ? a : b);
-      }(),
+      childrenPositions: bloodChildrenPositions,
+      childCoupleLines: childCoupleLines,
+      // Every blood member of the middle row (viewer + siblings) —
+      // everyone who connects up to the parents row above. The
+      // spouse (`S`) married in, so it's excluded here the same way
+      // it's excluded from the sibling-bracket scan.
+      middleRowDropXs: parentsRow == null
+          ? const []
+          : [
+              for (final m in b.middle)
+                if (m.relationCode != 'S') middleRow.positionOf(m.userId).centerX,
+            ],
     );
 
     return Column(
@@ -577,7 +607,15 @@ class FamilyTreeBuckets {
 FamilyTreeBuckets bucketFamilyTreeMembers(List<FamilyMemberVm> all) {
   final parents = <FamilyMemberVm>[];
   final middle = <FamilyMemberVm>[];
-  final children = <FamilyMemberVm>[];
+  final bloodChildren = <FamilyMemberVm>[];
+  // A child's spouse (daughter-in-law / son-in-law) married in —
+  // they don't belong in "other relatives" next to nieces and
+  // great-grandparents, they belong right beside their own spouse
+  // in the children row, same as how `S` sits beside `SELF` in the
+  // middle row. Collected separately here and interleaved with
+  // `bloodChildren` below once every entry has been classified.
+  final sonSpouses = <FamilyMemberVm>[];
+  final dauSpouses = <FamilyMemberVm>[];
   final extended = <FamilyMemberVm>[];
 
   for (final m in all) {
@@ -599,7 +637,13 @@ FamilyTreeBuckets bucketFamilyTreeMembers(List<FamilyMemberVm> all) {
         break;
       case 'Son':
       case 'Dau':
-        children.add(m);
+        bloodChildren.add(m);
+        break;
+      case 'Son.S':
+        sonSpouses.add(m);
+        break;
+      case 'Dau.S':
+        dauSpouses.add(m);
         break;
       default:
         extended.add(m);
@@ -623,7 +667,35 @@ FamilyTreeBuckets bucketFamilyTreeMembers(List<FamilyMemberVm> all) {
     return 0;
   });
 
-  children.sort((a, b) => a.relationCode.compareTo(b.relationCode));
+  bloodChildren.sort((a, b) => a.relationCode.compareTo(b.relationCode));
+
+  // Interleave: each blood child immediately followed by their
+  // spouse (if one was found), so both the row layout (simple
+  // left-to-right spacing) and the painter (which pairs adjacent
+  // Son/Son.S or Dau/Dau.S entries) place and connect them as a
+  // couple. Note the API's `relationCode` is viewer-relative, not a
+  // graph edge — it can't say *which* son a daughter-in-law belongs
+  // to when there's more than one son, so with multiple same-gender
+  // children this pairs by encounter order (first unmatched spouse
+  // of that gender to the next child of that gender) rather than a
+  // guaranteed-correct match. Correct for the common case (one son
+  // or daughter with a spouse) this is actually for.
+  final children = <FamilyMemberVm>[];
+  var sonSpouseIdx = 0;
+  var dauSpouseIdx = 0;
+  for (final child in bloodChildren) {
+    children.add(child);
+    if (child.relationCode == 'Son' && sonSpouseIdx < sonSpouses.length) {
+      children.add(sonSpouses[sonSpouseIdx++]);
+    } else if (child.relationCode == 'Dau' && dauSpouseIdx < dauSpouses.length) {
+      children.add(dauSpouses[dauSpouseIdx++]);
+    }
+  }
+  // Leftover spouses (more in-laws than blood children of that
+  // gender — shouldn't normally happen) fall back to the extended
+  // list rather than being silently dropped.
+  extended.addAll(sonSpouses.skip(sonSpouseIdx));
+  extended.addAll(dauSpouses.skip(dauSpouseIdx));
 
   return FamilyTreeBuckets(
     parents: parents,
@@ -721,8 +793,12 @@ class _ConnectorLayout {
   final _CardRect? spousePos;
   final double? childrenRowTopY;
   final List<_CardRect> childrenPositions;
-  final double? leftSiblingBracketX;
-  final double? rightSiblingBracketX;
+  // Marriage lines within the children row — each pair is a blood
+  // child (Son/Dau) and their in-law spouse (Son.S/Dau.S).
+  final List<_CoupleMidpoint> childCoupleLines;
+  // centerX of every middle-row member that connects up to the
+  // parents row (viewer + siblings; excludes the married-in spouse).
+  final List<double> middleRowDropXs;
 
   const _ConnectorLayout({
     required this.parentCouple,
@@ -734,8 +810,8 @@ class _ConnectorLayout {
     required this.spousePos,
     required this.childrenRowTopY,
     required this.childrenPositions,
-    required this.leftSiblingBracketX,
-    required this.rightSiblingBracketX,
+    required this.childCoupleLines,
+    required this.middleRowDropXs,
   });
 }
 
@@ -770,31 +846,30 @@ class _FamilyTreePainter extends CustomPainter {
       );
     }
 
-    // 2. Drop from parents (or single parent) into the middle row.
+    // 2. Drop from parents (or single parent) into the middle row —
+    // fans out to every blood member of that row (viewer + siblings;
+    // the spouse married in, so it isn't connected to these
+    // parents). Previously this dropped a single line to one
+    // midpoint X with no further branching, so it never actually
+    // touched any card below it when there was more than one — or
+    // even exactly one off-center — descendant; visually a
+    // connector that "gave up" a few pixels short of the row.
     if (c.parentsRowBottomY != null &&
-        (c.parentCouple != null || c.parentSingle != null)) {
+        (c.parentCouple != null || c.parentSingle != null) &&
+        c.middleRowDropXs.isNotEmpty) {
       final startX = c.parentCouple?.x ?? c.parentSingle!.centerX;
-      final startY = (c.parentCouple?.left.bottom ??
-              c.parentSingle!.bottom) +
-          _dropGap;
+      final startY =
+          (c.parentCouple?.left.bottom ?? c.parentSingle!.bottom) + _dropGap;
       final endY = c.middleRowTopY - _dropGap;
-      // Drop to the bracket midpoint horizontally — but for the
-      // middle row, we want to land at the bracket center if
-      // siblings exist, otherwise at the viewer.
-      final leftBracketX = c.leftSiblingBracketX;
-      final rightBracketX = c.rightSiblingBracketX;
-      double endX;
-      if (leftBracketX != null && rightBracketX != null) {
-        endX = (leftBracketX + rightBracketX) / 2;
-      } else if (leftBracketX != null) {
-        endX = leftBracketX;
-      } else if (rightBracketX != null) {
-        endX = rightBracketX;
-      } else {
-        endX = c.viewerPos.centerX;
-      }
-      // L-shape: vertical drop then horizontal spread.
-      _drawL(canvas, paint, Offset(startX, startY), Offset(endX, endY));
+      _drawBusFanOut(
+        canvas,
+        paint,
+        trunkX: startX,
+        trunkY: startY,
+        busY: endY - _dropGap / 2,
+        endY: endY,
+        targetXs: c.middleRowDropXs,
+      );
     }
 
     // 3. Marriage line in Gen 0 (between viewer + spouse)
@@ -813,68 +888,69 @@ class _FamilyTreePainter extends CustomPainter {
       );
     }
 
-    // 4. Drop from middle row down to the children row.
+    // 4. Drop from middle row down to the children row (blood
+    // children only — an in-law spouse is reached via the marriage
+    // line in section 5 below, not a separate drop from this bus).
     if (c.childrenRowTopY != null && c.childrenPositions.isNotEmpty) {
       final startX = c.spousePos != null
           ? (c.viewerPos.centerX + c.spousePos!.centerX) / 2
           : c.viewerPos.centerX;
       final startY = c.viewerPos.bottom + _dropGap;
       final endY = c.childrenRowTopY! - _dropGap;
-      // Fan out from startX to every child center via a single
-      // horizontal bus + vertical drops.
-      final childCenters =
-          c.childrenPositions.map((p) => p.centerX).toList()..sort();
-      final busY = endY - _dropGap / 2;
+      _drawBusFanOut(
+        canvas,
+        paint,
+        trunkX: startX,
+        trunkY: startY,
+        busY: endY - _dropGap / 2,
+        endY: endY,
+        targetXs: c.childrenPositions.map((p) => p.centerX).toList(),
+      );
+    }
+
+    // 5. Marriage lines within the children row — each blood child
+    // paired with their in-law spouse (daughter-in-law/son-in-law),
+    // same idea as the Gen 0 marriage line in section 3.
+    for (final couple in c.childCoupleLines) {
+      final y = (couple.left.top + couple.left.bottom) / 2;
+      final left = couple.left.right < couple.right.left
+          ? couple.left.right
+          : couple.left.centerX;
+      final right = couple.left.right < couple.right.left
+          ? couple.right.left
+          : couple.right.centerX;
       canvas.drawLine(
-        Offset(startX, startY),
-        Offset(startX, busY),
+        Offset(left, y),
+        Offset(right, y),
         paint,
       );
-      if (childCenters.length == 1) {
-        canvas.drawLine(
-          Offset(startX, busY),
-          Offset(childCenters.first, busY),
-          paint,
-        );
-        canvas.drawLine(
-          Offset(childCenters.first, busY),
-          Offset(childCenters.first, endY),
-          paint,
-        );
-      } else {
-        final minX = childCenters.first;
-        final maxX = childCenters.last;
-        canvas.drawLine(
-          Offset(startX, busY),
-          Offset(minX, busY),
-          paint,
-        );
-        canvas.drawLine(
-          Offset(minX, busY),
-          Offset(maxX, busY),
-          paint,
-        );
-        for (final x in childCenters) {
-          canvas.drawLine(
-            Offset(x, busY),
-            Offset(x, endY),
-            paint,
-          );
-        }
-      }
     }
   }
 
-  void _drawL(Canvas canvas, Paint paint, Offset from, Offset to) {
-    // Vertical down from `from`, then horizontal to `to.x`, then
-    // vertical down to `to.y` — standard family-tree "L bracket".
-    final midY = (from.dy + to.dy) / 2;
-    final path = Path()
-      ..moveTo(from.dx, from.dy)
-      ..lineTo(from.dx, midY)
-      ..lineTo(to.dx, midY)
-      ..lineTo(to.dx, to.dy);
-    canvas.drawPath(path, paint);
+  /// Shared "trunk down, bus across, drop to each target" shape used
+  /// by both the parents→middle and middle→children connectors: a
+  /// single vertical line from the source down to a horizontal bus
+  /// just above the target row, then one vertical drop per target X
+  /// so every card in that row actually gets touched by a line
+  /// (instead of the drop dead-ending at one aggregate point).
+  void _drawBusFanOut(
+    Canvas canvas,
+    Paint paint, {
+    required double trunkX,
+    required double trunkY,
+    required double busY,
+    required double endY,
+    required List<double> targetXs,
+  }) {
+    final xs = [...targetXs]..sort();
+    canvas.drawLine(Offset(trunkX, trunkY), Offset(trunkX, busY), paint);
+    canvas.drawLine(Offset(trunkX, busY), Offset(xs.first, busY), paint);
+    if (xs.length > 1) {
+      canvas.drawLine(Offset(xs.first, busY), Offset(xs.last, busY), paint);
+    }
+    for (final x in xs) {
+      canvas.drawLine(Offset(x, busY), Offset(x, endY), paint);
+    }
   }
 
   @override
@@ -1011,7 +1087,7 @@ class _ExtendedList extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.diversity_3_outlined,
                     size: 16,
                     color: AppColors.textSecondary,
@@ -1020,7 +1096,7 @@ class _ExtendedList extends StatelessWidget {
                   Expanded(
                     child: Text(
                       l10n.familyTreeOtherFamily,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -1069,7 +1145,7 @@ class _ExtendedList extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
               child: Text(
                 l10n.familyTreeOtherFamilyDesc(members.length),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textHint,
                 ),
@@ -1125,7 +1201,7 @@ class _ExtendedTile extends StatelessWidget {
       ),
       title: Text(
         member.name,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
@@ -1133,7 +1209,7 @@ class _ExtendedTile extends StatelessWidget {
       ),
       subtitle: Text(
         label ?? l10n.profileMe,
-        style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+        style: TextStyle(fontSize: 11, color: AppColors.textHint),
       ),
       trailing: member.isOnline
           ? Container(

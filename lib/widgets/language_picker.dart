@@ -64,7 +64,7 @@ class LanguagePickerButton extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               localeDisplayName(current),
-              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
           ],
         ),

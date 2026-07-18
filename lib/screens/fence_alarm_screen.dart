@@ -97,7 +97,7 @@ class _FenceAlarmScreenState extends State<FenceAlarmScreen> {
                         const SizedBox(height: 12),
                         Text(
                           l10n.fenceAlarmEmpty,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -107,7 +107,7 @@ class _FenceAlarmScreenState extends State<FenceAlarmScreen> {
                         Text(
                           l10n.fenceAlarmEmptyDesc,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                           ),
@@ -177,7 +177,7 @@ class _AlarmCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           alarm.targetUsername,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -208,13 +208,13 @@ class _AlarmCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.shield_outlined,
+                      Icon(Icons.shield_outlined,
                           size: 13, color: AppColors.textHint),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
                           alarm.fenceName ?? l10n.fenceListTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                           ),
@@ -226,7 +226,7 @@ class _AlarmCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.access_time,
+                      Icon(Icons.access_time,
                           size: 13, color: AppColors.textHint),
                       const SizedBox(width: 4),
                       Text(
@@ -234,7 +234,7 @@ class _AlarmCard extends StatelessWidget {
                           AppTimeFormatter(Localizations.localeOf(context))
                               .forRecordList(alarm.alarmedAt.toLocal()),
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textHint,
                         ),

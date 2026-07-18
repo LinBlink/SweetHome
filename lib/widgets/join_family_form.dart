@@ -122,7 +122,7 @@ class JoinFamilyFormState extends State<JoinFamilyForm> {
         ),
         const SizedBox(height: 6),
         Text(l10n.registerInviteCodeHint,
-            style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
+            style: TextStyle(fontSize: 12, color: AppColors.textHint)),
         if (_lookupError != null) ...[
           const SizedBox(height: 8),
           ErrorBanner(
@@ -150,7 +150,7 @@ class JoinFamilyFormState extends State<JoinFamilyForm> {
         children: [
           Text(
             preview.familyName,
-            style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+            style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 8),
           RadioGroup<int>(
@@ -169,7 +169,7 @@ class JoinFamilyFormState extends State<JoinFamilyForm> {
           ),
           const SizedBox(height: 8),
           Text(l10n.registerRelationLabel,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,

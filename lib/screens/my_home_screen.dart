@@ -128,7 +128,7 @@ class _WelcomeCard extends StatelessWidget {
               children: [
                 Text(
                   _greeting(l10n, auth.currentUser?.name),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.inkFaded,
                     letterSpacing: 0.4,
@@ -138,7 +138,7 @@ class _WelcomeCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   auth.currentUser?.familyName ?? l10n.brandName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w700,
                     color: AppColors.ink,
@@ -148,7 +148,7 @@ class _WelcomeCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   l10n.myHomeWelcomeTagline,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColors.inkFaded,
                     fontStyle: FontStyle.italic,
@@ -227,7 +227,7 @@ class _HubTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.ink,
@@ -237,7 +237,7 @@ class _HubTile extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.inkFaded,
                     height: 1.4,

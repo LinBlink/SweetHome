@@ -53,12 +53,12 @@ class PhoneInputField extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   selectedCountry.dialCode,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+                Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
                 const SizedBox(width: 8),
                 Container(width: 1, height: 20, color: AppColors.divider),
               ],
@@ -91,7 +91,7 @@ class _CountryPickerSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Text(
               l10n.countryPickerTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,

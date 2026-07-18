@@ -214,7 +214,7 @@ class _CommentsSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(2, 4, 0, 8),
             child: Text(
               l10n.momentCommentSectionTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textSecondary,
@@ -244,7 +244,7 @@ class _CommentsSection extends StatelessWidget {
               child: Center(
                 child: Text(
                   l10n.momentCommentEmpty,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textHint,
                   ),
@@ -307,7 +307,7 @@ class _CommentRow extends StatelessWidget {
                     Flexible(
                       child: Text(
                         comment.username,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -318,7 +318,7 @@ class _CommentRow extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       time,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textHint,
                       ),
@@ -328,7 +328,7 @@ class _CommentRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   comment.content,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textPrimary,
                     height: 1.4,
@@ -340,7 +340,7 @@ class _CommentRow extends StatelessWidget {
           if (isMine)
             IconButton(
               tooltip: l10n.familyFeedDeleteTitle,
-              icon: const Icon(
+              icon: Icon(
                 Icons.delete_outline_rounded,
                 size: 18,
                 color: AppColors.textHint,
@@ -371,7 +371,7 @@ class _CommentComposer extends StatelessWidget {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surface,
           border: Border(top: BorderSide(color: AppColors.divider)),
         ),
@@ -396,11 +396,11 @@ class _CommentComposer extends StatelessWidget {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: AppColors.divider),
+                    borderSide: BorderSide(color: AppColors.divider),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: AppColors.divider),
+                    borderSide: BorderSide(color: AppColors.divider),
                   ),
                 ),
               ),
@@ -478,7 +478,7 @@ class _LikersSheetState extends State<_LikersSheet> {
             ),
             Text(
               l10n.momentDetailWhoLikedTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AppColors.ink,
@@ -505,7 +505,7 @@ class _LikersSheetState extends State<_LikersSheet> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
                       l10n.familyFeedLoadMoreError,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textHint,
                       ),
@@ -513,13 +513,25 @@ class _LikersSheetState extends State<_LikersSheet> {
                   );
                 }
                 final detail = snap.data!;
+                // Server order isn't guaranteed to be by rank (§7.7 just
+                // groups by liker); sort here so the heaviest liker is
+                // always first, which is also what the "like king" badge
+                // below depends on.
+                final ranked = [...detail.likers]
+                  ..sort((a, b) => b.likeCount.compareTo(a.likeCount));
+                // "点赞狂人": top liker needs >10 likes *and* a big enough
+                // lead over #2 (at least 50% more) that it reads as a
+                // real blowout, not just noise between close scores.
+                final isLikeKing = ranked.length > 1 &&
+                    ranked[0].likeCount > 10 &&
+                    ranked[0].likeCount > ranked[1].likeCount * 1.5;
                 if (detail.likers.isEmpty) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Center(
                       child: Text(
                         l10n.momentDetailNoLikes,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textHint,
                         ),
@@ -533,10 +545,10 @@ class _LikersSheetState extends State<_LikersSheet> {
                   ),
                   child: ListView.separated(
                     shrinkWrap: true,
-                    itemCount: detail.likers.length,
+                    itemCount: ranked.length,
                     separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (ctx, i) {
-                      final entry = detail.likers[i];
+                      final entry = ranked[i];
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor:
@@ -551,10 +563,40 @@ class _LikersSheetState extends State<_LikersSheet> {
                             ),
                           ),
                         ),
-                        title: Text(entry.username),
+                        title: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                entry.username,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (i == 0 && isLikeKing) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  l10n.momentDetailLikeKing,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                         trailing: Text(
                           l10n.momentDetailLikedTimes(entry.likeCount),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textHint,
                             fontSize: 12,
                           ),

@@ -87,9 +87,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get registerJoinFamilyTab => '加入已有家庭';
 
   @override
-  String get registerRequestJoinTab => '申请邀请码';
-
-  @override
   String get registerFamilyNameLabel => '家庭名称（如：王家、李家）';
 
   @override
@@ -141,58 +138,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get registerSubmitJoin => '注册并加入家庭';
 
   @override
-  String get requestJoinTargetPhoneLabel => '你认识的家庭成员的手机号';
-
-  @override
-  String get requestJoinTargetPhoneRequired => '请输入对方手机号';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* 不需要邀请码，只需要填一个已经在这个家庭里的人的手机号，对方家庭的管理员会审核你的申请';
-
-  @override
-  String get requestJoinMessageLabel => '给管理员的留言（选填）';
-
-  @override
-  String get requestJoinSubmit => '提交申请';
-
-  @override
-  String get requestJoinSubmittedTitle => '申请已提交';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      '你的申请已发送给家庭管理员审核，审核通过后请用刚才填写的手机号和密码登录';
-
-  @override
-  String get joinRequestsTitle => '加入申请';
-
-  @override
-  String get joinRequestsEmpty => '暂无待处理的申请';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '想成为 $targetName 的$relation';
-  }
-
-  @override
-  String get relationNounChild => '孩子';
-
-  @override
-  String get relationNounParent => '父母';
-
-  @override
-  String get relationNounSpouse => '配偶';
-
-  @override
-  String get relationNounSibling => '兄弟姐妹';
-
-  @override
-  String get joinRequestsApprove => '通过';
-
-  @override
-  String get joinRequestsReject => '拒绝';
-
-  @override
   String get phoneLabel => '手机号';
 
   @override
@@ -224,24 +169,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get myHomeLocationDesc => '查看每个家庭成员的当前位置';
-
-  @override
-  String get myHomeJoinRequestsEntry => '加入申请';
-
-  @override
-  String get myHomeJoinRequestsDesc => '审核并批准加入本家庭的申请';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 条待处理',
-      one: '1 条待处理',
-      zero: '暂无待处理',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => '家庭动态';
@@ -378,61 +305,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationRefresh => '刷新';
 
   @override
-  String get joinRequestsAdminTitle => '加入申请';
-
-  @override
-  String get joinRequestsAdminEmpty => '暂无待处理的申请。';
-
-  @override
-  String get joinRequestsAdminReject => '拒绝';
-
-  @override
-  String get joinRequestsAdminApprove => '通过';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '想成为 $targetName 的$relation';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return '留言：$message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => '确认拒绝此申请？';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => '拒绝原因（选填）';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => '拒绝';
-
-  @override
-  String get joinRequestsAdminRejectCancel => '取消';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => '已拒绝';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => '已通过';
-
-  @override
-  String get joinRequestsAdminError => '操作失败';
-
-  @override
-  String get requestJoinModeByCode => '我有邀请码';
-
-  @override
-  String get requestJoinModeByPhone => '我认识某位成员的手机号';
-
-  @override
-  String get requestJoinNoFamilySubmit => '提交申请';
-
-  @override
-  String get requestJoinByCodeHint => '如已拿到邀请码，可使用邀请码加入。';
-
-  @override
   String get conversationsSearchTooltip => '搜索';
 
   @override
@@ -443,6 +315,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get conversationsEmptySubtitle => '邀请家人加入，开始聊天吧';
+
+  @override
+  String get conversationSpouseLabel => '配偶';
 
   @override
   String get connectionErrorRetry => '重试';
@@ -914,12 +789,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get locationHubFenceAlarmsDesc => '查看家人进出围栏的提醒';
 
   @override
-  String get profileJoinRequestsRow => '加入申请';
-
-  @override
-  String get profileJoinRequestsAdminOnly => '仅管理员可见';
-
-  @override
   String get familyFeedEmptyTitle => '还没有动态';
 
   @override
@@ -960,6 +829,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return '还有 $count 人';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return '$count 条评论';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -1072,10 +951,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get momentDetailVideoLoadFailed => '视频加载失败';
 
   @override
+  String get momentDetailAudioLoadFailed => '语音加载失败';
+
+  @override
   String get momentDetailAudioPlay => '播放';
 
   @override
   String get momentDetailAudioPause => '暂停';
+
+  @override
+  String get momentDetailLikeKing => '点赞狂人';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -1122,6 +1007,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileThemeSheetTitle => '选择主题';
 
   @override
+  String get profileAppearanceRow => '外观模式';
+
+  @override
+  String get profileAppearanceSheetTitle => '选择外观模式';
+
+  @override
+  String get profileThemeModeSection => '外观模式';
+
+  @override
+  String get profileThemeModeSystem => '跟随系统';
+
+  @override
+  String get profileThemeModeLight => '浅色';
+
+  @override
+  String get profileThemeModeDark => '深色';
+
+  @override
+  String get profileThemeColorSection => '配色';
+
+  @override
   String get momentCommentSectionTitle => '评论';
 
   @override
@@ -1146,12 +1052,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatMessageTooLong => '消息过长（最多 2000 字）';
 
   @override
-  String get profileClearLocalChatRow => '删除本地聊天记录';
-
-  @override
-  String get profileClearLocalChatSubtitle => '仅清除本机缓存的消息';
-
-  @override
   String get profileClearLocalChatConfirmTitle => '删除本地聊天记录？';
 
   @override
@@ -1160,6 +1060,87 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profileClearLocalChatSuccess => '本地聊天记录已删除';
+
+  @override
+  String get profileStorageRow => '存储空间';
+
+  @override
+  String get profileStorageSubtitle => '查看本地缓存占用，并清理';
+
+  @override
+  String get profileExportChatRow => '导出聊天记录';
+
+  @override
+  String get profileExportChatSubtitle => '将本地聊天记录保存为文本文件';
+
+  @override
+  String get chatExportTitle => '导出聊天记录';
+
+  @override
+  String get chatExportEmpty => '暂无可导出的本地聊天记录';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '共 $conversations 个对话，$messages 条消息';
+  }
+
+  @override
+  String get chatExportCopy => '复制全部';
+
+  @override
+  String get chatExportCopied => '已复制到剪贴板';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return '已保存至：$path';
+  }
+
+  @override
+  String get storageScreenTitle => '存储空间';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '共 $size';
+  }
+
+  @override
+  String get storageImageCache => '图片缓存';
+
+  @override
+  String get storageVideoCache => '视频缓存';
+
+  @override
+  String get storageAudioCache => '音频缓存';
+
+  @override
+  String get storageChatHistory => '聊天记录';
+
+  @override
+  String get storageSizeUnknown => '未知';
+
+  @override
+  String get storageClear => '清除';
+
+  @override
+  String get storageClearAll => '清除全部缓存';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '确定要清除$category吗？';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody => '缓存文件将被删除，下次使用时会重新从网络下载。';
+
+  @override
+  String get storageClearAllConfirmTitle => '确定要清除全部本地缓存吗？';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      '这将清除图片、视频、音频缓存以及本地保存的聊天记录。媒体文件会在需要时重新下载；聊天记录可重新从服务器加载。';
+
+  @override
+  String get storageClearSuccess => '缓存已清除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1245,9 +1226,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get registerJoinFamilyTab => '加入已有家庭';
 
   @override
-  String get registerRequestJoinTab => '申请邀请码';
-
-  @override
   String get registerFamilyNameLabel => '家庭名称（如：王家、李家）';
 
   @override
@@ -1299,58 +1277,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get registerSubmitJoin => '注册并加入家庭';
 
   @override
-  String get requestJoinTargetPhoneLabel => '你认识的家庭成员的手机号';
-
-  @override
-  String get requestJoinTargetPhoneRequired => '请输入对方手机号';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* 不需要邀请码，只需要填一个已经在这个家庭里的人的手机号，对方家庭的管理员会审核你的申请';
-
-  @override
-  String get requestJoinMessageLabel => '给管理员的留言（选填）';
-
-  @override
-  String get requestJoinSubmit => '提交申请';
-
-  @override
-  String get requestJoinSubmittedTitle => '申请已提交';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      '你的申请已发送给家庭管理员审核，审核通过后请用刚才填写的手机号和密码登录';
-
-  @override
-  String get joinRequestsTitle => '加入申请';
-
-  @override
-  String get joinRequestsEmpty => '暂无待处理的申请';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '想成为 $targetName 的$relation';
-  }
-
-  @override
-  String get relationNounChild => '孩子';
-
-  @override
-  String get relationNounParent => '父母';
-
-  @override
-  String get relationNounSpouse => '配偶';
-
-  @override
-  String get relationNounSibling => '兄弟姐妹';
-
-  @override
-  String get joinRequestsApprove => '通过';
-
-  @override
-  String get joinRequestsReject => '拒绝';
-
-  @override
   String get phoneLabel => '手机号';
 
   @override
@@ -1382,24 +1308,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get myHomeLocationDesc => '查看每个家庭成员的当前位置';
-
-  @override
-  String get myHomeJoinRequestsEntry => '加入申请';
-
-  @override
-  String get myHomeJoinRequestsDesc => '审核并批准加入本家庭的申请';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 条待处理',
-      one: '1 条待处理',
-      zero: '暂无待处理',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => '家庭动态';
@@ -1536,61 +1444,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationRefresh => '刷新';
 
   @override
-  String get joinRequestsAdminTitle => '加入申请';
-
-  @override
-  String get joinRequestsAdminEmpty => '暂无待处理的申请。';
-
-  @override
-  String get joinRequestsAdminReject => '拒绝';
-
-  @override
-  String get joinRequestsAdminApprove => '通过';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '想成为 $targetName 的$relation';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return '留言：$message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => '确认拒绝此申请？';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => '拒绝原因（选填）';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => '拒绝';
-
-  @override
-  String get joinRequestsAdminRejectCancel => '取消';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => '已拒绝';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => '已通过';
-
-  @override
-  String get joinRequestsAdminError => '操作失败';
-
-  @override
-  String get requestJoinModeByCode => '我有邀请码';
-
-  @override
-  String get requestJoinModeByPhone => '我认识某位成员的手机号';
-
-  @override
-  String get requestJoinNoFamilySubmit => '提交申请';
-
-  @override
-  String get requestJoinByCodeHint => '如已拿到邀请码，可使用邀请码加入。';
-
-  @override
   String get conversationsSearchTooltip => '搜索';
 
   @override
@@ -1601,6 +1454,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get conversationsEmptySubtitle => '邀请家人加入，开始聊天吧';
+
+  @override
+  String get conversationSpouseLabel => '配偶';
 
   @override
   String get connectionErrorRetry => '重试';
@@ -2072,12 +1928,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get locationHubFenceAlarmsDesc => '查看家人进出围栏的提醒';
 
   @override
-  String get profileJoinRequestsRow => '加入申请';
-
-  @override
-  String get profileJoinRequestsAdminOnly => '仅管理员可见';
-
-  @override
   String get familyFeedEmptyTitle => '还没有动态';
 
   @override
@@ -2118,6 +1968,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String familyFeedMoreLikers(Object count) {
     return '还有 $count 人';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return '$count 条评论';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -2230,10 +2090,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get momentDetailVideoLoadFailed => '视频加载失败';
 
   @override
+  String get momentDetailAudioLoadFailed => '语音加载失败';
+
+  @override
   String get momentDetailAudioPlay => '播放';
 
   @override
   String get momentDetailAudioPause => '暂停';
+
+  @override
+  String get momentDetailLikeKing => '点赞狂人';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -2280,6 +2146,27 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get profileThemeSheetTitle => '选择主题';
 
   @override
+  String get profileAppearanceRow => '外观模式';
+
+  @override
+  String get profileAppearanceSheetTitle => '选择外观模式';
+
+  @override
+  String get profileThemeModeSection => '外观模式';
+
+  @override
+  String get profileThemeModeSystem => '跟随系统';
+
+  @override
+  String get profileThemeModeLight => '浅色';
+
+  @override
+  String get profileThemeModeDark => '深色';
+
+  @override
+  String get profileThemeColorSection => '配色';
+
+  @override
   String get momentCommentSectionTitle => '评论';
 
   @override
@@ -2304,12 +2191,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get chatMessageTooLong => '消息过长（最多 2000 字）';
 
   @override
-  String get profileClearLocalChatRow => '删除本地聊天记录';
-
-  @override
-  String get profileClearLocalChatSubtitle => '仅清除本机缓存的消息';
-
-  @override
   String get profileClearLocalChatConfirmTitle => '删除本地聊天记录？';
 
   @override
@@ -2318,6 +2199,87 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get profileClearLocalChatSuccess => '本地聊天记录已删除';
+
+  @override
+  String get profileStorageRow => '存储空间';
+
+  @override
+  String get profileStorageSubtitle => '查看本地缓存占用，并清理';
+
+  @override
+  String get profileExportChatRow => '导出聊天记录';
+
+  @override
+  String get profileExportChatSubtitle => '将本地聊天记录保存为文本文件';
+
+  @override
+  String get chatExportTitle => '导出聊天记录';
+
+  @override
+  String get chatExportEmpty => '暂无可导出的本地聊天记录';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '共 $conversations 个对话，$messages 条消息';
+  }
+
+  @override
+  String get chatExportCopy => '复制全部';
+
+  @override
+  String get chatExportCopied => '已复制到剪贴板';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return '已保存至：$path';
+  }
+
+  @override
+  String get storageScreenTitle => '存储空间';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '共 $size';
+  }
+
+  @override
+  String get storageImageCache => '图片缓存';
+
+  @override
+  String get storageVideoCache => '视频缓存';
+
+  @override
+  String get storageAudioCache => '音频缓存';
+
+  @override
+  String get storageChatHistory => '聊天记录';
+
+  @override
+  String get storageSizeUnknown => '未知';
+
+  @override
+  String get storageClear => '清除';
+
+  @override
+  String get storageClearAll => '清除全部缓存';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '确定要清除$category吗？';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody => '缓存文件将被删除，下次使用时会重新从网络下载。';
+
+  @override
+  String get storageClearAllConfirmTitle => '确定要清除全部本地缓存吗？';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      '这将清除图片、视频、音频缓存以及本地保存的聊天记录。媒体文件会在需要时重新下载；聊天记录可重新从服务器加载。';
+
+  @override
+  String get storageClearSuccess => '缓存已清除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2403,9 +2365,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get registerJoinFamilyTab => '加入已有家庭';
 
   @override
-  String get registerRequestJoinTab => '申請邀請碼';
-
-  @override
   String get registerFamilyNameLabel => '家庭名稱（如：王家、李家）';
 
   @override
@@ -2457,58 +2416,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get registerSubmitJoin => '註冊並加入家庭';
 
   @override
-  String get requestJoinTargetPhoneLabel => '你認識的家庭成員的手機號';
-
-  @override
-  String get requestJoinTargetPhoneRequired => '請輸入對方手機號';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* 不需要邀請碼，只需要填一個已經在這個家庭裡的人的手機號，對方家庭的管理員會審核你的申請';
-
-  @override
-  String get requestJoinMessageLabel => '給管理員的留言（選填）';
-
-  @override
-  String get requestJoinSubmit => '提交申請';
-
-  @override
-  String get requestJoinSubmittedTitle => '申請已提交';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      '你的申請已發送給家庭管理員審核，審核通過後請用剛才填寫的手機號和密碼登入';
-
-  @override
-  String get joinRequestsTitle => '加入申請';
-
-  @override
-  String get joinRequestsEmpty => '暫無待處理的申請';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '想成為 $targetName 的$relation';
-  }
-
-  @override
-  String get relationNounChild => '孩子';
-
-  @override
-  String get relationNounParent => '父母';
-
-  @override
-  String get relationNounSpouse => '配偶';
-
-  @override
-  String get relationNounSibling => '兄弟姐妹';
-
-  @override
-  String get joinRequestsApprove => '通過';
-
-  @override
-  String get joinRequestsReject => '拒絕';
-
-  @override
   String get phoneLabel => '手機號';
 
   @override
@@ -2540,24 +2447,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get myHomeLocationDesc => '查看每個家庭成員的當前位置';
-
-  @override
-  String get myHomeJoinRequestsEntry => '加入申請';
-
-  @override
-  String get myHomeJoinRequestsDesc => '審核並批准加入本家庭的申請';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 條待處理',
-      one: '1 條待處理',
-      zero: '暫無待處理',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => '家庭動態';
@@ -2694,61 +2583,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationRefresh => '刷新';
 
   @override
-  String get joinRequestsAdminTitle => '加入申請';
-
-  @override
-  String get joinRequestsAdminEmpty => '暫無待處理的申請。';
-
-  @override
-  String get joinRequestsAdminReject => '拒絕';
-
-  @override
-  String get joinRequestsAdminApprove => '通過';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '想成為 $targetName 的$relation';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return '留言：$message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => '確認拒絕此申請？';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => '拒絕原因（選填）';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => '拒絕';
-
-  @override
-  String get joinRequestsAdminRejectCancel => '取消';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => '已拒絕';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => '已通過';
-
-  @override
-  String get joinRequestsAdminError => '操作失敗';
-
-  @override
-  String get requestJoinModeByCode => '我有邀請碼';
-
-  @override
-  String get requestJoinModeByPhone => '我認識某位成員的手機號';
-
-  @override
-  String get requestJoinNoFamilySubmit => '提交申請';
-
-  @override
-  String get requestJoinByCodeHint => '如已拿到邀請碼，可使用邀請碼加入。';
-
-  @override
   String get conversationsSearchTooltip => '搜尋';
 
   @override
@@ -2759,6 +2593,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get conversationsEmptySubtitle => '邀請家人加入，開始聊天吧';
+
+  @override
+  String get conversationSpouseLabel => '配偶';
 
   @override
   String get connectionErrorRetry => '重試';
@@ -3230,12 +3067,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get locationHubFenceAlarmsDesc => '查看家人進出圍欄的提醒';
 
   @override
-  String get profileJoinRequestsRow => '加入申請';
-
-  @override
-  String get profileJoinRequestsAdminOnly => '僅管理員可見';
-
-  @override
   String get familyFeedEmptyTitle => '還沒有動態';
 
   @override
@@ -3276,6 +3107,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String familyFeedMoreLikers(Object count) {
     return '還有 $count 人';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return '$count 則評論';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -3388,10 +3229,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get momentDetailVideoLoadFailed => '影片載入失敗';
 
   @override
+  String get momentDetailAudioLoadFailed => '語音載入失敗';
+
+  @override
   String get momentDetailAudioPlay => '播放';
 
   @override
   String get momentDetailAudioPause => '暫停';
+
+  @override
+  String get momentDetailLikeKing => '點讚狂人';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -3438,6 +3285,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get profileThemeSheetTitle => '選擇主題';
 
   @override
+  String get profileAppearanceRow => '外觀模式';
+
+  @override
+  String get profileAppearanceSheetTitle => '選擇外觀模式';
+
+  @override
+  String get profileThemeModeSection => '外觀模式';
+
+  @override
+  String get profileThemeModeSystem => '跟隨系統';
+
+  @override
+  String get profileThemeModeLight => '淺色';
+
+  @override
+  String get profileThemeModeDark => '深色';
+
+  @override
+  String get profileThemeColorSection => '配色';
+
+  @override
   String get momentCommentSectionTitle => '評論';
 
   @override
@@ -3462,12 +3330,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get chatMessageTooLong => '訊息過長（最多 2000 字）';
 
   @override
-  String get profileClearLocalChatRow => '刪除本機聊天記錄';
-
-  @override
-  String get profileClearLocalChatSubtitle => '僅清除本機快取的訊息';
-
-  @override
   String get profileClearLocalChatConfirmTitle => '刪除本機聊天記錄？';
 
   @override
@@ -3476,4 +3338,85 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileClearLocalChatSuccess => '本機聊天記錄已刪除';
+
+  @override
+  String get profileStorageRow => '儲存空間';
+
+  @override
+  String get profileStorageSubtitle => '查看本機快取佔用，並清理';
+
+  @override
+  String get profileExportChatRow => '匯出聊天記錄';
+
+  @override
+  String get profileExportChatSubtitle => '將本機聊天記錄儲存為文字檔';
+
+  @override
+  String get chatExportTitle => '匯出聊天記錄';
+
+  @override
+  String get chatExportEmpty => '暫無可匯出的本機聊天記錄';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '共 $conversations 個對話，$messages 則訊息';
+  }
+
+  @override
+  String get chatExportCopy => '複製全部';
+
+  @override
+  String get chatExportCopied => '已複製到剪貼簿';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return '已儲存至：$path';
+  }
+
+  @override
+  String get storageScreenTitle => '儲存空間';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '共 $size';
+  }
+
+  @override
+  String get storageImageCache => '圖片快取';
+
+  @override
+  String get storageVideoCache => '影片快取';
+
+  @override
+  String get storageAudioCache => '音訊快取';
+
+  @override
+  String get storageChatHistory => '聊天記錄';
+
+  @override
+  String get storageSizeUnknown => '未知';
+
+  @override
+  String get storageClear => '清除';
+
+  @override
+  String get storageClearAll => '清除全部快取';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '確定要清除$category嗎？';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody => '快取檔案將被刪除，下次使用時會重新從網路下載。';
+
+  @override
+  String get storageClearAllConfirmTitle => '確定要清除全部本機快取嗎？';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      '這將清除圖片、影片、音訊快取以及本機保存的聊天記錄。媒體檔案會在需要時重新下載；聊天記錄可重新從伺服器載入。';
+
+  @override
+  String get storageClearSuccess => '快取已清除';
 }

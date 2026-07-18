@@ -40,18 +40,20 @@ class PaperBackground extends StatelessWidget {
       children: [
         // Warm wash — top slightly lighter than bottom, like light
         // falling on a sheet of paper.
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFFFFCF6),
+                AppColors.isDark
+                    ? const Color(0xFF221C16)
+                    : const Color(0xFFFFFCF6),
                 AppColors.background,
               ],
             ),
           ),
-          child: SizedBox.expand(),
+          child: const SizedBox.expand(),
         ),
         // Faint speckle — drawn once, on top of the wash but under
         // the child. Cached by Flutter so re-builds don't repaint.
@@ -138,7 +140,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: kToolbarHeight - 8,
+              // Mirrors `preferredSize`'s own `+ 18` for the subtitle
+              // case — without it this box stays a fixed 48px even
+              // with a subtitle line added below the title, and the
+              // inner Column overflows by a few pixels on narrow /
+              // larger-font-scale devices.
+              height: subtitle == null
+                  ? kToolbarHeight - 8
+                  : kToolbarHeight - 8 + 18,
               child: Row(
                 children: [
                   if (leading != null)
@@ -157,7 +166,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: AppColors.ink,
@@ -172,7 +181,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                                     subtitle as String,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       color: AppColors.inkFaded,
                                       fontWeight: FontWeight.w500,
@@ -552,7 +561,7 @@ class HomeListItem extends StatelessWidget {
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.ink,
@@ -564,7 +573,7 @@ class HomeListItem extends StatelessWidget {
                             subtitle!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppColors.inkFaded,
                             ),
@@ -709,7 +718,7 @@ class HomeSectionHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColors.inkFaded,

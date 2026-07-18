@@ -93,11 +93,11 @@ class _LocationFullscreenScreenState
               color: Colors.white.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(color: color, width: 1),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 2,
-                  offset: Offset(0, 1),
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
@@ -118,11 +118,11 @@ class _LocationFullscreenScreenState
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -271,7 +271,7 @@ class _AttrBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       color: Colors.white70,
-      child: const Text(
+      child: Text(
         '© OpenStreetMap contributors',
         style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
       ),

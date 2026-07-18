@@ -63,10 +63,17 @@ class SweetHomeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
+    // Watching (not reading) subscribes this widget to every
+    // `ThemeProvider.notifyListeners()` call — including the ones
+    // `didChangePlatformBrightness` fires while following "system".
+    // `AppColors.isDark` is kept in sync with this same provider (see
+    // `ThemeProvider`/`AppColors.applyBrightness`) before any of those
+    // notifications fire, so it's always current by the time this
+    // widget rebuilds.
     final palette = context.watch<ThemeProvider>().palette;
     return MaterialApp(
       title: 'Sweet Home',
-      theme: AppTheme.build(palette),
+      theme: AppTheme.build(palette, isDark: AppColors.isDark),
       debugShowCheckedModeBanner: false,
       navigatorKey: rootNavigatorKey,
       locale: locale,
@@ -313,18 +320,20 @@ class _MainShellState extends State<MainShell> {
   }
 
   /// A wooden tray at the bottom of the screen — the "shelf" the
-  /// rest of the app is sitting on. Dark wood grain, white
-  /// labels, terracotta highlight bar under the active tab.
+  /// rest of the app is sitting on. Grain tone follows the active
+  /// theme (`primaryDark`) rather than a fixed brown, so switching
+  /// palettes recolors the shelf along with everything else. White
+  /// labels, accent highlight bar under the active tab.
   Widget _buildNavBar() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.wood,
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
         boxShadow: [
           // Soft inner highlight on the top edge so the bar reads
           // as a wooden plank with a chamfered lip, not a flat
           // strip.
-          BoxShadow(
+          const BoxShadow(
             color: Color(0x33FFFFFF),
             blurRadius: 0,
             offset: Offset(0, 1),
@@ -333,7 +342,7 @@ class _MainShellState extends State<MainShell> {
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 14,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -391,7 +400,11 @@ class _MainShellState extends State<MainShell> {
 
   int _getUnreadCount() {
     try {
-      final chat = context.read<ChatProvider>();
+      // `watch`, not `read` — the nav bar's badge count (and the
+      // shake it drives on the Messages icon) needs to update the
+      // moment a message arrives or gets read, not just whenever
+      // `_MainShellState` happens to rebuild for some other reason.
+      final chat = context.watch<ChatProvider>();
       return chat.conversations.fold(0, (sum, c) => sum + c.unreadCount);
     } catch (_) {
       return 0;
@@ -419,10 +432,13 @@ class _MainShellState extends State<MainShell> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Icon(
-                  isSelected ? activeIcon : icon,
-                  color: fg,
-                  size: 23,
+                child: _ShakingIcon(
+                  shaking: badgeCount > 0,
+                  child: Icon(
+                    isSelected ? activeIcon : icon,
+                    color: fg,
+                    size: 23,
+                  ),
                 ),
               ),
               if (badgeCount > 0)
@@ -438,12 +454,13 @@ class _MainShellState extends State<MainShell> {
                     decoration: BoxDecoration(
                       color: context.brandAccent,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.wood, width: 1.4),
+                      border: Border.all(
+                          color: AppColors.primaryDark, width: 1.4),
                     ),
                     child: Text(
                       badgeCount > 99 ? '99+' : '$badgeCount',
-                      style: const TextStyle(
-                        color: AppColors.wood,
+                      style: TextStyle(
+                        color: AppColors.primaryDark,
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                       ),
@@ -477,6 +494,88 @@ class _MainShellState extends State<MainShell> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Wraps a nav-bar icon with a periodic "cute" wiggle whenever
+/// [shaking] is true (i.e. there's something unread) — a quick
+/// few-degree rock left-right-left, then a pause, on repeat. Stops
+/// and snaps back to upright the moment [shaking] flips to false
+/// (the badge clears once everything's read).
+class _ShakingIcon extends StatefulWidget {
+  final bool shaking;
+  final Widget child;
+  const _ShakingIcon({required this.shaking, required this.child});
+
+  @override
+  State<_ShakingIcon> createState() => _ShakingIconState();
+}
+
+class _ShakingIconState extends State<_ShakingIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2200),
+  );
+
+  // One full period: hold upright, rock through a few quick swings,
+  // then hold upright again for a beat before the next repeat —
+  // reads as a little "psst, look at me" nudge rather than a
+  // constant nervous twitch.
+  late final Animation<double> _angle = TweenSequence<double>([
+    TweenSequenceItem(tween: ConstantTween(0.0), weight: 55),
+    TweenSequenceItem(
+      tween: Tween(begin: 0.0, end: -0.16).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 6,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: -0.16, end: 0.16).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 10,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: 0.16, end: -0.10).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 9,
+    ),
+    TweenSequenceItem(
+      tween: Tween(begin: -0.10, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 5,
+    ),
+    TweenSequenceItem(tween: ConstantTween(0.0), weight: 15),
+  ]).animate(_controller);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.shaking) _controller.repeat();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ShakingIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.shaking && !oldWidget.shaking) {
+      _controller.repeat();
+    } else if (!widget.shaking && oldWidget.shaking) {
+      _controller.stop();
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _angle,
+      child: widget.child,
+      builder: (context, child) => Transform.rotate(
+        angle: _angle.value,
+        child: child,
       ),
     );
   }
@@ -530,7 +629,7 @@ class _SplashScreen extends StatelessWidget {
                 const SizedBox(height: 28),
                 Text(
                   l10n.brandName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
                     color: AppColors.ink,
@@ -540,7 +639,7 @@ class _SplashScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   l10n.appTagline,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.inkFaded,
                     letterSpacing: 0.4,

@@ -151,7 +151,7 @@ class _FamilyFeedScreenState extends State<FamilyFeedScreen> {
                                         onPressed: provider.loadMore,
                                         child: Text(
                                           provider.loadMoreError!,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: AppColors.textHint,
                                           ),
                                         ),
@@ -233,7 +233,7 @@ class _EmptyFeed extends StatelessWidget {
               const SizedBox(height: 18),
               Text(
                 l10n.familyFeedEmptyTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: AppColors.ink,
@@ -243,7 +243,7 @@ class _EmptyFeed extends StatelessWidget {
               Text(
                 l10n.familyFeedEmptyDesc,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: AppColors.inkFaded,
                   height: 1.5,

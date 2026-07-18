@@ -165,10 +165,10 @@ class _LocationDebugScreenState extends State<LocationDebugScreen> {
         children: [
           _StatusCard(provider: provider),
           if (_lastCoords != null) ...[
-            const Divider(height: 1, color: AppColors.divider),
+            Divider(height: 1, color: AppColors.divider),
             _CoordsCard(position: _lastCoords!),
           ],
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: AppColors.divider),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Wrap(
@@ -248,7 +248,7 @@ class _LocationDebugScreenState extends State<LocationDebugScreen> {
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: AppColors.divider),
           Expanded(child: _LogView(entries: provider.debugLog)),
         ],
       ),
@@ -280,7 +280,7 @@ class _CoordsCard extends StatelessWidget {
             child: Text(
               '$coords  (±${position.accuracy.toStringAsFixed(0)}m, '
               '${position.timestamp.toLocal()})',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'monospace',
                 color: AppColors.textPrimary,
@@ -327,7 +327,7 @@ class _StatusCard extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '${e.key}: ',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -335,7 +335,7 @@ class _StatusCard extends StatelessWidget {
                     ),
                     TextSpan(
                       text: e.value,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'monospace',
                         color: AppColors.textPrimary,
@@ -383,7 +383,7 @@ class _LogView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No log entries yet — run something above, or wait for the\n'
           'background sampling loop to tick.',
@@ -408,7 +408,7 @@ class _LogView extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '${_fmtTime(e.time)}  ',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontFamily: 'monospace',
                     color: AppColors.textHint,

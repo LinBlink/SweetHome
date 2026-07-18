@@ -88,9 +88,6 @@ class AppLocalizationsMy extends AppLocalizations {
   String get registerJoinFamilyTab => 'မိသားစုတွင်ဝင်ရောက်ရန်';
 
   @override
-  String get registerRequestJoinTab => 'ဖိတ်ခေါ်ကုဒ်တောင်းရန်';
-
-  @override
   String get registerFamilyNameLabel => 'မိသားစုအမည်';
 
   @override
@@ -146,59 +143,6 @@ class AppLocalizationsMy extends AppLocalizations {
   String get registerSubmitJoin => 'စာရင်းသွင်း၍ မိသားစုဝင်ရောက်ရန်';
 
   @override
-  String get requestJoinTargetPhoneLabel => 'သင်သိသော မိသားစုဝင်၏ ဖုန်းနံပါတ်';
-
-  @override
-  String get requestJoinTargetPhoneRequired => 'အခြားသူ၏ ဖုန်းနံပါတ်ထည့်ပါ';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* ဖိတ်ခေါ်ကုဒ် မလိုအပ်ပါ — ထိုမိသားစုထဲရှိပြီးသားသူတစ်ဦး၏ ဖုန်းနံပါတ်ကိုသာ ထည့်ပါ။ ထိုမိသားစု၏ အုပ်ချုပ်သူက သင့်လျှောက်လွှာကို စစ်ဆေးပါမည်';
-
-  @override
-  String get requestJoinMessageLabel =>
-      'အုပ်ချုပ်သူထံ စာတိုပေးရန် (ရွေးချယ်ခွင့်)';
-
-  @override
-  String get requestJoinSubmit => 'လျှောက်လွှာတင်ရန်';
-
-  @override
-  String get requestJoinSubmittedTitle => 'လျှောက်လွှာတင်ပြီးပါပြီ';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      'သင့်လျှောက်လွှာကို မိသားစုအုပ်ချုပ်သူထံ ပေးပို့ပြီးပါပြီ။ အတည်ပြုပြီးပါက ယခုထည့်သွင်းခဲ့သော ဖုန်းနံပါတ်နှင့် စကားဝှက်ဖြင့် လော့ဂ်အင်ဝင်ပါ';
-
-  @override
-  String get joinRequestsTitle => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
-
-  @override
-  String get joinRequestsEmpty => 'စောင့်ဆိုင်းနေသော လျှောက်လွှာမရှိပါ';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '$targetName ၏ $relation ဖြစ်လိုသည်';
-  }
-
-  @override
-  String get relationNounChild => 'သားသမီး';
-
-  @override
-  String get relationNounParent => 'မိဘ';
-
-  @override
-  String get relationNounSpouse => 'အိမ်ထောင်ဖက်';
-
-  @override
-  String get relationNounSibling => 'မောင်နှမ';
-
-  @override
-  String get joinRequestsApprove => 'အတည်ပြုရန်';
-
-  @override
-  String get joinRequestsReject => 'ပယ်ချရန်';
-
-  @override
   String get phoneLabel => 'ဖုန်းနံပါတ်';
 
   @override
@@ -231,25 +175,6 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get myHomeLocationDesc =>
       'မိသားစုဝင်တစ်ဦးစီ၏ လက်ရှိတည်နေရာကို ကြည့်ရှုပါ';
-
-  @override
-  String get myHomeJoinRequestsEntry => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
-
-  @override
-  String get myHomeJoinRequestsDesc =>
-      'မိသားစုသို့ ဝင်ရောက်ရန် လျှောက်လွှာများကို စစ်ဆေးပြီး အတည်ပြုရန်';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count စောင် စောင့်ဆိုင်းနေသည်',
-      one: '၁ စောင် စောင့်ဆိုင်းနေသည်',
-      zero: 'စောင့်ဆိုင်းနေသော လျှောက်လွှာမရှိပါ',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => 'မိသားစု Feed';
@@ -396,64 +321,6 @@ class AppLocalizationsMy extends AppLocalizations {
   String get locationRefresh => 'ပြန်လည်စတင်ရန်';
 
   @override
-  String get joinRequestsAdminTitle => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
-
-  @override
-  String get joinRequestsAdminEmpty =>
-      'လောလောနယ်တွင် စောင့်ဆိုင်းနေသော လျှောက်လွှာမရှိပါ။';
-
-  @override
-  String get joinRequestsAdminReject => 'ပယ်ချရန်';
-
-  @override
-  String get joinRequestsAdminApprove => 'အတည်ပြုရန်';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '$targetName ၏ $relation ဖြစ်လိုသည်';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return 'မက်ဆေ့ချ်: $message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => 'ဤလျှောက်လွှာကို ပယ်မည်လား?';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason =>
-      'အကြောင်းအရင်း (ရွေးချယ်ခွင့်)';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => 'ပယ်ချရန်';
-
-  @override
-  String get joinRequestsAdminRejectCancel => 'မလုပ်တော့ပါ';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => 'လျှောက်လွှာကို ပယ်ချလိုက်သည်';
-
-  @override
-  String get joinRequestsAdminApproveSuccess =>
-      'လျှောက်လွှာကို အတည်ပြုလိုက်သည်';
-
-  @override
-  String get joinRequestsAdminError => 'လုပ်ဆောင်မှု မအောင်မြင်ပါ';
-
-  @override
-  String get requestJoinModeByCode => 'ဖိတ်ကုဒ် ရှိသည်';
-
-  @override
-  String get requestJoinModeByPhone => 'မိသားစုဝင်တစ်ယောက်၏ ဖုန်းနံပါတ် သိသည်';
-
-  @override
-  String get requestJoinNoFamilySubmit => 'လျှောက်လွှာ ပို့ရန်';
-
-  @override
-  String get requestJoinByCodeHint => 'ဖိတ်ကုဒ် ရှိပါက ဤနေရာတွင် အသုံးပြုပါ။';
-
-  @override
   String get conversationsSearchTooltip => 'ရှာဖွေရန်';
 
   @override
@@ -465,6 +332,9 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get conversationsEmptySubtitle =>
       'မိသားစုဝင်များကို ဖိတ်ခေါ်၍ စတင်စကားပြောပါ';
+
+  @override
+  String get conversationSpouseLabel => 'အိမ်ထောင်ဖက်';
 
   @override
   String get connectionErrorRetry => 'ထပ်စမ်းရန်';
@@ -952,12 +822,6 @@ class AppLocalizationsMy extends AppLocalizations {
       'မိသားစုဝင်များ၏ ဖင်း ဝင်/ထွက် မှတ်တမ်းများ';
 
   @override
-  String get profileJoinRequestsRow => 'ဝင်ရောက်ရန် လျှောက်လွှာများ';
-
-  @override
-  String get profileJoinRequestsAdminOnly => 'အုပ်ချုပ်သူများသာ';
-
-  @override
   String get familyFeedEmptyTitle => 'မပို့ရသေးပါ';
 
   @override
@@ -1000,6 +864,16 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return 'နောက်ထပ် $count ယောက်';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return 'မှတ်ချက် $count ခု';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -1116,10 +990,16 @@ class AppLocalizationsMy extends AppLocalizations {
   String get momentDetailVideoLoadFailed => 'ဗီဒီယို မဆွဲနိုင်ပါ';
 
   @override
+  String get momentDetailAudioLoadFailed => 'အသံ မဆွဲနိုင်ပါ';
+
+  @override
   String get momentDetailAudioPlay => 'ဖွင့်မည်';
 
   @override
   String get momentDetailAudioPause => 'ခဏရပ်မည်';
+
+  @override
+  String get momentDetailLikeKing => 'Like ဘုရင်';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -1169,6 +1049,27 @@ class AppLocalizationsMy extends AppLocalizations {
   String get profileThemeSheetTitle => 'အပြင်အဆင် ရွေးပါ';
 
   @override
+  String get profileAppearanceRow => 'မျက်နှာပြင်ပုံစံ';
+
+  @override
+  String get profileAppearanceSheetTitle => 'မျက်နှာပြင်ပုံစံ ရွေးပါ';
+
+  @override
+  String get profileThemeModeSection => 'မျက်နှာပြင်ပုံစံ';
+
+  @override
+  String get profileThemeModeSystem => 'စက်၏ဆက်တင်အတိုင်း';
+
+  @override
+  String get profileThemeModeLight => 'အလင်းရောင်';
+
+  @override
+  String get profileThemeModeDark => 'အမှောင်ချယ်';
+
+  @override
+  String get profileThemeColorSection => 'အရောင်';
+
+  @override
   String get momentCommentSectionTitle => 'မှတ်ချက်များ';
 
   @override
@@ -1195,13 +1096,6 @@ class AppLocalizationsMy extends AppLocalizations {
       'မက်ဆေ့ချ် အရမ်းရှည်နေပါသည် (အများဆုံး ၂၀၀၀ စာလုံး)';
 
   @override
-  String get profileClearLocalChatRow => 'စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်မည်';
-
-  @override
-  String get profileClearLocalChatSubtitle =>
-      'ဤစက်ထဲ သိမ်းထားသော မက်ဆေ့ချ်များကိုသာ ဖျက်ပါမည်';
-
-  @override
   String get profileClearLocalChatConfirmTitle =>
       'စက်တွင်းစကားပြောမှတ်တမ်းကို ဖျက်မလား?';
 
@@ -1212,4 +1106,89 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get profileClearLocalChatSuccess =>
       'စက်တွင်းစကားပြောမှတ်တမ်း ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get profileStorageRow => 'သိုလှောင်မှုနှင့် Cache';
+
+  @override
+  String get profileStorageSubtitle =>
+      'စက်တွင်းသိမ်းထားသော Cache ပမာဏကြည့်ပြီး ဖျက်ပါ';
+
+  @override
+  String get profileExportChatRow => 'စကားပြောမှတ်တမ်း ထုတ်ယူရန်';
+
+  @override
+  String get profileExportChatSubtitle =>
+      'စက်တွင်းရှိ မက်ဆေ့ချ်များကို စာသားဖိုင်အဖြစ် သိမ်းဆည်းပါ';
+
+  @override
+  String get chatExportTitle => 'စကားပြောမှတ်တမ်း ထုတ်ယူရန်';
+
+  @override
+  String get chatExportEmpty => 'ထုတ်ယူရန် စက်တွင်းစကားပြောမှတ်တမ်း မရှိသေးပါ';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return 'စကားဝိုင်း $conversations ခု၊ မက်ဆေ့ချ် $messages စောင်';
+  }
+
+  @override
+  String get chatExportCopy => 'အားလုံး ကူးယူရန်';
+
+  @override
+  String get chatExportCopied => 'ကလစ်ဘုတ်သို့ ကူးယူပြီးပါပြီ';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return 'သိမ်းဆည်းရာနေရာ：$path';
+  }
+
+  @override
+  String get storageScreenTitle => 'သိုလှောင်မှုနှင့် Cache';
+
+  @override
+  String storageTotalLabel(String size) {
+    return 'စုစုပေါင်း $size';
+  }
+
+  @override
+  String get storageImageCache => 'ဓာတ်ပုံ Cache';
+
+  @override
+  String get storageVideoCache => 'ဗီဒီယို Cache';
+
+  @override
+  String get storageAudioCache => 'အသံ Cache';
+
+  @override
+  String get storageChatHistory => 'စကားပြောမှတ်တမ်း';
+
+  @override
+  String get storageSizeUnknown => 'မသိ';
+
+  @override
+  String get storageClear => 'ဖျက်ရန်';
+
+  @override
+  String get storageClearAll => 'Cache အားလုံး ဖျက်ရန်';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '$category ကို ဖျက်မလား?';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody =>
+      'သိမ်းထားသော ဖိုင်များ ဖျက်ပြီး လိုအပ်ပါက ထပ်မံဒေါင်းလုဒ်လုပ်ပါမည်။';
+
+  @override
+  String get storageClearAllConfirmTitle =>
+      'စက်တွင်းရှိ Cache အားလုံးကို ဖျက်မလား?';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      'ဓာတ်ပုံ၊ ဗီဒီယို၊ အသံ Cache များနှင့် စက်တွင်းသိမ်းထားသော စကားပြောမှတ်တမ်းကို ဖျက်ပါမည်။ မီဒီယာများကို လိုအပ်ပါက ထပ်မံဒေါင်းလုဒ်လုပ်ပြီး၊ စကားပြောမှတ်တမ်းကို ဆာဗာမှ ပြန်လည်ရယူနိုင်ပါသည်။';
+
+  @override
+  String get storageClearSuccess => 'Cache ကို ဖျက်ပြီးပါပြီ';
 }

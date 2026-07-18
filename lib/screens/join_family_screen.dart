@@ -29,9 +29,9 @@ class _JoinFamilyScreenState extends State<JoinFamilyScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(l10n.joinFamilyTitle, style: const TextStyle(color: AppColors.textPrimary)),
+        title: Text(l10n.joinFamilyTitle, style: TextStyle(color: AppColors.textPrimary)),
         content: Text(l10n.joinFamilyConfirmMessage,
-            style: const TextStyle(color: AppColors.textSecondary)),
+            style: TextStyle(color: AppColors.textSecondary)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           TextButton(

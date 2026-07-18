@@ -262,12 +262,6 @@ abstract class AppLocalizations {
   /// **'Join a Family'**
   String get registerJoinFamilyTab;
 
-  /// No description provided for @registerRequestJoinTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Request to Join'**
-  String get registerRequestJoinTab;
-
   /// No description provided for @registerFamilyNameLabel.
   ///
   /// In en, this message translates to:
@@ -370,102 +364,6 @@ abstract class AppLocalizations {
   /// **'Register & Join Family'**
   String get registerSubmitJoin;
 
-  /// No description provided for @requestJoinTargetPhoneLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Phone number of a family member you know'**
-  String get requestJoinTargetPhoneLabel;
-
-  /// No description provided for @requestJoinTargetPhoneRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter their phone number'**
-  String get requestJoinTargetPhoneRequired;
-
-  /// No description provided for @requestJoinTargetPhoneHint.
-  ///
-  /// In en, this message translates to:
-  /// **'* No invite code needed — just the phone number of someone already in that family. Their family admin will review your request.'**
-  String get requestJoinTargetPhoneHint;
-
-  /// No description provided for @requestJoinMessageLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Message to the admin (optional)'**
-  String get requestJoinMessageLabel;
-
-  /// No description provided for @requestJoinSubmit.
-  ///
-  /// In en, this message translates to:
-  /// **'Submit Request'**
-  String get requestJoinSubmit;
-
-  /// No description provided for @requestJoinSubmittedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Request Submitted'**
-  String get requestJoinSubmittedTitle;
-
-  /// No description provided for @requestJoinSubmittedMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Your request has been sent to the family admin for review. Once approved, log in with the phone number and password you just entered.'**
-  String get requestJoinSubmittedMessage;
-
-  /// No description provided for @joinRequestsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Requests'**
-  String get joinRequestsTitle;
-
-  /// No description provided for @joinRequestsEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No pending requests'**
-  String get joinRequestsEmpty;
-
-  /// No description provided for @joinRequestsRelationLine.
-  ///
-  /// In en, this message translates to:
-  /// **'Wants to be {targetName}\'s {relation}'**
-  String joinRequestsRelationLine(String relation, String targetName);
-
-  /// No description provided for @relationNounChild.
-  ///
-  /// In en, this message translates to:
-  /// **'child'**
-  String get relationNounChild;
-
-  /// No description provided for @relationNounParent.
-  ///
-  /// In en, this message translates to:
-  /// **'parent'**
-  String get relationNounParent;
-
-  /// No description provided for @relationNounSpouse.
-  ///
-  /// In en, this message translates to:
-  /// **'spouse'**
-  String get relationNounSpouse;
-
-  /// No description provided for @relationNounSibling.
-  ///
-  /// In en, this message translates to:
-  /// **'sibling'**
-  String get relationNounSibling;
-
-  /// No description provided for @joinRequestsApprove.
-  ///
-  /// In en, this message translates to:
-  /// **'Approve'**
-  String get joinRequestsApprove;
-
-  /// No description provided for @joinRequestsReject.
-  ///
-  /// In en, this message translates to:
-  /// **'Reject'**
-  String get joinRequestsReject;
-
   /// No description provided for @phoneLabel.
   ///
   /// In en, this message translates to:
@@ -531,24 +429,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See where each family member is right now'**
   String get myHomeLocationDesc;
-
-  /// No description provided for @myHomeJoinRequestsEntry.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Requests'**
-  String get myHomeJoinRequestsEntry;
-
-  /// No description provided for @myHomeJoinRequestsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Review and approve requests to join this family'**
-  String get myHomeJoinRequestsDesc;
-
-  /// No description provided for @myHomeJoinRequestsBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{No pending} =1{1 pending} other{{count} pending}}'**
-  String myHomeJoinRequestsBadge(int count);
 
   /// No description provided for @familyFeedTitle.
   ///
@@ -796,108 +676,6 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get locationRefresh;
 
-  /// No description provided for @joinRequestsAdminTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Requests'**
-  String get joinRequestsAdminTitle;
-
-  /// No description provided for @joinRequestsAdminEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No pending requests right now.'**
-  String get joinRequestsAdminEmpty;
-
-  /// No description provided for @joinRequestsAdminReject.
-  ///
-  /// In en, this message translates to:
-  /// **'Reject'**
-  String get joinRequestsAdminReject;
-
-  /// No description provided for @joinRequestsAdminApprove.
-  ///
-  /// In en, this message translates to:
-  /// **'Approve'**
-  String get joinRequestsAdminApprove;
-
-  /// No description provided for @joinRequestsAdminRelationLine.
-  ///
-  /// In en, this message translates to:
-  /// **'Wants to be {relation} of {targetName}'**
-  String joinRequestsAdminRelationLine(String relation, String targetName);
-
-  /// No description provided for @joinRequestsAdminMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Message: {message}'**
-  String joinRequestsAdminMessage(String message);
-
-  /// No description provided for @joinRequestsAdminRejectDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reject this request?'**
-  String get joinRequestsAdminRejectDialogTitle;
-
-  /// No description provided for @joinRequestsAdminRejectDialogReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Reason (optional)'**
-  String get joinRequestsAdminRejectDialogReason;
-
-  /// No description provided for @joinRequestsAdminRejectSubmit.
-  ///
-  /// In en, this message translates to:
-  /// **'Reject'**
-  String get joinRequestsAdminRejectSubmit;
-
-  /// No description provided for @joinRequestsAdminRejectCancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get joinRequestsAdminRejectCancel;
-
-  /// No description provided for @joinRequestsAdminRejectSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Request rejected'**
-  String get joinRequestsAdminRejectSuccess;
-
-  /// No description provided for @joinRequestsAdminApproveSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Request approved'**
-  String get joinRequestsAdminApproveSuccess;
-
-  /// No description provided for @joinRequestsAdminError.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not complete the action'**
-  String get joinRequestsAdminError;
-
-  /// No description provided for @requestJoinModeByCode.
-  ///
-  /// In en, this message translates to:
-  /// **'Have an invite code'**
-  String get requestJoinModeByCode;
-
-  /// No description provided for @requestJoinModeByPhone.
-  ///
-  /// In en, this message translates to:
-  /// **'Know a member\'s phone'**
-  String get requestJoinModeByPhone;
-
-  /// No description provided for @requestJoinNoFamilySubmit.
-  ///
-  /// In en, this message translates to:
-  /// **'Send request'**
-  String get requestJoinNoFamilySubmit;
-
-  /// No description provided for @requestJoinByCodeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Use the family\'s invite code if you have one.'**
-  String get requestJoinByCodeHint;
-
   /// No description provided for @conversationsSearchTooltip.
   ///
   /// In en, this message translates to:
@@ -921,6 +699,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invite family members to start chatting'**
   String get conversationsEmptySubtitle;
+
+  /// No description provided for @conversationSpouseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spouse'**
+  String get conversationSpouseLabel;
 
   /// No description provided for @connectionErrorRetry.
   ///
@@ -1804,18 +1588,6 @@ abstract class AppLocalizations {
   /// **'History of when family entered or left a fence'**
   String get locationHubFenceAlarmsDesc;
 
-  /// No description provided for @profileJoinRequestsRow.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Requests'**
-  String get profileJoinRequestsRow;
-
-  /// No description provided for @profileJoinRequestsAdminOnly.
-  ///
-  /// In en, this message translates to:
-  /// **'Admin only'**
-  String get profileJoinRequestsAdminOnly;
-
   /// No description provided for @familyFeedEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -1881,6 +1653,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} more'**
   String familyFeedMoreLikers(Object count);
+
+  /// No description provided for @momentCardCommentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 comment} other{{count} comments}}'**
+  String momentCardCommentCount(int count);
+
+  /// No description provided for @momentCardLatestComment.
+  ///
+  /// In en, this message translates to:
+  /// **'{content}'**
+  String momentCardLatestComment(String content);
 
   /// No description provided for @momentDetailLikedTimes.
   ///
@@ -2092,6 +1876,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load video'**
   String get momentDetailVideoLoadFailed;
 
+  /// No description provided for @momentDetailAudioLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load audio'**
+  String get momentDetailAudioLoadFailed;
+
   /// No description provided for @momentDetailAudioPlay.
   ///
   /// In en, this message translates to:
@@ -2103,6 +1893,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pause'**
   String get momentDetailAudioPause;
+
+  /// Badge shown next to the top name in the like list when they've liked the moment more than 10 times and beat the second-place liker by at least 50%.
+  ///
+  /// In en, this message translates to:
+  /// **'Like King'**
+  String get momentDetailLikeKing;
 
   /// No description provided for @publishMomentRecordingInProgress.
   ///
@@ -2176,6 +1972,48 @@ abstract class AppLocalizations {
   /// **'Pick a theme'**
   String get profileThemeSheetTitle;
 
+  /// No description provided for @profileAppearanceRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileAppearanceRow;
+
+  /// No description provided for @profileAppearanceSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose appearance'**
+  String get profileAppearanceSheetTitle;
+
+  /// No description provided for @profileThemeModeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileThemeModeSection;
+
+  /// No description provided for @profileThemeModeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow system'**
+  String get profileThemeModeSystem;
+
+  /// No description provided for @profileThemeModeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get profileThemeModeLight;
+
+  /// No description provided for @profileThemeModeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get profileThemeModeDark;
+
+  /// No description provided for @profileThemeColorSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get profileThemeColorSection;
+
   /// No description provided for @momentCommentSectionTitle.
   ///
   /// In en, this message translates to:
@@ -2224,18 +2062,6 @@ abstract class AppLocalizations {
   /// **'Message is too long (max 2000 characters).'**
   String get chatMessageTooLong;
 
-  /// No description provided for @profileClearLocalChatRow.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear Local Chat History'**
-  String get profileClearLocalChatRow;
-
-  /// No description provided for @profileClearLocalChatSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Only removes messages cached on this device'**
-  String get profileClearLocalChatSubtitle;
-
   /// No description provided for @profileClearLocalChatConfirmTitle.
   ///
   /// In en, this message translates to:
@@ -2253,6 +2079,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Local chat history cleared'**
   String get profileClearLocalChatSuccess;
+
+  /// No description provided for @profileStorageRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage & Cache'**
+  String get profileStorageRow;
+
+  /// No description provided for @profileStorageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See what\'s cached locally and clear it'**
+  String get profileStorageSubtitle;
+
+  /// No description provided for @profileExportChatRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Chat History'**
+  String get profileExportChatRow;
+
+  /// No description provided for @profileExportChatSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your local messages as a text file'**
+  String get profileExportChatSubtitle;
+
+  /// No description provided for @chatExportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Chat History'**
+  String get chatExportTitle;
+
+  /// No description provided for @chatExportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No local chat history to export yet'**
+  String get chatExportEmpty;
+
+  /// No description provided for @chatExportSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{conversations} conversations, {messages} messages'**
+  String chatExportSummary(int conversations, int messages);
+
+  /// No description provided for @chatExportCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy all'**
+  String get chatExportCopy;
+
+  /// No description provided for @chatExportCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get chatExportCopied;
+
+  /// No description provided for @chatExportSavedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to: {path}'**
+  String chatExportSavedTo(String path);
+
+  /// No description provided for @storageScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage & Cache'**
+  String get storageScreenTitle;
+
+  /// No description provided for @storageTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} total'**
+  String storageTotalLabel(String size);
+
+  /// No description provided for @storageImageCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo cache'**
+  String get storageImageCache;
+
+  /// No description provided for @storageVideoCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Video cache'**
+  String get storageVideoCache;
+
+  /// No description provided for @storageAudioCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio cache'**
+  String get storageAudioCache;
+
+  /// No description provided for @storageChatHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history'**
+  String get storageChatHistory;
+
+  /// No description provided for @storageSizeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get storageSizeUnknown;
+
+  /// No description provided for @storageClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get storageClear;
+
+  /// No description provided for @storageClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all cache'**
+  String get storageClearAll;
+
+  /// No description provided for @storageClearMediaConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear {category}?'**
+  String storageClearMediaConfirmTitle(String category);
+
+  /// No description provided for @storageClearMediaConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cached files will be removed and re-downloaded the next time they\'re needed.'**
+  String get storageClearMediaConfirmBody;
+
+  /// No description provided for @storageClearAllConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all local cache?'**
+  String get storageClearAllConfirmTitle;
+
+  /// No description provided for @storageClearAllConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears the photo, video, and audio caches plus locally cached chat history. Media re-downloads on demand; chat history reloads from the server.'**
+  String get storageClearAllConfirmBody;
+
+  /// No description provided for @storageClearSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache cleared'**
+  String get storageClearSuccess;
 }
 
 class _AppLocalizationsDelegate

@@ -93,7 +93,7 @@ class _EmojiPickerState extends State<EmojiPicker> {
     ];
     return Container(
       height: widget.height,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.divider)),
       ),
@@ -164,7 +164,7 @@ class _CategoryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.linen,
         border: Border(top: BorderSide(color: AppColors.divider)),
       ),

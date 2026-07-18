@@ -229,7 +229,7 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
               _StatsStrip(data: data, l10n: l10n),
               _ProviderBanner(),
-              const Divider(height: 1, color: AppColors.divider),
+              Divider(height: 1, color: AppColors.divider),
               Expanded(
                 child: members.isEmpty
                     ? _EmptyState(l10n: l10n, total: data.totalMemberCount)
@@ -354,11 +354,11 @@ class _MemberMarker extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(color: color, width: 1),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 2,
-                  offset: Offset(0, 1),
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
@@ -379,11 +379,11 @@ class _MemberMarker extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: AppColors.shadow,
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -410,7 +410,7 @@ class _OsmAttribution extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       color: Colors.white70,
-      child: const Text(
+      child: Text(
         '© OpenStreetMap contributors',
         style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
       ),
@@ -431,7 +431,7 @@ class _StatsStrip extends StatelessWidget {
       color: AppColors.surface,
       child: Row(
         children: [
-          const Icon(Icons.people, size: 16, color: AppColors.textSecondary),
+          Icon(Icons.people, size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
@@ -439,7 +439,7 @@ class _StatsStrip extends StatelessWidget {
                 data.onlineMemberCount,
                 data.totalMemberCount,
               ),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -447,7 +447,7 @@ class _StatsStrip extends StatelessWidget {
           ),
           Text(
             l10n.locationTotalMembers(data.totalMemberCount),
-            style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+            style: TextStyle(fontSize: 12, color: AppColors.textHint),
           ),
         ],
       ),
@@ -556,7 +556,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               l10n.locationNoData,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
@@ -566,13 +566,13 @@ class _EmptyState extends StatelessWidget {
             Text(
               l10n.locationNoDataDesc,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+              style: TextStyle(fontSize: 12, color: AppColors.textHint),
             ),
             if (total > 0) ...[
               const SizedBox(height: 8),
               Text(
                 l10n.locationTotalMembers(total),
-                style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+                style: TextStyle(fontSize: 11, color: AppColors.textHint),
               ),
             ],
           ],
@@ -613,7 +613,7 @@ class _AddressLine extends StatelessWidget {
             snap.data!,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
             ),
@@ -622,7 +622,7 @@ class _AddressLine extends StatelessWidget {
         if (snap.connectionState == ConnectionState.waiting) {
           return Row(
             children: [
-              const SizedBox(
+              SizedBox(
                 width: 10,
                 height: 10,
                 child: CircularProgressIndicator(
@@ -633,14 +633,14 @@ class _AddressLine extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 l10n.locationResolving,
-                style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+                style: TextStyle(fontSize: 12, color: AppColors.textHint),
               ),
             ],
           );
         }
         return Text(
           l10n.locationAddressUnavailable,
-          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+          style: TextStyle(fontSize: 12, color: AppColors.textHint),
         );
       },
     );
@@ -686,7 +686,7 @@ class _MemberTile extends StatelessWidget {
                     Expanded(
                       child: Text(
                         member.username,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -737,7 +737,7 @@ class _MemberTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.battery_full,
                       size: 12,
                       color: AppColors.textHint,
@@ -745,13 +745,13 @@ class _MemberTile extends StatelessWidget {
                     const SizedBox(width: 3),
                     Text(
                       _batteryLabel(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textHint,
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Icon(
+                    Icon(
                       Icons.access_time,
                       size: 12,
                       color: AppColors.textHint,
@@ -759,7 +759,7 @@ class _MemberTile extends StatelessWidget {
                     const SizedBox(width: 3),
                     Text(
                       _timeLabel(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textHint,
                       ),
@@ -836,7 +836,7 @@ class _ShareToggle extends StatelessWidget {
                   isRunning
                       ? l10n.locationShareOnTitle
                       : l10n.locationShareOffTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -944,7 +944,7 @@ class _LastReportedLine extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '(#${provider.attemptCount})',
-            style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+            style: TextStyle(fontSize: 11, color: AppColors.textHint),
           ),
         ],
       ],

@@ -141,7 +141,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       const SizedBox(height: 14),
                       Text(
                         l10n.contactsEmpty,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppColors.inkFaded,
                         ),
@@ -236,7 +236,7 @@ class _ContactTile extends StatelessWidget {
                   children: [
                     Text(
                       member.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.ink,
@@ -246,7 +246,7 @@ class _ContactTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         relation,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textHint,
                         ),

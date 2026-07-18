@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 22),
         Text(
           l10n.brandName,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
             color: AppColors.ink,
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 8),
         Text(
           l10n.appTagline,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             color: AppColors.inkFaded,
             letterSpacing: 0.6,
@@ -146,10 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _passwordCtrl,
                 obscureText: _obscurePassword,
-                style: const TextStyle(color: AppColors.ink),
+                style: TextStyle(color: AppColors.ink),
                 decoration: InputDecoration(
                   labelText: l10n.commonPasswordLabel,
-                  labelStyle: const TextStyle(color: AppColors.inkFaded),
+                  labelStyle: TextStyle(color: AppColors.inkFaded),
                   prefixIcon: Icon(
                     Icons.lock_outline,
                     color: AppColors.primary,
@@ -202,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           l10n.loginNoAccount,
-          style: const TextStyle(color: AppColors.inkFaded),
+          style: TextStyle(color: AppColors.inkFaded),
         ),
         HomeGhostButton(
           label: l10n.loginRegisterNow,

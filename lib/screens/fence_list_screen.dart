@@ -65,7 +65,7 @@ class _FenceListScreenState extends State<FenceListScreen> {
         backgroundColor: AppColors.surface,
         title: Text(
           l10n.fenceDeleteConfirm,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
         ),
         actions: [
           TextButton(
@@ -164,7 +164,7 @@ class _FenceListScreenState extends State<FenceListScreen> {
                         const SizedBox(height: 12),
                         Text(
                           l10n.fenceListEmpty,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -174,7 +174,7 @@ class _FenceListScreenState extends State<FenceListScreen> {
                         Text(
                           l10n.fenceListEmptyDesc,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textHint,
                           ),
@@ -265,7 +265,7 @@ class _FenceGroupSection extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -313,7 +313,7 @@ class _FenceGroupSection extends StatelessWidget {
                 Expanded(
                   child: Text(
                     emptyHint,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textHint,
                     ),
@@ -370,7 +370,7 @@ class _FenceCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     fence.name ?? l10n.fenceListTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -393,7 +393,7 @@ class _FenceCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.fenceRadiusLabel(fence.fenceRange.round()),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
@@ -468,12 +468,12 @@ class _FenceCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.access_time,
+                        Icon(Icons.access_time,
                             size: 12, color: AppColors.textHint),
                         const SizedBox(width: 4),
                         Text(
                           l10n.fenceCreatedAt(createdStr),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textHint,
                           ),
@@ -511,7 +511,7 @@ class _MemberLine extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+            style: TextStyle(fontSize: 12, color: AppColors.textHint),
           ),
           const SizedBox(width: 6),
           AvatarWidget(
@@ -524,7 +524,7 @@ class _MemberLine extends StatelessWidget {
           Flexible(
             child: Text(
               member.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColors.textPrimary,
               ),

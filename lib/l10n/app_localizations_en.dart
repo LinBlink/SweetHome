@@ -88,9 +88,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerJoinFamilyTab => 'Join a Family';
 
   @override
-  String get registerRequestJoinTab => 'Request to Join';
-
-  @override
   String get registerFamilyNameLabel => 'Family name (e.g. The Wangs)';
 
   @override
@@ -146,60 +143,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerSubmitJoin => 'Register & Join Family';
 
   @override
-  String get requestJoinTargetPhoneLabel =>
-      'Phone number of a family member you know';
-
-  @override
-  String get requestJoinTargetPhoneRequired =>
-      'Please enter their phone number';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* No invite code needed — just the phone number of someone already in that family. Their family admin will review your request.';
-
-  @override
-  String get requestJoinMessageLabel => 'Message to the admin (optional)';
-
-  @override
-  String get requestJoinSubmit => 'Submit Request';
-
-  @override
-  String get requestJoinSubmittedTitle => 'Request Submitted';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      'Your request has been sent to the family admin for review. Once approved, log in with the phone number and password you just entered.';
-
-  @override
-  String get joinRequestsTitle => 'Join Requests';
-
-  @override
-  String get joinRequestsEmpty => 'No pending requests';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return 'Wants to be $targetName\'s $relation';
-  }
-
-  @override
-  String get relationNounChild => 'child';
-
-  @override
-  String get relationNounParent => 'parent';
-
-  @override
-  String get relationNounSpouse => 'spouse';
-
-  @override
-  String get relationNounSibling => 'sibling';
-
-  @override
-  String get joinRequestsApprove => 'Approve';
-
-  @override
-  String get joinRequestsReject => 'Reject';
-
-  @override
   String get phoneLabel => 'Phone number';
 
   @override
@@ -231,25 +174,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myHomeLocationDesc => 'See where each family member is right now';
-
-  @override
-  String get myHomeJoinRequestsEntry => 'Join Requests';
-
-  @override
-  String get myHomeJoinRequestsDesc =>
-      'Review and approve requests to join this family';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count pending',
-      one: '1 pending',
-      zero: 'No pending',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => 'Family Feed';
@@ -396,62 +320,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationRefresh => 'Refresh';
 
   @override
-  String get joinRequestsAdminTitle => 'Join Requests';
-
-  @override
-  String get joinRequestsAdminEmpty => 'No pending requests right now.';
-
-  @override
-  String get joinRequestsAdminReject => 'Reject';
-
-  @override
-  String get joinRequestsAdminApprove => 'Approve';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return 'Wants to be $relation of $targetName';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return 'Message: $message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => 'Reject this request?';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => 'Reason (optional)';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => 'Reject';
-
-  @override
-  String get joinRequestsAdminRejectCancel => 'Cancel';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => 'Request rejected';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => 'Request approved';
-
-  @override
-  String get joinRequestsAdminError => 'Could not complete the action';
-
-  @override
-  String get requestJoinModeByCode => 'Have an invite code';
-
-  @override
-  String get requestJoinModeByPhone => 'Know a member\'s phone';
-
-  @override
-  String get requestJoinNoFamilySubmit => 'Send request';
-
-  @override
-  String get requestJoinByCodeHint =>
-      'Use the family\'s invite code if you have one.';
-
-  @override
   String get conversationsSearchTooltip => 'Search';
 
   @override
@@ -463,6 +331,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get conversationsEmptySubtitle =>
       'Invite family members to start chatting';
+
+  @override
+  String get conversationSpouseLabel => 'Spouse';
 
   @override
   String get connectionErrorRetry => 'Retry';
@@ -950,12 +821,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'History of when family entered or left a fence';
 
   @override
-  String get profileJoinRequestsRow => 'Join Requests';
-
-  @override
-  String get profileJoinRequestsAdminOnly => 'Admin only';
-
-  @override
   String get familyFeedEmptyTitle => 'No moments yet';
 
   @override
@@ -998,6 +863,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return '$count more';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -1113,10 +994,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get momentDetailVideoLoadFailed => 'Couldn\'t load video';
 
   @override
+  String get momentDetailAudioLoadFailed => 'Couldn\'t load audio';
+
+  @override
   String get momentDetailAudioPlay => 'Play';
 
   @override
   String get momentDetailAudioPause => 'Pause';
+
+  @override
+  String get momentDetailLikeKing => 'Like King';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -1166,6 +1053,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileThemeSheetTitle => 'Pick a theme';
 
   @override
+  String get profileAppearanceRow => 'Appearance';
+
+  @override
+  String get profileAppearanceSheetTitle => 'Choose appearance';
+
+  @override
+  String get profileThemeModeSection => 'Appearance';
+
+  @override
+  String get profileThemeModeSystem => 'Follow system';
+
+  @override
+  String get profileThemeModeLight => 'Light';
+
+  @override
+  String get profileThemeModeDark => 'Dark';
+
+  @override
+  String get profileThemeColorSection => 'Color';
+
+  @override
   String get momentCommentSectionTitle => 'Comments';
 
   @override
@@ -1192,13 +1100,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatMessageTooLong => 'Message is too long (max 2000 characters).';
 
   @override
-  String get profileClearLocalChatRow => 'Clear Local Chat History';
-
-  @override
-  String get profileClearLocalChatSubtitle =>
-      'Only removes messages cached on this device';
-
-  @override
   String get profileClearLocalChatConfirmTitle => 'Clear local chat history?';
 
   @override
@@ -1207,4 +1108,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileClearLocalChatSuccess => 'Local chat history cleared';
+
+  @override
+  String get profileStorageRow => 'Storage & Cache';
+
+  @override
+  String get profileStorageSubtitle =>
+      'See what\'s cached locally and clear it';
+
+  @override
+  String get profileExportChatRow => 'Export Chat History';
+
+  @override
+  String get profileExportChatSubtitle =>
+      'Save your local messages as a text file';
+
+  @override
+  String get chatExportTitle => 'Export Chat History';
+
+  @override
+  String get chatExportEmpty => 'No local chat history to export yet';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '$conversations conversations, $messages messages';
+  }
+
+  @override
+  String get chatExportCopy => 'Copy all';
+
+  @override
+  String get chatExportCopied => 'Copied to clipboard';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return 'Saved to: $path';
+  }
+
+  @override
+  String get storageScreenTitle => 'Storage & Cache';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '$size total';
+  }
+
+  @override
+  String get storageImageCache => 'Photo cache';
+
+  @override
+  String get storageVideoCache => 'Video cache';
+
+  @override
+  String get storageAudioCache => 'Audio cache';
+
+  @override
+  String get storageChatHistory => 'Chat history';
+
+  @override
+  String get storageSizeUnknown => 'Unknown';
+
+  @override
+  String get storageClear => 'Clear';
+
+  @override
+  String get storageClearAll => 'Clear all cache';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return 'Clear $category?';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody =>
+      'Cached files will be removed and re-downloaded the next time they\'re needed.';
+
+  @override
+  String get storageClearAllConfirmTitle => 'Clear all local cache?';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      'This clears the photo, video, and audio caches plus locally cached chat history. Media re-downloads on demand; chat history reloads from the server.';
+
+  @override
+  String get storageClearSuccess => 'Cache cleared';
 }

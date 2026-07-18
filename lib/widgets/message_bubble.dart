@@ -61,7 +61,7 @@ class MessageBubble extends StatelessWidget {
                       senderRelationLabel != null
                           ? '${message.senderName} · $senderRelationLabel'
                           : message.senderName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
@@ -80,14 +80,14 @@ class MessageBubble extends StatelessWidget {
                     children: [
                       Text(
                         _formatTime(message.sentAt, locale),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           color: AppColors.textHint,
                         ),
                       ),
                       if (isMe && message.isPending) ...[
                         const SizedBox(width: 4),
-                        const SizedBox(
+                        SizedBox(
                           width: 10,
                           height: 10,
                           child: CircularProgressIndicator(

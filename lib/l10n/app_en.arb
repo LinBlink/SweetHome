@@ -26,7 +26,6 @@
   "registerGenderRequired": "Please select a gender",
   "registerCreateFamilyTab": "Create a Family",
   "registerJoinFamilyTab": "Join a Family",
-  "registerRequestJoinTab": "Request to Join",
   "registerFamilyNameLabel": "Family name (e.g. The Wangs)",
   "registerFamilyNameRequired": "Please enter a family name",
   "registerFamilyNameHint": "* After registering, you can generate an invite code to invite family members",
@@ -44,32 +43,6 @@
   "registerRelationAnchorRequired": "Please choose which member you're related to",
   "registerSubmitCreate": "Register & Create Family",
   "registerSubmitJoin": "Register & Join Family",
-  "requestJoinTargetPhoneLabel": "Phone number of a family member you know",
-  "requestJoinTargetPhoneRequired": "Please enter their phone number",
-  "requestJoinTargetPhoneHint": "* No invite code needed — just the phone number of someone already in that family. Their family admin will review your request.",
-  "requestJoinMessageLabel": "Message to the admin (optional)",
-  "requestJoinSubmit": "Submit Request",
-  "requestJoinSubmittedTitle": "Request Submitted",
-  "requestJoinSubmittedMessage": "Your request has been sent to the family admin for review. Once approved, log in with the phone number and password you just entered.",
-  "joinRequestsTitle": "Join Requests",
-  "joinRequestsEmpty": "No pending requests",
-  "joinRequestsRelationLine": "Wants to be {targetName}'s {relation}",
-  "@joinRequestsRelationLine": {
-    "placeholders": {
-      "relation": {
-        "type": "String"
-      },
-      "targetName": {
-        "type": "String"
-      }
-    }
-  },
-  "relationNounChild": "child",
-  "relationNounParent": "parent",
-  "relationNounSpouse": "spouse",
-  "relationNounSibling": "sibling",
-  "joinRequestsApprove": "Approve",
-  "joinRequestsReject": "Reject",
   "phoneLabel": "Phone number",
   "phoneRequired": "Please enter a phone number",
   "phoneInvalid": "Invalid phone number format",
@@ -81,16 +54,6 @@
   "myHomeTitle": "My Home",
   "myHomeLocationEntry": "Real-time Location",
   "myHomeLocationDesc": "See where each family member is right now",
-  "myHomeJoinRequestsEntry": "Join Requests",
-  "myHomeJoinRequestsDesc": "Review and approve requests to join this family",
-  "myHomeJoinRequestsBadge": "{count, plural, =0{No pending} =1{1 pending} other{{count} pending}}",
-  "@myHomeJoinRequestsBadge": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "familyFeedTitle": "Family Feed",
   "familyFeedComingSoon": "Coming soon",
   "familyFeedComingSoonDesc": "Family updates and milestones are on the way.",
@@ -132,44 +95,11 @@
   "locationGpsTimeout": "Couldn't get a GPS fix in time. Try again outdoors or check your signal.",
   "locationGpsUnavailable": "Location service isn't available on this device. Check system settings, mock-location app, or vendor privacy settings.",
   "locationRefresh": "Refresh",
-  "joinRequestsAdminTitle": "Join Requests",
-  "joinRequestsAdminEmpty": "No pending requests right now.",
-  "joinRequestsAdminReject": "Reject",
-  "joinRequestsAdminApprove": "Approve",
-  "joinRequestsAdminRelationLine": "Wants to be {relation} of {targetName}",
-  "@joinRequestsAdminRelationLine": {
-    "placeholders": {
-      "relation": {
-        "type": "String"
-      },
-      "targetName": {
-        "type": "String"
-      }
-    }
-  },
-  "joinRequestsAdminMessage": "Message: {message}",
-  "@joinRequestsAdminMessage": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "joinRequestsAdminRejectDialogTitle": "Reject this request?",
-  "joinRequestsAdminRejectDialogReason": "Reason (optional)",
-  "joinRequestsAdminRejectSubmit": "Reject",
-  "joinRequestsAdminRejectCancel": "Cancel",
-  "joinRequestsAdminRejectSuccess": "Request rejected",
-  "joinRequestsAdminApproveSuccess": "Request approved",
-  "joinRequestsAdminError": "Could not complete the action",
-  "requestJoinModeByCode": "Have an invite code",
-  "requestJoinModeByPhone": "Know a member's phone",
-  "requestJoinNoFamilySubmit": "Send request",
-  "requestJoinByCodeHint": "Use the family's invite code if you have one.",
   "conversationsSearchTooltip": "Search",
   "conversationsNewTooltip": "New conversation",
   "conversationsEmptyTitle": "No messages yet",
   "conversationsEmptySubtitle": "Invite family members to start chatting",
+  "conversationSpouseLabel": "Spouse",
   "connectionErrorRetry": "Retry",
   "newConversationTitle": "New Conversation",
   "editProfileTitle": "Edit Profile",
@@ -377,8 +307,6 @@
   "locationHubHistoryDesc": "View a member's movement for a chosen day",
   "locationHubFenceDesc": "Set safe zones and get notified on entry or exit",
   "locationHubFenceAlarmsDesc": "History of when family entered or left a fence",
-  "profileJoinRequestsRow": "Join Requests",
-  "profileJoinRequestsAdminOnly": "Admin only",
 
   "familyFeedEmptyTitle": "No moments yet",
   "familyFeedEmptyDesc": "Post the first update for your family.",
@@ -391,6 +319,8 @@
   "familyFeedUnlikeTooltip": "Liked",
   "familyFeedLikeCount": "{count, plural, =0{0 likes} =1{1 like} other{{count} likes}}",
   "familyFeedMoreLikers": "{count} more",
+  "momentCardCommentCount": "{count, plural, =1{1 comment} other{{count} comments}}",
+  "momentCardLatestComment": "{content}",
   "momentDetailLikedTimes": "Liked {count} times",
   "familyFeedNoCommentsYet": "No comments yet",
   "familyFeedCommentsComingSoon": "Comments are on the way",
@@ -426,12 +356,31 @@
   "momentDetailNoLikes": "Be the first to like this",
   "momentDetailPlayVideo": "Play video",
   "momentDetailVideoLoadFailed": "Couldn't load video",
+  "momentDetailAudioLoadFailed": "Couldn't load audio",
   "momentDetailAudioPlay": "Play",
   "momentDetailAudioPause": "Pause",
+  "momentDetailLikeKing": "Like King",
+  "@momentDetailLikeKing": {
+    "description": "Badge shown next to the top name in the like list when they've liked the moment more than 10 times and beat the second-place liker by at least 50%."
+  },
   "@familyFeedLikeCount": {
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "@momentCardCommentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@momentCardLatestComment": {
+    "placeholders": {
+      "content": {
+        "type": "String"
       }
     }
   },
@@ -494,6 +443,13 @@
 "conversationsSearchNoResults": "No matches for \"{query}\"."
 ,"profileThemeRow": "Theme",
 "profileThemeSheetTitle": "Pick a theme",
+"profileAppearanceRow": "Appearance",
+"profileAppearanceSheetTitle": "Choose appearance",
+"profileThemeModeSection": "Appearance",
+"profileThemeModeSystem": "Follow system",
+"profileThemeModeLight": "Light",
+"profileThemeModeDark": "Dark",
+"profileThemeColorSection": "Color",
 "momentCommentSectionTitle": "Comments",
 "momentCommentEmpty": "Be the first to comment",
 "momentCommentInputHint": "Write a comment...",
@@ -502,9 +458,62 @@
 "momentCommentDeleteBody": "This comment will be removed for everyone.",
 "momentCommentDeleteFailed": "Couldn't delete the comment — please try again.",
 "chatMessageTooLong": "Message is too long (max 2000 characters).",
-"profileClearLocalChatRow": "Clear Local Chat History",
-"profileClearLocalChatSubtitle": "Only removes messages cached on this device",
 "profileClearLocalChatConfirmTitle": "Clear local chat history?",
 "profileClearLocalChatConfirmBody": "This only clears messages cached on this device — nothing is deleted from the server, and reopening a chat will reload it from there.",
-"profileClearLocalChatSuccess": "Local chat history cleared"
+"profileClearLocalChatSuccess": "Local chat history cleared",
+"profileStorageRow": "Storage & Cache",
+"profileStorageSubtitle": "See what's cached locally and clear it",
+"profileExportChatRow": "Export Chat History",
+"profileExportChatSubtitle": "Save your local messages as a text file",
+"chatExportTitle": "Export Chat History",
+"chatExportEmpty": "No local chat history to export yet",
+"chatExportSummary": "{conversations} conversations, {messages} messages",
+"@chatExportSummary": {
+  "placeholders": {
+    "conversations": {
+      "type": "int"
+    },
+    "messages": {
+      "type": "int"
+    }
+  }
+},
+"chatExportCopy": "Copy all",
+"chatExportCopied": "Copied to clipboard",
+"chatExportSavedTo": "Saved to: {path}",
+"@chatExportSavedTo": {
+  "placeholders": {
+    "path": {
+      "type": "String"
+    }
+  }
+},
+"storageScreenTitle": "Storage & Cache",
+"storageTotalLabel": "{size} total",
+"storageImageCache": "Photo cache",
+"storageVideoCache": "Video cache",
+"storageAudioCache": "Audio cache",
+"storageChatHistory": "Chat history",
+"storageSizeUnknown": "Unknown",
+"storageClear": "Clear",
+"storageClearAll": "Clear all cache",
+"storageClearMediaConfirmTitle": "Clear {category}?",
+"storageClearMediaConfirmBody": "Cached files will be removed and re-downloaded the next time they're needed.",
+"storageClearAllConfirmTitle": "Clear all local cache?",
+"storageClearAllConfirmBody": "This clears the photo, video, and audio caches plus locally cached chat history. Media re-downloads on demand; chat history reloads from the server.",
+"storageClearSuccess": "Cache cleared",
+"@storageTotalLabel": {
+  "placeholders": {
+    "size": {
+      "type": "String"
+    }
+  }
+},
+"@storageClearMediaConfirmTitle": {
+  "placeholders": {
+    "category": {
+      "type": "String"
+    }
+  }
+}
 }

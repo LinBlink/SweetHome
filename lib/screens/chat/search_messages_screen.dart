@@ -72,14 +72,14 @@ class _SearchMessagesScreenState extends State<SearchMessagesScreen> {
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: l10n.conversationsSearchHint,
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.search_rounded,
                     color: AppColors.textHint,
                   ),
                   suffixIcon: _query.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.close_rounded,
                             color: AppColors.textHint,
                             size: 18,
@@ -124,7 +124,7 @@ class _EmptyHint extends StatelessWidget {
             Text(
               l10n.conversationsSearchEmptyHint,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.inkFaded,
                 height: 1.5,
@@ -150,7 +150,7 @@ class _NoResults extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.search_off_rounded,
               size: 44,
               color: AppColors.textHint,
@@ -159,7 +159,7 @@ class _NoResults extends StatelessWidget {
             Text(
               l10n.conversationsSearchNoResults(query),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.inkFaded,
                 height: 1.5,
@@ -214,7 +214,7 @@ class _Results extends StatelessWidget {
                               conv.name.isEmpty
                                   ? m.senderName
                                   : '${conv.name} · ${m.senderName}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.ink,
@@ -225,7 +225,7 @@ class _Results extends StatelessWidget {
                           ),
                           Text(
                             _relativeTime(m.sentAt),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               color: AppColors.textHint,
                             ),
@@ -235,7 +235,7 @@ class _Results extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text.rich(
                         _highlightedSnippet(m.content, query),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           color: AppColors.ink,
                           height: 1.4,

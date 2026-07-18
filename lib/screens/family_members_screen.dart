@@ -47,7 +47,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(l10n.inviteGenerate, style: const TextStyle(color: AppColors.textPrimary)),
+        title: Text(l10n.inviteGenerate, style: TextStyle(color: AppColors.textPrimary)),
         content: error != null
             ? Text(error, style: const TextStyle(color: AppColors.danger))
             : Column(
@@ -55,7 +55,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(l10n.inviteCodeLabel,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                   const SizedBox(height: 6),
                   SelectableText(
                     info!.inviteCode,
@@ -69,7 +69,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                   const SizedBox(height: 10),
                   Text(
                     InviteExpiry.remaining(ctx, info.expiresAt.toLocal()),
-                    style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+                    style: TextStyle(fontSize: 12, color: AppColors.textHint),
                   ),
                 ],
               ),
@@ -123,10 +123,18 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
           // member-list fetch and the chat connection), so this
           // is additive — `_onlineUserIds.add` is a no-op if the
           // id is already present.
+          //
+          // Deferred to a post-frame callback: `markUserOnline` calls
+          // `notifyListeners()`, and calling that synchronously here
+          // (inside this `builder`, i.e. during the build phase) trips
+          // "setState() or markNeedsBuild() called during build" on
+          // ChatProvider's InheritedProvider scope.
           final chat = context.read<ChatProvider>();
-          for (final m in members) {
-            if (m.isOnline) chat.markUserOnline(m.userId);
-          }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            for (final m in members) {
+              if (m.isOnline) chat.markUserOnline(m.userId);
+            }
+          });
           return ListView.separated(
             itemCount: members.length,
             separatorBuilder: (_, _) => const Divider(height: 1, indent: 70),
@@ -211,7 +219,7 @@ class _MemberTile extends StatelessWidget {
                   children: [
                     Text(
                       member.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -226,7 +234,7 @@ class _MemberTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   relationLabel ?? '',
-                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
               ],
             ),

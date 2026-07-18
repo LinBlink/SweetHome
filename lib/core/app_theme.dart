@@ -8,32 +8,50 @@ class AppTheme {
   /// The "过家家 · Sweet Home" theme.
   ///
   /// [palette] drives the brand identity (primary / primaryDark /
-  /// primaryLight / accent); paper / wood / ink / divider stay
-  /// constant so the app's "feel" doesn't change when the user
-  /// picks a different accent. The palette is registered into
+  /// primaryLight / accent); [isDark] drives light/dark mode via
+  /// `AppColors`'s brightness-aware getters (paper/ink/divider flip,
+  /// wood/sage/status colors deliberately stay constant — see
+  /// `AppColors` for which is which). The palette is registered into
   /// the resulting [ThemeData] via `extensions:` so widgets can
   /// read it with `Theme.of(context).extension<AppPalette>()!`
   /// (or the `BrandColors.of(context)` shortcut).
-  static ThemeData build(AppPalette palette) {
+  static ThemeData build(AppPalette palette, {required bool isDark}) {
+    final colorScheme = isDark
+        ? ColorScheme.dark(
+            primary: palette.primary,
+            onPrimary: Colors.white,
+            primaryContainer: palette.primaryLight,
+            onPrimaryContainer: palette.primaryDark,
+            secondary: palette.accent,
+            onSecondary: Colors.white,
+            surface: AppColors.surface,
+            onSurface: AppColors.ink,
+            surfaceContainerHighest: AppColors.surfaceVariant,
+            error: AppColors.danger,
+            outline: AppColors.divider,
+            surfaceTint: AppColors.surface,
+          )
+        : ColorScheme.light(
+            primary: palette.primary,
+            onPrimary: Colors.white,
+            primaryContainer: palette.primaryLight,
+            onPrimaryContainer: palette.primaryDark,
+            secondary: palette.accent,
+            onSecondary: Colors.white,
+            surface: AppColors.surface,
+            onSurface: AppColors.ink,
+            surfaceContainerHighest: AppColors.surfaceVariant,
+            error: AppColors.danger,
+            outline: AppColors.divider,
+            surfaceTint: AppColors.surface,
+          );
     return ThemeData(
       useMaterial3: true,
+      brightness: isDark ? Brightness.dark : Brightness.light,
       extensions: <ThemeExtension<dynamic>>[palette],
-      colorScheme: ColorScheme.light(
-        primary: palette.primary,
-        onPrimary: Colors.white,
-        primaryContainer: palette.primaryLight,
-        onPrimaryContainer: palette.primaryDark,
-        secondary: palette.accent,
-        onSecondary: Colors.white,
-        surface: AppColors.surface,
-        onSurface: AppColors.ink,
-        surfaceContainerHighest: AppColors.surfaceVariant,
-        error: AppColors.danger,
-        outline: AppColors.divider,
-        surfaceTint: AppColors.surface,
-      ),
+      colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
         elevation: 0,
@@ -87,15 +105,15 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        hintStyle: const TextStyle(color: AppColors.textHint),
+        hintStyle: TextStyle(color: AppColors.textHint),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.divider, width: 0.8),
+          borderSide: BorderSide(color: AppColors.divider, width: 0.8),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.divider, width: 0.8),
+          borderSide: BorderSide(color: AppColors.divider, width: 0.8),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -156,21 +174,21 @@ class AppTheme {
             width: 0.8,
           ),
         ),
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w700,
           color: AppColors.ink,
         ),
-        contentTextStyle: const TextStyle(
+        contentTextStyle: TextStyle(
           fontSize: 14,
           color: AppColors.ink,
           height: 1.4,
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
         ),
       ),
@@ -211,16 +229,16 @@ class AppTheme {
         linearTrackColor: AppColors.linenDeep,
         circularTrackColor: AppColors.linenDeep,
       ),
-      dividerTheme: const DividerThemeData(
+      dividerTheme: DividerThemeData(
         color: AppColors.divider,
         thickness: 0.6,
         space: 1,
       ),
-      iconTheme: const IconThemeData(
+      iconTheme: IconThemeData(
         color: AppColors.ink,
         size: 22,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         headlineLarge: TextStyle(
           color: AppColors.ink,
           fontWeight: FontWeight.w700,

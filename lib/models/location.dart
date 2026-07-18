@@ -1,5 +1,15 @@
 import '../core/time/backend_time.dart';
 
+/// Guards every §6 lat/lng we parse off the wire. `flutter_map`'s
+/// `LatLngBounds.fromPoints` (used by every map screen to fit the
+/// camera to a set of points) asserts `-90 <= lat <= 90` and
+/// `-180 <= lng <= 180` and throws otherwise — a single malformed
+/// row from the location service (e.g. a stale/corrupt GPS fix, a
+/// unit mix-up) would otherwise crash the whole screen instead of
+/// just being a missing dot on the map.
+bool _isValidLatLng(double lat, double lng) =>
+    lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+
 /// API §6 payload shapes — see docs/api.md §6.1 (`POST /location/report`)
 /// and §6.2 (`GET /location/family`). The response includes a
 /// pre-bucketed online/total pair (10-minute Redis-TTL count) plus a
@@ -23,6 +33,7 @@ class FamilyLocations {
   factory FamilyLocations.fromJson(Map<String, dynamic> json) {
     final list = (json['familyMemberLocations'] as List? ?? const [])
         .map((e) => MemberLocation.fromJson(e as Map<String, dynamic>))
+        .where((m) => _isValidLatLng(m.lat, m.lng))
         .toList();
     return FamilyLocations(
       familyId: json['familyId'] as int,
@@ -181,6 +192,7 @@ class LocationHistory {
       userAvatarUrl: json['userAvatarUrl'] as String?,
       locations: (json['locations'] as List? ?? const [])
           .map((e) => LocationHistoryPoint.fromJson(e as Map<String, dynamic>))
+          .where((p) => _isValidLatLng(p.lat, p.lng))
           .toList(),
     );
   }

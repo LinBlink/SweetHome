@@ -107,6 +107,15 @@ class ChatLocalCache {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_kBlobKey);
   }
+
+  /// UTF-8 byte length of the stored blob, for the storage settings
+  /// screen's "chat history" row. `0` if nothing has been cached yet.
+  Future<int> sizeBytes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final blob = prefs.getString(_kBlobKey);
+    if (blob == null) return 0;
+    return utf8.encode(blob).length;
+  }
 }
 
 extension on Conversation {

@@ -62,6 +62,12 @@ class PushService {
   final _onTapController = StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get onTap => _onTapController.stream;
 
+  /// Set by [registerForUser] when it's called before the SDK has
+  /// handed back a registrationId, so [_refreshRegistrationId] can
+  /// retry the §2.7.1 call once one actually arrives instead of the
+  /// registration silently never happening for that login/register.
+  AuthUser? _pendingRegisterUser;
+
   static const _prefKeyRegistrationId = 'jpush_registration_id';
 
   /// Initializes the JPush SDK. Idempotent — calling more than once is a
@@ -147,6 +153,16 @@ class PushService {
       _registrationId = id;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_prefKeyRegistrationId, id);
+      // A `registerForUser` call that arrived before the SDK had a
+      // registrationId yet (cold start + fast login/register — the
+      // native JPush handshake is still in flight) parked itself in
+      // `_pendingRegisterUser` instead of silently dropping the
+      // §2.7.1 call forever. Now that an id finally exists, retry it.
+      final pending = _pendingRegisterUser;
+      if (pending != null) {
+        _pendingRegisterUser = null;
+        unawaited(registerForUser(pending));
+      }
       return id;
     } catch (e) {
       debugPrint('JPush getRegistrationID failed: $e');
@@ -175,9 +191,17 @@ class PushService {
     if (AppConfig.mockMode) return;
     final id = _registrationId;
     if (id == null) {
-      debugPrint('JPush registerForUser: no registrationId available');
+      // Common on a cold start: login/register can complete before
+      // JPush's own async handshake has produced a registrationId.
+      // Park the user so `_refreshRegistrationId` retries this call
+      // as soon as one shows up, instead of the device silently
+      // never registering for this session.
+      _pendingRegisterUser = user;
+      debugPrint(
+          'JPush registerForUser: no registrationId yet, will retry once available');
       return;
     }
+    _pendingRegisterUser = null;
     try {
       final resp = await http
           .post(

@@ -175,7 +175,7 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
                         ),
                         child: Text(
                           l10n.fenceNoWatchableMembers,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textHint,
                             fontSize: 12,
                           ),
@@ -206,12 +206,12 @@ class _FenceCreateScreenState extends State<FenceCreateScreen> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
-                              const BorderSide(color: AppColors.divider),
+                              BorderSide(color: AppColors.divider),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
-                              const BorderSide(color: AppColors.divider),
+                              BorderSide(color: AppColors.divider),
                         ),
                       ),
                     ),
@@ -276,7 +276,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
         color: AppColors.textSecondary,

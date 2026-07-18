@@ -87,9 +87,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get registerJoinFamilyTab => '기존 가족 참여하기';
 
   @override
-  String get registerRequestJoinTab => '초대 코드 요청';
-
-  @override
   String get registerFamilyNameLabel => '가족 이름 (예: 왕씨 가족)';
 
   @override
@@ -141,58 +138,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get registerSubmitJoin => '가입하고 가족 참여하기';
 
   @override
-  String get requestJoinTargetPhoneLabel => '아는 가족 구성원의 전화번호';
-
-  @override
-  String get requestJoinTargetPhoneRequired => '상대방의 전화번호를 입력해주세요';
-
-  @override
-  String get requestJoinTargetPhoneHint =>
-      '* 초대 코드가 필요 없습니다 — 이미 그 가족에 속한 사람의 전화번호만 입력하면 됩니다. 해당 가족의 관리자가 요청을 검토합니다';
-
-  @override
-  String get requestJoinMessageLabel => '관리자에게 남길 메시지 (선택)';
-
-  @override
-  String get requestJoinSubmit => '요청 제출';
-
-  @override
-  String get requestJoinSubmittedTitle => '요청이 제출되었습니다';
-
-  @override
-  String get requestJoinSubmittedMessage =>
-      '요청이 가족 관리자에게 전송되어 검토 중입니다. 승인되면 방금 입력한 전화번호와 비밀번호로 로그인하세요';
-
-  @override
-  String get joinRequestsTitle => '가입 요청';
-
-  @override
-  String get joinRequestsEmpty => '대기 중인 요청이 없습니다';
-
-  @override
-  String joinRequestsRelationLine(String relation, String targetName) {
-    return '$targetName의 $relation(이)가 되고 싶어합니다';
-  }
-
-  @override
-  String get relationNounChild => '자녀';
-
-  @override
-  String get relationNounParent => '부모';
-
-  @override
-  String get relationNounSpouse => '배우자';
-
-  @override
-  String get relationNounSibling => '형제자매';
-
-  @override
-  String get joinRequestsApprove => '승인';
-
-  @override
-  String get joinRequestsReject => '거절';
-
-  @override
   String get phoneLabel => '휴대폰 번호';
 
   @override
@@ -224,24 +169,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get myHomeLocationDesc => '가족 구성원의 현재 위치를 확인하세요';
-
-  @override
-  String get myHomeJoinRequestsEntry => '가입 요청';
-
-  @override
-  String get myHomeJoinRequestsDesc => '가족 가입 요청 검토 및 승인';
-
-  @override
-  String myHomeJoinRequestsBadge(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count건 대기',
-      one: '1건 대기',
-      zero: '대기 없음',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get familyFeedTitle => '패밀리 피드';
@@ -381,61 +308,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationRefresh => '새로고침';
 
   @override
-  String get joinRequestsAdminTitle => '가입 요청';
-
-  @override
-  String get joinRequestsAdminEmpty => '현재 대기 중인 요청이 없습니다.';
-
-  @override
-  String get joinRequestsAdminReject => '거절';
-
-  @override
-  String get joinRequestsAdminApprove => '승인';
-
-  @override
-  String joinRequestsAdminRelationLine(String relation, String targetName) {
-    return '$targetName의 $relation이 되고 싶음';
-  }
-
-  @override
-  String joinRequestsAdminMessage(String message) {
-    return '메시지: $message';
-  }
-
-  @override
-  String get joinRequestsAdminRejectDialogTitle => '이 요청을 거절하시겠습니까?';
-
-  @override
-  String get joinRequestsAdminRejectDialogReason => '거절 사유 (선택)';
-
-  @override
-  String get joinRequestsAdminRejectSubmit => '거절';
-
-  @override
-  String get joinRequestsAdminRejectCancel => '취소';
-
-  @override
-  String get joinRequestsAdminRejectSuccess => '요청이 거절되었습니다';
-
-  @override
-  String get joinRequestsAdminApproveSuccess => '요청이 승인되었습니다';
-
-  @override
-  String get joinRequestsAdminError => '작업을 완료할 수 없습니다';
-
-  @override
-  String get requestJoinModeByCode => '초대 코드가 있어요';
-
-  @override
-  String get requestJoinModeByPhone => '구성원 전화번호를 알아요';
-
-  @override
-  String get requestJoinNoFamilySubmit => '요청 보내기';
-
-  @override
-  String get requestJoinByCodeHint => '초대 코드가 있는 경우 사용하세요.';
-
-  @override
   String get conversationsSearchTooltip => '검색';
 
   @override
@@ -446,6 +318,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get conversationsEmptySubtitle => '가족을 초대하여 대화를 시작해보세요';
+
+  @override
+  String get conversationSpouseLabel => '배우자';
 
   @override
   String get connectionErrorRetry => '다시 시도';
@@ -919,12 +794,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationHubFenceAlarmsDesc => '가족의 펜스 출입 기록 확인';
 
   @override
-  String get profileJoinRequestsRow => '가입 요청';
-
-  @override
-  String get profileJoinRequestsAdminOnly => '관리자만';
-
-  @override
   String get familyFeedEmptyTitle => '아직 게시글이 없어요';
 
   @override
@@ -965,6 +834,16 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String familyFeedMoreLikers(Object count) {
     return '$count명 더';
+  }
+
+  @override
+  String momentCardCommentCount(int count) {
+    return '댓글 $count개';
+  }
+
+  @override
+  String momentCardLatestComment(String content) {
+    return '$content';
   }
 
   @override
@@ -1078,10 +957,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get momentDetailVideoLoadFailed => '동영상을 불러오지 못했어요';
 
   @override
+  String get momentDetailAudioLoadFailed => '음성을 불러오지 못했어요';
+
+  @override
   String get momentDetailAudioPlay => '재생';
 
   @override
   String get momentDetailAudioPause => '일시정지';
+
+  @override
+  String get momentDetailLikeKing => '좋아요광';
 
   @override
   String publishMomentRecordingInProgress(int seconds) {
@@ -1128,6 +1013,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileThemeSheetTitle => '테마 선택';
 
   @override
+  String get profileAppearanceRow => '화면 모드';
+
+  @override
+  String get profileAppearanceSheetTitle => '화면 모드 선택';
+
+  @override
+  String get profileThemeModeSection => '화면 모드';
+
+  @override
+  String get profileThemeModeSystem => '시스템 설정 따르기';
+
+  @override
+  String get profileThemeModeLight => '라이트';
+
+  @override
+  String get profileThemeModeDark => '다크';
+
+  @override
+  String get profileThemeColorSection => '색상';
+
+  @override
   String get momentCommentSectionTitle => '댓글';
 
   @override
@@ -1152,12 +1058,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chatMessageTooLong => '메시지가 너무 깁니다 (최대 2000자)';
 
   @override
-  String get profileClearLocalChatRow => '로컬 채팅 기록 삭제';
-
-  @override
-  String get profileClearLocalChatSubtitle => '이 기기에 저장된 메시지만 삭제돼요';
-
-  @override
   String get profileClearLocalChatConfirmTitle => '로컬 채팅 기록을 삭제할까요?';
 
   @override
@@ -1166,4 +1066,86 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get profileClearLocalChatSuccess => '로컬 채팅 기록을 삭제했어요';
+
+  @override
+  String get profileStorageRow => '저장공간 및 캐시';
+
+  @override
+  String get profileStorageSubtitle => '로컬 캐시 사용량 확인 및 삭제';
+
+  @override
+  String get profileExportChatRow => '채팅 기록 내보내기';
+
+  @override
+  String get profileExportChatSubtitle => '로컬 메시지를 텍스트 파일로 저장';
+
+  @override
+  String get chatExportTitle => '채팅 기록 내보내기';
+
+  @override
+  String get chatExportEmpty => '내보낼 로컬 채팅 기록이 없어요';
+
+  @override
+  String chatExportSummary(int conversations, int messages) {
+    return '대화 $conversations개, 메시지 $messages개';
+  }
+
+  @override
+  String get chatExportCopy => '전체 복사';
+
+  @override
+  String get chatExportCopied => '클립보드에 복사되었습니다';
+
+  @override
+  String chatExportSavedTo(String path) {
+    return '저장 위치: $path';
+  }
+
+  @override
+  String get storageScreenTitle => '저장공간 및 캐시';
+
+  @override
+  String storageTotalLabel(String size) {
+    return '총 $size';
+  }
+
+  @override
+  String get storageImageCache => '이미지 캐시';
+
+  @override
+  String get storageVideoCache => '동영상 캐시';
+
+  @override
+  String get storageAudioCache => '오디오 캐시';
+
+  @override
+  String get storageChatHistory => '채팅 기록';
+
+  @override
+  String get storageSizeUnknown => '알 수 없음';
+
+  @override
+  String get storageClear => '삭제';
+
+  @override
+  String get storageClearAll => '전체 캐시 삭제';
+
+  @override
+  String storageClearMediaConfirmTitle(String category) {
+    return '$category을(를) 삭제할까요?';
+  }
+
+  @override
+  String get storageClearMediaConfirmBody =>
+      '캐시된 파일이 삭제되며, 다음에 필요할 때 다시 다운로드됩니다.';
+
+  @override
+  String get storageClearAllConfirmTitle => '모든 로컬 캐시를 삭제할까요?';
+
+  @override
+  String get storageClearAllConfirmBody =>
+      '이미지·동영상·오디오 캐시와 로컬에 저장된 채팅 기록이 삭제됩니다. 미디어는 필요할 때 다시 다운로드되며, 채팅 기록은 서버에서 다시 불러올 수 있습니다.';
+
+  @override
+  String get storageClearSuccess => '캐시가 삭제되었습니다';
 }

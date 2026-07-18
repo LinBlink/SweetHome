@@ -181,7 +181,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                       const SizedBox(height: 6),
                       Text(
                         l10n.publishMomentMaxMedia,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textHint,
                         ),
@@ -695,7 +695,7 @@ class _DraftPreview extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 a.durationSec == null ? '' : _formatSeconds(a.durationSec!),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   color: AppColors.textHint,
                 ),
@@ -723,7 +723,7 @@ class _DraftPhotoTile extends StatelessWidget {
     final placeholder = Container(
       color: AppColors.surfaceVariant,
       alignment: Alignment.center,
-      child: const Icon(
+      child: Icon(
         Icons.broken_image_outlined,
         size: 28,
         color: AppColors.textHint,
@@ -804,7 +804,7 @@ class _DraftVideoTileState extends State<_DraftVideoTile> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.movie_filter_outlined,
                 size: 22,
                 color: AppColors.textHint,
@@ -812,7 +812,7 @@ class _DraftVideoTileState extends State<_DraftVideoTile> {
               const SizedBox(height: 4),
               Text(
                 l10n.momentDetailVideoLoadFailed,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   color: AppColors.textHint,
                 ),
@@ -901,7 +901,7 @@ class _AddMediaButton extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       l10n.publishMomentAddMediaSheet,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.ink,

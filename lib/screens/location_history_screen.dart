@@ -179,7 +179,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen>
             trailing: ordered[i].userId == me
                 ? Text(
                     l10n.profileMe,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppColors.textHint,
                     ),
@@ -414,7 +414,7 @@ class _LocationHistoryScreenState extends State<LocationHistoryScreen>
                       color: AppColors.surface,
                       child: Text(
                         l10n.locationHistoryPointCount(data.locations.length),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
@@ -459,7 +459,7 @@ class _PickMemberPrompt extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               l10n.locationHistoryTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -508,7 +508,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               l10n.locationHistoryEmpty,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
@@ -518,13 +518,13 @@ class _EmptyState extends StatelessWidget {
             Text(
               l10n.locationHistoryEmptyDesc,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+              style: TextStyle(fontSize: 12, color: AppColors.textHint),
             ),
             const SizedBox(height: 14),
             Text(
               AppTimeFormatter(Localizations.localeOf(context))
                   .forDateOnly(date),
-              style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+              style: TextStyle(fontSize: 11, color: AppColors.textHint),
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -591,7 +591,7 @@ class _HistoryTile extends StatelessWidget {
                   children: [
                     Text(
                       time,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -600,7 +600,7 @@ class _HistoryTile extends StatelessWidget {
                     if (point.battery >= 0)
                       Text(
                         l10n.locationHistoryBatteryLabel(point.battery),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.textHint,
                         ),
@@ -653,7 +653,7 @@ class _PointAddressLine extends StatelessWidget {
             l10n.locationHistoryPointAddress(snap.data!),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
             ),
@@ -662,7 +662,7 @@ class _PointAddressLine extends StatelessWidget {
         if (snap.connectionState == ConnectionState.waiting) {
           return Row(
             children: [
-              const SizedBox(
+              SizedBox(
                 width: 10,
                 height: 10,
                 child: CircularProgressIndicator(
@@ -674,14 +674,14 @@ class _PointAddressLine extends StatelessWidget {
               Text(
                 l10n.locationResolving,
                 style:
-                    const TextStyle(fontSize: 12, color: AppColors.textHint),
+                    TextStyle(fontSize: 12, color: AppColors.textHint),
               ),
             ],
           );
         }
         return Text(
           l10n.locationAddressUnavailable,
-          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+          style: TextStyle(fontSize: 12, color: AppColors.textHint),
         );
       },
     );
@@ -820,7 +820,7 @@ class _OsmAttribution extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       color: Colors.white70,
-      child: const Text(
+      child: Text(
         '© OpenStreetMap contributors',
         style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
       ),

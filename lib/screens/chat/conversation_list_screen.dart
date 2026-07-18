@@ -161,7 +161,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 18),
             Text(
               l10n.conversationsEmptyTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.ink,
@@ -171,7 +171,7 @@ class _EmptyState extends StatelessWidget {
             Text(
               l10n.conversationsEmptySubtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.inkFaded,
                 height: 1.5,
@@ -222,7 +222,7 @@ class _ConnectionErrorBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColors.ink,
                   ),
@@ -246,7 +246,7 @@ class _ConnectionErrorBanner extends StatelessWidget {
               const SizedBox(width: 4),
               GestureDetector(
                 onTap: onDismiss,
-                child: const Icon(
+                child: Icon(
                   Icons.close,
                   color: AppColors.inkFaded,
                   size: 16,
