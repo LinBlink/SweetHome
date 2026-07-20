@@ -1,6 +1,14 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:record/record.dart';
+import 'package:uuid/uuid.dart';
+import 'package:video_compress/video_compress.dart';
 import '../../core/app_colors.dart';
 import '../../core/error_messages.dart';
 import '../../core/home_widgets.dart';
@@ -35,12 +43,23 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
+  static const int _maxVideoBytes = 50 * 1024 * 1024;
+  static const _uuid = Uuid();
+
   final _textCtrl = TextEditingController();
   final _textFocus = FocusNode();
   final _scrollCtrl = ScrollController();
   bool _canSend = false;
   bool _uploadingImage = false;
+  bool _uploadingVideo = false;
   bool _showEmoji = false;
+
+  AudioRecorder? _recorder;
+  bool _isRecording = false;
+  bool _sendingVoice = false;
+  int? _recordingStartMs;
+  int _recordingElapsedSec = 0;
+  Timer? _elapsedTimer;
 
   /// One `GlobalKey` per message bubble currently built, keyed by
   /// `clientId` — lets `_jumpToMessage` locate a bubble's render
@@ -119,6 +138,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     _textCtrl.dispose();
     _textFocus.dispose();
     _scrollCtrl.dispose();
+    _elapsedTimer?.cancel();
+    _recorder?.dispose();
+    VideoCompress.dispose();
     super.dispose();
   }
 
@@ -145,14 +167,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   /// `content = <r2-url>`. Disables the picker while an upload is in
   /// flight so the user can't double-tap and queue two uploads for
   /// the same conversation.
+  ///
+  /// `pickMultiImage` lets the user select several photos at once;
+  /// each one becomes its own independent message (own bubble, own
+  /// upload, own `clientId`) sent one after another — there's no
+  /// "album" message type on the wire (§4.4/§5.2 only ever carry one
+  /// `content` URL per message), so a multi-select is just a
+  /// shorthand for "send these N images in a row" rather than a
+  /// single grouped message.
   Future<void> _pickAndSendImage() async {
     if (_uploadingImage) return;
     final l10n = AppLocalizations.of(context)!;
     final picker = ImagePicker();
-    final XFile? picked;
+    final List<XFile> picked;
     try {
-      picked = await picker.pickImage(
-        source: ImageSource.gallery,
+      picked = await picker.pickMultiImage(
         maxWidth: 1280,
         maxHeight: 1280,
         imageQuality: 80,
@@ -162,37 +191,270 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       _showSnack(l10n.chatRoomImageUploadFailed);
       return;
     }
-    if (picked == null) return; // user cancelled
+    if (picked.isEmpty) return; // user cancelled
     setState(() => _uploadingImage = true);
+    var anyFailed = false;
     try {
-      final bytes = await picked.readAsBytes();
+      for (final file in picked) {
+        if (!mounted) return;
+        try {
+          final bytes = await file.readAsBytes();
+          if (!mounted) return;
+          final contentType =
+              detectImageMimeType(bytes) ?? file.mimeType ?? 'image/jpeg';
+          final ok = await context.read<ChatProvider>().sendImageMessage(
+                widget.conversationId,
+                bytes: bytes,
+                filename: file.name,
+                contentType: contentType,
+              );
+          if (!ok) anyFailed = true;
+        } on ApiException {
+          anyFailed = true;
+        } catch (_) {
+          anyFailed = true;
+        }
+      }
       if (!mounted) return;
-      final contentType =
-          detectImageMimeType(bytes) ?? picked.mimeType ?? 'image/jpeg';
-      final messenger = ScaffoldMessenger.of(context);
-      final ok = await context.read<ChatProvider>().sendImageMessage(
+      _scrollToBottom();
+      if (anyFailed) {
+        _showSnack(l10n.chatRoomImageUploadFailed);
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
+    }
+  }
+
+  /// Video-send path — picks from [source] (camera or gallery),
+  /// re-encodes via `video_compress` (same pipeline as the moments
+  /// composer) so a phone-camera clip doesn't blow past the §2.5 size
+  /// cap, then uploads + sends as a `type = "video"` message.
+  Future<void> _pickAndSendVideo(ImageSource source) async {
+    if (_uploadingVideo) return;
+    final l10n = AppLocalizations.of(context)!;
+    final picker = ImagePicker();
+    XFile? raw;
+    try {
+      raw = await picker.pickVideo(source: source);
+    } catch (_) {
+      if (!mounted) return;
+      _showSnack(l10n.chatRoomVideoUploadFailed);
+      return;
+    }
+    if (raw == null) return; // user cancelled
+    setState(() => _uploadingVideo = true);
+
+    // See the matching comment in publish_moment_screen.dart's
+    // _pickVideo — `video_compress` wraps a flaky native transcoder;
+    // a failure here doesn't mean the video is too large, so fall
+    // back to the original file rather than misreporting it as
+    // oversized. The timeout keeps a stuck transcode from blocking
+    // the send indefinitely.
+    File uploadFile = File(raw.path);
+    var wasCompressed = false;
+    try {
+      final info = await VideoCompress.compressVideo(
+        raw.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        frameRate: 30,
+        includeAudio: true,
+      ).timeout(const Duration(seconds: 25));
+      if (info?.file != null && await info!.file!.exists()) {
+        uploadFile = info.file!;
+        wasCompressed = true;
+      }
+    } catch (_) {
+      unawaited(VideoCompress.cancelCompression());
+    }
+
+    final size = await uploadFile.length().catchError((_) => 0);
+    if (size > _maxVideoBytes) {
+      final sizeMb = (size / (1024 * 1024)).toStringAsFixed(1);
+      if (wasCompressed) {
+        try {
+          await uploadFile.delete();
+        } catch (_) {}
+      }
+      if (mounted) setState(() => _uploadingVideo = false);
+      _showSnack(
+        wasCompressed
+            ? l10n.publishMomentVideoTooLarge(sizeMb)
+            : l10n.publishMomentVideoTooLargeRaw(sizeMb),
+      );
+      return;
+    }
+    try {
+      final bytes = await uploadFile.readAsBytes();
+      if (!mounted) return;
+      final ok = await context.read<ChatProvider>().sendVideoMessage(
             widget.conversationId,
             bytes: bytes,
-            filename: picked.name,
-            contentType: contentType,
+            filename: raw.name,
           );
       if (!mounted) return;
       if (ok) {
         _scrollToBottom();
       } else {
-        messenger.showSnackBar(
-          SnackBar(content: Text(l10n.chatRoomImageUploadFailed)),
-        );
+        _showSnack(l10n.chatRoomVideoUploadFailed);
       }
     } on ApiException catch (e) {
       if (!mounted) return;
       _showSnack(localizeErrorMessage(e.message, l10n));
     } catch (_) {
       if (!mounted) return;
-      _showSnack(l10n.chatRoomImageUploadFailed);
+      _showSnack(l10n.chatRoomVideoUploadFailed);
     } finally {
-      if (mounted) setState(() => _uploadingImage = false);
+      if (mounted) setState(() => _uploadingVideo = false);
     }
+  }
+
+  /// Voice-message record/stop toggle — mirrors the moments composer's
+  /// recording flow (`record` package, opus @16kHz mono), except a
+  /// chat voice message uploads and sends immediately on stop instead
+  /// of sitting in a draft list.
+  Future<void> _toggleVoiceRecording() async {
+    final l10n = AppLocalizations.of(context)!;
+    if (_isRecording) {
+      _elapsedTimer?.cancel();
+      String? stopped;
+      try {
+        stopped = await _recorder?.stop();
+      } catch (e) {
+        _toastFromException(e, l10n);
+      }
+      if (!mounted) return;
+      setState(() {
+        _isRecording = false;
+        _recordingStartMs = null;
+        _recordingElapsedSec = 0;
+      });
+      if (stopped == null || stopped.isEmpty) return;
+      setState(() => _sendingVoice = true);
+      try {
+        final file = File(stopped);
+        final bytes = await file.readAsBytes();
+        if (!mounted) return;
+        final ok = await context.read<ChatProvider>().sendVoiceMessage(
+              widget.conversationId,
+              bytes: bytes,
+              filename: stopped.split(Platform.pathSeparator).last,
+            );
+        if (!mounted) return;
+        if (ok) {
+          _scrollToBottom();
+        } else {
+          _showSnack(l10n.chatRoomVoiceUploadFailed);
+        }
+      } catch (_) {
+        if (!mounted) return;
+        _showSnack(l10n.chatRoomVoiceUploadFailed);
+      } finally {
+        if (mounted) setState(() => _sendingVoice = false);
+      }
+      return;
+    }
+    try {
+      final recorder = _recorder ??= AudioRecorder();
+      final hasPerm = await recorder.hasPermission();
+      if (!hasPerm) {
+        _toastFromException(
+          Exception(l10n.publishMomentRecordingPermissionBody),
+          l10n,
+        );
+        return;
+      }
+      final dir = await getTemporaryDirectory();
+      final path = '${dir.path}/voice_${_uuid.v4()}.opus';
+      await recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.opus,
+          bitRate: 32000,
+          sampleRate: 16000,
+          numChannels: 1,
+        ),
+        path: path,
+      );
+      if (!mounted) return;
+      setState(() {
+        _isRecording = true;
+        _recordingStartMs = DateTime.now().millisecondsSinceEpoch;
+        _recordingElapsedSec = 0;
+      });
+      _elapsedTimer?.cancel();
+      _elapsedTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) {
+          _elapsedTimer?.cancel();
+          return;
+        }
+        final start = _recordingStartMs;
+        if (start == null) return;
+        final elapsed = (DateTime.now().millisecondsSinceEpoch - start) ~/ 1000;
+        if (elapsed != _recordingElapsedSec) {
+          setState(() => _recordingElapsedSec = elapsed);
+        }
+      });
+    } catch (e) {
+      _toastFromException(e, l10n);
+    }
+  }
+
+  void _toastFromException(Object e, AppLocalizations l10n) {
+    final msg = e is ApiException ? e.message : e.toString();
+    _showSnack(localizeErrorMessage(msg, l10n));
+  }
+
+  void _openMediaSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 6),
+            ListTile(
+              leading: Icon(Icons.photo_outlined, color: AppColors.primary),
+              title: Text(l10n.chatRoomSendImageTooltip),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndSendImage();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.videocam_outlined, color: AppColors.primary),
+              title: Text(l10n.chatRoomRecordVideoOption),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndSendVideo(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.video_library_outlined, color: AppColors.primary),
+              title: Text(l10n.chatRoomGalleryVideoOption),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndSendVideo(ImageSource.gallery);
+              },
+            ),
+            if (!kIsWeb)
+              ListTile(
+                leading: Icon(Icons.mic_none_rounded, color: AppColors.primary),
+                title: Text(l10n.chatRoomVoiceOption),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _toggleVoiceRecording();
+                },
+              ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showSnack(String message) {
@@ -304,6 +566,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             },
           ),
           Expanded(child: _buildMessageList(l10n)),
+          if (_isRecording)
+            _RecordingBanner(
+              elapsedSec: _recordingElapsedSec,
+              onStop: _toggleVoiceRecording,
+              label: l10n.publishMomentRecordingInProgress(_recordingElapsedSec),
+              stopLabel: l10n.publishMomentRecordingStopInline,
+            ),
           _buildInputBar(l10n),
           AnimatedSize(
             duration: const Duration(milliseconds: 180),
@@ -413,10 +682,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // "+" image picker — replaces the old placeholder "More"
-          // button. While an upload is in flight we swap to a small
-          // spinner so the user sees the action was picked up.
-          _uploadingImage
+          // "+" media picker (image / video / voice) — while any
+          // upload is in flight we swap to a small spinner so the
+          // user sees the action was picked up.
+          (_uploadingImage || _uploadingVideo || _sendingVoice)
               ? Padding(
                   padding: const EdgeInsets.all(12),
                   child: SizedBox(
@@ -431,7 +700,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               : IconButton(
                   icon: Icon(Icons.add_circle_outline,
                       color: AppColors.primary),
-                  onPressed: _pickAndSendImage,
+                  onPressed: _openMediaSheet,
                   tooltip: l10n.chatRoomSendImageTooltip,
                 ),
           Expanded(
@@ -501,6 +770,64 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         : l10n.chatRoomEmojiTooltip,
                     onPressed: _toggleEmojiPicker,
                   ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Live "recording…" strip shown above the input bar while a voice
+/// message is being captured — elapsed seconds + an inline stop
+/// button, mirroring the moments composer's recording banner.
+class _RecordingBanner extends StatelessWidget {
+  final int elapsedSec;
+  final VoidCallback onStop;
+  final String label;
+  final String stopLabel;
+  const _RecordingBanner({
+    required this.elapsedSec,
+    required this.onStop,
+    required this.label,
+    required this.stopLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.10),
+        border: Border(
+          bottom: BorderSide(color: Colors.red.withValues(alpha: 0.25)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.red,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onStop,
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(stopLabel),
           ),
         ],
       ),

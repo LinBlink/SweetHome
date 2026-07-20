@@ -43,6 +43,40 @@ class AuthProvider extends ChangeNotifier {
     _restoreSession();
   }
 
+  Timer? _refreshTimer;
+
+  /// The JWT TTL is 15 minutes (docs/api.md §1.2). Reactive refresh-on-401
+  /// (`handleUnauthorized`) covers REST calls fine, but the WebSocket
+  /// connection has no equivalent signal: `WebSocketService` reconnects
+  /// using whatever token `tokenProvider()` currently returns, and a
+  /// handshake rejected for an expired JWT looks identical to a plain
+  /// network failure — it just backs off and retries with the same stale
+  /// token, with no path back to this provider. A socket that drops after
+  /// expiry with no REST call happening nearby to trigger a reactive
+  /// refresh would otherwise never recover. Refreshing proactively, well
+  /// inside the 15-minute window, keeps the token that `WebSocketService`
+  /// reads always fresh so reconnects never race an expiry.
+  static const _refreshInterval = Duration(minutes: 10);
+
+  void _scheduleTokenRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(
+      _refreshInterval,
+      (_) => unawaited(handleUnauthorized()),
+    );
+  }
+
+  void _cancelTokenRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+  }
+
+  @override
+  void dispose() {
+    _cancelTokenRefresh();
+    super.dispose();
+  }
+
   Future<void> _restoreSession() async {
     if (AppConfig.mockMode) {
       _isLoading = false;
@@ -68,6 +102,7 @@ class AuthProvider extends ChangeNotifier {
       // the restored token is safe (the server upserts by token,
       // see §2.7.1).
       unawaited(_push?.registerForUser(_currentUser!));
+      _scheduleTokenRefresh();
     }
     _isLoading = false;
     notifyListeners();
@@ -97,6 +132,7 @@ class AuthProvider extends ChangeNotifier {
         // §2.7.1: register this device's JPush registration ID with
         // the new session so fence-alarm pushes can be delivered.
         unawaited(_push?.registerForUser(_currentUser!));
+        _scheduleTokenRefresh();
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -148,6 +184,7 @@ class AuthProvider extends ChangeNotifier {
         // §2.7.1: same as login — register the JPush token with the
         // freshly-minted session.
         unawaited(_push?.registerForUser(_currentUser!));
+        _scheduleTokenRefresh();
       }
     } on ApiException catch (e) {
       _error = e.message;
@@ -287,6 +324,7 @@ class AuthProvider extends ChangeNotifier {
     final user = _currentUser;
     final refresh = user?.refreshToken ?? '';
     _currentUser = null;
+    _cancelTokenRefresh();
     notifyListeners();
     // §2.7.2: deregister the JPush token BEFORE wiping local credentials
     // — the call needs the live JWT in its Authorization header. Wait

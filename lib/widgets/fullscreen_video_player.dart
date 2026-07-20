@@ -1,6 +1,30 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
+import '../services/media_cache.dart';
+
+/// Resolves [url] through the same on-disk cache `CachedNetworkImage`
+/// uses for photos, then hands `video_player` the local file instead
+/// of the raw network URL — without this, `VideoPlayerController.
+/// networkUrl` re-streams the clip from the network every time,
+/// including after simply closing and reopening the app since
+/// nothing persists across process restarts otherwise. Shared by the
+/// family feed (`moment_card.dart`) and chat video bubbles
+/// (`message_bubble.dart`).
+///
+/// Skipped on web: `video_player_web` throws `UnimplementedError` for
+/// `DataSourceType.file` (there's no filesystem to hand it a `File`
+/// from), so web falls back to the original network-streaming path —
+/// the browser's own HTTP cache is the best we get there.
+Future<VideoPlayerController> cachedVideoController(String url) async {
+  if (kIsWeb) {
+    return VideoPlayerController.networkUrl(Uri.parse(url));
+  }
+  final file = await MediaCache.videos.getSingleFile(url);
+  return VideoPlayerController.file(file);
+}
 
 /// Full-screen video playback shell shared by the family-feed's
 /// fullscreen video (`moment_card.dart`) and the publish composer's
@@ -230,14 +254,15 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                   duration: duration,
                   onPlayPause: _togglePlay,
                   onSeekStart: () => _hideControlsTimer?.cancel(),
+                  // `v` already arrives in milliseconds — the Slider's
+                  // min/max are set to 0/`duration.inMilliseconds`
+                  // below, not a normalized 0–1000 range. Multiplying
+                  // by `duration.inMilliseconds` again (the previous
+                  // bug) overshot the real duration on almost any
+                  // drag, so `seekTo` clamped straight to the end —
+                  // "drag once and it jumps to the end".
                   onSeekChange: (v) async {
-                    final d = duration.inMilliseconds == 0
-                        ? Duration.zero
-                        : Duration(
-                            milliseconds:
-                                duration.inMilliseconds * (v / 1000).toInt(),
-                          );
-                    await c.seekTo(d);
+                    await c.seekTo(Duration(milliseconds: v.toInt()));
                   },
                   onBackward: () => _seekRelative(
                     const Duration(seconds: -10),

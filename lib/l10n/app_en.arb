@@ -189,6 +189,11 @@
   "chatRoomSendImageTooltip": "Send image",
   "chatRoomImageUploading": "Uploading image…",
   "chatRoomImageUploadFailed": "Couldn't send image",
+  "chatRoomRecordVideoOption": "Record video",
+  "chatRoomGalleryVideoOption": "Choose video from gallery",
+  "chatRoomVoiceOption": "Voice message",
+  "chatRoomVideoUploadFailed": "Couldn't send video",
+  "chatRoomVoiceUploadFailed": "Couldn't send voice message",
   "chatRoomEmojiTooltip": "Open emoji picker",
   "chatRoomKeyboardTooltip": "Show keyboard",
   "emojiCategorySmileys": "Smileys & emotion",
@@ -201,6 +206,7 @@
   "emojiCategorySymbols": "Symbols",
   "chatMessageTypeImage": "[Image]",
   "chatMessageTypeVoice": "[Voice]",
+  "chatMessageTypeVideo": "[Video]",
   "chatMessageTypeSystem": "[System]",
   "locationHistoryTitle": "Today's Trajectory",
   "locationHistoryEmpty": "No trajectory points for this day",
@@ -487,6 +493,27 @@
 "chatExportCopy": "Copy all",
 "chatExportCopied": "Copied to clipboard",
 "chatExportSavedTo": "Saved to: {path}",
+"chatExportSelectConversationsTitle": "Choose conversations to export",
+"chatExportSelectAll": "Select all",
+"chatExportDeselectAll": "Deselect all",
+"chatExportFormatSection": "Export format",
+"chatExportFormatTxt": "Text (no images)",
+"chatExportFormatPdf": "PDF (with images)",
+"chatExportGenerateButton": "Export",
+"chatExportSelectAtLeastOne": "Select at least one conversation",
+"chatExportShare": "Share",
+"chatExportGenerating": "Generating…",
+"chatExportGeneratingProgress": "Generating {current}/{total} messages…",
+"@chatExportGeneratingProgress": {
+  "placeholders": {
+    "current": {"type": "int"},
+    "total": {"type": "int"}
+  }
+},
+"chatExportDateRangeAll": "All time",
+"chatExportLongRangeTitle": "Long date range",
+"chatExportLongRangeBody": "The selected date range is long, so generating the export may be slow. Continue anyway?",
+"chatExportImageLoadFailed": "Couldn't load image",
 "@chatExportSavedTo": {
   "placeholders": {
     "path": {
@@ -516,10 +543,53 @@
   }
 },
 "@storageClearMediaConfirmTitle": {
-  "placeholders": {
-    "category": {
-      "type": "String"
-    }
-  }
-}
+   "placeholders": {
+     "category": {
+       "type": "String"
+     }
+   }
+ },
+ "myHomeSectionHealthTitle": "Health",
+ "healthTitle": "Family Health",
+ "healthSubtitle": "Track height, weight and blood pressure for the whole family",
+ "healthTabMyRecords": "My Records",
+ "healthTabFamily": "Family Members",
+ "healthTabSettings": "Settings",
+ "healthTabAll": "All",
+ "healthRecordNew": "Record new data",
+ "healthRecordSubmit": "Save",
+ "healthRecordDate": "Date",
+ "healthHeight": "Height",
+ "healthWeight": "Weight",
+ "healthBloodPressure": "Blood Pressure",
+ "healthHeightCm": "Height (cm)",
+ "healthWeightKg": "Weight (kg)",
+ "healthBloodPressureSystolic": "Systolic (mmHg)",
+ "healthBloodPressureDiastolic": "Diastolic (mmHg)",
+ "healthBloodPressureBothRequired": "Please enter both systolic and diastolic values",
+ "healthValueRequired": "Please enter a value",
+ "healthValueInvalid": "Invalid number",
+ "healthHistoryTitle": "History",
+ "healthNoRecords": "No health records yet.",
+ "healthSelectMember": "Select a family member",
+ "healthSelectMemberHint": "Pick a family member above to view their public health records.",
+ "healthFilterByMetric": "Filter by type",
+ "healthVisibilityTitle": "Visibility",
+ "healthReminderTitle": "Daily Reminder",
+ "healthReminderEnable": "Enable daily reminder",
+ "healthReminderTime": "Reminder time",
+ "healthReminderHint": "You will receive a push notification at this time if you haven't recorded health data today.",
+ "healthChartEmpty": "Not enough data to draw a chart yet.",
+ "healthChartSinglePoint": "Only one record so far — keep recording to see a trend.",
+ "healthChartLatest": "Latest",
+ "healthChartMin": "Min",
+ "healthChartMax": "Max",
+ "healthChartAverage": "Average",
+ "healthChartSelectMetric": "Pick a metric above to see a chart.",
+ "healthEditSave": "Save",
+ "healthEditDateConflict": "A record for this date already exists.",
+ "healthEditRecordNotFound": "This record no longer exists.",
+ "healthEditNotOwner": "You can only edit your own records.",
+ "healthEditFailed": "Could not update the record.",
+ "healthRecordEditHint": "Tap a record to edit."
 }

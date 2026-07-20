@@ -1030,6 +1030,36 @@ abstract class AppLocalizations {
   /// **'Couldn\'t send image'**
   String get chatRoomImageUploadFailed;
 
+  /// No description provided for @chatRoomRecordVideoOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Record video'**
+  String get chatRoomRecordVideoOption;
+
+  /// No description provided for @chatRoomGalleryVideoOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose video from gallery'**
+  String get chatRoomGalleryVideoOption;
+
+  /// No description provided for @chatRoomVoiceOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice message'**
+  String get chatRoomVoiceOption;
+
+  /// No description provided for @chatRoomVideoUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send video'**
+  String get chatRoomVideoUploadFailed;
+
+  /// No description provided for @chatRoomVoiceUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send voice message'**
+  String get chatRoomVoiceUploadFailed;
+
   /// No description provided for @chatRoomEmojiTooltip.
   ///
   /// In en, this message translates to:
@@ -1101,6 +1131,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'[Voice]'**
   String get chatMessageTypeVoice;
+
+  /// No description provided for @chatMessageTypeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'[Video]'**
+  String get chatMessageTypeVideo;
 
   /// No description provided for @chatMessageTypeSystem.
   ///
@@ -2170,6 +2206,96 @@ abstract class AppLocalizations {
   /// **'Saved to: {path}'**
   String chatExportSavedTo(String path);
 
+  /// No description provided for @chatExportSelectConversationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose conversations to export'**
+  String get chatExportSelectConversationsTitle;
+
+  /// No description provided for @chatExportSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get chatExportSelectAll;
+
+  /// No description provided for @chatExportDeselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect all'**
+  String get chatExportDeselectAll;
+
+  /// No description provided for @chatExportFormatSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Export format'**
+  String get chatExportFormatSection;
+
+  /// No description provided for @chatExportFormatTxt.
+  ///
+  /// In en, this message translates to:
+  /// **'Text (no images)'**
+  String get chatExportFormatTxt;
+
+  /// No description provided for @chatExportFormatPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF (with images)'**
+  String get chatExportFormatPdf;
+
+  /// No description provided for @chatExportGenerateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get chatExportGenerateButton;
+
+  /// No description provided for @chatExportSelectAtLeastOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one conversation'**
+  String get chatExportSelectAtLeastOne;
+
+  /// No description provided for @chatExportShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get chatExportShare;
+
+  /// No description provided for @chatExportGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating…'**
+  String get chatExportGenerating;
+
+  /// No description provided for @chatExportGeneratingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating {current}/{total} messages…'**
+  String chatExportGeneratingProgress(int current, int total);
+
+  /// No description provided for @chatExportDateRangeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get chatExportDateRangeAll;
+
+  /// No description provided for @chatExportLongRangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Long date range'**
+  String get chatExportLongRangeTitle;
+
+  /// No description provided for @chatExportLongRangeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected date range is long, so generating the export may be slow. Continue anyway?'**
+  String get chatExportLongRangeBody;
+
+  /// No description provided for @chatExportImageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load image'**
+  String get chatExportImageLoadFailed;
+
   /// No description provided for @storageScreenTitle.
   ///
   /// In en, this message translates to:
@@ -2253,6 +2379,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cache cleared'**
   String get storageClearSuccess;
+
+  /// No description provided for @myHomeSectionHealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get myHomeSectionHealthTitle;
+
+  /// No description provided for @healthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Health'**
+  String get healthTitle;
+
+  /// No description provided for @healthSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track height, weight and blood pressure for the whole family'**
+  String get healthSubtitle;
+
+  /// No description provided for @healthTabMyRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'My Records'**
+  String get healthTabMyRecords;
+
+  /// No description provided for @healthTabFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Members'**
+  String get healthTabFamily;
+
+  /// No description provided for @healthTabSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get healthTabSettings;
+
+  /// No description provided for @healthTabAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get healthTabAll;
+
+  /// No description provided for @healthRecordNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Record new data'**
+  String get healthRecordNew;
+
+  /// No description provided for @healthRecordSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get healthRecordSubmit;
+
+  /// No description provided for @healthRecordDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get healthRecordDate;
+
+  /// No description provided for @healthHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get healthHeight;
+
+  /// No description provided for @healthWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get healthWeight;
+
+  /// No description provided for @healthBloodPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure'**
+  String get healthBloodPressure;
+
+  /// No description provided for @healthHeightCm.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get healthHeightCm;
+
+  /// No description provided for @healthWeightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get healthWeightKg;
+
+  /// No description provided for @healthBloodPressureSystolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic (mmHg)'**
+  String get healthBloodPressureSystolic;
+
+  /// No description provided for @healthBloodPressureDiastolic.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic (mmHg)'**
+  String get healthBloodPressureDiastolic;
+
+  /// No description provided for @healthBloodPressureBothRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter both systolic and diastolic values'**
+  String get healthBloodPressureBothRequired;
+
+  /// No description provided for @healthValueRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a value'**
+  String get healthValueRequired;
+
+  /// No description provided for @healthValueInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid number'**
+  String get healthValueInvalid;
+
+  /// No description provided for @healthHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get healthHistoryTitle;
+
+  /// No description provided for @healthNoRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'No health records yet.'**
+  String get healthNoRecords;
+
+  /// No description provided for @healthSelectMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a family member'**
+  String get healthSelectMember;
+
+  /// No description provided for @healthSelectMemberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a family member above to view their public health records.'**
+  String get healthSelectMemberHint;
+
+  /// No description provided for @healthFilterByMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by type'**
+  String get healthFilterByMetric;
+
+  /// No description provided for @healthVisibilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility'**
+  String get healthVisibilityTitle;
+
+  /// No description provided for @healthReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder'**
+  String get healthReminderTitle;
+
+  /// No description provided for @healthReminderEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable daily reminder'**
+  String get healthReminderEnable;
+
+  /// No description provided for @healthReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get healthReminderTime;
+
+  /// No description provided for @healthReminderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive a push notification at this time if you haven\'t recorded health data today.'**
+  String get healthReminderHint;
+
+  /// No description provided for @healthChartEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data to draw a chart yet.'**
+  String get healthChartEmpty;
+
+  /// No description provided for @healthChartSinglePoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one record so far — keep recording to see a trend.'**
+  String get healthChartSinglePoint;
+
+  /// No description provided for @healthChartLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get healthChartLatest;
+
+  /// No description provided for @healthChartMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get healthChartMin;
+
+  /// No description provided for @healthChartMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get healthChartMax;
+
+  /// No description provided for @healthChartAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get healthChartAverage;
+
+  /// No description provided for @healthChartSelectMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a metric above to see a chart.'**
+  String get healthChartSelectMetric;
+
+  /// No description provided for @healthEditSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get healthEditSave;
+
+  /// No description provided for @healthEditDateConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'A record for this date already exists.'**
+  String get healthEditDateConflict;
+
+  /// No description provided for @healthEditRecordNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This record no longer exists.'**
+  String get healthEditRecordNotFound;
+
+  /// No description provided for @healthEditNotOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only edit your own records.'**
+  String get healthEditNotOwner;
+
+  /// No description provided for @healthEditFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update the record.'**
+  String get healthEditFailed;
+
+  /// No description provided for @healthRecordEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a record to edit.'**
+  String get healthRecordEditHint;
 }
 
 class _AppLocalizationsDelegate

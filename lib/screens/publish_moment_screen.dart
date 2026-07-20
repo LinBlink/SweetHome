@@ -542,51 +542,62 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     }
     if (raw == null) return;
     setState(() => _isCompressingMedia = true);
-    MediaInfo? info;
+
+    // `video_compress` wraps a native transcoder that's known to be
+    // flaky on some devices/source videos (throws or spends a long
+    // time stuck mid-decode — the "Decoder(AUDIO,0): buffer() failed"
+    // / "Reader: Returning State.Wait" logcat spam is that transcoder
+    // stalling). A compression failure doesn't mean the video is too
+    // large — it means compression didn't work this time — so fall
+    // back to uploading the original file instead of unconditionally
+    // (and misleadingly) reporting it as oversized. The timeout keeps
+    // a stuck transcode from blocking the user indefinitely.
+    File uploadFile = File(raw.path);
+    var wasCompressed = false;
     try {
-      info = await VideoCompress.compressVideo(
+      final info = await VideoCompress.compressVideo(
         raw.path,
         quality: VideoQuality.MediumQuality,
         deleteOrigin: false,
         frameRate: 30,
         includeAudio: true,
-      );
+      ).timeout(const Duration(seconds: 25));
+      if (info?.file != null && await info!.file!.exists()) {
+        uploadFile = info.file!;
+        wasCompressed = true;
+      }
     } catch (_) {
-      info = null;
+      unawaited(VideoCompress.cancelCompression());
     }
-    final rawSize = await File(raw.path).length().catchError((_) => 0);
-    if (info == null || info.file == null || !await info.file!.exists()) {
+
+    final size = await uploadFile.length().catchError((_) => 0);
+    if (size > _maxVideoBytes) {
+      final sizeMb = (size / (1024 * 1024)).toStringAsFixed(1);
+      if (wasCompressed) {
+        try {
+          await uploadFile.delete();
+        } catch (_) {}
+      }
       if (mounted) setState(() => _isCompressingMedia = false);
-      final sizeMb = (rawSize / (1024 * 1024)).toStringAsFixed(1);
       messenger.showSnackBar(SnackBar(
         content: Text(
-          l10n.publishMomentVideoTooLargeRaw(sizeMb),
+          wasCompressed
+              ? l10n.publishMomentVideoTooLarge(sizeMb)
+              : l10n.publishMomentVideoTooLargeRaw(sizeMb),
         ),
       ));
       return;
     }
-    final compressedSize =
-        info.filesize ?? await info.file!.length().catchError((_) => 0);
-    if (compressedSize > _maxVideoBytes) {
-      final sizeMb = (compressedSize / (1024 * 1024)).toStringAsFixed(1);
-      try {
-        await info.file!.delete();
-      } catch (_) {}
-      if (mounted) setState(() => _isCompressingMedia = false);
-      messenger.showSnackBar(SnackBar(
-        content: Text(l10n.publishMomentVideoTooLarge(sizeMb)),
-      ));
-      return;
-    }
-    final finalPath = info.file!.path;
     if (!mounted) {
-      try {
-        await File(finalPath).delete();
-      } catch (_) {}
+      if (wasCompressed) {
+        try {
+          await uploadFile.delete();
+        } catch (_) {}
+      }
       return;
     }
     final draft = MomentDraft.fromXFile(
-      XFile(finalPath, name: raw.name),
+      XFile(uploadFile.path, name: raw.name),
       MomentDraftKind.video,
     );
     setState(() {
@@ -924,7 +935,7 @@ class _BlinkingDotState extends State<_BlinkingDot>
   }
 }
 
-class _DraftsStrip extends StatelessWidget {
+class _DraftsStrip extends StatefulWidget {
   final List<MomentDraft> drafts;
   final ValueChanged<int> onRemove;
   final void Function(int oldIndex, int newIndex) onReorder;
@@ -937,7 +948,19 @@ class _DraftsStrip extends StatelessWidget {
   });
 
   @override
+  State<_DraftsStrip> createState() => _DraftsStripState();
+}
+
+class _DraftsStripState extends State<_DraftsStrip> {
+  // Tracked so the trailing "drop here to move to the end" zone only
+  // takes up space while a drag is actually in progress — otherwise
+  // it'd sit there as a permanent, unexplained empty slot after the
+  // last thumbnail.
+  bool _dragging = false;
+
+  @override
   Widget build(BuildContext context) {
+    final drafts = widget.drafts;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -947,10 +970,28 @@ class _DraftsStrip extends StatelessWidget {
             key: ValueKey(drafts[i].id),
             index: i,
             draft: drafts[i],
-            onRemove: () => onRemove(i),
-            onTap: () => onTapDraft(drafts[i]),
-            onReorder: onReorder,
+            onRemove: () => widget.onRemove(i),
+            onTap: () => widget.onTapDraft(drafts[i]),
+            onReorder: widget.onReorder,
+            onDragStateChanged: (dragging) {
+              if (_dragging != dragging) setState(() => _dragging = dragging);
+            },
           ),
+        // A drop target after the last tile so a dragged item can
+        // actually land in the true last position — without this,
+        // dropping onto the last tile's own DragTarget only ever
+        // inserts *before* it (this slot's target index is
+        // `drafts.length`, past every real tile), so an item could
+        // never be moved all the way to the end.
+        AnimatedSize(
+          duration: const Duration(milliseconds: 150),
+          child: _dragging
+              ? _TrailingDropZone(
+                  targetIndex: drafts.length,
+                  onReorder: widget.onReorder,
+                )
+              : const SizedBox(width: 0, height: 84),
+        ),
       ],
     );
   }
@@ -968,6 +1009,7 @@ class _DraggableDraftTile extends StatelessWidget {
   final VoidCallback onRemove;
   final VoidCallback onTap;
   final void Function(int oldIndex, int newIndex) onReorder;
+  final ValueChanged<bool> onDragStateChanged;
 
   const _DraggableDraftTile({
     required super.key,
@@ -976,6 +1018,7 @@ class _DraggableDraftTile extends StatelessWidget {
     required this.onRemove,
     required this.onTap,
     required this.onReorder,
+    required this.onDragStateChanged,
   });
 
   @override
@@ -1029,19 +1072,90 @@ class _DraggableDraftTile extends StatelessWidget {
         final isDropTarget = candidateData.isNotEmpty;
         return LongPressDraggable<int>(
           data: index,
+          onDragStarted: () => onDragStateChanged(true),
+          onDragEnd: (_) => onDragStateChanged(false),
+          onDraggableCanceled: (_, _) => onDragStateChanged(false),
           feedback: Material(
             color: Colors.transparent,
-            child: Opacity(opacity: 0.85, child: tile),
+            child: Transform.scale(
+              scale: 1.08,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: tile,
+              ),
+            ),
           ),
           childWhenDragging: Opacity(opacity: 0.3, child: tile),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: isDropTarget
-                  ? Border.all(color: AppColors.primary, width: 2)
-                  : null,
+          child: _DropHighlight(active: isDropTarget, child: tile),
+        );
+      },
+    );
+  }
+}
+
+/// Shared drop-target highlight — a visible tinted fill plus a
+/// noticeably thick border, used both by each tile's own
+/// [DragTarget] and by [_TrailingDropZone], so hovering a drag over
+/// either reads as an unambiguous "drop here" cue rather than the
+/// easy-to-miss thin outline this used to be.
+class _DropHighlight extends StatelessWidget {
+  final bool active;
+  final Widget child;
+  const _DropHighlight({required this.active, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: active ? AppColors.primary.withValues(alpha: 0.16) : null,
+        border: Border.all(
+          color: active ? AppColors.primary : Colors.transparent,
+          width: 2.5,
+        ),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: child,
+    );
+  }
+}
+
+/// Appears only while a tile is being dragged (see
+/// `_DraftsStripState._dragging`) — a drop target past the end of
+/// the real tiles so an item can be moved all the way to last.
+class _TrailingDropZone extends StatelessWidget {
+  final int targetIndex;
+  final void Function(int oldIndex, int newIndex) onReorder;
+  const _TrailingDropZone({required this.targetIndex, required this.onReorder});
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<int>(
+      onAcceptWithDetails: (details) => onReorder(details.data, targetIndex),
+      builder: (context, candidateData, rejectedData) {
+        final isDropTarget = candidateData.isNotEmpty;
+        return _DropHighlight(
+          active: isDropTarget,
+          child: SizedBox(
+            width: 84,
+            height: 84,
+            child: Center(
+              child: Icon(
+                Icons.arrow_forward_rounded,
+                size: 20,
+                color: AppColors.textHint.withValues(alpha: 0.6),
+              ),
             ),
-            child: tile,
           ),
         );
       },

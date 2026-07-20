@@ -8,14 +8,17 @@ import 'core/app_theme.dart';
 import 'core/app_colors.dart';
 import 'core/brand_colors.dart';
 import 'core/home_widgets.dart';
+import 'core/tab_visibility.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
+import 'providers/health_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/moment_provider.dart';
 import 'providers/theme_provider.dart';
 import 'services/chat_service.dart';
+import 'services/health_service.dart';
 import 'services/location_service.dart';
 import 'services/moment_service.dart';
 import 'services/push_notification_router.dart';
@@ -99,6 +102,16 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   PushNotificationRouter? _pushRouter;
 
+  /// Tracks the previous `isAuthenticated` value across rebuilds so a
+  /// true→false transition (session expired — `AuthProvider.logout()`
+  /// called from the reactive-401 path, the periodic proactive refresh,
+  /// or the profile screen's own logout button) can be told apart from
+  /// "was already logged out" or "just logged in". Starts false: at
+  /// `initState` the provider hasn't finished `_restoreSession()` yet
+  /// (`isLoading` is true, `currentUser` is still null), so the very
+  /// first real value is never a false→false no-op read as a login.
+  bool _wasAuthenticated = false;
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +149,20 @@ class _AuthGateState extends State<AuthGate> {
         // window. Idempotent — flushPending is a no-op if nothing
         // is pending.
         if (auth.isAuthenticated) _pushRouter?.flushPending();
+        // A session that just ended (true→false) can leave screens
+        // pushed on top of this route (a chat room, an open dialog,
+        // several levels of `Navigator.push`) — swapping *this*
+        // widget for `LoginScreen` below only changes what the base
+        // route renders, it doesn't clear whatever's stacked above
+        // it, so the user would still be staring at the old screen.
+        // Pop everything back to that base route so the login screen
+        // this build is about to return is actually what's on screen.
+        if (_wasAuthenticated && !auth.isAuthenticated) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            rootNavigatorKey.currentState?.popUntil((r) => r.isFirst);
+          });
+        }
+        _wasAuthenticated = auth.isAuthenticated;
         if (auth.isLoading) return const _SplashScreen();
         if (auth.isAuthenticated) {
           return MultiProvider(
@@ -180,6 +207,12 @@ class _AuthGateState extends State<AuthGate> {
                   currentUser: auth.currentUser!,
                   service: MomentService(
                       () => auth.currentUser!.token),
+                )..loadInitial(),
+              ),
+              ChangeNotifierProvider(
+                create: (_) => HealthProvider(
+                  service: HealthService(() => auth.currentUser!.token),
+                  mockMode: AppConfig.mockMode,
                 )..loadInitial(),
               ),
             ],
@@ -260,7 +293,18 @@ class _MainShellState extends State<MainShell> {
       body: PageView(
         controller: _pageController,
         onPageChanged: (i) => setState(() => _currentIndex = i),
-        children: _screens,
+        // Each page wrapped in its own `TabVisibility` so widgets that
+        // own playback (family-feed inline video/audio tiles) can tell
+        // "off-screen because another tab is selected" apart from
+        // "on-screen" and pause accordingly — see tab_visibility.dart.
+        // Rebuilding this list on every `_currentIndex` change is
+        // cheap and doesn't disturb the underlying screens' State: same
+        // widget type + implicit index-based key at each position, so
+        // Flutter keeps reusing the same Elements.
+        children: [
+          for (var i = 0; i < _screens.length; i++)
+            TabVisibility(visible: i == _currentIndex, child: _screens[i]),
+        ],
       ),
       // bottomNavigationBar is the visible bar with 4 regular tabs;
       // the raised MyHome button is overlaid on top of it via

@@ -492,6 +492,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chatRoomImageUploadFailed => '图片发送失败';
 
   @override
+  String get chatRoomRecordVideoOption => '拍摄视频';
+
+  @override
+  String get chatRoomGalleryVideoOption => '从相册选择视频';
+
+  @override
+  String get chatRoomVoiceOption => '语音留言';
+
+  @override
+  String get chatRoomVideoUploadFailed => '视频发送失败';
+
+  @override
+  String get chatRoomVoiceUploadFailed => '语音发送失败';
+
+  @override
   String get chatRoomEmojiTooltip => '打开表情';
 
   @override
@@ -526,6 +541,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatMessageTypeVoice => '[语音]';
+
+  @override
+  String get chatMessageTypeVideo => '[视频]';
 
   @override
   String get chatMessageTypeSystem => '[系统消息]';
@@ -1111,6 +1129,53 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get chatExportSelectConversationsTitle => '选择要导出的对话';
+
+  @override
+  String get chatExportSelectAll => '全选';
+
+  @override
+  String get chatExportDeselectAll => '取消全选';
+
+  @override
+  String get chatExportFormatSection => '导出格式';
+
+  @override
+  String get chatExportFormatTxt => '文本（不含图片）';
+
+  @override
+  String get chatExportFormatPdf => 'PDF（含图片）';
+
+  @override
+  String get chatExportGenerateButton => '导出';
+
+  @override
+  String get chatExportSelectAtLeastOne => '请至少选择一个对话';
+
+  @override
+  String get chatExportShare => '分享';
+
+  @override
+  String get chatExportGenerating => '正在生成…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return '正在生成 $current/$total 条消息…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => '全部时间';
+
+  @override
+  String get chatExportLongRangeTitle => '日期范围较长';
+
+  @override
+  String get chatExportLongRangeBody => '选择的日期范围较长，生成速度可能会比较慢，是否继续导出？';
+
+  @override
+  String get chatExportImageLoadFailed => '图片加载失败';
+
+  @override
   String get storageScreenTitle => '存储空间';
 
   @override
@@ -1156,6 +1221,135 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storageClearSuccess => '缓存已清除';
+
+  @override
+  String get myHomeSectionHealthTitle => '健康';
+
+  @override
+  String get healthTitle => '家庭健康';
+
+  @override
+  String get healthSubtitle => '记录全家人的身高、体重和血压';
+
+  @override
+  String get healthTabMyRecords => '我的记录';
+
+  @override
+  String get healthTabFamily => '家人';
+
+  @override
+  String get healthTabSettings => '设置';
+
+  @override
+  String get healthTabAll => '全部';
+
+  @override
+  String get healthRecordNew => '记录新数据';
+
+  @override
+  String get healthRecordSubmit => '保存';
+
+  @override
+  String get healthRecordDate => '日期';
+
+  @override
+  String get healthHeight => '身高';
+
+  @override
+  String get healthWeight => '体重';
+
+  @override
+  String get healthBloodPressure => '血压';
+
+  @override
+  String get healthHeightCm => '身高 (cm)';
+
+  @override
+  String get healthWeightKg => '体重 (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => '收缩压 (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => '舒张压 (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired => '请输入收缩压和舒张压';
+
+  @override
+  String get healthValueRequired => '请输入数值';
+
+  @override
+  String get healthValueInvalid => '数字格式不正确';
+
+  @override
+  String get healthHistoryTitle => '历史记录';
+
+  @override
+  String get healthNoRecords => '暂无健康记录';
+
+  @override
+  String get healthSelectMember => '选择家庭成员';
+
+  @override
+  String get healthSelectMemberHint => '选择家人查看他们公开的健康数据。';
+
+  @override
+  String get healthFilterByMetric => '按类型筛选';
+
+  @override
+  String get healthVisibilityTitle => '可见性';
+
+  @override
+  String get healthReminderTitle => '每日提醒';
+
+  @override
+  String get healthReminderEnable => '开启每日提醒';
+
+  @override
+  String get healthReminderTime => '提醒时间';
+
+  @override
+  String get healthReminderHint => '到设定时间若还未记录健康数据，将通过推送通知提醒你。';
+
+  @override
+  String get healthChartEmpty => '数据不足，暂无法绘制图表。';
+
+  @override
+  String get healthChartSinglePoint => '当前只有一条记录，继续记录即可看到趋势。';
+
+  @override
+  String get healthChartLatest => '最新';
+
+  @override
+  String get healthChartMin => '最低';
+
+  @override
+  String get healthChartMax => '最高';
+
+  @override
+  String get healthChartAverage => '平均';
+
+  @override
+  String get healthChartSelectMetric => '选择上方指标类型查看图表。';
+
+  @override
+  String get healthEditSave => '保存';
+
+  @override
+  String get healthEditDateConflict => '该日期已存在该指标的记录。';
+
+  @override
+  String get healthEditRecordNotFound => '这条记录已不存在。';
+
+  @override
+  String get healthEditNotOwner => '只能修改自己的记录。';
+
+  @override
+  String get healthEditFailed => '更新记录失败。';
+
+  @override
+  String get healthRecordEditHint => '点击记录以编辑';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1646,6 +1840,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get chatRoomImageUploadFailed => '图片发送失败';
 
   @override
+  String get chatRoomRecordVideoOption => '拍摄视频';
+
+  @override
+  String get chatRoomGalleryVideoOption => '从相册选择视频';
+
+  @override
+  String get chatRoomVoiceOption => '语音留言';
+
+  @override
+  String get chatRoomVideoUploadFailed => '视频发送失败';
+
+  @override
+  String get chatRoomVoiceUploadFailed => '语音发送失败';
+
+  @override
   String get chatRoomEmojiTooltip => '打开表情';
 
   @override
@@ -1680,6 +1889,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get chatMessageTypeVoice => '[语音]';
+
+  @override
+  String get chatMessageTypeVideo => '[视频]';
 
   @override
   String get chatMessageTypeSystem => '[系统消息]';
@@ -2265,6 +2477,53 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get chatExportSelectConversationsTitle => '选择要导出的对话';
+
+  @override
+  String get chatExportSelectAll => '全选';
+
+  @override
+  String get chatExportDeselectAll => '取消全选';
+
+  @override
+  String get chatExportFormatSection => '导出格式';
+
+  @override
+  String get chatExportFormatTxt => '文本（不含图片）';
+
+  @override
+  String get chatExportFormatPdf => 'PDF（含图片）';
+
+  @override
+  String get chatExportGenerateButton => '导出';
+
+  @override
+  String get chatExportSelectAtLeastOne => '请至少选择一个对话';
+
+  @override
+  String get chatExportShare => '分享';
+
+  @override
+  String get chatExportGenerating => '正在生成…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return '正在生成 $current/$total 条消息…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => '全部时间';
+
+  @override
+  String get chatExportLongRangeTitle => '日期范围较长';
+
+  @override
+  String get chatExportLongRangeBody => '选择的日期范围较长，生成速度可能会比较慢，是否继续导出？';
+
+  @override
+  String get chatExportImageLoadFailed => '图片加载失败';
+
+  @override
   String get storageScreenTitle => '存储空间';
 
   @override
@@ -2310,6 +2569,135 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get storageClearSuccess => '缓存已清除';
+
+  @override
+  String get myHomeSectionHealthTitle => '健康';
+
+  @override
+  String get healthTitle => '家庭健康';
+
+  @override
+  String get healthSubtitle => '记录全家人的身高、体重和血压';
+
+  @override
+  String get healthTabMyRecords => '我的记录';
+
+  @override
+  String get healthTabFamily => '家人';
+
+  @override
+  String get healthTabSettings => '设置';
+
+  @override
+  String get healthTabAll => '全部';
+
+  @override
+  String get healthRecordNew => '记录新数据';
+
+  @override
+  String get healthRecordSubmit => '保存';
+
+  @override
+  String get healthRecordDate => '日期';
+
+  @override
+  String get healthHeight => '身高';
+
+  @override
+  String get healthWeight => '体重';
+
+  @override
+  String get healthBloodPressure => '血压';
+
+  @override
+  String get healthHeightCm => '身高 (cm)';
+
+  @override
+  String get healthWeightKg => '体重 (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => '收缩压 (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => '舒张压 (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired => '请输入收缩压和舒张压';
+
+  @override
+  String get healthValueRequired => '请输入数值';
+
+  @override
+  String get healthValueInvalid => '数字格式不正确';
+
+  @override
+  String get healthHistoryTitle => '历史记录';
+
+  @override
+  String get healthNoRecords => '暂无健康记录';
+
+  @override
+  String get healthSelectMember => '选择家庭成员';
+
+  @override
+  String get healthSelectMemberHint => '选择家人查看他们公开的健康数据。';
+
+  @override
+  String get healthFilterByMetric => '按类型筛选';
+
+  @override
+  String get healthVisibilityTitle => '可见性';
+
+  @override
+  String get healthReminderTitle => '每日提醒';
+
+  @override
+  String get healthReminderEnable => '开启每日提醒';
+
+  @override
+  String get healthReminderTime => '提醒时间';
+
+  @override
+  String get healthReminderHint => '到设定时间若还未记录健康数据，将通过推送通知提醒你。';
+
+  @override
+  String get healthChartEmpty => '数据不足，暂无法绘制图表。';
+
+  @override
+  String get healthChartSinglePoint => '当前只有一条记录，继续记录即可看到趋势。';
+
+  @override
+  String get healthChartLatest => '最新';
+
+  @override
+  String get healthChartMin => '最低';
+
+  @override
+  String get healthChartMax => '最高';
+
+  @override
+  String get healthChartAverage => '平均';
+
+  @override
+  String get healthChartSelectMetric => '选择上方指标类型查看图表。';
+
+  @override
+  String get healthEditSave => '保存';
+
+  @override
+  String get healthEditDateConflict => '该日期已存在该指标的记录。';
+
+  @override
+  String get healthEditRecordNotFound => '这条记录已不存在。';
+
+  @override
+  String get healthEditNotOwner => '只能修改自己的记录。';
+
+  @override
+  String get healthEditFailed => '更新记录失败。';
+
+  @override
+  String get healthRecordEditHint => '点击记录以编辑';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2800,6 +3188,21 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get chatRoomImageUploadFailed => '圖片發送失敗';
 
   @override
+  String get chatRoomRecordVideoOption => '拍攝影片';
+
+  @override
+  String get chatRoomGalleryVideoOption => '從相簿選擇影片';
+
+  @override
+  String get chatRoomVoiceOption => '語音留言';
+
+  @override
+  String get chatRoomVideoUploadFailed => '影片發送失敗';
+
+  @override
+  String get chatRoomVoiceUploadFailed => '語音發送失敗';
+
+  @override
   String get chatRoomEmojiTooltip => '打開表情';
 
   @override
@@ -2834,6 +3237,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get chatMessageTypeVoice => '[語音]';
+
+  @override
+  String get chatMessageTypeVideo => '[影片]';
 
   @override
   String get chatMessageTypeSystem => '[系統訊息]';
@@ -3419,6 +3825,53 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String get chatExportSelectConversationsTitle => '選擇要匯出的對話';
+
+  @override
+  String get chatExportSelectAll => '全選';
+
+  @override
+  String get chatExportDeselectAll => '取消全選';
+
+  @override
+  String get chatExportFormatSection => '匯出格式';
+
+  @override
+  String get chatExportFormatTxt => '文字（不含圖片）';
+
+  @override
+  String get chatExportFormatPdf => 'PDF（含圖片）';
+
+  @override
+  String get chatExportGenerateButton => '匯出';
+
+  @override
+  String get chatExportSelectAtLeastOne => '請至少選擇一個對話';
+
+  @override
+  String get chatExportShare => '分享';
+
+  @override
+  String get chatExportGenerating => '正在產生…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return '正在產生 $current/$total 則訊息…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => '全部時間';
+
+  @override
+  String get chatExportLongRangeTitle => '日期範圍較長';
+
+  @override
+  String get chatExportLongRangeBody => '選擇的日期範圍較長，產生速度可能會比較慢，是否繼續匯出？';
+
+  @override
+  String get chatExportImageLoadFailed => '圖片載入失敗';
+
+  @override
   String get storageScreenTitle => '儲存空間';
 
   @override
@@ -3464,4 +3917,133 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get storageClearSuccess => '快取已清除';
+
+  @override
+  String get myHomeSectionHealthTitle => '健康';
+
+  @override
+  String get healthTitle => '家庭健康';
+
+  @override
+  String get healthSubtitle => '記錄全家人的身高、體重和血壓';
+
+  @override
+  String get healthTabMyRecords => '我的記錄';
+
+  @override
+  String get healthTabFamily => '家人';
+
+  @override
+  String get healthTabSettings => '設定';
+
+  @override
+  String get healthTabAll => '全部';
+
+  @override
+  String get healthRecordNew => '記錄新數據';
+
+  @override
+  String get healthRecordSubmit => '儲存';
+
+  @override
+  String get healthRecordDate => '日期';
+
+  @override
+  String get healthHeight => '身高';
+
+  @override
+  String get healthWeight => '體重';
+
+  @override
+  String get healthBloodPressure => '血壓';
+
+  @override
+  String get healthHeightCm => '身高 (cm)';
+
+  @override
+  String get healthWeightKg => '體重 (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => '收縮壓 (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => '舒張壓 (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired => '請輸入收縮壓和舒張壓';
+
+  @override
+  String get healthValueRequired => '請輸入數值';
+
+  @override
+  String get healthValueInvalid => '數字格式不正確';
+
+  @override
+  String get healthHistoryTitle => '歷史記錄';
+
+  @override
+  String get healthNoRecords => '暫無健康記錄';
+
+  @override
+  String get healthSelectMember => '選擇家庭成員';
+
+  @override
+  String get healthSelectMemberHint => '選擇家人查看他們公開的健康數據。';
+
+  @override
+  String get healthFilterByMetric => '按類型篩選';
+
+  @override
+  String get healthVisibilityTitle => '可見性';
+
+  @override
+  String get healthReminderTitle => '每日提醒';
+
+  @override
+  String get healthReminderEnable => '開啟每日提醒';
+
+  @override
+  String get healthReminderTime => '提醒時間';
+
+  @override
+  String get healthReminderHint => '到設定時間若還未記錄健康數據，將通過推送通知提醒你。';
+
+  @override
+  String get healthChartEmpty => '資料不足，暫無法繪製圖表。';
+
+  @override
+  String get healthChartSinglePoint => '目前只有一筆記錄，繼續記錄即可看到趨勢。';
+
+  @override
+  String get healthChartLatest => '最新';
+
+  @override
+  String get healthChartMin => '最低';
+
+  @override
+  String get healthChartMax => '最高';
+
+  @override
+  String get healthChartAverage => '平均';
+
+  @override
+  String get healthChartSelectMetric => '選擇上方指標類型查看圖表。';
+
+  @override
+  String get healthEditSave => '儲存';
+
+  @override
+  String get healthEditDateConflict => '該日期已存在該指標的記錄。';
+
+  @override
+  String get healthEditRecordNotFound => '這筆記錄已不存在。';
+
+  @override
+  String get healthEditNotOwner => '只能修改自己的記錄。';
+
+  @override
+  String get healthEditFailed => '更新記錄失敗。';
+
+  @override
+  String get healthRecordEditHint => '點擊記錄以編輯';
 }

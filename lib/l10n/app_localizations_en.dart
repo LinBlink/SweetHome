@@ -509,6 +509,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatRoomImageUploadFailed => 'Couldn\'t send image';
 
   @override
+  String get chatRoomRecordVideoOption => 'Record video';
+
+  @override
+  String get chatRoomGalleryVideoOption => 'Choose video from gallery';
+
+  @override
+  String get chatRoomVoiceOption => 'Voice message';
+
+  @override
+  String get chatRoomVideoUploadFailed => 'Couldn\'t send video';
+
+  @override
+  String get chatRoomVoiceUploadFailed => 'Couldn\'t send voice message';
+
+  @override
   String get chatRoomEmojiTooltip => 'Open emoji picker';
 
   @override
@@ -543,6 +558,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatMessageTypeVoice => '[Voice]';
+
+  @override
+  String get chatMessageTypeVideo => '[Video]';
 
   @override
   String get chatMessageTypeSystem => '[System]';
@@ -1161,6 +1179,55 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chatExportSelectConversationsTitle =>
+      'Choose conversations to export';
+
+  @override
+  String get chatExportSelectAll => 'Select all';
+
+  @override
+  String get chatExportDeselectAll => 'Deselect all';
+
+  @override
+  String get chatExportFormatSection => 'Export format';
+
+  @override
+  String get chatExportFormatTxt => 'Text (no images)';
+
+  @override
+  String get chatExportFormatPdf => 'PDF (with images)';
+
+  @override
+  String get chatExportGenerateButton => 'Export';
+
+  @override
+  String get chatExportSelectAtLeastOne => 'Select at least one conversation';
+
+  @override
+  String get chatExportShare => 'Share';
+
+  @override
+  String get chatExportGenerating => 'Generating…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return 'Generating $current/$total messages…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => 'All time';
+
+  @override
+  String get chatExportLongRangeTitle => 'Long date range';
+
+  @override
+  String get chatExportLongRangeBody =>
+      'The selected date range is long, so generating the export may be slow. Continue anyway?';
+
+  @override
+  String get chatExportImageLoadFailed => 'Couldn\'t load image';
+
+  @override
   String get storageScreenTitle => 'Storage & Cache';
 
   @override
@@ -1207,4 +1274,138 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageClearSuccess => 'Cache cleared';
+
+  @override
+  String get myHomeSectionHealthTitle => 'Health';
+
+  @override
+  String get healthTitle => 'Family Health';
+
+  @override
+  String get healthSubtitle =>
+      'Track height, weight and blood pressure for the whole family';
+
+  @override
+  String get healthTabMyRecords => 'My Records';
+
+  @override
+  String get healthTabFamily => 'Family Members';
+
+  @override
+  String get healthTabSettings => 'Settings';
+
+  @override
+  String get healthTabAll => 'All';
+
+  @override
+  String get healthRecordNew => 'Record new data';
+
+  @override
+  String get healthRecordSubmit => 'Save';
+
+  @override
+  String get healthRecordDate => 'Date';
+
+  @override
+  String get healthHeight => 'Height';
+
+  @override
+  String get healthWeight => 'Weight';
+
+  @override
+  String get healthBloodPressure => 'Blood Pressure';
+
+  @override
+  String get healthHeightCm => 'Height (cm)';
+
+  @override
+  String get healthWeightKg => 'Weight (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => 'Systolic (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => 'Diastolic (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired =>
+      'Please enter both systolic and diastolic values';
+
+  @override
+  String get healthValueRequired => 'Please enter a value';
+
+  @override
+  String get healthValueInvalid => 'Invalid number';
+
+  @override
+  String get healthHistoryTitle => 'History';
+
+  @override
+  String get healthNoRecords => 'No health records yet.';
+
+  @override
+  String get healthSelectMember => 'Select a family member';
+
+  @override
+  String get healthSelectMemberHint =>
+      'Pick a family member above to view their public health records.';
+
+  @override
+  String get healthFilterByMetric => 'Filter by type';
+
+  @override
+  String get healthVisibilityTitle => 'Visibility';
+
+  @override
+  String get healthReminderTitle => 'Daily Reminder';
+
+  @override
+  String get healthReminderEnable => 'Enable daily reminder';
+
+  @override
+  String get healthReminderTime => 'Reminder time';
+
+  @override
+  String get healthReminderHint =>
+      'You will receive a push notification at this time if you haven\'t recorded health data today.';
+
+  @override
+  String get healthChartEmpty => 'Not enough data to draw a chart yet.';
+
+  @override
+  String get healthChartSinglePoint =>
+      'Only one record so far — keep recording to see a trend.';
+
+  @override
+  String get healthChartLatest => 'Latest';
+
+  @override
+  String get healthChartMin => 'Min';
+
+  @override
+  String get healthChartMax => 'Max';
+
+  @override
+  String get healthChartAverage => 'Average';
+
+  @override
+  String get healthChartSelectMetric => 'Pick a metric above to see a chart.';
+
+  @override
+  String get healthEditSave => 'Save';
+
+  @override
+  String get healthEditDateConflict => 'A record for this date already exists.';
+
+  @override
+  String get healthEditRecordNotFound => 'This record no longer exists.';
+
+  @override
+  String get healthEditNotOwner => 'You can only edit your own records.';
+
+  @override
+  String get healthEditFailed => 'Could not update the record.';
+
+  @override
+  String get healthRecordEditHint => 'Tap a record to edit.';
 }

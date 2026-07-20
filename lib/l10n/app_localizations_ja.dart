@@ -495,6 +495,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatRoomImageUploadFailed => '画像を送信できませんでした';
 
   @override
+  String get chatRoomRecordVideoOption => '動画を撮影';
+
+  @override
+  String get chatRoomGalleryVideoOption => 'アルバムから動画を選択';
+
+  @override
+  String get chatRoomVoiceOption => '音声メッセージ';
+
+  @override
+  String get chatRoomVideoUploadFailed => '動画を送信できませんでした';
+
+  @override
+  String get chatRoomVoiceUploadFailed => '音声を送信できませんでした';
+
+  @override
   String get chatRoomEmojiTooltip => '絵文字ピッカーを開く';
 
   @override
@@ -529,6 +544,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chatMessageTypeVoice => '[音声]';
+
+  @override
+  String get chatMessageTypeVideo => '[動画]';
 
   @override
   String get chatMessageTypeSystem => '[システム]';
@@ -1115,6 +1133,54 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get chatExportSelectConversationsTitle => 'エクスポートする会話を選択';
+
+  @override
+  String get chatExportSelectAll => 'すべて選択';
+
+  @override
+  String get chatExportDeselectAll => '選択解除';
+
+  @override
+  String get chatExportFormatSection => 'エクスポート形式';
+
+  @override
+  String get chatExportFormatTxt => 'テキスト（画像なし）';
+
+  @override
+  String get chatExportFormatPdf => 'PDF（画像あり）';
+
+  @override
+  String get chatExportGenerateButton => 'エクスポート';
+
+  @override
+  String get chatExportSelectAtLeastOne => '会話を1つ以上選択してください';
+
+  @override
+  String get chatExportShare => '共有';
+
+  @override
+  String get chatExportGenerating => '生成中…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return '$current/$total 件のメッセージを生成中…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => 'すべての期間';
+
+  @override
+  String get chatExportLongRangeTitle => '日付範囲が長すぎます';
+
+  @override
+  String get chatExportLongRangeBody =>
+      '選択した日付範囲が長いため、生成に時間がかかる場合があります。続行しますか？';
+
+  @override
+  String get chatExportImageLoadFailed => '画像を読み込めませんでした';
+
+  @override
   String get storageScreenTitle => 'ストレージとキャッシュ';
 
   @override
@@ -1161,4 +1227,133 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storageClearSuccess => 'キャッシュを削除しました';
+
+  @override
+  String get myHomeSectionHealthTitle => '健康';
+
+  @override
+  String get healthTitle => '家族の健康';
+
+  @override
+  String get healthSubtitle => '家族みんなの身長、体重、血圧を記録';
+
+  @override
+  String get healthTabMyRecords => '自分の記録';
+
+  @override
+  String get healthTabFamily => '家族';
+
+  @override
+  String get healthTabSettings => '設定';
+
+  @override
+  String get healthTabAll => 'すべて';
+
+  @override
+  String get healthRecordNew => '新しい記録';
+
+  @override
+  String get healthRecordSubmit => '保存';
+
+  @override
+  String get healthRecordDate => '日付';
+
+  @override
+  String get healthHeight => '身長';
+
+  @override
+  String get healthWeight => '体重';
+
+  @override
+  String get healthBloodPressure => '血圧';
+
+  @override
+  String get healthHeightCm => '身長 (cm)';
+
+  @override
+  String get healthWeightKg => '体重 (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => '収縮期 (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => '拡張期 (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired => '収縮期と拡張期の両方を入力してください';
+
+  @override
+  String get healthValueRequired => '数値を入力してください';
+
+  @override
+  String get healthValueInvalid => '無効な数値';
+
+  @override
+  String get healthHistoryTitle => '履歴';
+
+  @override
+  String get healthNoRecords => 'まだ健康記録がありません';
+
+  @override
+  String get healthSelectMember => '家族メンバーを選択';
+
+  @override
+  String get healthSelectMemberHint => '上のメンバーを選択して公開健康データを表示します。';
+
+  @override
+  String get healthFilterByMetric => '種類で絞り込み';
+
+  @override
+  String get healthVisibilityTitle => '公開設定';
+
+  @override
+  String get healthReminderTitle => '毎日のリマインダー';
+
+  @override
+  String get healthReminderEnable => '毎日のリマインダーを有効にする';
+
+  @override
+  String get healthReminderTime => 'リマインダー時間';
+
+  @override
+  String get healthReminderHint => '設定した時間に健康データが未記録の場合、プッシュ通知でお知らせします。';
+
+  @override
+  String get healthChartEmpty => 'データが足りず、グラフを表示できません。';
+
+  @override
+  String get healthChartSinglePoint => '記録は1件のみです。継続して記録すると推移が見られます。';
+
+  @override
+  String get healthChartLatest => '最新';
+
+  @override
+  String get healthChartMin => '最小';
+
+  @override
+  String get healthChartMax => '最大';
+
+  @override
+  String get healthChartAverage => '平均';
+
+  @override
+  String get healthChartSelectMetric => '上の指標を選んでグラフを表示します。';
+
+  @override
+  String get healthEditSave => '保存';
+
+  @override
+  String get healthEditDateConflict => 'この日付にはすでに記録があります。';
+
+  @override
+  String get healthEditRecordNotFound => 'この記録は存在しません。';
+
+  @override
+  String get healthEditNotOwner => '自分の記録のみ編集できます。';
+
+  @override
+  String get healthEditFailed => '記録を更新できませんでした。';
+
+  @override
+  String get healthRecordEditHint => 'タップして編集';
 }

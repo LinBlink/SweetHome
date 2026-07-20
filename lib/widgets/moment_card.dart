@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
+import '../core/tab_visibility.dart';
 import '../core/time/app_time_formatter.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
@@ -407,25 +408,6 @@ class _MomentsImageTile extends StatelessWidget {
   }
 }
 
-/// Resolves [url] through the same on-disk cache `CachedNetworkImage`
-/// uses for photos, then hands `video_player` the local file instead of
-/// the raw network URL. Without this, `VideoPlayerController.networkUrl`
-/// re-streams the clip from the network every time — including after
-/// simply closing and reopening the app, since nothing persists across
-/// process restarts otherwise.
-///
-/// Skipped on web: `video_player_web` throws `UnimplementedError` for
-/// `DataSourceType.file` (there's no filesystem to hand it a `File`
-/// from), so web falls back to the original network-streaming path —
-/// the browser's own HTTP cache is the best we get there.
-Future<VideoPlayerController> _cachedVideoController(String url) async {
-  if (kIsWeb) {
-    return VideoPlayerController.networkUrl(Uri.parse(url));
-  }
-  final file = await MediaCache.videos.getSingleFile(url);
-  return VideoPlayerController.file(file);
-}
-
 /// Silent autoplay inline video preview — muted + looping as soon as
 /// it's ready, matching the muted-autoplay convention of most social
 /// feeds (WeChat Moments / Douyin) instead of a frozen first frame
@@ -455,8 +437,22 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile>
   // the element gets disposed and re-created on every scroll-back, which
   // tears down the controller and re-fetches the video from the network
   // from scratch each time.
+  //
+  // That same keep-alive is *why* switching away from the Family Feed
+  // tab doesn't stop this on its own: `MainShell`'s `PageView(children:)`
+  // never unmounts a tab just because another one is selected, so this
+  // widget's `dispose()` never runs from a tab switch alone. Pausing
+  // has to be driven explicitly from [TabVisibility] instead (see
+  // [didChangeDependencies]).
   @override
   bool get wantKeepAlive => true;
+
+  /// Null until the first [didChangeDependencies]; used only to tell a
+  /// genuine visibility *change* apart from the initial read, and to
+  /// gate the autoplay in [_init] so a tile that finishes loading while
+  /// its tab isn't the active one doesn't start playing (audibly or
+  /// not) somewhere the user isn't looking.
+  bool? _tabVisible;
 
   @override
   void initState() {
@@ -464,16 +460,35 @@ class _MomentsVideoTileState extends State<_MomentsVideoTile>
     _init();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visible = TabVisibility.of(context);
+    final changed = _tabVisible != null && _tabVisible != visible;
+    _tabVisible = visible;
+    if (changed) _applyTabVisibility(visible);
+  }
+
+  void _applyTabVisibility(bool visible) {
+    final c = _controller;
+    if (c == null || !_initialized) return;
+    if (visible) {
+      c.play();
+    } else {
+      c.pause();
+    }
+  }
+
   Future<void> _init() async {
     try {
-      final c = await _cachedVideoController(widget.url);
+      final c = await cachedVideoController(widget.url);
       _controller = c;
       await c.initialize();
       await c.setVolume(0);
       await c.setLooping(true);
       if (!mounted) return;
       setState(() => _initialized = true);
-      await c.play();
+      if (_tabVisible ?? true) await c.play();
     } catch (_) {
       if (!mounted) return;
       setState(() => _failed = true);
@@ -621,10 +636,33 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
   @override
   bool get wantKeepAlive => true;
 
+  /// Below this content width (a grid cell shared with image/video
+  /// tiles can be as narrow as ~100dp once there are 3+ columns), the
+  /// full play button + slider + mm:ss/mm:ss row doesn't fit and
+  /// overflows — drop to just a play button and a live elapsed-time
+  /// readout instead.
+  static const _compactBreakpoint = 160.0;
+
+  /// See `_MomentsVideoTileState._tabVisible` — same tab-switch-doesn't-
+  /// unmount problem applies to a clip a user tapped play on here.
+  bool? _tabVisible;
+
   @override
   void initState() {
     super.initState();
     _init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visible = TabVisibility.of(context);
+    final changed = _tabVisible != null && _tabVisible != visible;
+    _tabVisible = visible;
+    // Unlike the video tile, audio here never autoplays (it only starts
+    // on a manual tap), so there's nothing to resume on becoming visible
+    // again — only pause when the tab is switched away from mid-playback.
+    if (changed && !visible) _player?.pause();
   }
 
   Future<void> _init() async {
@@ -636,7 +674,7 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
         // browser's own HTTP cache handle repeat plays.
         _duration = await p.setUrl(widget.url);
       } else {
-        // Same on-disk cache as the video tile (`_cachedVideoController`)
+        // Same on-disk cache as the video tile (`cachedVideoController`)
         // and photos (`CachedNetworkImage`), then play the local file.
         // Deliberately not `LockCachingAudioSource`: on Android it plays
         // through a local cleartext HTTP proxy on 127.0.0.1, which the
@@ -654,6 +692,8 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
       p.playerStateStream.listen((s) {
         if (!mounted) return;
         if (s.processingState == ProcessingState.completed) {
+          p.seek(Duration.zero);
+          p.pause();
           setState(() => _position = Duration.zero);
         }
       });
@@ -709,80 +749,133 @@ class _MomentsAudioTileState extends State<_MomentsAudioTile>
         color: AppColors.linen,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
-        children: [
-          IconButton(
-            tooltip: playing ? l10n.momentDetailAudioPause : l10n.momentDetailAudioPlay,
-            onPressed: () {
-              if (playing) {
-                _player!.pause();
-              } else {
-                _player!.play();
-              }
-              setState(() {});
-            },
-            icon: Icon(
-              playing
-                  ? Icons.pause_circle_filled_rounded
-                  : Icons.play_circle_fill_rounded,
-              size: 32,
-              color: AppColors.primary,
-            ),
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SliderTheme(
-                  data: SliderThemeData(
-                    activeTrackColor: AppColors.primary,
-                    inactiveTrackColor: AppColors.surfaceVariant,
-                    thumbColor: AppColors.primary,
-                    trackHeight: 3,
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 6,
-                    ),
-                  ),
-                  child: Slider(
-                    value: pos.inMilliseconds
-                        .toDouble()
-                        .clamp(0, dur.inMilliseconds.toDouble()),
-                    min: 0,
-                    max: dur.inMilliseconds.toDouble().clamp(1, double.infinity),
-                    onChanged: (v) {
-                      _player!.seek(Duration(milliseconds: v.toInt()));
-                    },
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _format(pos),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textHint,
-                      ),
-                    ),
-                    Text(
-                      _format(dur),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textHint,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return constraints.maxWidth < _compactBreakpoint
+              ? _compactControls(l10n, playing, pos)
+              : _fullControls(l10n, playing, pos, dur);
+        },
       ),
+    );
+  }
+
+  void _togglePlay() {
+    if (_player!.playing) {
+      _player!.pause();
+    } else {
+      _player!.play();
+    }
+    setState(() {});
+  }
+
+  void _stopAudio() {
+    _player!.pause();
+    _player!.seek(Duration.zero);
+    setState(() => _position = Duration.zero);
+  }
+
+  Widget _fullControls(
+    AppLocalizations l10n,
+    bool playing,
+    Duration pos,
+    Duration dur,
+  ) {
+    return Row(
+      children: [
+        IconButton(
+          tooltip: playing ? l10n.momentDetailAudioPause : l10n.momentDetailAudioPlay,
+          onPressed: _togglePlay,
+          icon: Icon(
+            playing
+                ? Icons.pause_circle_filled_rounded
+                : Icons.play_circle_fill_rounded,
+            size: 36,
+            color: AppColors.primary,
+          ),
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SliderTheme(
+                data: SliderThemeData(
+                  activeTrackColor: AppColors.primary,
+                  inactiveTrackColor: AppColors.surfaceVariant,
+                  thumbColor: AppColors.primary,
+                  trackHeight: 3,
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 6,
+                  ),
+                ),
+                child: Slider(
+                  value: pos.inMilliseconds
+                      .toDouble()
+                      .clamp(0, dur.inMilliseconds.toDouble()),
+                  min: 0,
+                  max: dur.inMilliseconds.toDouble().clamp(1, double.infinity),
+                  onChanged: (v) {
+                    _player!.seek(Duration(milliseconds: v.toInt()));
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _format(pos),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                  Text(
+                    _format(dur),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// No room for the slider/duration row — play/stop button with
+  /// elapsed-time readout underneath, per [_compactBreakpoint].
+  Widget _compactControls(AppLocalizations l10n, bool playing, Duration pos) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          tooltip: playing ? l10n.momentDetailAudioPause : l10n.momentDetailAudioPlay,
+          onPressed: playing ? _stopAudio : _togglePlay,
+          icon: Icon(
+            playing
+                ? Icons.stop_circle_rounded
+                : Icons.play_circle_fill_rounded,
+            size: 32,
+            color: AppColors.primary,
+          ),
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+        Text(
+          _format(pos),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 11, color: AppColors.textHint),
+        ),
+      ],
     );
   }
 
@@ -922,7 +1015,7 @@ class _MomentsFullscreenVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return FullscreenVideoPlayer(
-      openController: () => _cachedVideoController(url),
+      openController: () => cachedVideoController(url),
       loadFailedLabel: l10n.momentDetailVideoLoadFailed,
     );
   }

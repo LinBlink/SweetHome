@@ -425,7 +425,10 @@ class ChatProvider extends ChangeNotifier {
         // rather than appending a duplicate.
         final isOwnOptimistic = existingIdx >= 0;
         if (isOwnOptimistic) {
-          _messages[m.conversationId]![existingIdx] = m;
+          _messages[m.conversationId]![existingIdx] = _reconcileType(
+            _messages[m.conversationId]![existingIdx],
+            m,
+          );
         } else {
           _messages[m.conversationId]!.add(m);
         }
@@ -482,7 +485,31 @@ class ChatProvider extends ChangeNotifier {
     final list = _messages[convId];
     if (list == null) return;
     final idx = list.indexWhere((m) => m.clientId == clientId);
-    if (idx >= 0) list[idx] = replacement;
+    if (idx >= 0) list[idx] = _reconcileType(list[idx], replacement);
+  }
+
+  /// If the server echoed back a plain-text message for what we know
+  /// we originally sent as image/video/voice, keep rendering it as
+  /// that original media type on *our own* device instead of letting
+  /// the (possibly downgraded) server type win. This exists because
+  /// docs/api.md's chat `messageType` set doesn't recognize every
+  /// non-text type yet (see `MessageType.fromApi`'s doc comment) —
+  /// an unrecognized type is silently stored/echoed back as `TEXT`,
+  /// which would otherwise flip a just-sent video/voice bubble into
+  /// a plain-text bubble showing the raw upload URL the moment the
+  /// server's confirmation arrives.
+  ///
+  /// This only fixes the *sender's* view — a family member receiving
+  /// the message never had a pre-existing optimistic entry to compare
+  /// against, so they still see whatever type the server actually
+  /// stored until the backend adds proper support.
+  Message _reconcileType(Message original, Message incoming) {
+    final weKnewBetter =
+        original.type != MessageType.text && original.type != MessageType.system;
+    if (weKnewBetter && incoming.type == MessageType.text) {
+      return incoming.copyWith(type: original.type);
+    }
+    return incoming;
   }
 
   void _updateConversationLastMessage(
@@ -508,12 +535,6 @@ class ChatProvider extends ChangeNotifier {
   /// them sequentially inside the provider so the call site only sees
   /// one "send image" button.
   ///
-  /// Returns `true` on success (the optimistic message has been
-  /// reconciled with the server's confirmation), `false` on any
-  /// failure. The optimistic message stays in the list either way;
-  /// failures flip `isPending` back to `false` so the bubble doesn't
-  /// stay in the perpetual-pending state.
-  ///
   /// [contentType] follows the same magic-byte sniffing pattern as
   /// avatar upload — see `AuthService.uploadAvatar`.
   Future<bool> sendImageMessage(
@@ -521,6 +542,98 @@ class ChatProvider extends ChangeNotifier {
     required Uint8List bytes,
     required String filename,
     String? contentType,
+  }) {
+    return _sendMediaMessage(
+      conversationId,
+      type: MessageType.image,
+      mockUrl: (clientId) =>
+          'https://mock.local/photos/${_currentUser.userId}-$clientId.jpg',
+      upload: () async {
+        // Compress before upload. image_picker's maxWidth/quality
+        // args only kick in on iOS/Android; on Web the picker hands
+        // us the raw original bytes, which routinely busts the §2.4
+        // 1 MB cap on phone camera rolls. flutter_image_compress
+        // runs on every platform (native uses libjpeg-turbo, web uses
+        // a WASM codec), so this single call covers all targets.
+        // Output as JPEG regardless of source format — keeps the
+        // decoded payload small and consistent with the rest of the
+        // media pipeline.
+        final compressed = await _compressForUpload(bytes);
+        return AuthService.uploadImage(
+          _currentUser,
+          bytes: compressed,
+          filename: filename,
+          contentType: 'image/jpeg',
+        );
+      },
+    );
+  }
+
+  /// `POST /users/upload/video` (docs/api.md §2.5) → `SEND_MESSAGE`
+  /// with `type=video`. See the `MessageType.fromApi` doc comment for
+  /// the caveat that the backend doesn't have first-class support for
+  /// this messageType yet. [bytes] should already be compressed
+  /// (`video_compress`, same as the moment composer) before this is
+  /// called — this method only uploads + sends, it doesn't transcode.
+  Future<bool> sendVideoMessage(
+    int conversationId, {
+    required Uint8List bytes,
+    required String filename,
+    String contentType = 'video/mp4',
+  }) {
+    return _sendMediaMessage(
+      conversationId,
+      type: MessageType.video,
+      mockUrl: (clientId) =>
+          'https://mock.local/videos/${_currentUser.userId}-$clientId.mp4',
+      upload: () => AuthService.uploadVideo(
+        _currentUser,
+        bytes: bytes,
+        filename: filename,
+        contentType: contentType,
+      ),
+    );
+  }
+
+  /// `POST /users/upload/audio` (docs/api.md §2.6) → `SEND_MESSAGE`
+  /// with `type=voice` — the one messageType outside text/image that
+  /// the backend already recognizes (see `MessageType.fromApi`).
+  Future<bool> sendVoiceMessage(
+    int conversationId, {
+    required Uint8List bytes,
+    required String filename,
+    String contentType = 'audio/ogg',
+  }) {
+    return _sendMediaMessage(
+      conversationId,
+      type: MessageType.voice,
+      mockUrl: (clientId) =>
+          'https://mock.local/voices/${_currentUser.userId}-$clientId.opus',
+      upload: () => AuthService.uploadAudio(
+        _currentUser,
+        bytes: bytes,
+        filename: filename,
+        contentType: contentType,
+      ),
+    );
+  }
+
+  /// Shared body for every "upload a file, then send it as a chat
+  /// message" flow (image/video/voice): insert an optimistic
+  /// media-message bubble immediately, upload in the background, then
+  /// reconcile the bubble with the real URL and push it over the wire
+  /// (or REST-fallback, via `_sendOverWire`).
+  ///
+  /// Returns `true` on success (the optimistic message has been
+  /// reconciled with the server's confirmation), `false` on any
+  /// failure. The optimistic message stays in the list either way;
+  /// failures flip `isPending` back to `false` so the bubble doesn't
+  /// stay in the perpetual-pending state.
+  Future<bool> _sendMediaMessage(
+    int conversationId, {
+    required MessageType type,
+    required Future<String> Function() upload,
+    required String Function(String clientId) mockUrl,
   }) async {
     final clientId = _uuid.v4();
     final optimistic = Message(
@@ -533,7 +646,7 @@ class ChatProvider extends ChangeNotifier {
           : '',
       senderAvatarColor: AppColors.primary,
       content: '',
-      type: MessageType.image,
+      type: type,
       sentAt: DateTime.now(),
       isMe: true,
       isPending: true,
@@ -541,53 +654,30 @@ class ChatProvider extends ChangeNotifier {
 
     _messages[conversationId] ??= [];
     _messages[conversationId]!.add(optimistic);
-    _updateConversationLastMessage(
-      conversationId,
-      optimistic.content,
-      type: MessageType.image,
-    );
+    _updateConversationLastMessage(conversationId, optimistic.content, type: type);
     notifyListeners();
 
     try {
-      String imageUrl;
+      String url;
       if (AppConfig.mockMode) {
         await Future<void>.delayed(const Duration(milliseconds: 400));
-        imageUrl = 'https://mock.local/photos/${_currentUser.userId}-$clientId.jpg';
+        url = mockUrl(clientId);
       } else {
-        // Compress before upload. image_picker's maxWidth/quality
-        // args only kick in on iOS/Android; on Web the picker hands
-        // us the raw original bytes, which routinely busts the §2.4
-        // 1 MB cap on phone camera rolls. flutter_image_compress
-        // runs on every platform (native uses libjpeg-turbo, web uses
-        // a WASM codec), so this single call covers all targets.
-        // Output as JPEG regardless of source format — keeps the
-        // decoded payload small and consistent with the rest of the
-        // media pipeline.
-        final compressed = await _compressForUpload(bytes);
-        imageUrl = await AuthService.uploadImage(
-          _currentUser,
-          bytes: compressed,
-          filename: filename,
-          contentType: 'image/jpeg',
-        );
+        url = await upload();
       }
       final replacement = optimistic.copyWith(
         isPending: false,
         senderAvatarUrl: _currentUser.avatarUrl,
-        content: imageUrl,
+        content: url,
       );
       _replaceOptimistic(conversationId, clientId, replacement);
-      _updateConversationLastMessage(
-        conversationId,
-        imageUrl,
-        type: MessageType.image,
-      );
+      _updateConversationLastMessage(conversationId, url, type: type);
       notifyListeners();
       if (!AppConfig.mockMode) {
         await _sendOverWire(
           conversationId: conversationId,
-          content: imageUrl,
-          type: MessageType.image,
+          content: url,
+          type: type,
           clientId: clientId,
         );
       }

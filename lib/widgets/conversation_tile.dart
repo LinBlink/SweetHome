@@ -195,6 +195,10 @@ class _LastMessagePreview extends StatelessWidget {
         leading = Icons.mic_none_rounded;
         text = l10n.chatMessageTypeVoice;
         break;
+      case MessageType.video:
+        leading = Icons.videocam_outlined;
+        text = l10n.chatMessageTypeVideo;
+        break;
       case MessageType.system:
         leading = Icons.info_outline;
         text = l10n.chatMessageTypeSystem;

@@ -34,7 +34,9 @@ dependencies:
   shared_preferences: ^2.3.2
   intl: ^0.20.1
   uuid: ^4.5.1
-
+  share_plus: ^13.2.1
+  pdf: ^3.12.0
+  printing: ^5.15.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -48,3 +50,10 @@ dependency_overrides:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/fonts/NotoSansSC-Regular.ttf
+    - assets/fonts/NotoSansTC-Medium.ttf
+    - assets/fonts/NotoSansJP-Regular.ttf
+    - assets/fonts/NotoSansKR-Regular.ttf
+    - assets/fonts/NotoSansMyanmar-Regular.ttf
+    - assets/fonts/NotoEmoji-Regular.ttf

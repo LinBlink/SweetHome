@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 import '../core/kinship/kinship_engine.dart';
 import '../core/kinship/kinship_graph.dart';
+import '../models/api_exception.dart';
 import '../models/auth_models.dart';
 import '../models/chat_models.dart';
 import '../models/family_member_vm.dart';
 import '../models/fence.dart';
+import '../models/health_record.dart';
 import '../models/location.dart';
 
 class MockDataSource {
@@ -617,6 +619,193 @@ class _LngLat {
   final double lng;
   final double lat;
   const _LngLat(this.lng, this.lat);
+}
+
+/// Mock health data for §8 — used by [HealthProvider] in MOCK_MODE.
+///
+/// Provides pre-seeded records for user 1 (王建国) and a few family
+/// members, default visibility settings (all private), and a default
+/// reminder (off, 20:00). Mutable via static methods so the provider's
+/// mock branch can simulate server state changes (submit, toggle
+/// visibility, update reminder) that survive within one session.
+class MockHealthData {
+  MockHealthData._();
+
+  static final List<HealthRecord> _records = [
+    HealthRecord(
+      id: 101,
+      userId: 1,
+      metricType: HealthMetricType.height,
+      value: 175,
+      recordedAt: '2026-07-10',
+    ),
+    HealthRecord(
+      id: 102,
+      userId: 1,
+      metricType: HealthMetricType.weight,
+      value: 72,
+      recordedAt: '2026-07-10',
+    ),
+    HealthRecord(
+      id: 103,
+      userId: 1,
+      metricType: HealthMetricType.bloodPressure,
+      value: 118,
+      valueSecondary: 76,
+      recordedAt: '2026-07-10',
+    ),
+    HealthRecord(
+      id: 104,
+      userId: 1,
+      metricType: HealthMetricType.weight,
+      value: 71,
+      recordedAt: '2026-07-15',
+    ),
+    HealthRecord(
+      id: 105,
+      userId: 1,
+      metricType: HealthMetricType.bloodPressure,
+      value: 122,
+      valueSecondary: 80,
+      recordedAt: '2026-07-18',
+    ),
+    // Family member 2 (张美玲) — wife
+    HealthRecord(
+      id: 201,
+      userId: 2,
+      metricType: HealthMetricType.height,
+      value: 162,
+      recordedAt: '2026-07-05',
+    ),
+    HealthRecord(
+      id: 202,
+      userId: 2,
+      metricType: HealthMetricType.weight,
+      value: 55,
+      recordedAt: '2026-07-05',
+    ),
+    HealthRecord(
+      id: 203,
+      userId: 2,
+      metricType: HealthMetricType.bloodPressure,
+      value: 108,
+      valueSecondary: 70,
+      recordedAt: '2026-07-12',
+    ),
+    // Family member 3 (王爷爷) — father
+    HealthRecord(
+      id: 301,
+      userId: 3,
+      metricType: HealthMetricType.height,
+      value: 170,
+      recordedAt: '2026-06-20',
+    ),
+    HealthRecord(
+      id: 302,
+      userId: 3,
+      metricType: HealthMetricType.weight,
+      value: 68,
+      recordedAt: '2026-07-01',
+    ),
+    HealthRecord(
+      id: 303,
+      userId: 3,
+      metricType: HealthMetricType.bloodPressure,
+      value: 142,
+      valueSecondary: 88,
+      recordedAt: '2026-07-16',
+    ),
+    HealthRecord(
+      id: 304,
+      userId: 3,
+      metricType: HealthMetricType.bloodPressure,
+      value: 138,
+      valueSecondary: 85,
+      recordedAt: '2026-07-18',
+    ),
+  ];
+
+  static List<HealthRecord> get ownRecords =>
+      List.unmodifiable(_records.where((r) => r.userId == 1));
+
+  static void addOrUpdateRecord(HealthRecord record) {
+    final idx = _records.indexWhere(
+      (r) =>
+          r.userId == record.userId &&
+          r.metricType == record.metricType &&
+          r.recordedAt == record.recordedAt,
+    );
+    if (idx >= 0) {
+      _records[idx] = record;
+    } else {
+      _records.add(record);
+    }
+  }
+
+  /// §8.3 mock: simulate the server-side checks for an existing-record
+  /// edit. Mirrors the real API contract:
+  ///
+  /// - recordId not found → `ApiException(404, NO_SUCH_HEALTH_RECORD)`
+  /// - moving `recordedAt` to a date already occupied by another of
+  ///   the same metric for the same user →
+  ///   `ApiException(409, HEALTH_RECORD_DATE_CONFLICT)`
+  /// - otherwise mutate the row in place and return it.
+  static HealthRecord updateRecord({
+    required int recordId,
+    required double value,
+    double? valueSecondary,
+    String? recordedAt,
+  }) {
+    final idx = _records.indexWhere((r) => r.id == recordId);
+    if (idx < 0) {
+      throw ApiException(404, 'NO_SUCH_HEALTH_RECORD');
+    }
+    final original = _records[idx];
+    final newDate = recordedAt ?? original.recordedAt;
+    final conflict = _records.any((r) =>
+        r.id != recordId &&
+        r.userId == original.userId &&
+        r.metricType == original.metricType &&
+        r.recordedAt == newDate);
+    if (conflict) {
+      throw ApiException(409, 'HEALTH_RECORD_DATE_CONFLICT');
+    }
+    final updated = original.copyWith(
+      value: value,
+      valueSecondary: valueSecondary,
+      recordedAt: newDate,
+    );
+    _records[idx] = updated;
+    return updated;
+  }
+
+  static List<HealthRecord> familyRecordsFor(int memberId) =>
+      List.unmodifiable(_records.where((r) => r.userId == memberId));
+
+  static List<HealthVisibility> _vis = const [
+    HealthVisibility(metricType: HealthMetricType.height, visible: false),
+    HealthVisibility(metricType: HealthMetricType.weight, visible: false),
+    HealthVisibility(metricType: HealthMetricType.bloodPressure, visible: false),
+  ];
+
+  static List<HealthVisibility> get visibilities => _vis;
+
+  static void setVisibility(HealthMetricType type, bool visible) {
+    _vis = _vis.map((v) {
+      if (v.metricType == type) {
+        return HealthVisibility(metricType: type, visible: visible);
+      }
+      return v;
+    }).toList();
+  }
+
+  static HealthReminder _rem = const HealthReminder();
+
+  static HealthReminder get reminder => _rem;
+
+  static void setReminder(String remindTime, bool enabled) {
+    _rem = HealthReminder(remindTime: remindTime, enabled: enabled);
+  }
 }
 
 /// Internal struct used only by the mock location fixture above —

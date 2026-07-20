@@ -510,6 +510,21 @@ class AppLocalizationsMy extends AppLocalizations {
   String get chatRoomImageUploadFailed => 'ပုံပို့၍ မရပါ';
 
   @override
+  String get chatRoomRecordVideoOption => 'ဗီဒီယို ရိုက်ကူးမည်';
+
+  @override
+  String get chatRoomGalleryVideoOption => 'ဓာတ်ပုံအယ်လဘမ်မှ ဗီဒီယိုရွေးမည်';
+
+  @override
+  String get chatRoomVoiceOption => 'အသံစာတိုပေးပို့ခြင်း';
+
+  @override
+  String get chatRoomVideoUploadFailed => 'ဗီဒီယိုပို့၍ မရပါ';
+
+  @override
+  String get chatRoomVoiceUploadFailed => 'အသံပို့၍ မရပါ';
+
+  @override
   String get chatRoomEmojiTooltip => 'အီမိုဂျီ ရွေးချယ်စရာကို ဖွင့်ရန်';
 
   @override
@@ -544,6 +559,9 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get chatMessageTypeVoice => '[အသံ]';
+
+  @override
+  String get chatMessageTypeVideo => '[ဗီဒီယို]';
 
   @override
   String get chatMessageTypeSystem => '[စနစ်]';
@@ -1160,6 +1178,55 @@ class AppLocalizationsMy extends AppLocalizations {
   }
 
   @override
+  String get chatExportSelectConversationsTitle =>
+      'ထုတ်ယူလိုသော စကားဝိုင်းများကို ရွေးပါ';
+
+  @override
+  String get chatExportSelectAll => 'အားလုံးရွေးမည်';
+
+  @override
+  String get chatExportDeselectAll => 'အားလုံးမရွေးတော့ပါ';
+
+  @override
+  String get chatExportFormatSection => 'ထုတ်ယူမည့်ပုံစံ';
+
+  @override
+  String get chatExportFormatTxt => 'စာသား（ပုံမပါ）';
+
+  @override
+  String get chatExportFormatPdf => 'PDF（ပုံပါ）';
+
+  @override
+  String get chatExportGenerateButton => 'ထုတ်ယူမည်';
+
+  @override
+  String get chatExportSelectAtLeastOne => 'စကားဝိုင်းတစ်ခုအနည်းဆုံး ရွေးပါ';
+
+  @override
+  String get chatExportShare => 'မျှဝေမည်';
+
+  @override
+  String get chatExportGenerating => 'ထုတ်လုပ်နေသည်…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return 'မက်ဆေ့ချ် $current/$total ထုတ်လုပ်နေသည်…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => 'အချိန်အားလုံး';
+
+  @override
+  String get chatExportLongRangeTitle => 'ရက်စွဲအပိုင်းအခြား ရှည်လွန်းသည်';
+
+  @override
+  String get chatExportLongRangeBody =>
+      'ရွေးထားသော ရက်စွဲအပိုင်းအခြားရှည်လျှင် ထုတ်လုပ်ရန် အချိန်ကြာနိုင်ပါသည်။ ဆက်လုပ်မည်လား？';
+
+  @override
+  String get chatExportImageLoadFailed => 'ပုံကို ဖွင့်၍မရပါ';
+
+  @override
   String get storageScreenTitle => 'သိုလှောင်မှုနှင့် Cache';
 
   @override
@@ -1207,4 +1274,140 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get storageClearSuccess => 'Cache ကို ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get myHomeSectionHealthTitle => 'ကျန်းမာရေး';
+
+  @override
+  String get healthTitle => 'မိသားစုကျန်းမာရေး';
+
+  @override
+  String get healthSubtitle =>
+      'မိသားစုတစ်စုလုံးအတွက် အရပ်၊ ကိုယ်အလေးချိန်နှင့် သွေးပေါင်ချိန်ကို မှတ်တမ်းတင်ပါ';
+
+  @override
+  String get healthTabMyRecords => 'ကျွန်ုပ်၏မှတ်တမ်း';
+
+  @override
+  String get healthTabFamily => 'မိသားစုဝင်များ';
+
+  @override
+  String get healthTabSettings => 'ဆက်တင်များ';
+
+  @override
+  String get healthTabAll => 'အားလုံး';
+
+  @override
+  String get healthRecordNew => 'ဒေတာအသစ်မှတ်တမ်းတင်ရန်';
+
+  @override
+  String get healthRecordSubmit => 'သိမ်းဆည်းရန်';
+
+  @override
+  String get healthRecordDate => 'ရက်စွဲ';
+
+  @override
+  String get healthHeight => 'အရပ်';
+
+  @override
+  String get healthWeight => 'ကိုယ်အလေးချိန်';
+
+  @override
+  String get healthBloodPressure => 'သွေးပေါင်ချိန်';
+
+  @override
+  String get healthHeightCm => 'အရပ် (cm)';
+
+  @override
+  String get healthWeightKg => 'ကိုယ်အလေးချိန် (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => 'အပေါ်သွေး (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => 'အောက်သွေး (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired =>
+      'အပေါ်သွေးနှင့်အောက်သွေး နှစ်ခုလုံးထည့်ပါ';
+
+  @override
+  String get healthValueRequired => 'တန်ဖိုးထည့်ပါ';
+
+  @override
+  String get healthValueInvalid => 'နံပါတ်မမှန်ပါ';
+
+  @override
+  String get healthHistoryTitle => 'မှတ်တမ်းဟောင်း';
+
+  @override
+  String get healthNoRecords => 'ကျန်းမာရေးမှတ်တမ်းမရှိသေးပါ။';
+
+  @override
+  String get healthSelectMember => 'မိသားစုဝင်ကိုရွေးပါ';
+
+  @override
+  String get healthSelectMemberHint =>
+      'အထက်မှမိသားစုဝင်ကိုရွေးချယ်၍ ၎င်းတို့၏ကျန်းမာရေးဒေတာကိုကြည့်ပါ။';
+
+  @override
+  String get healthFilterByMetric => 'အမျိုးအစားဖြင့်စစ်ရန်';
+
+  @override
+  String get healthVisibilityTitle => 'မြင်နိုင်မှု';
+
+  @override
+  String get healthReminderTitle => 'နေ့စဉ်သတိပေးချက်';
+
+  @override
+  String get healthReminderEnable => 'နေ့စဉ်သတိပေးချက်ဖွင့်ရန်';
+
+  @override
+  String get healthReminderTime => 'သတိပေးချိန်';
+
+  @override
+  String get healthReminderHint =>
+      'ယနေ့ကျန်းမာရေးဒေတာမှတ်တမ်းမတင်ရသေးပါက ဤအချိန်တွင် push သတိပေးချက်ရရှိမည်။';
+
+  @override
+  String get healthChartEmpty => 'ဒေတာမလုံလောက်သေးပါ၊ ဂရပ်ဖ်ဆွဲ၍မရပါ။';
+
+  @override
+  String get healthChartSinglePoint =>
+      'မှတ်တမ်းတစ်ခုသာရှိပါသည်။ ဆက်လက်မှတ်တမ်းတင်ပါ။';
+
+  @override
+  String get healthChartLatest => 'နောက်ဆုံး';
+
+  @override
+  String get healthChartMin => 'အနည်းဆုံး';
+
+  @override
+  String get healthChartMax => 'အများဆုံး';
+
+  @override
+  String get healthChartAverage => 'ပျမ်းမျှ';
+
+  @override
+  String get healthChartSelectMetric =>
+      'ဂရပ်ဖ်ကြည့်ရန် အပေါ်မှအမျိုးအစားရွေးပါ။';
+
+  @override
+  String get healthEditSave => 'သိမ်းဆည်းရန်';
+
+  @override
+  String get healthEditDateConflict => 'ဤရက်စွဲတွင် မှတ်တမ်းရှိပြီးဖြစ်သည်။';
+
+  @override
+  String get healthEditRecordNotFound => 'ဤမှတ်တမ်း မရှိတော့ပါ။';
+
+  @override
+  String get healthEditNotOwner =>
+      'ကိုယ်ပိုင်မှတ်တမ်းများကိုသာ တည်းဖြတ်နိုင်ပါသည်။';
+
+  @override
+  String get healthEditFailed => 'မှတ်တမ်းကို အပ်ဒိတ်မလုပ်နိုင်ပါ။';
+
+  @override
+  String get healthRecordEditHint => 'တည်းဖြတ်ရန် နှိပ်ပါ';
 }

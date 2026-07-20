@@ -8,11 +8,22 @@ enum MessageType {
   text,
   image,
   voice,
+  video,
   system;
 
-  /// Maps the API's `messageType` string (`"TEXT"` / `"IMAGE"` / `"VOICE"`)
-  /// to this enum. Case-insensitive; unknown values fall back to [text].
-  /// See docs/api.md §4.3/§5.2.
+  /// Maps the API's `messageType` string (`"TEXT"` / `"IMAGE"` / `"VOICE"`
+  /// / `"VIDEO"`) to this enum. Case-insensitive; unknown values fall back
+  /// to [text]. See docs/api.md §4.3/§5.2.
+  ///
+  /// NOTE: as of this writing, docs/api.md §5.2 documents the server as
+  /// only recognizing `TEXT`/`IMAGE`/`VOICE`/`SYSTEM` for *chat* messages
+  /// (unlike §7.1's moment media, which already accepts `image`/`video`/
+  /// `audio`) — an unrecognized `messageType` is silently stored/echoed
+  /// back as `TEXT`. Sending `VIDEO` here is forward-looking: it renders
+  /// correctly for this client's own optimistic bubble, but until the
+  /// backend adds first-class `VIDEO` support, a recipient (or this
+  /// client after WS/REST reconciliation) may see it degrade to a plain
+  /// text bubble containing the raw video URL instead of a video player.
   static MessageType fromApi(String? raw) {
     switch (raw?.toUpperCase()) {
       case 'TEXT':
@@ -21,6 +32,8 @@ enum MessageType {
         return MessageType.image;
       case 'VOICE':
         return MessageType.voice;
+      case 'VIDEO':
+        return MessageType.video;
       case 'SYSTEM':
         return MessageType.system;
       default:
@@ -29,7 +42,8 @@ enum MessageType {
   }
 
   /// Inverse of [fromApi] — wire value for outbound WebSocket frames
-  /// (`§5.2` uses uppercase: `TEXT` / `IMAGE` / `VOICE` / `SYSTEM`).
+  /// (`§5.2` uses uppercase: `TEXT` / `IMAGE` / `VOICE` / `VIDEO` /
+  /// `SYSTEM`).
   String get apiValue {
     switch (this) {
       case MessageType.text:
@@ -38,6 +52,8 @@ enum MessageType {
         return 'IMAGE';
       case MessageType.voice:
         return 'VOICE';
+      case MessageType.video:
+        return 'VIDEO';
       case MessageType.system:
         return 'SYSTEM';
     }
@@ -45,9 +61,9 @@ enum MessageType {
 
   /// REST wire value for `§4.4` `POST /conversations/{id}/messages`.
   /// The HTTP path uses **lowercase** (`text` / `image` / `voice` /
-  /// `system`) per `API.md §4.4` — distinct from the WebSocket path's
-  /// uppercase `messageType`. Reusing [apiValue] here would produce
-  /// `400 INVALID_MESSAGE_TYPE` server-side.
+  /// `video` / `system`) per `API.md §4.4` — distinct from the
+  /// WebSocket path's uppercase `messageType`. Reusing [apiValue] here
+  /// would produce `400 INVALID_MESSAGE_TYPE` server-side.
   String get restValue {
     switch (this) {
       case MessageType.text:
@@ -56,6 +72,8 @@ enum MessageType {
         return 'image';
       case MessageType.voice:
         return 'voice';
+      case MessageType.video:
+        return 'video';
       case MessageType.system:
         return 'system';
     }
@@ -247,7 +265,14 @@ class Message {
         'sentAt': sentAt.toIso8601String(),
       };
 
-  Message copyWith({int? serverId, bool? isPending, String? senderAvatarUrl, String? content}) => Message(
+  Message copyWith({
+    int? serverId,
+    bool? isPending,
+    String? senderAvatarUrl,
+    String? content,
+    MessageType? type,
+  }) =>
+      Message(
         clientId: clientId,
         serverId: serverId ?? this.serverId,
         conversationId: conversationId,
@@ -257,7 +282,7 @@ class Message {
         senderAvatarUrl: senderAvatarUrl ?? this.senderAvatarUrl,
         senderAvatarColor: senderAvatarColor,
         content: content ?? this.content,
-        type: type,
+        type: type ?? this.type,
         sentAt: sentAt,
         isMe: isMe,
         isPending: isPending ?? this.isPending,

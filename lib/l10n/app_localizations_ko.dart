@@ -496,6 +496,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chatRoomImageUploadFailed => '이미지를 보낼 수 없습니다';
 
   @override
+  String get chatRoomRecordVideoOption => '동영상 촬영';
+
+  @override
+  String get chatRoomGalleryVideoOption => '앨범에서 동영상 선택';
+
+  @override
+  String get chatRoomVoiceOption => '음성 메시지';
+
+  @override
+  String get chatRoomVideoUploadFailed => '동영상을 보낼 수 없습니다';
+
+  @override
+  String get chatRoomVoiceUploadFailed => '음성 메시지를 보낼 수 없습니다';
+
+  @override
   String get chatRoomEmojiTooltip => '이모지 선택기 열기';
 
   @override
@@ -530,6 +545,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatMessageTypeVoice => '[음성]';
+
+  @override
+  String get chatMessageTypeVideo => '[동영상]';
 
   @override
   String get chatMessageTypeSystem => '[시스템]';
@@ -1117,6 +1135,54 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get chatExportSelectConversationsTitle => '내보낼 대화 선택';
+
+  @override
+  String get chatExportSelectAll => '전체 선택';
+
+  @override
+  String get chatExportDeselectAll => '전체 선택 해제';
+
+  @override
+  String get chatExportFormatSection => '내보내기 형식';
+
+  @override
+  String get chatExportFormatTxt => '텍스트 (이미지 제외)';
+
+  @override
+  String get chatExportFormatPdf => 'PDF (이미지 포함)';
+
+  @override
+  String get chatExportGenerateButton => '내보내기';
+
+  @override
+  String get chatExportSelectAtLeastOne => '대화를 하나 이상 선택하세요';
+
+  @override
+  String get chatExportShare => '공유';
+
+  @override
+  String get chatExportGenerating => '생성 중…';
+
+  @override
+  String chatExportGeneratingProgress(int current, int total) {
+    return '$current/$total개 메시지 생성 중…';
+  }
+
+  @override
+  String get chatExportDateRangeAll => '전체 기간';
+
+  @override
+  String get chatExportLongRangeTitle => '날짜 범위가 깁니다';
+
+  @override
+  String get chatExportLongRangeBody =>
+      '선택한 날짜 범위가 길어서 생성 속도가 느릴 수 있습니다. 계속할까요?';
+
+  @override
+  String get chatExportImageLoadFailed => '이미지를 불러올 수 없습니다';
+
+  @override
   String get storageScreenTitle => '저장공간 및 캐시';
 
   @override
@@ -1163,4 +1229,133 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get storageClearSuccess => '캐시가 삭제되었습니다';
+
+  @override
+  String get myHomeSectionHealthTitle => '건강';
+
+  @override
+  String get healthTitle => '가족 건강';
+
+  @override
+  String get healthSubtitle => '가족 모두의 키, 몸무게, 혈압을 기록하세요';
+
+  @override
+  String get healthTabMyRecords => '내 기록';
+
+  @override
+  String get healthTabFamily => '가족';
+
+  @override
+  String get healthTabSettings => '설정';
+
+  @override
+  String get healthTabAll => '전체';
+
+  @override
+  String get healthRecordNew => '새 기록';
+
+  @override
+  String get healthRecordSubmit => '저장';
+
+  @override
+  String get healthRecordDate => '날짜';
+
+  @override
+  String get healthHeight => '키';
+
+  @override
+  String get healthWeight => '몸무게';
+
+  @override
+  String get healthBloodPressure => '혈압';
+
+  @override
+  String get healthHeightCm => '키 (cm)';
+
+  @override
+  String get healthWeightKg => '몸무게 (kg)';
+
+  @override
+  String get healthBloodPressureSystolic => '수축기 (mmHg)';
+
+  @override
+  String get healthBloodPressureDiastolic => '이완기 (mmHg)';
+
+  @override
+  String get healthBloodPressureBothRequired => '수축기와 이완기를 모두 입력해주세요';
+
+  @override
+  String get healthValueRequired => '값을 입력해주세요';
+
+  @override
+  String get healthValueInvalid => '올바른 숫자가 아닙니다';
+
+  @override
+  String get healthHistoryTitle => '기록';
+
+  @override
+  String get healthNoRecords => '아직 건강 기록이 없습니다';
+
+  @override
+  String get healthSelectMember => '가족 구성원 선택';
+
+  @override
+  String get healthSelectMemberHint => '위에서 가족 구성원을 선택하여 공개 건강 데이터를 확인하세요.';
+
+  @override
+  String get healthFilterByMetric => '유형별 필터';
+
+  @override
+  String get healthVisibilityTitle => '공개 설정';
+
+  @override
+  String get healthReminderTitle => '매일 알림';
+
+  @override
+  String get healthReminderEnable => '매일 알림 켜기';
+
+  @override
+  String get healthReminderTime => '알림 시간';
+
+  @override
+  String get healthReminderHint => '설정한 시간까지 건강 데이터를 기록하지 않으면 푸시 알림으로 알려드립니다.';
+
+  @override
+  String get healthChartEmpty => '데이터가 부족하여 그래프를 표시할 수 없습니다.';
+
+  @override
+  String get healthChartSinglePoint => '기록이 1건뿐입니다. 계속 기록하면 추세를 볼 수 있어요.';
+
+  @override
+  String get healthChartLatest => '최신';
+
+  @override
+  String get healthChartMin => '최소';
+
+  @override
+  String get healthChartMax => '최대';
+
+  @override
+  String get healthChartAverage => '평균';
+
+  @override
+  String get healthChartSelectMetric => '위에서 지표를 선택하면 그래프가 표시됩니다.';
+
+  @override
+  String get healthEditSave => '저장';
+
+  @override
+  String get healthEditDateConflict => '이 날짜에 이미 기록이 있습니다.';
+
+  @override
+  String get healthEditRecordNotFound => '이 기록은 더 이상 존재하지 않습니다.';
+
+  @override
+  String get healthEditNotOwner => '자신의 기록만 편집할 수 있습니다.';
+
+  @override
+  String get healthEditFailed => '기록을 업데이트할 수 없습니다.';
+
+  @override
+  String get healthRecordEditHint => '탭하여 편집';
 }

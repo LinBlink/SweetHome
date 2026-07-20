@@ -4,8 +4,10 @@ import '../core/app_colors.dart';
 import '../core/home_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/health_provider.dart';
 import '../providers/location_provider.dart';
 import 'family_tree_screen.dart';
+import 'health/health_home_screen.dart';
 import 'location_hub_screen.dart';
 
 /// "鎴戠殑锟? tab 锟?the **sub-app entry hub** for the bottom nav.
@@ -62,11 +64,31 @@ class MyHomeScreen extends StatelessWidget {
                   // descendant of it, so the app-scoped LocationProvider
                   // (provided in main.dart) has to be re-provided
                   // explicitly for the live-map screen inside the
-                  // sub-app hub 锟?same pattern as the ChatProvider
+                  // sub-app hub — same pattern as the ChatProvider
                   // re-wiring used elsewhere in this app.
                   builder: (_) => ChangeNotifierProvider.value(
                     value: context.read<LocationProvider>(),
                     child: const LocationHubScreen(),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            HomeSectionHeader(
+              title: l10n.myHomeSectionHealthTitle,
+              accentIcon: Icons.favorite_rounded,
+            ),
+            _HubTile(
+              icon: Icons.monitor_heart_outlined,
+              title: l10n.healthTitle,
+              subtitle: l10n.healthSubtitle,
+              color: AppColors.danger,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: context.read<HealthProvider>(),
+                    child: const HealthHomeScreen(),
                   ),
                 ),
               ),

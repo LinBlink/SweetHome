@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "502646346256",
+    "project_id": "sweet-home-3ced9",
+    "storage_bucket": "sweet-home-3ced9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502646346256:android:6d079af0ae3ecddd353095",
+        "android_client_info": {
+          "package_name": "asia.sweethome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNN7Q_dD8VnV1zXNGnbFxOzf2e4d57j94"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
