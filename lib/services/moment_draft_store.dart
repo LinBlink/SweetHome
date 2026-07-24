@@ -44,11 +44,23 @@ class MomentDraftSnapshot {
   final String content;
   final List<MomentDraftMediaSnapshot> media;
 
-  const MomentDraftSnapshot({required this.content, required this.media});
+  /// Whether the composer was set to publish publicly when the draft
+  /// was saved. Defaulted to `false` for drafts saved by older app
+  /// versions that didn't have the toggle; the public-mode flag is a
+  /// forward-compatible optional field, missing on the wire just
+  /// means "family only" — same as the §7.1 server default.
+  final bool isPublic;
+
+  const MomentDraftSnapshot({
+    required this.content,
+    required this.media,
+    this.isPublic = false,
+  });
 
   Map<String, dynamic> toJson() => {
         'content': content,
         'media': media.map((m) => m.toJson()).toList(),
+        'isPublic': isPublic,
       };
 
   factory MomentDraftSnapshot.fromJson(Map<String, dynamic> json) {
@@ -58,6 +70,7 @@ class MomentDraftSnapshot {
           .map((e) =>
               MomentDraftMediaSnapshot.fromJson(e as Map<String, dynamic>))
           .toList(),
+      isPublic: json['isPublic'] as bool? ?? false,
     );
   }
 }

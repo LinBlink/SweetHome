@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/error_messages.dart';
 import '../core/image_mime.dart';
+import '../core/money/money_formatter.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../providers/auth_provider.dart';
@@ -137,6 +138,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onTap: () => _pickAndUploadAvatar(l10n),
                 ),
                 const SizedBox(height: 28),
+                // Read-only balance field — §2.1 surfaces the user's
+                // wallet balance; we render it as a disabled field
+                // so the user sees the current number without the
+                // affordance to edit it (there's no top-up flow on
+                // this client yet). Refreshes automatically with
+                // every /users/me round-trip via [AuthProvider].
+                TextFormField(
+                  initialValue: l10n.balanceValue(
+                      MoneyFormatter.format(user?.balance ?? 0)),
+                  enabled: false,
+                  decoration: InputDecoration(
+                    labelText: l10n.profileBalanceLabel,
+                    helperText: l10n.editProfileBalanceHint,
+                    prefixIcon: Icon(
+                      Icons.account_balance_wallet_rounded,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _nameCtrl,
                   decoration: InputDecoration(

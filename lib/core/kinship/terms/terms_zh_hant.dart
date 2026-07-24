@@ -54,6 +54,12 @@ final KinshipTermSet zhHantKinshipTerms = KinshipTermSet(
     'yZ.Dau': '外甥女',
     'Son.S': '媳婦',
     'Dau.S': '女婿',
+    // 孫輩的配偶 — 沒有這些條目時 localizer 會拼成字面的
+    // "孫女的配偶"，而不是實際的簡稱。
+    'Son.Son.S': '孫媳婦',
+    'Son.Dau.S': '孫女婿',
+    'Dau.Son.S': '外孫媳婦',
+    'Dau.Dau.S': '外孫女婿',
     'S.F#male': '岳父',
     'S.F#female': '公公',
     'S.M#male': '岳母',
@@ -66,5 +72,28 @@ final KinshipTermSet zhHantKinshipTerms = KinshipTermSet(
     'S.eZ#female': '大姑子',
     'S.yZ#male': '小姨子',
     'S.yZ#female': '小姑子',
+    // 同 terms_zh_hans.dart — 岳父母的父母走传统汉字形;解释同上
+    'S.F.F': '爺爺',
+    'S.F.M': '奶奶',
+    'S.M.F': '外公',
+    'S.M.M': '外婆',
   },
+  // 同 terms_zh_hans.dart — 深度 3+ 祖先链短称,字形走繁体
+  greatGrandfatherPat: '曾祖父',
+  greatGrandmotherPat: '曾祖母',
+  greatGrandfatherMat: '外曾祖父',
+  greatGrandmotherMat: '外曾祖母',
+  ggGrandfatherPat: '高祖父',
+  ggGrandmotherPat: '高祖母',
+  ggGrandfatherMat: '外高祖父',
+  ggGrandmotherMat: '外高祖母',
+  // 深度 3 / 4 的子孫鏈 — 對應上面祖先鏈的 Son/Dau 版本
+  greatGrandsonPat: '曾孫',
+  greatGranddaughterPat: '曾孫女',
+  greatGrandsonMat: '外曾孫',
+  greatGranddaughterMat: '外曾孫女',
+  ggGrandsonPat: '玄孫',
+  ggGranddaughterPat: '玄孫女',
+  ggGrandsonMat: '外玄孫',
+  ggGranddaughterMat: '外玄孫女',
 );

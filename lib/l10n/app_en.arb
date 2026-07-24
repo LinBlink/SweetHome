@@ -99,7 +99,6 @@
   "conversationsNewTooltip": "New conversation",
   "conversationsEmptyTitle": "No messages yet",
   "conversationsEmptySubtitle": "Invite family members to start chatting",
-  "conversationSpouseLabel": "Spouse",
   "connectionErrorRetry": "Retry",
   "newConversationTitle": "New Conversation",
   "editProfileTitle": "Edit Profile",
@@ -524,6 +523,7 @@
 "storageScreenTitle": "Storage & Cache",
 "storageTotalLabel": "{size} total",
 "storageImageCache": "Photo cache",
+  "storageAvatarCache": "Avatar cache",
 "storageVideoCache": "Video cache",
 "storageAudioCache": "Audio cache",
 "storageChatHistory": "Chat history",
@@ -591,5 +591,189 @@
  "healthEditRecordNotFound": "This record no longer exists.",
  "healthEditNotOwner": "You can only edit your own records.",
  "healthEditFailed": "Could not update the record.",
- "healthRecordEditHint": "Tap a record to edit."
+ "healthRecordEditHint": "Tap a record to edit.",
+ "healthChartBpZoneLow": "Low",
+ "healthChartBpZoneNormal": "Normal",
+ "healthChartBpZoneElevated": "Elevated",
+ "healthChartBpZoneHigh": "High",
+ "healthChartBpDiastolicCap": "Diastolic cap 80",
+ "familyFeedScopeMyFamily": "My family",
+ "familyFeedScopeOthers": "Other families",
+ "publishMomentPublicToggle": "Post publicly",
+ "publishMomentPublicHint": "Public posts also appear in the cross-family feed for everyone to see.",
+ "publicMomentsTitle": "Other families' posts",
+ "publicMomentsFromFamily": "From {familyName}",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+ "publicMomentsEmptyTitle": "No public posts yet",
+ "publicMomentsEmptyDesc": "Be the first family to share a public post.",
+ "publicMomentsLoadMoreError": "Couldn't load more",
+ "profileBalanceLabel": "Balance",
+ "@profileBalanceLabel": {},
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "Top up by contacting your family admin",
+ "redpacketHubTitle": "My Redpackets",
+ "redpacketHubSubtitle": "Red packets you've sent and received",
+ "redpacketSendTitle": "Send a Red Packet",
+ "redpacketTotalAmountLabel": "Total amount",
+ "redpacketTotalAmountHint": "In yuan, e.g. 100 or 88.88",
+ "redpacketTotalCountLabel": "Number of shares",
+ "redpacketTotalCountHint": "Up to {max}",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "Send Red Packet",
+ "redpacketAmountYuan": "{amount} yuan",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count} shares",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "{count} packets",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "Red packet",
+ "redpacketCardFromLabel": "{name} sent a red packet",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "Ongoing",
+ "redpacketStatusFinished": "Fully claimed",
+ "redpacketStatusExpired": "Expired",
+ "redpacketStatusRefunded": "Refunded",
+ "redpacketGrabButton": "Grab",
+ "redpacketGrabSuccess": "You got ¥{amount}",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "You've already grabbed this red packet",
+ "redpacketGrabListTitle": "Who has grabbed",
+ "redpacketGrabListEmpty": "No one has grabbed yet",
+ "redpacketGrabListCount": "{grabbed}/{total} grabbed",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "This red packet has expired",
+ "redpacketEmptyNotice": "This red packet is empty",
+ "redpacketSelfNotice": "You sent this red packet",
+ "redpacketRecordsTitle": "My Redpackets",
+ "redpacketRecordsTabSent": "Sent",
+ "redpacketRecordsTabReceived": "Received",
+ "redpacketRecordsEmpty": "No red packets yet",
+ "redpacketErrorInvalidAmount": "Total amount must be at least the same as the number of shares (each share needs at least 1 cent).",
+ "redpacketErrorInsufficientFund": "Not enough balance to send this red packet.",
+ "redpacketErrorTooManyShares": "Number of shares can't exceed the number of conversation members.",
+ "redpacketErrorNotMember": "You're no longer a member of this conversation.",
+ "redpacketErrorExpired": "This red packet has expired.",
+ "redpacketErrorAlreadyGrabbed": "You've already grabbed this red packet.",
+ "redpacketErrorEmpty": "This red packet is empty.",
+ "redpacketErrorNotFound": "Red packet not found.",
+ "redpacketMessageSendFailed": "Red packet created, but couldn't send the announcement message. Reopen the chat once you're back online.",
+ "chatRoomRedpacketOption": "Red packet",
+ "chatMessageTypeRedpacket": "[Red Packet]",
+ "errorParamInvalid": "Invalid request parameters.",
+ "errorUnauthorized": "Not logged in, or your session has expired. Please log in again.",
+ "errorForbidden": "You don't have permission to do this.",
+ "errorResourceNotFound": "The requested resource doesn't exist.",
+ "errorDataConflict": "Data conflict — please refresh and try again.",
+ "errorSystemBusy": "The system is busy — please try again later.",
+ "errorEmptyFile": "The uploaded file is empty.",
+ "errorFileSizeIllegal": "The file size doesn't meet the requirements.",
+ "errorFileTypeIllegal": "This file type isn't supported.",
+ "errorFileNameIllegal": "The file name isn't valid.",
+ "errorFileUploadFailed": "File upload failed — please try again later.",
+ "errorPhoneFormatInvalid": "Phone number format is incorrect — please check it.",
+ "errorPasswordFormatInvalid": "Password format doesn't meet the requirements — please check it.",
+ "errorNameFormatInvalid": "Nickname doesn't meet the requirements — please check it.",
+ "errorRegisterParamConflict": "Choose either a family name or an invite code, not both.",
+ "errorPhoneAlreadyExists": "This phone number is already registered.",
+ "errorLoginFailed": "Incorrect phone number or password.",
+ "errorTokenInvalid": "Your session is no longer valid. Please log in again.",
+ "errorTokenExpired": "Your session has expired. Please log in again.",
+ "errorRefreshTokenInvalid": "Your session is no longer valid. Please log in again.",
+ "errorUserNotFound": "This user doesn't exist.",
+ "errorFamilyNameEmpty": "Please enter a family name.",
+ "errorInviteCodeEmpty": "Please enter an invite code.",
+ "errorRelationTypeInvalid": "Invalid family relation type.",
+ "errorFamilyNotFound": "This family can't be found.",
+ "errorFamilyMemberNotFound": "This family member can't be found.",
+ "errorInviteCodeInvalid": "This invite code doesn't exist or has expired.",
+ "errorRelationAnchorInvalid": "The selected relation anchor is invalid.",
+ "errorNotFamilyMember": "You're not a member of this family.",
+ "errorNotFamilyAdmin": "Only the family admin can do this.",
+ "errorFamilySaveFailed": "Failed to create the family — please try again later.",
+ "errorSpouseAlreadyExists": "This person already has a spouse.",
+ "errorNoKnownParent": "Parent relationship is unknown — can't set up a sibling relation.",
+ "errorConversationNotFound": "This conversation doesn't exist.",
+ "errorMessageTooLong": "This message is too long.",
+ "errorMessageTypeInvalid": "This message type isn't supported.",
+ "errorLocationCoordinateInvalid": "Location coordinates can't be empty.",
+ "errorLocationBatteryInvalid": "Battery level value is invalid.",
+ "errorLocationTimestampMissing": "Location timestamp can't be empty.",
+ "errorLocationTimestampStale": "Location data has expired — please report your location again.",
+ "errorLocationTargetNotFamilyMember": "The target user isn't in the same family.",
+ "errorFenceRangeInvalid": "Fence radius is invalid.",
+ "errorFenceNotFound": "This fence doesn't exist.",
+ "errorNotFenceSetter": "Only the person who created this fence can do this.",
+ "errorMomentContentEmpty": "A moment needs either text or media.",
+ "errorMomentMediaTypeInvalid": "Invalid media type.",
+ "errorLikeRecordNotFound": "You haven't liked this yet, so there's nothing to undo.",
+ "errorMomentNotFound": "This moment doesn't exist.",
+ "errorNotMomentOwner": "Only the person who posted this moment can do this.",
+ "errorCommentContentEmpty": "Comment can't be empty.",
+ "errorCommentNotFound": "This comment doesn't exist.",
+ "errorNotCommentOwner": "Only the person who wrote this comment can do this.",
+ "errorHealthMetricTypeInvalid": "Invalid health metric type.",
+ "errorHealthRecordValueInvalid": "This health record's value is invalid.",
+ "errorNotSameFamily": "The target user isn't in the same family.",
+ "errorRemindTimeInvalid": "Reminder time format is incorrect.",
+ "errorHealthRecordNotFound": "This health record doesn't exist.",
+ "errorNotHealthRecordOwner": "Only you can edit your own health records.",
+ "errorHealthRecordDateConflict": "A record for this metric already exists on this date."
 }

@@ -51,6 +51,36 @@ class MomentService {
     );
   }
 
+  /// `GET /moment/public?page=&pageSize=&asc=` — §7.3. The cross-family
+  /// "广场" feed: only moments where `is_public = true` show up,
+  /// regardless of which family the viewer belongs to. The same
+  /// page-wrapper shape as [fetchFamilyMoments]; the rows carry the
+  /// extra `familyId`/`familyName` fields the §7.3 spec adds for
+  /// disambiguation. `Moment.fromJson` already handles either shape
+  /// (the two family-fields just stay `null` on §7.2 rows), so callers
+  /// don't need a separate DTO.
+  Future<MomentPage> fetchPublicMoments({
+    int page = 1,
+    int pageSize = 10,
+    bool asc = false,
+  }) async {
+    final resp = await http
+        .get(
+          Uri.parse(
+              '${AppConfig.apiBaseUrl}/moment/public?page=$page&pageSize=$pageSize&asc=$asc'),
+          headers: _headers,
+        )
+        .timeout(const Duration(seconds: 10));
+    final data = ApiClient.unwrap(resp) as Map<String, dynamic>;
+    final list = (data['moments'] as List<dynamic>? ?? const [])
+        .map((e) => Moment.fromJson(e as Map<String, dynamic>))
+        .toList();
+    return MomentPage(
+      moments: list,
+      total: data['total'] as int? ?? list.length,
+    );
+  }
+
   /// `POST /moment` — §7.1. Client must have already uploaded each
   /// piece of media via `/users/upload/{image,video,audio}` (§2.4 /
   /// §2.5 / §2.6) and pass the resulting URLs here; this service
@@ -58,9 +88,15 @@ class MomentService {
   /// 400 `MOMENT_CONTENT_EMPTY` — so we map both `content` and
   /// `media` to `null`/empty in the JSON when they're absent, rather
   /// than dropping the key entirely.
+  ///
+  /// Pass `isPublic: true` to send the moment across families (the
+  /// §7.3 cross-family 广场). The server defaults to family-only when
+  /// the field is omitted, and that's also our default — flipping the
+  /// composer's "公开发布" switch is the only way to set this on.
   Future<void> publishMoment({
     String? content,
     required List<Map<String, String>> media,
+    bool isPublic = false,
   }) async {
     if ((content == null || content.trim().isEmpty) && media.isEmpty) {
       throw StateError(
@@ -68,6 +104,11 @@ class MomentService {
     }
     final body = <String, dynamic>{
       'content': content ?? '',
+      // Always include the key — server defaults to `false` if absent
+      // (per §7.1 schema), but being explicit avoids the round-trip
+      // ambiguity on Flutter web where the JSON serializer could
+      // collapse absent null-equivalent booleans.
+      'isPublic': isPublic,
     };
     body['media'] = media
         .map((m) => {'type': m['type'], 'content': m['content']})

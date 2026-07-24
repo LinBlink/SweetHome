@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../core/app_config.dart';
 import '../core/error_messages.dart';
+import '../core/kinship/kinship_graph.dart';
 import '../data/mock_data.dart';
 import '../models/api_exception.dart';
 import '../models/auth_models.dart';
@@ -210,14 +211,39 @@ class AuthProvider extends ChangeNotifier {
   /// reactively based on the current `LocaleProvider` locale (never bake a
   /// locale into the fetch itself, or the label goes stale when the user
   /// switches language without re-fetching).
+  ///
+  /// Side effect: caches each member's `gender` by `userId` (see
+  /// [genderForUserId]) — the conversation-list's spouse label needs a
+  /// gender to pick "丈夫" vs "妻子" for the bare `S` relation code, but
+  /// the conversation payload's own `otherUserGender` field isn't
+  /// reliably populated by every backend version, and unlike that field,
+  /// `family_members`' `gender` always has a real value (see
+  /// `FamilyMemberVm.gender`, never null). Any caller of this method —
+  /// contacts screen, family tree, etc. — warms this cache as a side
+  /// effect, so the fallback works regardless of which screen the user
+  /// happened to visit first.
   Future<List<FamilyMemberVm>> loadFamilyMembers() async {
     final user = _currentUser;
     if (user == null) return const [];
-    if (AppConfig.mockMode) {
-      return MockDataSource.membersFor(viewerId: user.userId);
+    final members = AppConfig.mockMode
+        ? MockDataSource.membersFor(viewerId: user.userId)
+        : await _familyService.fetchMembers(user.familyId);
+    var changed = false;
+    for (final m in members) {
+      if (_memberGenderByUserId[m.userId] != m.gender) {
+        _memberGenderByUserId[m.userId] = m.gender;
+        changed = true;
+      }
     }
-    return _familyService.fetchMembers(user.familyId);
+    if (changed) notifyListeners();
+    return members;
   }
+
+  final Map<int, Gender> _memberGenderByUserId = {};
+
+  /// See [loadFamilyMembers]'s doc comment — fallback gender source for
+  /// `Conversation.otherUserGender` when that field comes back null.
+  Gender? genderForUserId(int userId) => _memberGenderByUserId[userId];
 
   Future<void> updateProfile(String name) async {
     final user = _currentUser;
@@ -387,6 +413,27 @@ class AuthProvider extends ChangeNotifier {
       return ok;
     } finally {
       _unauthorizedHandling = null;
+    }
+  }
+
+  /// §2.1 — refetch the current user. Used by the §9 red-packet send
+  /// flow to surface the new `balance` (the §9.1 response doesn't echo
+  /// it back). Returns `false` on any failure (silently swallowed —
+  /// the optimistic UI keeps the pre-send balance, and the next
+  /// session restore will pick up the truth from the server). The
+  /// `MockDataSource` doesn't override this path because mock mode
+  /// never actually deducts anything from the user's balance.
+  Future<bool> refreshBalance() async {
+    final user = _currentUser;
+    if (user == null) return false;
+    try {
+      final fresh = await AuthService.fetchMe(user);
+      _currentUser = fresh;
+      await AuthService.persistUser(_currentUser!);
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 

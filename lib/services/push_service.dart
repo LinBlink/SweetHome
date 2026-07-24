@@ -31,7 +31,14 @@ import '../models/auth_models.dart';
 class PushService {
   PushService();
 
-  final JPushFlutterInterface _jpush = JPush.newJPush();
+  // Lazy, not a field initializer: `JPush.newJPush()` touches `dart:io`'s
+  // `Platform.isIOS` internally, which throws `Unsupported operation` on
+  // Flutter Web — even though every call site below already guards itself
+  // with `_isSupportedPlatform` first. An eager `final` initializer runs at
+  // construction time, before any of those guards get a chance to run, and
+  // crashes the whole app on web before the first frame.
+  JPushFlutterInterface? _jpushInstance;
+  JPushFlutterInterface get _jpush => _jpushInstance ??= JPush.newJPush();
 
   /// 在 [setup] 成功运行于底层插件后为 true。
   bool _initialized = false;

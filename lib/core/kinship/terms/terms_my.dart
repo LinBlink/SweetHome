@@ -44,4 +44,10 @@ final KinshipTermSet myKinshipTerms = KinshipTermSet(
     'eZ#male': 'အစ်မ',
     'eZ#female': 'အစ်မ',
   },
+  // Burmese kinship has many fine distinctions (see class doc), but
+  // for great-grandparent depth we're not confident enough to guess
+  // a single term. Leave all the depth-3 / depth-4 chain fields null
+  // so the localizer falls through to the generic base-terms
+  // composition ("အဖေ၏ အဖေ၏ အဖေ" etc.) — which is honest at
+  // least.
 );

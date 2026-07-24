@@ -99,7 +99,6 @@
   "conversationsNewTooltip": "新規会話",
   "conversationsEmptyTitle": "まだメッセージがありません",
   "conversationsEmptySubtitle": "家族を招待してチャットを始めましょう",
-  "conversationSpouseLabel": "配偶者",
   "connectionErrorRetry": "再試行",
   "newConversationTitle": "新規会話",
   "editProfileTitle": "プロフィール編集",
@@ -417,6 +416,7 @@
 "storageScreenTitle": "ストレージとキャッシュ",
 "storageTotalLabel": "合計 {size}",
 "storageImageCache": "画像キャッシュ",
+  "storageAvatarCache": "アバターキャッシュ",
 "storageVideoCache": "動画キャッシュ",
 "storageAudioCache": "音声キャッシュ",
 "storageChatHistory": "チャット履歴",
@@ -470,5 +470,188 @@
  "healthEditRecordNotFound": "この記録は存在しません。",
  "healthEditNotOwner": "自分の記録のみ編集できます。",
  "healthEditFailed": "記録を更新できませんでした。",
- "healthRecordEditHint": "タップして編集"
+ "healthRecordEditHint": "タップして編集",
+ "healthChartBpZoneLow": "低め",
+ "healthChartBpZoneNormal": "正常",
+ "healthChartBpZoneElevated": "高め",
+ "healthChartBpZoneHigh": "高い",
+ "healthChartBpDiastolicCap": "拡張期上限 80",
+ "familyFeedScopeMyFamily": "自分の家族",
+ "familyFeedScopeOthers": "他の家族",
+ "publishMomentPublicToggle": "公開投稿",
+ "publishMomentPublicHint": "公開した投稿は他家庭のフィードにも表示されます",
+ "publicMomentsTitle": "他の家族の投稿",
+ "publicMomentsFromFamily": "{familyName}より",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+"publicMomentsEmptyTitle": "まだ公開投稿がありません",
+ "publicMomentsEmptyDesc": "最初の投稿者になりませんか?",
+ "publicMomentsLoadMoreError": "もっと読み込めませんでした",
+ "profileBalanceLabel": "残高",
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "チャージは家族管理者にお問い合わせください",
+ "redpacketHubTitle": "私の红包",
+ "redpacketHubSubtitle": "送った・受け取った红包を確認",
+ "redpacketSendTitle": "红包を送る",
+ "redpacketTotalAmountLabel": "総額",
+ "redpacketTotalAmountHint": "単位：円（例：100 または 88.88）",
+ "redpacketTotalCountLabel": "红包の個数",
+ "redpacketTotalCountHint": "最大 {max} 個",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "红包に入れる",
+ "redpacketAmountYuan": "{amount} 円",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count} 個",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "{count} 個の红包",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "红包",
+ "redpacketCardFromLabel": "{name}さんが红包を送りました",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "開催中",
+ "redpacketStatusFinished": "全て取得済み",
+ "redpacketStatusExpired": "期限切れ",
+ "redpacketStatusRefunded": "返金済み",
+ "redpacketGrabButton": "開く",
+ "redpacketGrabSuccess": "¥{amount}を取得しました",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "この红包は既に取得済みです",
+ "redpacketGrabListTitle": "取得者リスト",
+ "redpacketGrabListEmpty": "まだ誰も取得していません",
+ "redpacketGrabListCount": "{grabbed}/{total} 取得",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "この红包は期限切れです",
+ "redpacketEmptyNotice": "この红包は空です",
+ "redpacketSelfNotice": "あなたが送った红包です",
+ "redpacketRecordsTitle": "私の红包",
+ "redpacketRecordsTabSent": "送信済み",
+ "redpacketRecordsTabReceived": "受信済み",
+ "redpacketRecordsEmpty": "红包の履歴はまだありません",
+ "redpacketErrorInvalidAmount": "総額は红包の個数以上である必要があります（各份は1分以上）。",
+ "redpacketErrorInsufficientFund": "残高が不足しているため、紅包を送れません。",
+ "redpacketErrorTooManyShares": "红包の個数は会話のメンバー数を超えることはできません。",
+ "redpacketErrorNotMember": "この会話のメンバーではありません。",
+ "redpacketErrorExpired": "この红包は期限切れです。",
+ "redpacketErrorAlreadyGrabbed": "この红包は既に取得済みです。",
+ "redpacketErrorEmpty": "この红包は空です。",
+ "redpacketErrorNotFound": "红包が見つかりません。",
+ "redpacketMessageSendFailed": "红包は作成されましたが、通知メッセージの送信に失敗しました。オンラインに戻ったらチャットを開き直してください。",
+ "chatRoomRedpacketOption": "红包",
+ "chatMessageTypeRedpacket": "[红包]",
+ "errorParamInvalid": "リクエストパラメータが正しくありません。",
+ "errorUnauthorized": "未ログイン、またはセッションの有効期限が切れています。再度ログインしてください。",
+ "errorForbidden": "この操作を行う権限がありません。",
+ "errorResourceNotFound": "リクエストされたリソースが存在しません。",
+ "errorDataConflict": "データが競合しています。更新してから再度お試しください。",
+ "errorSystemBusy": "システムが混雑しています。しばらくしてから再度お試しください。",
+ "errorEmptyFile": "アップロードされたファイルが空です。",
+ "errorFileSizeIllegal": "ファイルサイズが要件を満たしていません。",
+ "errorFileTypeIllegal": "このファイル形式はサポートされていません。",
+ "errorFileNameIllegal": "ファイル名が無効です。",
+ "errorFileUploadFailed": "ファイルのアップロードに失敗しました。しばらくしてから再度お試しください。",
+ "errorPhoneFormatInvalid": "電話番号の形式が正しくありません。確認してください。",
+ "errorPasswordFormatInvalid": "パスワードの形式が要件を満たしていません。確認してください。",
+ "errorNameFormatInvalid": "ニックネームが要件を満たしていません。確認してください。",
+ "errorRegisterParamConflict": "家族名か招待コードのどちらか一方だけを指定してください。",
+ "errorPhoneAlreadyExists": "この電話番号はすでに登録されています。",
+ "errorLoginFailed": "電話番号またはパスワードが間違っています。",
+ "errorTokenInvalid": "セッションが無効になりました。再度ログインしてください。",
+ "errorTokenExpired": "セッションの有効期限が切れました。再度ログインしてください。",
+ "errorRefreshTokenInvalid": "セッションが無効になりました。再度ログインしてください。",
+ "errorUserNotFound": "このユーザーは存在しません。",
+ "errorFamilyNameEmpty": "家族名を入力してください。",
+ "errorInviteCodeEmpty": "招待コードを入力してください。",
+ "errorRelationTypeInvalid": "家族関係の種類が無効です。",
+ "errorFamilyNotFound": "この家族が見つかりません。",
+ "errorFamilyMemberNotFound": "この家族メンバーが見つかりません。",
+ "errorInviteCodeInvalid": "この招待コードは存在しないか、期限切れです。",
+ "errorRelationAnchorInvalid": "選択した関係の起点が無効です。",
+ "errorNotFamilyMember": "あなたはこの家族のメンバーではありません。",
+ "errorNotFamilyAdmin": "この操作は家族の管理者のみ行えます。",
+ "errorFamilySaveFailed": "家族の作成に失敗しました。しばらくしてから再度お試しください。",
+ "errorSpouseAlreadyExists": "この方にはすでに配偶者がいます。",
+ "errorNoKnownParent": "親の関係が不明なため、兄弟姉妹関係を設定できません。",
+ "errorConversationNotFound": "この会話は存在しません。",
+ "errorMessageTooLong": "メッセージが長すぎます。",
+ "errorMessageTypeInvalid": "このメッセージ形式はサポートされていません。",
+ "errorLocationCoordinateInvalid": "位置情報の座標を空にすることはできません。",
+ "errorLocationBatteryInvalid": "バッテリー残量の値が無効です。",
+ "errorLocationTimestampMissing": "位置情報のタイムスタンプを空にすることはできません。",
+ "errorLocationTimestampStale": "位置情報データの期限が切れています。再度送信してください。",
+ "errorLocationTargetNotFamilyMember": "対象ユーザーは同じ家族のメンバーではありません。",
+ "errorFenceRangeInvalid": "フェンスの半径が無効です。",
+ "errorFenceNotFound": "このフェンスは存在しません。",
+ "errorNotFenceSetter": "この操作はフェンスを設定した本人のみ行えます。",
+ "errorMomentContentEmpty": "投稿にはテキストかメディアのいずれかが必要です。",
+ "errorMomentMediaTypeInvalid": "メディアの形式が正しくありません。",
+ "errorLikeRecordNotFound": "まだ「いいね」していないため取り消せません。",
+ "errorMomentNotFound": "この投稿は存在しません。",
+ "errorNotMomentOwner": "この操作は投稿者本人のみ行えます。",
+ "errorCommentContentEmpty": "コメントを空にすることはできません。",
+ "errorCommentNotFound": "このコメントは存在しません。",
+ "errorNotCommentOwner": "この操作はコメント投稿者本人のみ行えます。",
+ "errorHealthMetricTypeInvalid": "健康指標の種類が正しくありません。",
+ "errorHealthRecordValueInvalid": "健康記録の数値が無効です。",
+ "errorNotSameFamily": "対象ユーザーは同じ家族のメンバーではありません。",
+ "errorRemindTimeInvalid": "リマインダーの時刻形式が正しくありません。",
+ "errorHealthRecordNotFound": "この健康記録は存在しません。",
+ "errorNotHealthRecordOwner": "自分の健康記録は本人のみ編集できます。",
+ "errorHealthRecordDateConflict": "この日付にはすでに同じ指標の記録があります。"
 }

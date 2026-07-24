@@ -55,7 +55,6 @@
   "conversationsNewTooltip": "新建對話",
   "conversationsEmptyTitle": "還沒有訊息",
   "conversationsEmptySubtitle": "邀請家人加入，開始聊天吧",
-  "conversationSpouseLabel": "配偶",
   "connectionErrorRetry": "重試",
   "newConversationTitle": "新建對話",
   "editProfileTitle": "編輯資料",
@@ -417,6 +416,7 @@
 "storageScreenTitle": "儲存空間",
 "storageTotalLabel": "共 {size}",
 "storageImageCache": "圖片快取",
+  "storageAvatarCache": "頭像快取",
 "storageVideoCache": "影片快取",
 "storageAudioCache": "音訊快取",
 "storageChatHistory": "聊天記錄",
@@ -470,5 +470,188 @@
  "healthEditRecordNotFound": "這筆記錄已不存在。",
  "healthEditNotOwner": "只能修改自己的記錄。",
  "healthEditFailed": "更新記錄失敗。",
- "healthRecordEditHint": "點擊記錄以編輯"
+ "healthRecordEditHint": "點擊記錄以編輯",
+ "healthChartBpZoneLow": "偏低",
+ "healthChartBpZoneNormal": "正常",
+ "healthChartBpZoneElevated": "偏高",
+ "healthChartBpZoneHigh": "高",
+ "healthChartBpDiastolicCap": "舒張壓上限 80",
+"familyFeedScopeMyFamily": "自個兒家",
+  "familyFeedScopeOthers": "串串門",
+ "publishMomentPublicToggle": "公開發佈",
+ "publishMomentPublicHint": "公開後這則動態及其評論會出現在跨家庭動態廣場裡",
+ "publicMomentsTitle": "串串門",
+ "publicMomentsFromFamily": "來自 {familyName}",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+ "publicMomentsEmptyTitle": "還沒有人公開發佈",
+ "publicMomentsEmptyDesc": "想做第一個分享的人？",
+ "publicMomentsLoadMoreError": "載入更多失敗",
+ "profileBalanceLabel": "餘額",
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "如需儲值請聯絡家庭管理員",
+ "redpacketHubTitle": "我的紅包",
+ "redpacketHubSubtitle": "查看我發出和收到的紅包",
+ "redpacketSendTitle": "發紅包",
+ "redpacketTotalAmountLabel": "總金額",
+ "redpacketTotalAmountHint": "單位：元，例如 100 或 88.88",
+ "redpacketTotalCountLabel": "紅包個數",
+ "redpacketTotalCountHint": "最多 {max} 個",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "塞錢進紅包",
+ "redpacketAmountYuan": "{amount} 元",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count} 份",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "{count} 個紅包",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "紅包",
+ "redpacketCardFromLabel": "{name} 發了一個紅包",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "進行中",
+ "redpacketStatusFinished": "已領完",
+ "redpacketStatusExpired": "已過期",
+ "redpacketStatusRefunded": "已退款",
+ "redpacketGrabButton": "開",
+ "redpacketGrabSuccess": "你搶到了 ¥{amount}",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "你已經搶過這個紅包了",
+ "redpacketGrabListTitle": "已領取的人",
+ "redpacketGrabListEmpty": "暫無人領取",
+ "redpacketGrabListCount": "{grabbed}/{total} 已領取",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "紅包已過期",
+ "redpacketEmptyNotice": "紅包已被搶光了",
+ "redpacketSelfNotice": "你發出的紅包",
+ "redpacketRecordsTitle": "我的紅包",
+ "redpacketRecordsTabSent": "我發出的",
+ "redpacketRecordsTabReceived": "我收到的",
+ "redpacketRecordsEmpty": "暫無紅包記錄",
+ "redpacketErrorInvalidAmount": "總金額必須不少於紅包個數（每份至少 1 分錢）。",
+ "redpacketErrorInsufficientFund": "餘額不足，無法發送紅包。",
+ "redpacketErrorTooManyShares": "紅包個數不能超過對話成員數。",
+ "redpacketErrorNotMember": "你已不在該對話中。",
+ "redpacketErrorExpired": "紅包已過期。",
+ "redpacketErrorAlreadyGrabbed": "你已經搶過這個紅包。",
+ "redpacketErrorEmpty": "紅包已被搶完。",
+ "redpacketErrorNotFound": "紅包不存在。",
+ "redpacketMessageSendFailed": "紅包已建立，但公告訊息傳送失敗，網路恢復後重新開啟會話查看。",
+ "chatRoomRedpacketOption": "紅包",
+ "chatMessageTypeRedpacket": "[紅包]",
+ "errorParamInvalid": "請求參數錯誤。",
+ "errorUnauthorized": "未登入或登入已過期，請重新登入。",
+ "errorForbidden": "沒有權限執行該操作。",
+ "errorResourceNotFound": "請求的資源不存在。",
+ "errorDataConflict": "資料衝突，請重新整理後再試。",
+ "errorSystemBusy": "系統繁忙，請稍後再試。",
+ "errorEmptyFile": "上傳的檔案為空。",
+ "errorFileSizeIllegal": "檔案大小不符合要求。",
+ "errorFileTypeIllegal": "檔案類型不符合要求。",
+ "errorFileNameIllegal": "檔案名稱不符合要求。",
+ "errorFileUploadFailed": "檔案上傳失敗，請稍後再試。",
+ "errorPhoneFormatInvalid": "手機號碼格式不正確，請檢查。",
+ "errorPasswordFormatInvalid": "密碼格式不符合要求，請檢查。",
+ "errorNameFormatInvalid": "暱稱不符合要求，請檢查。",
+ "errorRegisterParamConflict": "家庭名稱與邀請碼只能擇一。",
+ "errorPhoneAlreadyExists": "該手機號碼已被註冊。",
+ "errorLoginFailed": "手機號碼或密碼錯誤。",
+ "errorTokenInvalid": "登入已失效，請重新登入。",
+ "errorTokenExpired": "登入已過期，請重新登入。",
+ "errorRefreshTokenInvalid": "登入已失效，請重新登入。",
+ "errorUserNotFound": "使用者不存在。",
+ "errorFamilyNameEmpty": "請輸入家庭名稱。",
+ "errorInviteCodeEmpty": "請輸入邀請碼。",
+ "errorRelationTypeInvalid": "無效的家庭關係類型。",
+ "errorFamilyNotFound": "找不到該家庭。",
+ "errorFamilyMemberNotFound": "找不到該家庭成員。",
+ "errorInviteCodeInvalid": "邀請碼不存在或已過期。",
+ "errorRelationAnchorInvalid": "選擇的關係對象無效。",
+ "errorNotFamilyMember": "你不是該家庭成員。",
+ "errorNotFamilyAdmin": "僅家庭管理員可執行該操作。",
+ "errorFamilySaveFailed": "家庭建立失敗，請稍後再試。",
+ "errorSpouseAlreadyExists": "對方已經有配偶了。",
+ "errorNoKnownParent": "父母關係未知，無法建立兄弟姊妹關係。",
+ "errorConversationNotFound": "對話不存在。",
+ "errorMessageTooLong": "訊息內容過長。",
+ "errorMessageTypeInvalid": "不支援的訊息類型。",
+ "errorLocationCoordinateInvalid": "定位座標不能為空。",
+ "errorLocationBatteryInvalid": "電量數值不合法。",
+ "errorLocationTimestampMissing": "定位時間戳記不能為空。",
+ "errorLocationTimestampStale": "定位資料已過期，請重新回報。",
+ "errorLocationTargetNotFamilyMember": "目標使用者不是同一家庭成員。",
+ "errorFenceRangeInvalid": "圍欄半徑不合法。",
+ "errorFenceNotFound": "圍欄不存在。",
+ "errorNotFenceSetter": "僅圍欄設置者可執行該操作。",
+ "errorMomentContentEmpty": "動態內容和媒體不能同時為空。",
+ "errorMomentMediaTypeInvalid": "媒體類型不正確。",
+ "errorLikeRecordNotFound": "尚未按讚，無法取消。",
+ "errorMomentNotFound": "動態不存在。",
+ "errorNotMomentOwner": "僅動態發布者本人可執行該操作。",
+ "errorCommentContentEmpty": "留言內容不能為空。",
+ "errorCommentNotFound": "留言不存在。",
+ "errorNotCommentOwner": "僅留言作者本人可執行該操作。",
+ "errorHealthMetricTypeInvalid": "健康指標類型不正確。",
+ "errorHealthRecordValueInvalid": "健康記錄數值不合法。",
+ "errorNotSameFamily": "目標使用者不是同一家庭成員。",
+ "errorRemindTimeInvalid": "提醒時間格式不正確。",
+ "errorHealthRecordNotFound": "健康記錄不存在。",
+ "errorNotHealthRecordOwner": "僅本人可修改自己的健康記錄。",
+ "errorHealthRecordDateConflict": "該日期已存在同指標的記錄。"
 }

@@ -88,6 +88,14 @@ class HealthChart extends StatelessWidget {
               painter: _HealthChartPainter(
                 records: filtered,
                 metricType: metricType,
+                zoneLabels: metricType == HealthMetricType.bloodPressure
+                    ? {
+                        'normal': l10n.healthChartBpZoneNormal,
+                        'elevated': l10n.healthChartBpZoneElevated,
+                        'high': l10n.healthChartBpZoneHigh,
+                        'diastolicCap': l10n.healthChartBpDiastolicCap,
+                      }
+                    : null,
               ),
             ),
           ),
@@ -285,9 +293,16 @@ class _HealthChartPainter extends CustomPainter {
   final List<HealthRecord> records;
   final HealthMetricType metricType;
 
+  /// Localized zone labels for the BP chart. `null` for non-BP
+  /// metrics — zone rendering is BP-only. The painter itself can't
+  /// reach `AppLocalizations` (it's drawn outside any BuildContext),
+  /// so the parent widget pulls the strings and hands them in.
+  final Map<String, String>? zoneLabels;
+
   _HealthChartPainter({
     required this.records,
     required this.metricType,
+    this.zoneLabels,
   });
 
   // Layout constants — kept conservative so a single chart works on
@@ -306,8 +321,16 @@ class _HealthChartPainter extends CustomPainter {
       size.height - _topPadding - _bottomAxisHeight,
     );
 
+    // BP zones are drawn FIRST so the grid, axes, and line all paint
+    // on top of them — the bands are background context, not data.
+    if (metricType == HealthMetricType.bloodPressure) {
+      _drawBpZones(canvas, chartRect);
+    }
     _drawGrid(canvas, chartRect);
     _drawAxesLabels(canvas, chartRect, size);
+    if (metricType == HealthMetricType.bloodPressure) {
+      _drawDiastolicThreshold(canvas, chartRect);
+    }
 
     if (metricType == HealthMetricType.bloodPressure) {
       _drawDualLine(canvas, chartRect);
@@ -406,6 +429,28 @@ class _HealthChartPainter extends CustomPainter {
       }
     }
 
+    // For BP, the visible range always covers the full clinical
+    // spectrum (50 → 160) so the Normal / Elevated / High zone
+    // bands stay readable even when a user is consistently
+    // hypertensive or consistently normal. Real readings outside
+    // this bracket (e.g. a hypertensive crisis above 160) still
+    // appear correctly because we union with the data range
+    // below rather than clamping the data itself.
+    if (metricType == HealthMetricType.bloodPressure) {
+      const minRangeLow = 50.0;
+      const minRangeHigh = 160.0;
+      if (minV == double.infinity) {
+        // No data — pure range.
+        return _ValueRange(minRangeLow, minRangeHigh);
+      }
+      if (minV > minRangeLow) minV = minRangeLow;
+      if (maxV < minRangeHigh) maxV = minRangeHigh;
+      // Skip the 8% padding for BP — the canonical range already
+      // gives breathing room and extra padding would push the
+      // zone bands off-screen.
+      return _ValueRange(minV, maxV);
+    }
+
     // Pad 8% on each side so the line never touches the edges —
     // visual breathing room, also helps when all values are equal.
     if (minV == maxV) {
@@ -416,6 +461,120 @@ class _HealthChartPainter extends CustomPainter {
     final range = maxV - minV;
     final pad = range * 0.08;
     return _ValueRange(minV - pad, maxV + pad);
+  }
+
+  /// Draws the colored Normal / Elevated / High zone bands behind
+  /// the BP chart. Bands are clipped to the visible chart rect so
+  /// a band that extends beyond [50, 160] (the canonical range)
+  /// still terminates at the chart edge instead of bleeding out.
+  ///
+  /// Thresholds follow the standard adult classification (AHA
+  /// 2017 + Chinese Hypertension League equivalent):
+  ///   - 60 → 120 : Normal (covers both normal diastolic 60-80
+  ///                and normal systolic 90-120 — simplified into a
+  ///                single contiguous band for readability)
+  ///   - 120 → 140: Elevated / Hypertension Stage 1
+  ///   - 140 → ∞  : Hypertension Stage 2+
+  void _drawBpZones(Canvas canvas, Rect chartRect) {
+    final range = _computeValueRange();
+
+    final bands = <_BpBand>[
+      _BpBand(60, 120, AppColors.success, zoneLabels?['normal']),
+      _BpBand(120, 140, AppColors.warning, zoneLabels?['elevated']),
+      _BpBand(140, range.max + 1, AppColors.danger, zoneLabels?['high']),
+    ];
+
+    for (final band in bands) {
+      final yTop = _yForValue(band.maxValue, range, chartRect);
+      final yBottom = _yForValue(band.minValue, range, chartRect);
+      // Clip to chart bounds — out-of-range bands shouldn't draw.
+      final topClamped = yTop.clamp(chartRect.top, chartRect.bottom);
+      final bottomClamped = yBottom.clamp(chartRect.top, chartRect.bottom);
+      if (bottomClamped <= topClamped) continue;
+
+      final rect = Rect.fromLTRB(
+        chartRect.left,
+        topClamped,
+        chartRect.right,
+        bottomClamped,
+      );
+      final paint = Paint()..color = band.color.withValues(alpha: 0.18);
+      canvas.drawRect(rect, paint);
+
+      // Right-edge label, vertically centered in the band, only
+      // when the band is wide enough to hold the text (~12px tall).
+      final label = band.label;
+      if (label != null && (bottomClamped - topClamped) >= 14) {
+        final tp = TextPainter(
+          text: TextSpan(
+            text: label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: band.color.withValues(alpha: 0.85),
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: chartRect.width);
+        // Anchor the label to the right edge of the band with a
+        // small inner padding. Right-to-left languages would flip
+        // this, but our 6 locales are all LTR.
+        final tx = chartRect.right - tp.width - 4;
+        final ty = (topClamped + bottomClamped) / 2 - tp.height / 2;
+        tp.paint(canvas, Offset(tx, ty));
+      }
+    }
+  }
+
+  /// Dashed reference line at y=80 (the upper bound of normal
+  /// diastolic BP) — the boundary every well-controlled BP
+  /// reading should keep diastolic under. Has its own localized
+  /// label so users remember what the dashed line means.
+  void _drawDiastolicThreshold(Canvas canvas, Rect chartRect) {
+    const threshold = 80.0;
+    final range = _computeValueRange();
+    if (threshold < range.min || threshold > range.max) return;
+
+    final y = _yForValue(threshold, range, chartRect);
+    final paint = Paint()
+      ..color = AppColors.inkFaded.withValues(alpha: 0.55)
+      ..strokeWidth = 1.0;
+    _drawHorizontalDashed(canvas, chartRect.left, chartRect.right, y, paint);
+
+    final label = zoneLabels?['diastolicCap'];
+    if (label != null) {
+      final tp = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: TextStyle(
+            fontSize: 9,
+            fontStyle: FontStyle.italic,
+            color: AppColors.inkFaded.withValues(alpha: 0.8),
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: chartRect.width);
+      // Place label just above the dashed line so it doesn't
+      // collide with the y=80 axis tick on the left.
+      tp.paint(canvas, Offset(chartRect.left + 4, y - tp.height - 2));
+    }
+  }
+
+  void _drawHorizontalDashed(
+    Canvas canvas,
+    double x1,
+    double x2,
+    double y,
+    Paint paint,
+  ) {
+    const dashLen = 4.0;
+    const gapLen = 3.0;
+    var x = x1;
+    while (x < x2) {
+      final segEnd = (x + dashLen).clamp(x1, x2);
+      canvas.drawLine(Offset(x, y), Offset(segEnd.toDouble(), y), paint);
+      x += dashLen + gapLen;
+    }
   }
 
   double _yForValue(double value, _ValueRange range, Rect chartRect) {
@@ -622,4 +781,17 @@ class _ValueRange {
   final double min;
   final double max;
   const _ValueRange(this.min, this.max);
+}
+
+/// One clinical zone band drawn behind the BP chart. `maxValue`
+/// exclusive at the top (e.g. `60 → 120`); for the topmost band
+/// use a value safely above `range.max + 1` so the clipping still
+/// draws it up to the chart top edge.
+class _BpBand {
+  final double minValue;
+  final double maxValue;
+  final Color color;
+  final String? label;
+
+  const _BpBand(this.minValue, this.maxValue, this.color, this.label);
 }

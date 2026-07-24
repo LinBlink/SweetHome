@@ -1,0 +1,2 @@
+- 更改家庭名称和家庭头像
+- 将flutter中的所有icon使用自定义的icon。我将重新设计所有icon的svg文件并放在 assets/icons/svg 中。你可以先生成空文件在 assets/icons/svg 中占位。我随后填充直接就能用。

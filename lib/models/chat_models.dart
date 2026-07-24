@@ -9,21 +9,32 @@ enum MessageType {
   image,
   voice,
   video,
-  system;
+  system,
+
+  /// §9 red packet. The chat message's `content` field carries the
+  /// red packet id as a string per the §9.1 spec ("前端需再自行往该
+  /// 会话发一条 `type=REDPACKET`、`content=红包id` 的聊天消息").
+  /// The renderer in `MessageBubble` parses that string back into
+  /// [Message.redpacketId] and renders a card instead of plain text.
+  redpacket;
 
   /// Maps the API's `messageType` string (`"TEXT"` / `"IMAGE"` / `"VOICE"`
-  /// / `"VIDEO"`) to this enum. Case-insensitive; unknown values fall back
-  /// to [text]. See docs/api.md §4.3/§5.2.
+  /// / `"VIDEO"` / `"REDPACKET"`) to this enum. Case-insensitive; unknown
+  /// values fall back to [text]. See docs/api.md §4.4/§5.2.
   ///
-  /// NOTE: as of this writing, docs/api.md §5.2 documents the server as
-  /// only recognizing `TEXT`/`IMAGE`/`VOICE`/`SYSTEM` for *chat* messages
-  /// (unlike §7.1's moment media, which already accepts `image`/`video`/
-  /// `audio`) — an unrecognized `messageType` is silently stored/echoed
-  /// back as `TEXT`. Sending `VIDEO` here is forward-looking: it renders
-  /// correctly for this client's own optimistic bubble, but until the
-  /// backend adds first-class `VIDEO` support, a recipient (or this
-  /// client after WS/REST reconciliation) may see it degrade to a plain
-  /// text bubble containing the raw video URL instead of a video player.
+  /// §4.4's REST `type` whitelist now covers `text`/`image`/`voice`/
+  /// `audio`/`video`/`system`/`redpacket` — `video` and `redpacket` are
+  /// both officially supported there (with worked examples), not just
+  /// accepted optimistically by this client. §5.2's WebSocket path
+  /// documents an explicit `REDPACKET` example too. The one remaining
+  /// documented gap is that a messageType outside this whole list is
+  /// silently stored/echoed back as `TEXT` over WebSocket, whereas
+  /// REST §4.4 400s on anything not in its whitelist — a known
+  /// inconsistency between the two paths per the docs.
+  ///
+  /// §4.4's wire whitelist lists both `voice` AND `audio` — they map
+  /// to the same conceptual chat message (a recorded audio clip), just
+  /// alternate spelling. We accept both and render them identically.
   static MessageType fromApi(String? raw) {
     switch (raw?.toUpperCase()) {
       case 'TEXT':
@@ -31,11 +42,14 @@ enum MessageType {
       case 'IMAGE':
         return MessageType.image;
       case 'VOICE':
+      case 'AUDIO':
         return MessageType.voice;
       case 'VIDEO':
         return MessageType.video;
       case 'SYSTEM':
         return MessageType.system;
+      case 'REDPACKET':
+        return MessageType.redpacket;
       default:
         return MessageType.text;
     }
@@ -56,6 +70,8 @@ enum MessageType {
         return 'VIDEO';
       case MessageType.system:
         return 'SYSTEM';
+      case MessageType.redpacket:
+        return 'REDPACKET';
     }
   }
 
@@ -76,6 +92,8 @@ enum MessageType {
         return 'video';
       case MessageType.system:
         return 'system';
+      case MessageType.redpacket:
+        return 'redpacket';
     }
   }
 }
@@ -209,6 +227,15 @@ class Message {
   /// the bare spouse code).
   final Gender? senderGender;
 
+  /// For [MessageType.redpacket] messages: the §9 red packet id parsed
+  /// out of [content] (which carries the id as a string per §9.1's
+  /// "前端需再自行往该会话发一条 type=REDPACKET、content=红包id 的聊天消息"
+  /// convention). Null for every other message type, or if [content]
+  /// wasn't a valid integer (which would only happen on a corrupted
+  /// historical row — the renderer falls back to a plain text bubble
+  /// in that case).
+  final int? redpacketId;
+
   const Message({
     required this.clientId,
     this.serverId,
@@ -225,11 +252,16 @@ class Message {
     this.isPending = false,
     this.senderRelationCode,
     this.senderGender,
+    this.redpacketId,
   });
 
   factory Message.fromJson(Map<String, dynamic> json,
       {required int currentUserId}) {
     final senderId = json['senderId'] as int;
+    final type = MessageType.fromApi(
+      (json['messageType'] ?? json['type']) as String?,
+    );
+    final content = json['content'] as String;
     return Message(
       clientId: json['clientId'] as String? ?? json['id'].toString(),
       serverId: json['id'] as int?,
@@ -239,19 +271,18 @@ class Message {
       senderAvatarLabel: json['senderAvatarLabel'] as String? ?? '?',
       senderAvatarUrl: json['senderAvatarUrl'] as String?,
       senderAvatarColor: const Color(0xFFBF5E3B),
-      content: json['content'] as String,
+      content: content,
       // REST §4.3 returns `"type"`, WS §5.2 returns `"messageType"` — accept
       // whichever the current frame carries. Without this fallback an image
       // message loaded from history silently parses as `text` (and renders
       // as a raw-URL text bubble instead of via `_ImageBubble`).
-      type: MessageType.fromApi(
-        (json['messageType'] ?? json['type']) as String?,
-      ),
+      type: type,
       sentAt: parseBackendTime(json['sentAt'] as String),
       isMe: senderId == currentUserId,
       senderRelationCode: json['senderRelationCode'] as String?,
       senderGender:
           json['senderGender'] != null ? genderFromString(json['senderGender'] as String) : null,
+      redpacketId: type == MessageType.redpacket ? int.tryParse(content) : null,
     );
   }
 
@@ -288,6 +319,7 @@ class Message {
         isPending: isPending ?? this.isPending,
         senderRelationCode: senderRelationCode,
         senderGender: senderGender,
+        redpacketId: redpacketId,
       );
 }
 

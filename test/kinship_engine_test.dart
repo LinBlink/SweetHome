@@ -114,11 +114,19 @@ void main() {
     );
   });
 
-  test('deep/uncommon path falls back to generic composition instead of failing', () {
+  test('deep/uncommon path collapses to a short ancestor term, not the literal base-terms composition', () {
+    // F.F.F (3-gen pure-F ancestor chain) used to fall through to the
+    // generic base-terms composition and render "父亲的父亲的父亲".
+    // We now shorten that to the idiomatic Chinese term 曾祖父
+    // (great-grandfather on the paternal side) — see
+    // [KinshipTermSet.greatGrandfatherPat] and the [_ancestorChainTerm]
+    // helper. Mixed-direction chains (e.g. F.M.F) and other exotics
+    // still fall through to the base-terms composition, but a clean
+    // pure-direction chain never does.
     final path = [RelToken.father, RelToken.father, RelToken.father];
     final label = localizeRelation(path, targetGender: Gender.male, localeCode: 'zh_Hans');
     expect(label, isNotEmpty);
-    expect(label, contains('父亲'));
+    expect(label, '曾祖父');
   });
 
   test('unsupported locale falls back to zh_Hans default', () {
@@ -143,11 +151,39 @@ void main() {
       );
     });
 
-    test('depth-3 code not in any table still composes via fallback', () {
+    test('depth-3 code collapses to the locale\'s great-grandparent term', () {
+      // F.F.F (3-gen pure-F ancestor chain) now shortens to
+      // "Great-grandfather" in English via
+      // [KinshipTermSet.greatGrandfatherPat] (English doesn't
+      // distinguish paternal/maternal great-grandparents so both
+      // sides share the same term). The literal base-terms
+      // composition ("Father's Father's Father") is the fallback
+      // for chains the locale doesn't have a short term for.
       final label =
           localizeRelationCode('F.F.F', targetGender: Gender.male, localeCode: 'en');
-      expect(label, isNotEmpty);
-      expect(label, contains("Father"));
+      expect(label, 'Great-grandfather');
+    });
+
+    test('prefixed depth-3 chain renders as parent_term + 的 + short chain term', () {
+      // M.F.F (mother's father's father) in Chinese is rendered
+      // colloquially as "母亲的爷爷" rather than the formal
+      // "外曾祖父" — the algorithm in [_ancestorChainTerm] takes the
+      // first token of the prefix (M), looks up its base term
+      // ("母亲"), and concatenates with [connective] + the short
+      // 2-gen chain term for the remaining F.F pair ("爷"). This
+      // matches everyday speech better than the formal term.
+      final label =
+          localizeRelationCode('M.F.F', targetGender: Gender.male, localeCode: 'zh_Hans');
+      expect(label, '母亲的爷爷');
+    });
+
+    test('depth-3 chain without prefix yields the bare short term', () {
+      // F.F.F with no parent prefix renders as the bare
+      // great-grandparent term — 曾祖父 for the paternal side in
+      // Chinese. See [_ancestorChainTerm] for the rule.
+      final label =
+          localizeRelationCode('F.F.F', targetGender: Gender.male, localeCode: 'zh_Hans');
+      expect(label, '曾祖父');
     });
 
     test('localizes per-locale across all 6 supported locales for a common code', () {
@@ -163,6 +199,70 @@ void main() {
           localizeRelationCode('F', targetGender: Gender.male, localeCode: locale),
           term,
           reason: 'locale=$locale',
+        );
+      });
+    });
+
+    group('descendant chains collapse to short terms, and nothing '
+        'composes into a 3+ segment run-on chain', () {
+      test('a grandchild\'s spouse uses the colloquial compound term, '
+          'not "孙女的配偶"', () {
+        expect(
+          localizeRelationCode('Son.Dau.S', targetGender: Gender.male, localeCode: 'zh_Hans'),
+          '孙女婿',
+        );
+        expect(
+          localizeRelationCode('Son.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
+          '孙媳',
+        );
+        expect(
+          localizeRelationCode('Dau.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
+          '外孙媳',
+        );
+        expect(
+          localizeRelationCode('Dau.Dau.S', targetGender: Gender.male, localeCode: 'zh_Hans'),
+          '外孙女婿',
+        );
+      });
+
+      test('a pure depth-3 Son/Dau chain collapses to the idiomatic '
+          'great-grandchild term', () {
+        expect(localizeRelationCode('Son.Son.Son', localeCode: 'zh_Hans'), '曾孙');
+        expect(localizeRelationCode('Son.Son.Dau', localeCode: 'zh_Hans'), '曾孙女');
+        expect(localizeRelationCode('Dau.Dau.Son', localeCode: 'zh_Hans'), '外曾孙');
+        expect(localizeRelationCode('Dau.Dau.Dau', localeCode: 'zh_Hans'), '外曾孙女');
+      });
+
+      test('an ancestor chain whose last hop differs from the run still '
+          'collapses (fixes F.F.M / M.M.F previously falling through '
+          'to the 3-segment literal composition)', () {
+        expect(localizeRelationCode('F.F.M', localeCode: 'zh_Hans'), '曾祖母');
+        expect(localizeRelationCode('M.M.F', localeCode: 'zh_Hans'), '外曾祖父');
+      });
+
+      test('uncovered mixed chains still compose down to at most two '
+          'segments instead of one-token-at-a-time', () {
+        // F.M.F (father's mother's father) — no formal single term,
+        // but should read "父亲的外公" (2 segments), never the
+        // atomic "父亲的母亲的父亲" (3 segments).
+        expect(localizeRelationCode('F.M.F', localeCode: 'zh_Hans'), '父亲的外公');
+        // Dau.Son.Son (daughter's son's son) — same idea on the
+        // descendant side: "女儿的孙子", not "女儿的儿子的儿子".
+        expect(localizeRelationCode('Dau.Son.Son', localeCode: 'zh_Hans'), '女儿的孙子');
+        // A great-grandchild's spouse (no dedicated compound term)
+        // still collapses the blood part first, then appends a
+        // gendered spouse term: "曾孙的妻子", not "儿子的儿子的
+        // 儿子的配偶".
+        expect(
+          localizeRelationCode('Son.Son.Son.S',
+              targetGender: Gender.female, localeCode: 'zh_Hans'),
+          '曾孙的妻子',
+        );
+        // A nephew's wife — no table entry for this combination at
+        // all, but the `eB.Son` prefix is still reused: "侄子的妻子".
+        expect(
+          localizeRelationCode('eB.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
+          '侄子的妻子',
         );
       });
     });

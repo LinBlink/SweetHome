@@ -102,7 +102,8 @@ class ChatExportService {
           MessageType.image => imageLabel,
           MessageType.voice => voiceLabel,
           MessageType.video => videoLabel,
-          MessageType.text || MessageType.system => m.content,
+          MessageType.text || MessageType.system || MessageType.redpacket =>
+            m.content,
         };
         buffer.writeln('[${_formatTime(m.sentAt)}] $sender: $content');
       }

@@ -104,9 +104,240 @@ String? localizeRelationCode(
   final direct = terms.table[code];
   if (direct != null) return direct;
 
-  final tokens = code.split('.').map(_tokenForCode).whereType<RelToken>();
-  if (tokens.isEmpty) return code;
-  return tokens.map((t) => terms.baseTerms[t]!).join(terms.connective);
+  // Ancestor/descendant-chain collapse: codes like F.F.F
+  // (great-grandfather, paternal), M.F.M (great-grandmother,
+  // maternal), or Son.Dau.Son (great-grandson, via a daughter)
+  // would otherwise fall through to the base-terms composition and
+  // render the literal "父亲的父亲的父亲" / "儿子的女儿的儿子",
+  // which reads as an unreadable run-on chain. When the run of
+  // same-direction parent (F/M) or child (Son/Dau) tokens is 2, 3,
+  // or 4 deep, look up a short idiomatic term in the locale's
+  // [KinshipTermSet] and prefix it with whatever comes before the
+  // run (e.g. M.F.F → "母亲的爷爷" or "外曾祖父", depending on
+  // locale preference). The pure-chain case with no prefix (just
+  // F.F.F) yields the bare short term ("曾祖父").
+  final chainTerm = _ancestorChainTerm(code, terms) ?? _descendantChainTerm(code, terms);
+  if (chainTerm != null) return chainTerm;
+
+  // Nothing above matched the *whole* code. Rather than decomposing
+  // it into every individual one-hop token and joining them all
+  // with [connective] — which is what produces the "儿子的女儿的
+  // 配偶"-style chains this whole cascade exists to avoid — greedily
+  // segment the code into the fewest possible chunks, preferring the
+  // longest sub-chain at each step that already has a term (a direct
+  // [KinshipTermSet.table] entry or an ancestor/descendant chain
+  // collapse). See [_composeFallback].
+  return _composeFallback(code, terms, targetGender: targetGender);
+}
+
+/// Greedily segments [code] into the fewest possible chunks and
+/// composes them with [terms.connective]. At each position, tries
+/// the longest remaining sub-chain first (a relationCode names a
+/// chain of hops starting from SELF, so any prefix of it is itself a
+/// meaningful sub-relation) via [_lookupChainTerm]; only when no
+/// sub-chain at all matches does a single hop fall back to its bare
+/// [KinshipTermSet.baseTerms] entry. This guarantees the result is
+/// never longer than the old one-token-at-a-time join and is usually
+/// much shorter, since it prefers whatever compound terms the
+/// locale's table/chain functions already define.
+///
+/// [targetGender] — when known and the trailing hop is the bare
+/// spouse marker `S` — picks [KinshipTermSet.spouseOfMale] /
+/// [spouseOfFemale] for that chunk instead of the gender-neutral
+/// base "spouse" term, so e.g. `Son.Son.Son.S` reads "曾孙的妻子"
+/// rather than the more generic "曾孙的配偶".
+String _composeFallback(
+  String code,
+  KinshipTermSet terms, {
+  Gender? targetGender,
+}) {
+  final segments = code.split('.');
+  final chunks = <String>[];
+  var start = 0;
+  while (start < segments.length) {
+    String? matched;
+    var consumed = 1;
+    for (var end = segments.length; end > start; end--) {
+      final term = _lookupChainTerm(segments.sublist(start, end).join('.'), terms);
+      if (term != null) {
+        matched = term;
+        consumed = end - start;
+        break;
+      }
+    }
+    if (matched == null) {
+      final segment = segments[start];
+      if (segment == 'S' && start == segments.length - 1 && targetGender != null) {
+        matched = targetGender == Gender.male ? terms.spouseOfMale : terms.spouseOfFemale;
+      } else {
+        final token = _tokenForCode(segment);
+        matched = token != null ? terms.baseTerms[token] : null;
+      }
+      matched ??= segment;
+    }
+    chunks.add(matched);
+    start += consumed;
+  }
+  return chunks.join(terms.connective);
+}
+
+/// Direct table lookup + ancestor/descendant chain collapse for a
+/// sub-chain [code] — used by [_composeFallback] to find the longest
+/// matching prefix at each step. Doesn't consider the `#male`/
+/// `#female` gender-suffix keys, which only apply to a handful of
+/// top-level in-law codes already handled earlier in
+/// [localizeRelationCode], not to interior sub-chains.
+String? _lookupChainTerm(String code, KinshipTermSet terms) {
+  final direct = terms.table[code];
+  if (direct != null) return direct;
+  return _ancestorChainTerm(code, terms) ?? _descendantChainTerm(code, terms);
+}
+
+/// Tries to shorten a depth-2, depth-3, or depth-4 ancestor chain
+/// into a natural-sounding kinship term. Returns `null` when the
+/// code doesn't have a useful F/M chain to collapse, or when the
+/// locale has no term registered for that depth+side — the caller
+/// then falls back to the next fallback in the cascade.
+///
+/// The chain's *side* (paternal vs maternal) is decided by the run
+/// of identical tokens immediately before the last one; the last
+/// token's own F/M only picks father vs mother *within* that side.
+/// That means `F.F.F` and `F.F.M` are both "paternal" (曾祖父 /
+/// 曾祖母) even though their last hop differs, and `M.F.F` collapses
+/// to a "mother" prefix + the `F.F` chain rather than requiring
+/// every token to match.
+///
+/// Examples:
+///   `F.F`         → "爷爷" (Chinese) / "Grandpa" (English)
+///   `M.F.F`       → "母亲的爷爷" / "Mom's Grandpa"
+///   `F.F.F`       → "曾祖父" / "Great-grandfather"
+///   `F.F.M`       → "曾祖母" (paternal side, last hop is mother)
+///   `M.M.F`       → "外曾祖父" (maternal side, last hop is father)
+///   `F.M.F`       → "父亲的外公" (`F` prefix + `M.F` chain)
+String? _ancestorChainTerm(String code, KinshipTermSet terms) {
+  final parts = code.split('.');
+  if (parts.length < 2) return null;
+  final last = parts.last;
+  if (last != 'F' && last != 'M') return null;
+  final beforeLast = parts.sublist(0, parts.length - 1);
+  // Find the longest trailing run of `beforeLast` that's homogeneous
+  // in direction (all F or all M), walking right-to-left.
+  int chainStart = beforeLast.length;
+  String? direction; // 'F' or 'M'
+  for (int i = beforeLast.length - 1; i >= 0; i--) {
+    if (beforeLast[i] != 'F' && beforeLast[i] != 'M') break;
+    if (direction == null) {
+      direction = beforeLast[i];
+      chainStart = i;
+    } else if (beforeLast[i] == direction) {
+      chainStart = i;
+    } else {
+      break;
+    }
+  }
+  if (direction == null) return null;
+  final prefix = parts.sublist(0, chainStart);
+  // A prefix longer than one token (e.g. `F.M` in `F.M.F.F`) has no
+  // single base term to render it as — bail rather than silently
+  // dropping the extra token, and let the caller fall back to
+  // composing shorter, still-accurate sub-chains instead.
+  if (prefix.length > 1) return null;
+  final chainLen = beforeLast.length - chainStart + 1; // + the final token
+  final isPat = direction == 'F';
+  // Look up the chain itself: length 2 reuses the existing 2-gen
+  // table entries (爷爷 / 奶奶 / 外公 / 外婆 / Grandpa / Grandma
+  // etc.); length 3+ uses the depth-specific fields on
+  // [KinshipTermSet].
+  String? bare;
+  if (chainLen == 2) {
+    bare = terms.table['$direction.$last'];
+  } else if (chainLen == 3) {
+    if (isPat) {
+      bare = last == 'F' ? terms.greatGrandfatherPat : terms.greatGrandmotherPat;
+    } else {
+      bare = last == 'F' ? terms.greatGrandfatherMat : terms.greatGrandmotherMat;
+    }
+  } else if (chainLen == 4) {
+    if (isPat) {
+      bare = last == 'F' ? terms.ggGrandfatherPat : terms.ggGrandmotherPat;
+    } else {
+      bare = last == 'F' ? terms.ggGrandfatherMat : terms.ggGrandmotherMat;
+    }
+  } else {
+    return null;
+  }
+  if (bare == null) return null;
+  if (prefix.isEmpty) return bare;
+  final head = _tokenForCode(prefix.first);
+  if (head == null) return null;
+  final headTerm = terms.baseTerms[head];
+  if (headTerm == null) return null;
+  return '$headTerm${terms.connective}$bare';
+}
+
+/// Mirrors [_ancestorChainTerm] for descendant chains — collapses a
+/// depth-2/3/4 Son/Dau run into a short idiomatic term (孙 / 曾孙 /
+/// 玄孙 family), with the same "the run before the last token
+/// decides the side; the last token decides the gender" rule, e.g.
+/// `Son.Son.Dau` is still "son-line" (曾孙女) even though its last
+/// hop is `Dau`.
+///
+/// Examples:
+///   `Son.Son`     → "孙子" (already in [KinshipTermSet.table]
+///                    directly, but this function also covers it)
+///   `Son.Son.Son` → "曾孙" (depth-3, son line)
+///   `Son.Son.Dau` → "曾孙女" (depth-3, son line, female)
+///   `Dau.Dau.Son` → "外曾孙" (depth-3, daughter line)
+///   `Dau.Son.Son` → "女儿的孙子" (`Dau` prefix + `Son.Son` chain)
+String? _descendantChainTerm(String code, KinshipTermSet terms) {
+  final parts = code.split('.');
+  if (parts.length < 2) return null;
+  final last = parts.last;
+  if (last != 'Son' && last != 'Dau') return null;
+  final beforeLast = parts.sublist(0, parts.length - 1);
+  int chainStart = beforeLast.length;
+  String? direction; // 'Son' or 'Dau'
+  for (int i = beforeLast.length - 1; i >= 0; i--) {
+    if (beforeLast[i] != 'Son' && beforeLast[i] != 'Dau') break;
+    if (direction == null) {
+      direction = beforeLast[i];
+      chainStart = i;
+    } else if (beforeLast[i] == direction) {
+      chainStart = i;
+    } else {
+      break;
+    }
+  }
+  if (direction == null) return null;
+  final prefix = parts.sublist(0, chainStart);
+  if (prefix.length > 1) return null;
+  final chainLen = beforeLast.length - chainStart + 1;
+  final isPat = direction == 'Son';
+  String? bare;
+  if (chainLen == 2) {
+    bare = terms.table['$direction.$last'];
+  } else if (chainLen == 3) {
+    if (isPat) {
+      bare = last == 'Son' ? terms.greatGrandsonPat : terms.greatGranddaughterPat;
+    } else {
+      bare = last == 'Son' ? terms.greatGrandsonMat : terms.greatGranddaughterMat;
+    }
+  } else if (chainLen == 4) {
+    if (isPat) {
+      bare = last == 'Son' ? terms.ggGrandsonPat : terms.ggGranddaughterPat;
+    } else {
+      bare = last == 'Son' ? terms.ggGrandsonMat : terms.ggGranddaughterMat;
+    }
+  } else {
+    return null;
+  }
+  if (bare == null) return null;
+  if (prefix.isEmpty) return bare;
+  final head = _tokenForCode(prefix.first);
+  if (head == null) return null;
+  final headTerm = terms.baseTerms[head];
+  if (headTerm == null) return null;
+  return '$headTerm${terms.connective}$bare';
 }
 
 /// Convenience wrapper combining [kinshipLocaleCodeFor] + [localizeRelationCode]

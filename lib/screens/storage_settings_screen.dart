@@ -10,10 +10,14 @@ import '../services/cache_stats_service.dart';
 /// Storage & cache screen, reached from the profile tab's settings
 /// section. Shows the on-disk size of each media cache
 /// (image/video/audio — each its own `MediaCache` bucket, see that
-/// file for why they're separate) plus the locally-cached chat
-/// history blob, and lets the user clear any one of them or all at
-/// once. Replaces the old single confirm-dialog "clear local chat
-/// history" row with a fuller breakdown.
+/// file for why they're separate) plus the avatar cache
+/// (`AvatarCache`, dedicated because every member list / chat header
+/// / location pin re-renders an avatar image and would re-download
+/// without LRU disk caching) plus the locally-cached chat history
+/// blob, and lets the user clear any one of them or all at once.
+///
+/// Replaces the old single confirm-dialog "clear local chat history"
+/// row with a fuller breakdown.
 class StorageSettingsScreen extends StatefulWidget {
   const StorageSettingsScreen({super.key});
 
@@ -21,7 +25,7 @@ class StorageSettingsScreen extends StatefulWidget {
   State<StorageSettingsScreen> createState() => _StorageSettingsScreenState();
 }
 
-enum _Category { images, videos, audio, chatHistory }
+enum _Category { images, avatars, videos, audio, chatHistory }
 
 class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
   final _stats = const CacheStatsService();
@@ -38,6 +42,7 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
     setState(() => _loading = true);
     final results = await Future.wait([
       _stats.imageCacheSize(),
+      _stats.avatarCacheSize(),
       _stats.videoCacheSize(),
       _stats.audioCacheSize(),
       _stats.chatHistorySize(),
@@ -45,9 +50,10 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
     if (!mounted) return;
     setState(() {
       _sizes[_Category.images] = results[0];
-      _sizes[_Category.videos] = results[1];
-      _sizes[_Category.audio] = results[2];
-      _sizes[_Category.chatHistory] = results[3];
+      _sizes[_Category.avatars] = results[1];
+      _sizes[_Category.videos] = results[2];
+      _sizes[_Category.audio] = results[3];
+      _sizes[_Category.chatHistory] = results[4];
       _loading = false;
     });
   }
@@ -60,6 +66,8 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
     switch (c) {
       case _Category.images:
         return l10n.storageImageCache;
+      case _Category.avatars:
+        return l10n.storageAvatarCache;
       case _Category.videos:
         return l10n.storageVideoCache;
       case _Category.audio:
@@ -111,6 +119,9 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
     switch (c) {
       case _Category.images:
         await _stats.clearImages();
+        break;
+      case _Category.avatars:
+        await _stats.clearAvatars();
         break;
       case _Category.videos:
         await _stats.clearVideos();
@@ -171,6 +182,7 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
     if (!mounted) return;
     setState(() {
       _sizes[_Category.images] = 0;
+      _sizes[_Category.avatars] = 0;
       _sizes[_Category.videos] = 0;
       _sizes[_Category.audio] = 0;
       _sizes[_Category.chatHistory] = 0;
@@ -216,6 +228,8 @@ class _StorageSettingsScreenState extends State<StorageSettingsScreen> {
                       children: [
                         _categoryRow(l10n, _Category.images,
                             Icons.image_outlined, AppColors.sage),
+                        _categoryRow(l10n, _Category.avatars,
+                            Icons.account_circle_outlined, AppColors.primaryLight),
                         _categoryRow(l10n, _Category.videos,
                             Icons.videocam_outlined, AppColors.accent),
                         _categoryRow(l10n, _Category.audio,

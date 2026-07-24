@@ -123,6 +123,13 @@ class _AuthorRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Show "来自 李家" only when the row came from the cross-family
+    // public feed and the viewer isn't the author themselves
+    // (within the same family the family name is implied). The badge
+    // makes the §7.3 disambiguation explicit — without it the user
+    // can't tell where "李秀英" lives.
+    final showFamilyBadge = !isMine &&
+        (moment.familyName != null && moment.familyName!.isNotEmpty);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -147,12 +154,37 @@ class _AuthorRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 1),
-              Text(
-                timeText,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textHint,
-                ),
+              Row(
+                children: [
+                  Text(
+                    timeText,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                  if (showFamilyBadge) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        l10n.publicMomentsFromFamily(moment.familyName!),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -199,9 +231,19 @@ class _LikeRow extends StatelessWidget {
             HapticFeedback.selectionClick();
             provider.addLike(momentId);
           },
-          onLongPress: mineActive
-              ? () => _onLongPress(context, provider, l10n)
-              : null,
+          // Always wired to a non-null closure so IconButton never
+          // falls back to its default long-press behaviour (which is
+          // to surface the [tooltip] — Flutter's "Show Button" hint,
+          // called out in `docs/BUGS_TO_FIX.md` "家庭动态页面"). The
+          // handler still shortcuts to a silent no-op when the user
+          // hasn't liked yet, so a long-press on an empty heart
+          // doesn't fire a meaningless server DELETE; only an actually-
+          // liked heart cancels its like intent through
+          // [MomentProvider.cancelLike].
+          onLongPress: () {
+            if (!mineActive) return;
+            _onLongPress(context, provider, l10n);
+          },
           icon: Icon(iconData, color: color, size: 22),
           visualDensity: VisualDensity.compact,
           padding: EdgeInsets.zero,

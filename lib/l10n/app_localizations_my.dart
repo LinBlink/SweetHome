@@ -334,9 +334,6 @@ class AppLocalizationsMy extends AppLocalizations {
       'မိသားစုဝင်များကို ဖိတ်ခေါ်၍ စတင်စကားပြောပါ';
 
   @override
-  String get conversationSpouseLabel => 'အိမ်ထောင်ဖက်';
-
-  @override
   String get connectionErrorRetry => 'ထပ်စမ်းရန်';
 
   @override
@@ -1238,6 +1235,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get storageImageCache => 'ဓာတ်ပုံ Cache';
 
   @override
+  String get storageAvatarCache => 'ပုံတူ Cache';
+
+  @override
   String get storageVideoCache => 'ဗီဒီယို Cache';
 
   @override
@@ -1410,4 +1410,413 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get healthRecordEditHint => 'တည်းဖြတ်ရန် နှိပ်ပါ';
+
+  @override
+  String get healthChartBpZoneLow => 'နိမ့်';
+
+  @override
+  String get healthChartBpZoneNormal => 'ပုံမှန်';
+
+  @override
+  String get healthChartBpZoneElevated => 'မြင့်';
+
+  @override
+  String get healthChartBpZoneHigh => 'အလွန်မြင့်';
+
+  @override
+  String get healthChartBpDiastolicCap => 'အောက်သွေးအမြင့်ဆုံး ၈၀';
+
+  @override
+  String get familyFeedScopeMyFamily => 'ကျွန်တော်တို့ မိသားစု';
+
+  @override
+  String get familyFeedScopeOthers => 'အခြား မိသားစုများ';
+
+  @override
+  String get publishMomentPublicToggle => 'အများမြင်အဖြစ် တင်မည်';
+
+  @override
+  String get publishMomentPublicHint =>
+      'အများမြင်တင်သော ပို့စ်များကို အခြားမိသားစုများမှ ကြည့်ရှုနိုင်ပါသည်';
+
+  @override
+  String get publicMomentsTitle => 'အခြားမိသားစု ပို့စ်များ';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '$familyName မှ';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => 'အများမြင် ပို့စ်မရှိသေးပါ';
+
+  @override
+  String get publicMomentsEmptyDesc => 'ပထမဆုံး မျှဝေသူ ဖြစ်လာပါစေ';
+
+  @override
+  String get publicMomentsLoadMoreError => 'ထပ်မရနိုင်ပါ';
+
+  @override
+  String get profileBalanceLabel => 'လက်ကျန်ငွေ';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint =>
+      'ငွေဖြည့်ရန် မိသားစု စီမံခန့်ခွဲသူကို ဆက်သွယ်ပါ';
+
+  @override
+  String get redpacketHubTitle => 'ကျွန်ုပ်၏ ဆန်တင်းကျီ';
+
+  @override
+  String get redpacketHubSubtitle =>
+      'ပို့ခဲ့သောနှင့် ရရှိခဲ့သော ဆန်တင်းကျီများ';
+
+  @override
+  String get redpacketSendTitle => 'ဆန်တင်းကျီ ပို့မည်';
+
+  @override
+  String get redpacketTotalAmountLabel => 'စုစုပေါင်း ပမာဏ';
+
+  @override
+  String get redpacketTotalAmountHint =>
+      'ယူအန်းဖြင့် (ဥပမာ 100 သို့မဟုတ် 88.88)';
+
+  @override
+  String get redpacketTotalCountLabel => 'အရေအတွက်';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return 'အများဆုံး $max ခု';
+  }
+
+  @override
+  String get redpacketSendButton => 'ဆန်တင်းကျီထဲ ထည့်မည်';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount ယူအန်း';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count ခု';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return 'ဆန်တင်းကျီ $count ခု';
+  }
+
+  @override
+  String get redpacketCardLabel => 'ဆန်တင်းကျီ';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name က ဆန်တင်းကျီ ပို့ခဲ့သည်';
+  }
+
+  @override
+  String get redpacketStatusOngoing => 'ဆက်လက်လုပ်ဆောင်နေသည်';
+
+  @override
+  String get redpacketStatusFinished => 'အကုန်ယူပြီးပြီ';
+
+  @override
+  String get redpacketStatusExpired => 'သက်တမ်းကုန်ပြီ';
+
+  @override
+  String get redpacketStatusRefunded => 'ပြန်အမ်းပြီးပြီ';
+
+  @override
+  String get redpacketGrabButton => 'ယူမည်';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '¥$amount ရရှိခဲ့သည်';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => 'ဤဆန်တင်းကျီကို ရယူပြီးပြီ';
+
+  @override
+  String get redpacketGrabListTitle => 'ရယူထားသူများ';
+
+  @override
+  String get redpacketGrabListEmpty => 'မည်သူမျှ မရယူရသေးပါ';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total ရယူပြီး';
+  }
+
+  @override
+  String get redpacketExpiredNotice => 'ဤဆန်တင်းကျီ သက်တမ်းကုန်ပါပြီ';
+
+  @override
+  String get redpacketEmptyNotice => 'ဤဆန်တင်းကျီ ဗလာဖြစ်နေသည်';
+
+  @override
+  String get redpacketSelfNotice => 'သင်ပို့ခဲ့သော ဆန်တင်းကျီ';
+
+  @override
+  String get redpacketRecordsTitle => 'ကျွန်ုပ်၏ ဆန်တင်းကျီ';
+
+  @override
+  String get redpacketRecordsTabSent => 'ပို့ခဲ့သည်';
+
+  @override
+  String get redpacketRecordsTabReceived => 'ရရှိခဲ့သည်';
+
+  @override
+  String get redpacketRecordsEmpty => 'ဆန်တင်းကျီ မှတ်တမ်း မရှိသေးပါ';
+
+  @override
+  String get redpacketErrorInvalidAmount =>
+      'စုစုပေါင်းပမာဏသည် အရေအတွက်ထက် မနည်းရ (တစ်ခုလျှင် 1 ဖန်မျှ ရှိရမည်)။';
+
+  @override
+  String get redpacketErrorInsufficientFund => 'လက်ကျန်ငွေ မလုံလောက်ပါ။';
+
+  @override
+  String get redpacketErrorTooManyShares =>
+      'အရေအတွက်သည် စကားပြောအဖွဲ့ဝင် အရေအတွက်ထက် မကျော်ရပါ။';
+
+  @override
+  String get redpacketErrorNotMember => 'ဤစကားပြောခန်း၏ အဖွဲ့ဝင် မဟုတ်တော့ပါ။';
+
+  @override
+  String get redpacketErrorExpired => 'ဤဆန်တင်းကျီ သက်တမ်းကုန်ပါပြီ။';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => 'ဤဆန်တင်းကျီကို ရယူပြီးပါပြီ။';
+
+  @override
+  String get redpacketErrorEmpty => 'ဤဆန်တင်းကျီ ဗလာဖြစ်နေသည်။';
+
+  @override
+  String get redpacketErrorNotFound => 'ဆန်တင်းကျီ မတွေ့ပါ။';
+
+  @override
+  String get redpacketMessageSendFailed =>
+      'ဆန်တင်းကျီ ဖန်တီးပြီးပါပြီ၊ သို့သော် အကြောင်းကြားစာတိုက်ပို့မှု မအောင်မြင်ပါ။ အင်တာနက်ပြန်ရရှိပါက စကားပြောခန်းကို ပြန်ဖွင့်ကြည့်ပါ။';
+
+  @override
+  String get chatRoomRedpacketOption => 'ဆန်တင်းကျီ';
+
+  @override
+  String get chatMessageTypeRedpacket => '[ဆန်တင်းကျီ]';
+
+  @override
+  String get errorParamInvalid => 'တောင်းဆိုမှု paramita မှားနေပါသည်။';
+
+  @override
+  String get errorUnauthorized =>
+      'မဝင်ရောက်ရသေးပါ သို့မဟုတ် Session သက်တမ်းကုန်သွားပါပြီ။ ပြန်လည်ဝင်ရောက်ပါ။';
+
+  @override
+  String get errorForbidden =>
+      'ဤလုပ်ဆောင်ချက်ကို လုပ်ဆောင်ရန် ခွင့်ပြုချက် မရှိပါ။';
+
+  @override
+  String get errorResourceNotFound => 'တောင်းဆိုသည့် အရင်းအမြစ် မရှိပါ။';
+
+  @override
+  String get errorDataConflict =>
+      'ဒေတာပဋိပက္ခ ဖြစ်နေသည်။ Refresh လုပ်ပြီး ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get errorSystemBusy => 'စနစ်အလုပ်များနေသည်။ နောက်မှ ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get errorEmptyFile => 'အပ်လုဒ်လုပ်သော ဖိုင် ဗလာဖြစ်နေသည်။';
+
+  @override
+  String get errorFileSizeIllegal =>
+      'ဖိုင်အရွယ်အစား သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။';
+
+  @override
+  String get errorFileTypeIllegal => 'ဤဖိုင်အမျိုးအစားကို ပံ့ပိုးမထားပါ။';
+
+  @override
+  String get errorFileNameIllegal => 'ဖိုင်အမည် မမှန်ကန်ပါ။';
+
+  @override
+  String get errorFileUploadFailed =>
+      'ဖိုင်အပ်လုဒ် မအောင်မြင်ပါ။ နောက်မှ ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get errorPhoneFormatInvalid =>
+      'ဖုန်းနံပါတ် ပုံစံ မှားနေပါသည်။ စစ်ဆေးပါ။';
+
+  @override
+  String get errorPasswordFormatInvalid =>
+      'စကားဝှက် ပုံစံ သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။ စစ်ဆေးပါ။';
+
+  @override
+  String get errorNameFormatInvalid =>
+      'အမည်ခံ သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။ စစ်ဆေးပါ။';
+
+  @override
+  String get errorRegisterParamConflict =>
+      'မိသားစုအမည် သို့မဟုတ် ဖိတ်ခေါ်ကုဒ် တစ်ခုတည်းသာ ရွေးရပါမည်။';
+
+  @override
+  String get errorPhoneAlreadyExists =>
+      'ဤဖုန်းနံပါတ်ကို မှတ်ပုံတင်ပြီးသားဖြစ်သည်။';
+
+  @override
+  String get errorLoginFailed => 'ဖုန်းနံပါတ် သို့မဟုတ် စကားဝှက် မှားနေပါသည်။';
+
+  @override
+  String get errorTokenInvalid => 'Session မမှန်ကန်တော့ပါ။ ပြန်လည်ဝင်ရောက်ပါ။';
+
+  @override
+  String get errorTokenExpired =>
+      'Session သက်တမ်းကုန်သွားပါပြီ။ ပြန်လည်ဝင်ရောက်ပါ။';
+
+  @override
+  String get errorRefreshTokenInvalid =>
+      'Session မမှန်ကန်တော့ပါ။ ပြန်လည်ဝင်ရောက်ပါ။';
+
+  @override
+  String get errorUserNotFound => 'အသုံးပြုသူ မရှိပါ။';
+
+  @override
+  String get errorFamilyNameEmpty => 'မိသားစုအမည် ထည့်ပါ။';
+
+  @override
+  String get errorInviteCodeEmpty => 'ဖိတ်ခေါ်ကုဒ် ထည့်ပါ။';
+
+  @override
+  String get errorRelationTypeInvalid =>
+      'မိသားစုဆက်ဆံရေး အမျိုးအစား မမှန်ကန်ပါ။';
+
+  @override
+  String get errorFamilyNotFound => 'ဤမိသားစုကို ရှာမတွေ့ပါ။';
+
+  @override
+  String get errorFamilyMemberNotFound => 'ဤမိသားစုဝင်ကို ရှာမတွေ့ပါ။';
+
+  @override
+  String get errorInviteCodeInvalid =>
+      'ဖိတ်ခေါ်ကုဒ် မရှိပါ သို့မဟုတ် သက်တမ်းကုန်ပါပြီ။';
+
+  @override
+  String get errorRelationAnchorInvalid =>
+      'ရွေးချယ်ထားသော ဆက်ဆံရေး anchor မမှန်ကန်ပါ။';
+
+  @override
+  String get errorNotFamilyMember => 'သင်သည် ဤမိသားစု၏ အဖွဲ့ဝင် မဟုတ်ပါ။';
+
+  @override
+  String get errorNotFamilyAdmin =>
+      'ဤလုပ်ဆောင်ချက်ကို မိသားစု admin သာ လုပ်ဆောင်နိုင်သည်။';
+
+  @override
+  String get errorFamilySaveFailed =>
+      'မိသားစု ဖန်တီးမှု မအောင်မြင်ပါ။ နောက်မှ ထပ်စမ်းကြည့်ပါ။';
+
+  @override
+  String get errorSpouseAlreadyExists =>
+      'ထိုသူတွင် အိမ်ထောင်ဖက် ရှိပြီးသားဖြစ်သည်။';
+
+  @override
+  String get errorNoKnownParent =>
+      'မိဘဆက်ဆံရေး မသိရသေးသဖြင့် မောင်နှမဆက်ဆံရေး သတ်မှတ်၍ မရပါ။';
+
+  @override
+  String get errorConversationNotFound => 'ဤစကားပြောခန်း မရှိပါ။';
+
+  @override
+  String get errorMessageTooLong => 'မက်ဆေ့ချ် ရှည်လွန်းသည်။';
+
+  @override
+  String get errorMessageTypeInvalid =>
+      'ဤမက်ဆေ့ချ်အမျိုးအစားကို ပံ့ပိုးမထားပါ။';
+
+  @override
+  String get errorLocationCoordinateInvalid =>
+      'တည်နေရာ ကိုသော်တစ်များ ဗလာမဖြစ်ရပါ။';
+
+  @override
+  String get errorLocationBatteryInvalid => 'ဘက်ထရီပမာဏ မမှန်ကန်ပါ။';
+
+  @override
+  String get errorLocationTimestampMissing =>
+      'တည်နေရာ အချိန်တံဆိပ် ဗလာမဖြစ်ရပါ။';
+
+  @override
+  String get errorLocationTimestampStale =>
+      'တည်နေရာဒေတာ သက်တမ်းကုန်ပါပြီ။ ပြန်လည်တင်ပါ။';
+
+  @override
+  String get errorLocationTargetNotFamilyMember =>
+      'ပစ်မှတ်အသုံးပြုသူသည် မိသားစုတူ အဖွဲ့ဝင် မဟုတ်ပါ။';
+
+  @override
+  String get errorFenceRangeInvalid => 'ဝင်းစည်းရုံး အချင်းဝက် မမှန်ကန်ပါ။';
+
+  @override
+  String get errorFenceNotFound => 'ဤဝင်းစည်းရုံး မရှိပါ။';
+
+  @override
+  String get errorNotFenceSetter =>
+      'ဤလုပ်ဆောင်ချက်ကို ဝင်းစည်းရုံး သတ်မှတ်သူသာ လုပ်ဆောင်နိုင်သည်။';
+
+  @override
+  String get errorMomentContentEmpty =>
+      'Moment တွင် စာသား သို့မဟုတ် မီဒီယာ လိုအပ်သည်။';
+
+  @override
+  String get errorMomentMediaTypeInvalid => 'မီဒီယာအမျိုးအစား မှားနေပါသည်။';
+
+  @override
+  String get errorLikeRecordNotFound => 'မလိုက်ကြည့်ရသေးသဖြင့် ပယ်ဖျက်၍ မရပါ။';
+
+  @override
+  String get errorMomentNotFound => 'ဤ moment မရှိပါ။';
+
+  @override
+  String get errorNotMomentOwner =>
+      'ဤလုပ်ဆောင်ချက်ကို moment ပို့စ်တင်သူသာ လုပ်ဆောင်နိုင်သည်။';
+
+  @override
+  String get errorCommentContentEmpty => 'မှတ်ချက် ဗလာမဖြစ်ရပါ။';
+
+  @override
+  String get errorCommentNotFound => 'ဤမှတ်ချက် မရှိပါ။';
+
+  @override
+  String get errorNotCommentOwner =>
+      'ဤလုပ်ဆောင်ချက်ကို မှတ်ချက်ရေးသူသာ လုပ်ဆောင်နိုင်သည်။';
+
+  @override
+  String get errorHealthMetricTypeInvalid =>
+      'ကျန်းမာရေးညွှန်ကိန်း အမျိုးအစား မှားနေပါသည်။';
+
+  @override
+  String get errorHealthRecordValueInvalid =>
+      'ကျန်းမာရေးမှတ်တမ်း တန်ဖိုး မမှန်ကန်ပါ။';
+
+  @override
+  String get errorNotSameFamily =>
+      'ပစ်မှတ်အသုံးပြုသူသည် မိသားစုတူ အဖွဲ့ဝင် မဟုတ်ပါ။';
+
+  @override
+  String get errorRemindTimeInvalid => 'သတိပေးချိန် ပုံစံ မှားနေပါသည်။';
+
+  @override
+  String get errorHealthRecordNotFound => 'ဤကျန်းမာရေးမှတ်တမ်း မရှိပါ။';
+
+  @override
+  String get errorNotHealthRecordOwner =>
+      'မိမိကျန်းမာရေးမှတ်တမ်းကို မိမိကိုယ်တိုင်သာ ပြင်ဆင်နိုင်သည်။';
+
+  @override
+  String get errorHealthRecordDateConflict =>
+      'ဤရက်စွဲတွင် တူညီသောညွှန်ကိန်း မှတ်တမ်း ရှိပြီးသားဖြစ်သည်။';
 }

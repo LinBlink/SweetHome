@@ -67,4 +67,12 @@ final KinshipTermSet jaKinshipTerms = KinshipTermSet(
     'S.yZ#male': '義理の妹',
     'S.yZ#female': '義理の妹',
   },
+  // ひいおじいさん / ひいおばあさん = great-grandparent. 曽祖父・曽祖母
+  // も使えるが普段遣いでは「ひいおじいさん」のほうが自然. 高祖父
+  // までは一般家庭であまり使わないので depth-4 は null のまま落と
+  // してフォールバックさせる.
+  greatGrandfatherPat: '曾祖父',
+  greatGrandmotherPat: '曾祖母',
+  greatGrandfatherMat: '曾祖父',
+  greatGrandmotherMat: '曾祖母',
 );

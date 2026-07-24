@@ -67,4 +67,26 @@ final KinshipTermSet enKinshipTerms = KinshipTermSet(
     'S.yZ#male': 'Sister-in-law',
     'S.yZ#female': 'Sister-in-law',
   },
+  // Depth-3 / depth-4 ancestor chains. English doesn't distinguish
+  // paternal vs maternal sides for "great-grandfather" so all four
+  // depth-3 fields share the same term (and same for depth-4).
+  // Great- vs great-great- is the only axis the language has.
+  greatGrandfatherPat: 'Great-grandfather',
+  greatGrandmotherPat: 'Great-grandmother',
+  greatGrandfatherMat: 'Great-grandfather',
+  greatGrandmotherMat: 'Great-grandmother',
+  ggGrandfatherPat: 'Great-great-grandfather',
+  ggGrandmotherPat: 'Great-great-grandmother',
+  ggGrandfatherMat: 'Great-great-grandfather',
+  ggGrandmotherMat: 'Great-great-grandmother',
+  // Depth-3 / depth-4 descendant chains — English doesn't distinguish
+  // son-line vs daughter-line here either, so Pat and Mat share terms.
+  greatGrandsonPat: 'Great-grandson',
+  greatGranddaughterPat: 'Great-granddaughter',
+  greatGrandsonMat: 'Great-grandson',
+  greatGranddaughterMat: 'Great-granddaughter',
+  ggGrandsonPat: 'Great-great-grandson',
+  ggGranddaughterPat: 'Great-great-granddaughter',
+  ggGrandsonMat: 'Great-great-grandson',
+  ggGranddaughterMat: 'Great-great-granddaughter',
 );

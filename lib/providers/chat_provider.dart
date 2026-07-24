@@ -625,10 +625,18 @@ class ChatProvider extends ChangeNotifier {
   /// (or REST-fallback, via `_sendOverWire`).
   ///
   /// Returns `true` on success (the optimistic message has been
-  /// reconciled with the server's confirmation), `false` on any
-  /// failure. The optimistic message stays in the list either way;
-  /// failures flip `isPending` back to `false` so the bubble doesn't
-  /// stay in the perpetual-pending state.
+  /// reconciled with the server's confirmation). On failure, the
+  /// optimistic message's `isPending` is flipped back to `false` so
+  /// the bubble doesn't stay in the perpetual-pending state, and the
+  /// original exception is **rethrown** (not swallowed into a bare
+  /// `false`) — so callers can pattern-match `on ApiException` and
+  /// show the server's actual §2.6-style business error (e.g.
+  /// `FILE_TYPE_ILLEGAL`, `FILE_SIZE_ILLEGAL`) via
+  /// `localizeErrorMessage` instead of one generic "upload failed"
+  /// toast that hides *why* every attempt is failing. `_pickAndSendVideo`
+  /// already had this `on ApiException catch` branch wired up — it
+  /// was silently dead code until this method actually let the
+  /// exception through.
   Future<bool> _sendMediaMessage(
     int conversationId, {
     required MessageType type,
@@ -682,18 +690,99 @@ class ChatProvider extends ChangeNotifier {
         );
       }
       return true;
-    } catch (_) {
+    } catch (e) {
       _replaceOptimistic(
         conversationId,
         clientId,
         optimistic.copyWith(isPending: false),
       );
       notifyListeners();
-      return false;
+      rethrow;
     }
   }
 
-  Future<void> _sendOverWire({
+  /// §9.1 spec: "前端需再自行往该会话发一条 `type=REDPACKET`、
+  /// `content=红包id` 的聊天消息" — after `RedpacketService.create()`
+  /// succeeds (in the send screen), the caller invokes this to drop the
+  /// chat-card message into the conversation. The card itself is
+  /// rendered by [_BubbleContent]'s `MessageType.redpacket` branch on
+  /// every recipient device, which calls `RedpacketDetailScreen` on
+  /// tap.
+  ///
+  /// docs/api.md §4.4 now explicitly lists `redpacket` in its REST
+  /// `type` whitelist (with a worked example), alongside §5.2's
+  /// WebSocket `messageType=REDPACKET` example — so unlike the earlier
+  /// draft of this spec, the REST §4.4 fallback is fully supported
+  /// here and this goes through the same shared [_sendOverWire] path
+  /// as image/video/voice (WS when connected, REST fallback
+  /// otherwise) instead of requiring a live WebSocket connection.
+  ///
+  /// Follows the same optimistic-send pattern as the media helpers but
+  /// skips the upload step (there's no binary payload — `content` is
+  /// just the int serialised to a string). Returns the sent [Message]
+  /// on success so the caller can navigate / scroll / show a snackbar.
+  Future<Message> sendRedpacketMessage(
+    int conversationId,
+    int redpacketId,
+  ) async {
+    final clientId = _uuid.v4();
+    final optimistic = Message(
+      clientId: clientId,
+      conversationId: conversationId,
+      senderId: _currentUser.userId,
+      senderName: _currentUser.name,
+      senderAvatarLabel: _currentUser.name.isNotEmpty
+          ? _currentUser.name[0]
+          : '',
+      senderAvatarColor: AppColors.primary,
+      content: '$redpacketId',
+      type: MessageType.redpacket,
+      sentAt: DateTime.now(),
+      isMe: true,
+      isPending: true,
+      redpacketId: redpacketId,
+    );
+
+    _messages[conversationId] ??= [];
+    _messages[conversationId]!.add(optimistic);
+    // Reuse the "last message" preview slot — the conversation tile's
+    // helper renders the localized [Red Packet] placeholder when
+    // `lastMessageType == MessageType.redpacket` instead of dumping
+    // the raw id.
+    _updateConversationLastMessage(
+      conversationId,
+      optimistic.content,
+      type: MessageType.redpacket,
+    );
+    notifyListeners();
+
+    if (AppConfig.mockMode) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      final confirmed = optimistic.copyWith(isPending: false);
+      _replaceOptimistic(conversationId, clientId, confirmed);
+      notifyListeners();
+      return confirmed;
+    }
+    // `_sendOverWire` returns `null` both when the WS send was fired
+    // off (fire-and-forget — reconciled later via the `NEW_MESSAGE`
+    // echo, same as every other WS-sent type) and when the REST
+    // fallback silently failed (its own best-effort catch). Either
+    // way, flip the local bubble out of the pending state so it
+    // doesn't spin forever; a successful WS round trip still gets
+    // properly reconciled once the echo arrives via `_reconcileType`.
+    final sent = await _sendOverWire(
+      conversationId: conversationId,
+      content: '$redpacketId',
+      type: MessageType.redpacket,
+      clientId: clientId,
+    );
+    final confirmed = sent ?? optimistic.copyWith(isPending: false);
+    _replaceOptimistic(conversationId, clientId, confirmed);
+    notifyListeners();
+    return confirmed;
+  }
+
+  Future<Message?> _sendOverWire({
     required int conversationId,
     required String content,
     required MessageType type,
@@ -711,7 +800,7 @@ class ChatProvider extends ChangeNotifier {
           },
         ),
       );
-      return;
+      return null;
     }
     try {
       final sent = await _chatService.sendMessage(
@@ -723,14 +812,19 @@ class ChatProvider extends ChangeNotifier {
       );
       _replaceOptimistic(conversationId, clientId, sent);
       notifyListeners();
+      return sent;
     } on ApiException catch (e) {
+      debugPrint(
+          'ChatProvider._sendOverWire REST fallback failed: ${e.code} ${e.message}');
       _handleApiException(e);
-    } catch (_) {
+    } catch (e) {
       // Best-effort: the optimistic message has already been
       // reconciled with the original uploaded URL; if the fallback
       // REST send fails, we leave the bubble as-is. The server
       // likely has it anyway (upload succeeded).
+      debugPrint('ChatProvider._sendOverWire REST fallback failed: $e');
     }
+    return null;
   }
 
   void dismissConnectionError() {

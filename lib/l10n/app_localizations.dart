@@ -700,12 +700,6 @@ abstract class AppLocalizations {
   /// **'Invite family members to start chatting'**
   String get conversationsEmptySubtitle;
 
-  /// No description provided for @conversationSpouseLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Spouse'**
-  String get conversationSpouseLabel;
-
   /// No description provided for @connectionErrorRetry.
   ///
   /// In en, this message translates to:
@@ -2314,6 +2308,12 @@ abstract class AppLocalizations {
   /// **'Photo cache'**
   String get storageImageCache;
 
+  /// No description provided for @storageAvatarCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar cache'**
+  String get storageAvatarCache;
+
   /// No description provided for @storageVideoCache.
   ///
   /// In en, this message translates to:
@@ -2637,6 +2637,708 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap a record to edit.'**
   String get healthRecordEditHint;
+
+  /// No description provided for @healthChartBpZoneLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get healthChartBpZoneLow;
+
+  /// No description provided for @healthChartBpZoneNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get healthChartBpZoneNormal;
+
+  /// No description provided for @healthChartBpZoneElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated'**
+  String get healthChartBpZoneElevated;
+
+  /// No description provided for @healthChartBpZoneHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get healthChartBpZoneHigh;
+
+  /// No description provided for @healthChartBpDiastolicCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic cap 80'**
+  String get healthChartBpDiastolicCap;
+
+  /// No description provided for @familyFeedScopeMyFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'My family'**
+  String get familyFeedScopeMyFamily;
+
+  /// No description provided for @familyFeedScopeOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'Other families'**
+  String get familyFeedScopeOthers;
+
+  /// No description provided for @publishMomentPublicToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post publicly'**
+  String get publishMomentPublicToggle;
+
+  /// No description provided for @publishMomentPublicHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Public posts also appear in the cross-family feed for everyone to see.'**
+  String get publishMomentPublicHint;
+
+  /// No description provided for @publicMomentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Other families\' posts'**
+  String get publicMomentsTitle;
+
+  /// No description provided for @publicMomentsFromFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'From {familyName}'**
+  String publicMomentsFromFamily(String familyName);
+
+  /// No description provided for @publicMomentsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No public posts yet'**
+  String get publicMomentsEmptyTitle;
+
+  /// No description provided for @publicMomentsEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first family to share a public post.'**
+  String get publicMomentsEmptyDesc;
+
+  /// No description provided for @publicMomentsLoadMoreError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load more'**
+  String get publicMomentsLoadMoreError;
+
+  /// No description provided for @profileBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get profileBalanceLabel;
+
+  /// No description provided for @balanceValue.
+  ///
+  /// In en, this message translates to:
+  /// **'¥{amount}'**
+  String balanceValue(String amount);
+
+  /// No description provided for @editProfileBalanceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up by contacting your family admin'**
+  String get editProfileBalanceHint;
+
+  /// No description provided for @redpacketHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Redpackets'**
+  String get redpacketHubTitle;
+
+  /// No description provided for @redpacketHubSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Red packets you\'ve sent and received'**
+  String get redpacketHubSubtitle;
+
+  /// No description provided for @redpacketSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a Red Packet'**
+  String get redpacketSendTitle;
+
+  /// No description provided for @redpacketTotalAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total amount'**
+  String get redpacketTotalAmountLabel;
+
+  /// No description provided for @redpacketTotalAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'In yuan, e.g. 100 or 88.88'**
+  String get redpacketTotalAmountHint;
+
+  /// No description provided for @redpacketTotalCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of shares'**
+  String get redpacketTotalCountLabel;
+
+  /// No description provided for @redpacketTotalCountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {max}'**
+  String redpacketTotalCountHint(int max);
+
+  /// No description provided for @redpacketSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Red Packet'**
+  String get redpacketSendButton;
+
+  /// No description provided for @redpacketAmountYuan.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} yuan'**
+  String redpacketAmountYuan(String amount);
+
+  /// No description provided for @redpacketShareCountSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} shares'**
+  String redpacketShareCountSuffix(int count);
+
+  /// No description provided for @redpacketCountUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} packets'**
+  String redpacketCountUnit(int count);
+
+  /// No description provided for @redpacketCardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Red packet'**
+  String get redpacketCardLabel;
+
+  /// No description provided for @redpacketCardFromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} sent a red packet'**
+  String redpacketCardFromLabel(String name);
+
+  /// No description provided for @redpacketStatusOngoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get redpacketStatusOngoing;
+
+  /// No description provided for @redpacketStatusFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully claimed'**
+  String get redpacketStatusFinished;
+
+  /// No description provided for @redpacketStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get redpacketStatusExpired;
+
+  /// No description provided for @redpacketStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get redpacketStatusRefunded;
+
+  /// No description provided for @redpacketGrabButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Grab'**
+  String get redpacketGrabButton;
+
+  /// No description provided for @redpacketGrabSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You got ¥{amount}'**
+  String redpacketGrabSuccess(String amount);
+
+  /// No description provided for @redpacketAlreadyGrabbed.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already grabbed this red packet'**
+  String get redpacketAlreadyGrabbed;
+
+  /// No description provided for @redpacketGrabListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who has grabbed'**
+  String get redpacketGrabListTitle;
+
+  /// No description provided for @redpacketGrabListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has grabbed yet'**
+  String get redpacketGrabListEmpty;
+
+  /// No description provided for @redpacketGrabListCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{grabbed}/{total} grabbed'**
+  String redpacketGrabListCount(int grabbed, int total);
+
+  /// No description provided for @redpacketExpiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This red packet has expired'**
+  String get redpacketExpiredNotice;
+
+  /// No description provided for @redpacketEmptyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This red packet is empty'**
+  String get redpacketEmptyNotice;
+
+  /// No description provided for @redpacketSelfNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You sent this red packet'**
+  String get redpacketSelfNotice;
+
+  /// No description provided for @redpacketRecordsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Redpackets'**
+  String get redpacketRecordsTitle;
+
+  /// No description provided for @redpacketRecordsTabSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get redpacketRecordsTabSent;
+
+  /// No description provided for @redpacketRecordsTabReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get redpacketRecordsTabReceived;
+
+  /// No description provided for @redpacketRecordsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No red packets yet'**
+  String get redpacketRecordsEmpty;
+
+  /// No description provided for @redpacketErrorInvalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total amount must be at least the same as the number of shares (each share needs at least 1 cent).'**
+  String get redpacketErrorInvalidAmount;
+
+  /// No description provided for @redpacketErrorInsufficientFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough balance to send this red packet.'**
+  String get redpacketErrorInsufficientFund;
+
+  /// No description provided for @redpacketErrorTooManyShares.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of shares can\'t exceed the number of conversation members.'**
+  String get redpacketErrorTooManyShares;
+
+  /// No description provided for @redpacketErrorNotMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re no longer a member of this conversation.'**
+  String get redpacketErrorNotMember;
+
+  /// No description provided for @redpacketErrorExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This red packet has expired.'**
+  String get redpacketErrorExpired;
+
+  /// No description provided for @redpacketErrorAlreadyGrabbed.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already grabbed this red packet.'**
+  String get redpacketErrorAlreadyGrabbed;
+
+  /// No description provided for @redpacketErrorEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This red packet is empty.'**
+  String get redpacketErrorEmpty;
+
+  /// No description provided for @redpacketErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Red packet not found.'**
+  String get redpacketErrorNotFound;
+
+  /// No description provided for @redpacketMessageSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red packet created, but couldn\'t send the announcement message. Reopen the chat once you\'re back online.'**
+  String get redpacketMessageSendFailed;
+
+  /// No description provided for @chatRoomRedpacketOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Red packet'**
+  String get chatRoomRedpacketOption;
+
+  /// No description provided for @chatMessageTypeRedpacket.
+  ///
+  /// In en, this message translates to:
+  /// **'[Red Packet]'**
+  String get chatMessageTypeRedpacket;
+
+  /// No description provided for @errorParamInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid request parameters.'**
+  String get errorParamInvalid;
+
+  /// No description provided for @errorUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Not logged in, or your session has expired. Please log in again.'**
+  String get errorUnauthorized;
+
+  /// No description provided for @errorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do this.'**
+  String get errorForbidden;
+
+  /// No description provided for @errorResourceNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The requested resource doesn\'t exist.'**
+  String get errorResourceNotFound;
+
+  /// No description provided for @errorDataConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Data conflict — please refresh and try again.'**
+  String get errorDataConflict;
+
+  /// No description provided for @errorSystemBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'The system is busy — please try again later.'**
+  String get errorSystemBusy;
+
+  /// No description provided for @errorEmptyFile.
+  ///
+  /// In en, this message translates to:
+  /// **'The uploaded file is empty.'**
+  String get errorEmptyFile;
+
+  /// No description provided for @errorFileSizeIllegal.
+  ///
+  /// In en, this message translates to:
+  /// **'The file size doesn\'t meet the requirements.'**
+  String get errorFileSizeIllegal;
+
+  /// No description provided for @errorFileTypeIllegal.
+  ///
+  /// In en, this message translates to:
+  /// **'This file type isn\'t supported.'**
+  String get errorFileTypeIllegal;
+
+  /// No description provided for @errorFileNameIllegal.
+  ///
+  /// In en, this message translates to:
+  /// **'The file name isn\'t valid.'**
+  String get errorFileNameIllegal;
+
+  /// No description provided for @errorFileUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'File upload failed — please try again later.'**
+  String get errorFileUploadFailed;
+
+  /// No description provided for @errorPhoneFormatInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number format is incorrect — please check it.'**
+  String get errorPhoneFormatInvalid;
+
+  /// No description provided for @errorPasswordFormatInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Password format doesn\'t meet the requirements — please check it.'**
+  String get errorPasswordFormatInvalid;
+
+  /// No description provided for @errorNameFormatInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname doesn\'t meet the requirements — please check it.'**
+  String get errorNameFormatInvalid;
+
+  /// No description provided for @errorRegisterParamConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose either a family name or an invite code, not both.'**
+  String get errorRegisterParamConflict;
+
+  /// No description provided for @errorPhoneAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone number is already registered.'**
+  String get errorPhoneAlreadyExists;
+
+  /// No description provided for @errorLoginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect phone number or password.'**
+  String get errorLoginFailed;
+
+  /// No description provided for @errorTokenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session is no longer valid. Please log in again.'**
+  String get errorTokenInvalid;
+
+  /// No description provided for @errorTokenExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please log in again.'**
+  String get errorTokenExpired;
+
+  /// No description provided for @errorRefreshTokenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session is no longer valid. Please log in again.'**
+  String get errorRefreshTokenInvalid;
+
+  /// No description provided for @errorUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This user doesn\'t exist.'**
+  String get errorUserNotFound;
+
+  /// No description provided for @errorFamilyNameEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a family name.'**
+  String get errorFamilyNameEmpty;
+
+  /// No description provided for @errorInviteCodeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an invite code.'**
+  String get errorInviteCodeEmpty;
+
+  /// No description provided for @errorRelationTypeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid family relation type.'**
+  String get errorRelationTypeInvalid;
+
+  /// No description provided for @errorFamilyNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This family can\'t be found.'**
+  String get errorFamilyNotFound;
+
+  /// No description provided for @errorFamilyMemberNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This family member can\'t be found.'**
+  String get errorFamilyMemberNotFound;
+
+  /// No description provided for @errorInviteCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This invite code doesn\'t exist or has expired.'**
+  String get errorInviteCodeInvalid;
+
+  /// No description provided for @errorRelationAnchorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected relation anchor is invalid.'**
+  String get errorRelationAnchorInvalid;
+
+  /// No description provided for @errorNotFamilyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not a member of this family.'**
+  String get errorNotFamilyMember;
+
+  /// No description provided for @errorNotFamilyAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the family admin can do this.'**
+  String get errorNotFamilyAdmin;
+
+  /// No description provided for @errorFamilySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create the family — please try again later.'**
+  String get errorFamilySaveFailed;
+
+  /// No description provided for @errorSpouseAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This person already has a spouse.'**
+  String get errorSpouseAlreadyExists;
+
+  /// No description provided for @errorNoKnownParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent relationship is unknown — can\'t set up a sibling relation.'**
+  String get errorNoKnownParent;
+
+  /// No description provided for @errorConversationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This conversation doesn\'t exist.'**
+  String get errorConversationNotFound;
+
+  /// No description provided for @errorMessageTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'This message is too long.'**
+  String get errorMessageTooLong;
+
+  /// No description provided for @errorMessageTypeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This message type isn\'t supported.'**
+  String get errorMessageTypeInvalid;
+
+  /// No description provided for @errorLocationCoordinateInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Location coordinates can\'t be empty.'**
+  String get errorLocationCoordinateInvalid;
+
+  /// No description provided for @errorLocationBatteryInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery level value is invalid.'**
+  String get errorLocationBatteryInvalid;
+
+  /// No description provided for @errorLocationTimestampMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Location timestamp can\'t be empty.'**
+  String get errorLocationTimestampMissing;
+
+  /// No description provided for @errorLocationTimestampStale.
+  ///
+  /// In en, this message translates to:
+  /// **'Location data has expired — please report your location again.'**
+  String get errorLocationTimestampStale;
+
+  /// No description provided for @errorLocationTargetNotFamilyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'The target user isn\'t in the same family.'**
+  String get errorLocationTargetNotFamilyMember;
+
+  /// No description provided for @errorFenceRangeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Fence radius is invalid.'**
+  String get errorFenceRangeInvalid;
+
+  /// No description provided for @errorFenceNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This fence doesn\'t exist.'**
+  String get errorFenceNotFound;
+
+  /// No description provided for @errorNotFenceSetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the person who created this fence can do this.'**
+  String get errorNotFenceSetter;
+
+  /// No description provided for @errorMomentContentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'A moment needs either text or media.'**
+  String get errorMomentContentEmpty;
+
+  /// No description provided for @errorMomentMediaTypeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid media type.'**
+  String get errorMomentMediaTypeInvalid;
+
+  /// No description provided for @errorLikeRecordNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t liked this yet, so there\'s nothing to undo.'**
+  String get errorLikeRecordNotFound;
+
+  /// No description provided for @errorMomentNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This moment doesn\'t exist.'**
+  String get errorMomentNotFound;
+
+  /// No description provided for @errorNotMomentOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the person who posted this moment can do this.'**
+  String get errorNotMomentOwner;
+
+  /// No description provided for @errorCommentContentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment can\'t be empty.'**
+  String get errorCommentContentEmpty;
+
+  /// No description provided for @errorCommentNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This comment doesn\'t exist.'**
+  String get errorCommentNotFound;
+
+  /// No description provided for @errorNotCommentOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the person who wrote this comment can do this.'**
+  String get errorNotCommentOwner;
+
+  /// No description provided for @errorHealthMetricTypeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid health metric type.'**
+  String get errorHealthMetricTypeInvalid;
+
+  /// No description provided for @errorHealthRecordValueInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This health record\'s value is invalid.'**
+  String get errorHealthRecordValueInvalid;
+
+  /// No description provided for @errorNotSameFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'The target user isn\'t in the same family.'**
+  String get errorNotSameFamily;
+
+  /// No description provided for @errorRemindTimeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time format is incorrect.'**
+  String get errorRemindTimeInvalid;
+
+  /// No description provided for @errorHealthRecordNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This health record doesn\'t exist.'**
+  String get errorHealthRecordNotFound;
+
+  /// No description provided for @errorNotHealthRecordOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can edit your own health records.'**
+  String get errorNotHealthRecordOwner;
+
+  /// No description provided for @errorHealthRecordDateConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'A record for this metric already exists on this date.'**
+  String get errorHealthRecordDateConflict;
 }
 
 class _AppLocalizationsDelegate

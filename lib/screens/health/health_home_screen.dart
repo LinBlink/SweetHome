@@ -627,7 +627,16 @@ class _SettingsTab extends StatelessWidget {
                   ),
                   Switch(
                     value: v.visible,
-                    activeColor: AppColors.primary,
+                    // `activeColor` (deprecated) flooded the entire
+                    // switch with the theme color, drowning the white
+                    // thumb against the terracotta track. Split the
+                    // roles so the track gets the brand color and the
+                    // thumb stays a contrasting off-white — both the
+                    // MUI-style "on" affordance *and* a visible knob.
+                    activeTrackColor: AppColors.primary,
+                    activeThumbColor: AppColors.surface,
+                    inactiveTrackColor: AppColors.divider,
+                    inactiveThumbColor: AppColors.inkFaded,
                     onChanged: (on) {
                       health.toggleVisibility(v.metricType, on);
                     },
@@ -657,7 +666,10 @@ class _SettingsTab extends StatelessWidget {
                   ),
                   Switch(
                     value: health.reminder.enabled,
-                    activeColor: AppColors.primary,
+                    activeTrackColor: AppColors.primary,
+                    activeThumbColor: AppColors.surface,
+                    inactiveTrackColor: AppColors.divider,
+                    inactiveThumbColor: AppColors.inkFaded,
                     onChanged: (on) {
                       final time =
                           health.reminder.remindTime ?? '20:00:00';

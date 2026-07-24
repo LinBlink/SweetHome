@@ -320,9 +320,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get conversationsEmptySubtitle => '가족을 초대하여 대화를 시작해보세요';
 
   @override
-  String get conversationSpouseLabel => '배우자';
-
-  @override
   String get connectionErrorRetry => '다시 시도';
 
   @override
@@ -1194,6 +1191,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get storageImageCache => '이미지 캐시';
 
   @override
+  String get storageAvatarCache => '아바타 캐시';
+
+  @override
   String get storageVideoCache => '동영상 캐시';
 
   @override
@@ -1358,4 +1358,375 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get healthRecordEditHint => '탭하여 편집';
+
+  @override
+  String get healthChartBpZoneLow => '낮음';
+
+  @override
+  String get healthChartBpZoneNormal => '정상';
+
+  @override
+  String get healthChartBpZoneElevated => '높음';
+
+  @override
+  String get healthChartBpZoneHigh => '고혈압';
+
+  @override
+  String get healthChartBpDiastolicCap => '이완기 상한 80';
+
+  @override
+  String get familyFeedScopeMyFamily => '우리 가족';
+
+  @override
+  String get familyFeedScopeOthers => '다른 가족';
+
+  @override
+  String get publishMomentPublicToggle => '전체 공개';
+
+  @override
+  String get publishMomentPublicHint => '공개한 게시글은 다른 가족의 피드에도 표시됩니다';
+
+  @override
+  String get publicMomentsTitle => '다른 가족의 게시글';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '$familyName에서';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => '아직 공개 게시글이 없어요';
+
+  @override
+  String get publicMomentsEmptyDesc => '첫 번째로 공유해 보세요!';
+
+  @override
+  String get publicMomentsLoadMoreError => '더 불러오지 못했어요';
+
+  @override
+  String get profileBalanceLabel => '잔액';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => '충전은 가족 관리자에게 문의하세요';
+
+  @override
+  String get redpacketHubTitle => '내 홍바오';
+
+  @override
+  String get redpacketHubSubtitle => '보내거나 받은 홍바오를 확인하세요';
+
+  @override
+  String get redpacketSendTitle => '홍바오 보내기';
+
+  @override
+  String get redpacketTotalAmountLabel => '총 금액';
+
+  @override
+  String get redpacketTotalAmountHint => '단위: 위안 (예: 100 또는 88.88)';
+
+  @override
+  String get redpacketTotalCountLabel => '홍바오 개수';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return '최대 $max개';
+  }
+
+  @override
+  String get redpacketSendButton => '홍바오에 넣기';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount 위안';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count개';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '홍바오 $count개';
+  }
+
+  @override
+  String get redpacketCardLabel => '홍바오';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name님이 홍바오를 보냈습니다';
+  }
+
+  @override
+  String get redpacketStatusOngoing => '진행 중';
+
+  @override
+  String get redpacketStatusFinished => '모두 받음';
+
+  @override
+  String get redpacketStatusExpired => '만료됨';
+
+  @override
+  String get redpacketStatusRefunded => '환불됨';
+
+  @override
+  String get redpacketGrabButton => '받기';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '¥$amount을(를) 받았습니다';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => '이미 받은 홍바오입니다';
+
+  @override
+  String get redpacketGrabListTitle => '받은 사람';
+
+  @override
+  String get redpacketGrabListEmpty => '아직 아무도 받지 않았습니다';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total 받음';
+  }
+
+  @override
+  String get redpacketExpiredNotice => '이 홍바오는 만료되었습니다';
+
+  @override
+  String get redpacketEmptyNotice => '이 홍바오는 비어 있습니다';
+
+  @override
+  String get redpacketSelfNotice => '내가 보낸 홍바오입니다';
+
+  @override
+  String get redpacketRecordsTitle => '내 홍바오';
+
+  @override
+  String get redpacketRecordsTabSent => '보낸 것';
+
+  @override
+  String get redpacketRecordsTabReceived => '받은 것';
+
+  @override
+  String get redpacketRecordsEmpty => '홍바오 기록이 없습니다';
+
+  @override
+  String get redpacketErrorInvalidAmount => '총 금액은 홍바오 개수 이상이어야 합니다 (각 1분 이상).';
+
+  @override
+  String get redpacketErrorInsufficientFund => '잔액이 부족하여 홍바오를 보낼 수 없습니다.';
+
+  @override
+  String get redpacketErrorTooManyShares => '홍바오 개수는 대화 멤버 수를 초과할 수 없습니다.';
+
+  @override
+  String get redpacketErrorNotMember => '이 대화의 멤버가 아닙니다.';
+
+  @override
+  String get redpacketErrorExpired => '이 홍바오는 만료되었습니다.';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => '이미 받은 홍바오입니다.';
+
+  @override
+  String get redpacketErrorEmpty => '이 홍바오는 비어 있습니다.';
+
+  @override
+  String get redpacketErrorNotFound => '홍바오를 찾을 수 없습니다.';
+
+  @override
+  String get redpacketMessageSendFailed =>
+      '홍바오는 생성되었지만 알림 메시지 전송에 실패했습니다. 온라인 상태가 되면 채팅방을 다시 열어보세요.';
+
+  @override
+  String get chatRoomRedpacketOption => '홍바오';
+
+  @override
+  String get chatMessageTypeRedpacket => '[홍바오]';
+
+  @override
+  String get errorParamInvalid => '요청 파라미터가 올바르지 않습니다.';
+
+  @override
+  String get errorUnauthorized => '로그인되어 있지 않거나 세션이 만료되었습니다. 다시 로그인해 주세요.';
+
+  @override
+  String get errorForbidden => '이 작업을 수행할 권한이 없습니다.';
+
+  @override
+  String get errorResourceNotFound => '요청한 리소스가 존재하지 않습니다.';
+
+  @override
+  String get errorDataConflict => '데이터 충돌이 발생했습니다. 새로고침 후 다시 시도해 주세요.';
+
+  @override
+  String get errorSystemBusy => '시스템이 혼잡합니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get errorEmptyFile => '업로드한 파일이 비어 있습니다.';
+
+  @override
+  String get errorFileSizeIllegal => '파일 크기가 요구 사항을 충족하지 않습니다.';
+
+  @override
+  String get errorFileTypeIllegal => '이 파일 형식은 지원되지 않습니다.';
+
+  @override
+  String get errorFileNameIllegal => '파일 이름이 유효하지 않습니다.';
+
+  @override
+  String get errorFileUploadFailed => '파일 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get errorPhoneFormatInvalid => '전화번호 형식이 올바르지 않습니다. 확인해 주세요.';
+
+  @override
+  String get errorPasswordFormatInvalid =>
+      '비밀번호 형식이 요구 사항을 충족하지 않습니다. 확인해 주세요.';
+
+  @override
+  String get errorNameFormatInvalid => '닉네임이 요구 사항을 충족하지 않습니다. 확인해 주세요.';
+
+  @override
+  String get errorRegisterParamConflict => '가족 이름과 초대 코드 중 하나만 선택해야 합니다.';
+
+  @override
+  String get errorPhoneAlreadyExists => '이 전화번호는 이미 등록되어 있습니다.';
+
+  @override
+  String get errorLoginFailed => '전화번호 또는 비밀번호가 올바르지 않습니다.';
+
+  @override
+  String get errorTokenInvalid => '세션이 더 이상 유효하지 않습니다. 다시 로그인해 주세요.';
+
+  @override
+  String get errorTokenExpired => '세션이 만료되었습니다. 다시 로그인해 주세요.';
+
+  @override
+  String get errorRefreshTokenInvalid => '세션이 더 이상 유효하지 않습니다. 다시 로그인해 주세요.';
+
+  @override
+  String get errorUserNotFound => '이 사용자는 존재하지 않습니다.';
+
+  @override
+  String get errorFamilyNameEmpty => '가족 이름을 입력해 주세요.';
+
+  @override
+  String get errorInviteCodeEmpty => '초대 코드를 입력해 주세요.';
+
+  @override
+  String get errorRelationTypeInvalid => '가족 관계 유형이 유효하지 않습니다.';
+
+  @override
+  String get errorFamilyNotFound => '이 가족을 찾을 수 없습니다.';
+
+  @override
+  String get errorFamilyMemberNotFound => '이 가족 구성원을 찾을 수 없습니다.';
+
+  @override
+  String get errorInviteCodeInvalid => '이 초대 코드는 존재하지 않거나 만료되었습니다.';
+
+  @override
+  String get errorRelationAnchorInvalid => '선택한 관계 기준 대상이 유효하지 않습니다.';
+
+  @override
+  String get errorNotFamilyMember => '당신은 이 가족의 구성원이 아닙니다.';
+
+  @override
+  String get errorNotFamilyAdmin => '이 작업은 가족 관리자만 수행할 수 있습니다.';
+
+  @override
+  String get errorFamilySaveFailed => '가족 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get errorSpouseAlreadyExists => '상대방에게 이미 배우자가 있습니다.';
+
+  @override
+  String get errorNoKnownParent => '부모 관계를 알 수 없어 형제자매 관계를 설정할 수 없습니다.';
+
+  @override
+  String get errorConversationNotFound => '이 대화는 존재하지 않습니다.';
+
+  @override
+  String get errorMessageTooLong => '메시지가 너무 깁니다.';
+
+  @override
+  String get errorMessageTypeInvalid => '이 메시지 유형은 지원되지 않습니다.';
+
+  @override
+  String get errorLocationCoordinateInvalid => '위치 좌표는 비워둘 수 없습니다.';
+
+  @override
+  String get errorLocationBatteryInvalid => '배터리 값이 유효하지 않습니다.';
+
+  @override
+  String get errorLocationTimestampMissing => '위치 타임스탬프는 비워둘 수 없습니다.';
+
+  @override
+  String get errorLocationTimestampStale => '위치 데이터가 만료되었습니다. 다시 보고해 주세요.';
+
+  @override
+  String get errorLocationTargetNotFamilyMember => '대상 사용자는 같은 가족 구성원이 아닙니다.';
+
+  @override
+  String get errorFenceRangeInvalid => '펜스 반경이 유효하지 않습니다.';
+
+  @override
+  String get errorFenceNotFound => '이 펜스는 존재하지 않습니다.';
+
+  @override
+  String get errorNotFenceSetter => '이 작업은 펜스를 설정한 사람만 수행할 수 있습니다.';
+
+  @override
+  String get errorMomentContentEmpty => '게시물에는 텍스트 또는 미디어가 필요합니다.';
+
+  @override
+  String get errorMomentMediaTypeInvalid => '미디어 유형이 올바르지 않습니다.';
+
+  @override
+  String get errorLikeRecordNotFound => '아직 좋아요를 누르지 않아 취소할 수 없습니다.';
+
+  @override
+  String get errorMomentNotFound => '이 게시물은 존재하지 않습니다.';
+
+  @override
+  String get errorNotMomentOwner => '이 작업은 게시물 작성자만 수행할 수 있습니다.';
+
+  @override
+  String get errorCommentContentEmpty => '댓글은 비워둘 수 없습니다.';
+
+  @override
+  String get errorCommentNotFound => '이 댓글은 존재하지 않습니다.';
+
+  @override
+  String get errorNotCommentOwner => '이 작업은 댓글 작성자만 수행할 수 있습니다.';
+
+  @override
+  String get errorHealthMetricTypeInvalid => '건강 지표 유형이 올바르지 않습니다.';
+
+  @override
+  String get errorHealthRecordValueInvalid => '건강 기록 값이 유효하지 않습니다.';
+
+  @override
+  String get errorNotSameFamily => '대상 사용자는 같은 가족 구성원이 아닙니다.';
+
+  @override
+  String get errorRemindTimeInvalid => '알림 시간 형식이 올바르지 않습니다.';
+
+  @override
+  String get errorHealthRecordNotFound => '이 건강 기록은 존재하지 않습니다.';
+
+  @override
+  String get errorNotHealthRecordOwner => '본인의 건강 기록은 본인만 수정할 수 있습니다.';
+
+  @override
+  String get errorHealthRecordDateConflict => '이 날짜에는 이미 동일한 지표의 기록이 있습니다.';
 }

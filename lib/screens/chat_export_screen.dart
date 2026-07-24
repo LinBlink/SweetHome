@@ -39,7 +39,7 @@ class ChatExportScreen extends StatefulWidget {
 
 class _ChatExportScreenState extends State<ChatExportScreen> {
   static const _txtService = ChatExportService();
-  static const _pdfService = ChatExportPdfService();
+  static final _pdfService = ChatExportPdfService();
 
   /// Beyond this span, `_generate` confirms with the user first —
   /// PDF generation in particular fetches every image message's

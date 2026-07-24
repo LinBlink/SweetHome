@@ -10,9 +10,15 @@ import '../models/family_member_vm.dart';
 import '../models/fence.dart';
 import '../models/health_record.dart';
 import '../models/location.dart';
+import '../models/redpacket.dart';
 
 class MockDataSource {
   MockDataSource._();
+
+  /// §2.1's example value (`10000` 分 = ¥100.00) — the mock user's
+  /// starting balance, used by the profile pill, the edit-profile
+  /// field, and the send-form pre-flight balance check.
+  static const int mockUserBalance = 10000;
 
   static final AuthUser mockUser = AuthUser(
     token: 'mock_token_abc123',
@@ -24,6 +30,7 @@ class MockDataSource {
     familyName: '王家',
     role: 'admin',
     gender: 'male',
+    balance: mockUserBalance,
   );
 
   /// The mock family's relation graph — the sole source of truth for
@@ -251,6 +258,17 @@ class MockDataSource {
         time: now.subtract(const Duration(hours: 4)),
       ),
       _msg(
+        id: 'g_rp_1',
+        convId: 1,
+        senderId: 1,
+        name: '王建国',
+        isMe: true,
+        content: '1001',
+        time: now.subtract(const Duration(hours: 3, minutes: 59)),
+        type: MessageType.redpacket,
+        redpacketId: 1001,
+      ),
+      _msg(
         id: 'g7',
         convId: 1,
         senderId: 3,
@@ -348,21 +366,24 @@ class MockDataSource {
     required String content,
     required DateTime time,
     bool isMe = false,
+    MessageType type = MessageType.text,
+    int? redpacketId,
   }) {
     return Message(
       clientId: id,
-      serverId: int.tryParse(id.replaceAll(RegExp(r'[a-z]'), '')),
+      serverId: int.tryParse(id.replaceAll(RegExp(r'[a-z_]'), '')),
       conversationId: convId,
       senderId: senderId,
       senderName: name,
       senderAvatarLabel: avatarInitialFor(senderId),
       senderAvatarColor: avatarColorFor(senderId),
       content: content,
-      type: MessageType.text,
+      type: type,
       sentAt: time,
       isMe: isMe,
       senderRelationCode: isMe ? null : relationCodeFor(senderId),
       senderGender: familyGraph.memberById(senderId)?.gender,
+      redpacketId: redpacketId,
     );
   }
 
@@ -610,6 +631,187 @@ class MockDataSource {
   static List<FenceAlarm> mockFenceAlarms() =>
       List.unmodifiable(_fenceAlarmFixture());
 
+  // -- §9 mock red packet fixtures -------------------------------
+  // Two pre-set red packets: one "ongoing" the mock user can still
+  // grab (id 1001, sender 王建国 himself so the detail screen's
+  // "you sent this" branch isn't always exercised by the mock), and
+  // one "finished" (id 1002) for the records-screen "Received" tab.
+
+  static Redpacket _redpacketFixture({
+    required int id,
+    required int userId,
+    required int totalAmount,
+    required int totalCount,
+    required RedpacketStatus status,
+  }) {
+    final now = DateTime.now();
+    return Redpacket(
+      id: id,
+      userId: userId,
+      totalAmount: totalAmount,
+      totalCount: totalCount,
+      status: status,
+      expiredAt: now.add(const Duration(days: 1)),
+      createdAt: now,
+    );
+  }
+
+  static Redpacket mockRedpacket1001() => _redpacketFixture(
+        id: 1001,
+        userId: 1,
+        totalAmount: 10000,
+        totalCount: 5,
+        status: RedpacketStatus.ongoing,
+      );
+
+  static Redpacket mockRedpacket1002() => _redpacketFixture(
+        id: 1002,
+        userId: 2,
+        totalAmount: 8888,
+        totalCount: 4,
+        status: RedpacketStatus.finished,
+      );
+
+  /// Red packets created at runtime via [SendRedpacketScreen] in mock
+  /// mode — the send form doesn't hit a real server, so without this
+  /// registry `mockRedpacketById`/`mockRedpacketGrabs` would only ever
+  /// recognize the two hardcoded fixtures (1001/1002) and every
+  /// freshly-sent packet's detail screen would 404. Grabs against a
+  /// registered packet accumulate here too (see [registerRedpacketGrab]),
+  /// so the "who has grabbed" list survives navigating away and back.
+  static final Map<int, Redpacket> _createdRedpackets = {};
+  static final Map<int, List<RedpacketGrab>> _createdRedpacketGrabs = {};
+
+  static void registerCreatedRedpacket(Redpacket redpacket) {
+    _createdRedpackets[redpacket.id] = redpacket;
+  }
+
+  static void registerRedpacketGrab(int redpacketId, RedpacketGrab grab) {
+    final grabs = _createdRedpacketGrabs.putIfAbsent(redpacketId, () => []);
+    if (!grabs.any((g) => g.userId == grab.userId)) {
+      grabs.add(grab);
+    }
+  }
+
+  static Redpacket? mockRedpacketById(int id) {
+    final created = _createdRedpackets[id];
+    if (created != null) return created;
+    switch (id) {
+      case 1001:
+        return mockRedpacket1001();
+      case 1002:
+        return mockRedpacket1002();
+    }
+    return null;
+  }
+
+  /// §9.4 — grab list for one red packet. Fixtures carry [username]
+  /// filled in (grabber info), mirroring what the real endpoint fills.
+  static List<RedpacketGrab> mockRedpacketGrabs(int redpacketId) {
+    final created = _createdRedpacketGrabs[redpacketId];
+    if (created != null) return List.unmodifiable(created);
+    final now = DateTime.now();
+    switch (redpacketId) {
+      case 1001:
+        // Mock user already grabbed id 1001 with 2333 cents, plus
+        // one other family member. Mirrors the §9.3 example
+        // response so the detail screen's grab-list pane has data.
+        return [
+          RedpacketGrab(
+            id: 50001,
+            redpacketId: 1001,
+            userId: 1,
+            grabAmount: 2333,
+            createdAt: now.subtract(const Duration(minutes: 5)),
+            username: familyGraph.memberById(1)?.name,
+          ),
+          RedpacketGrab(
+            id: 50002,
+            redpacketId: 1001,
+            userId: 3,
+            grabAmount: 1500,
+            createdAt: now.subtract(const Duration(minutes: 3)),
+            username: familyGraph.memberById(3)?.name,
+          ),
+        ];
+      case 1002:
+        return [
+          RedpacketGrab(
+            id: 50100,
+            redpacketId: 1002,
+            userId: 1,
+            grabAmount: 888,
+            createdAt: now.subtract(const Duration(hours: 2)),
+            username: familyGraph.memberById(1)?.name,
+          ),
+          RedpacketGrab(
+            id: 50101,
+            redpacketId: 1002,
+            userId: 4,
+            grabAmount: 3000,
+            createdAt: now.subtract(const Duration(hours: 1, minutes: 50)),
+            username: familyGraph.memberById(4)?.name,
+          ),
+          RedpacketGrab(
+            id: 50102,
+            redpacketId: 1002,
+            userId: 5,
+            grabAmount: 4000,
+            createdAt: now.subtract(const Duration(hours: 1, minutes: 30)),
+            username: familyGraph.memberById(5)?.name,
+          ),
+          RedpacketGrab(
+            id: 50103,
+            redpacketId: 1002,
+            userId: 3,
+            grabAmount: 1000,
+            createdAt: now.subtract(const Duration(hours: 1)),
+            username: familyGraph.memberById(3)?.name,
+          ),
+        ];
+    }
+    return [];
+  }
+
+  /// §9.5 — every red packet [userId] has sent. Fixture 1001 is
+  /// already `userId: 1` (the mock user); runtime-created packets
+  /// (via [registerCreatedRedpacket]) are folded in too since sending
+  /// in mock mode is always the logged-in user.
+  static List<Redpacket> mockSentRedpackets(int userId) {
+    final all = [
+      mockRedpacket1001(),
+      mockRedpacket1002(),
+      ..._createdRedpackets.values,
+    ];
+    return all.where((r) => r.userId == userId).toList();
+  }
+
+  /// §9.6 — every grab [userId] has made, across every known red
+  /// packet (the two fixtures plus any created at runtime), with the
+  /// owner-info group filled in ([RedpacketGrab.redpacketOwnerId] /
+  /// [RedpacketGrab.redpacketOwnerUsername]) instead of the
+  /// grabber-info group — mirrors what the real §9.6 endpoint fills.
+  static List<RedpacketGrab> mockReceivedRedpacketGrabs(int userId) {
+    final allIds = {1001, 1002, ..._createdRedpackets.keys};
+    final result = <RedpacketGrab>[];
+    for (final id in allIds) {
+      final rp = mockRedpacketById(id);
+      if (rp == null) continue;
+      for (final g in mockRedpacketGrabs(id)) {
+        if (g.userId != userId) continue;
+        result.add(RedpacketGrab(
+          id: g.id,
+          redpacketId: g.redpacketId,
+          userId: g.userId,
+          grabAmount: g.grabAmount,
+          createdAt: g.createdAt,
+          redpacketOwnerId: rp.userId,
+          redpacketOwnerUsername: familyGraph.memberById(rp.userId)?.name,
+        ));
+      }
+    }
+    return result;
+  }
 }
 
 /// Internal struct used only by the mock location fixture above —

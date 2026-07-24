@@ -4,6 +4,7 @@ import '../core/app_colors.dart';
 import '../core/app_palette.dart';
 import '../core/avatar_label.dart';
 import '../core/home_widgets.dart';
+import '../core/money/money_formatter.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
@@ -41,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               name: user?.name ?? '',
               familyName: user?.familyName ?? '',
               avatarUrl: user?.avatarUrl,
+              balance: user?.balance ?? 0,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const EditProfileScreen()),
@@ -490,16 +492,19 @@ class _ProfileCard extends StatelessWidget {
   final String name;
   final String familyName;
   final String? avatarUrl;
+  final int balance;
   final VoidCallback onTap;
   const _ProfileCard({
     required this.name,
     required this.familyName,
     required this.avatarUrl,
+    required this.balance,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -563,15 +568,54 @@ class _ProfileCard extends StatelessWidget {
                           size: 13,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          familyName,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
+                        Flexible(
+                          child: Text(
+                            familyName,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 6),
+                    // Balance pill — §2.1 wallet balance rendered
+                    // inside the profile card so the user can see it
+                    // at a glance without opening Edit Profile. A
+                    // wallet icon (matches the edit-profile row)
+                    // + the formatted amount; localized via
+                    // `balanceValue` so the `¥` symbol can later be
+                    // overridden per-locale.
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.account_balance_wallet_rounded,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.balanceValue(MoneyFormatter.format(balance)),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

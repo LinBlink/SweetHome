@@ -113,6 +113,94 @@ void main() {
       expect(m.createdAt.toUtc().hour, 2);
       expect(m.createdAt.toUtc().minute, 0);
     });
+
+    test('family-only feed row leaves familyId / familyName null', () {
+      // §7.2 (`GET /moment/myfamily`) doesn't include the family
+      // identifier — same DTO is used for both feeds but the
+      // family-only list returns these as missing. The UI gates the
+      // "来自 {familyName}" badge on the field being non-null + the
+      // viewer not being the author (see MomentCard._AuthorRow), so
+      // a null here means "this is intra-family, no badge".
+      final json = {
+        'id': 1,
+        'userId': 1,
+        'username': 'me',
+        'createdAt': '2026-07-15T10:00:00.000',
+        'content': 'hi',
+        'mediaFiles': <Map<String, dynamic>>[],
+      };
+      final m = Moment.fromJson(json);
+      expect(m.familyId, isNull);
+      expect(m.familyName, isNull);
+    });
+
+    test('public-feed row carries familyId + familyName (§7.3)', () {
+      // §7.3 (`GET /moment/public`) adds these two fields for
+      // cross-family disambiguation — "李秀英" by herself doesn't
+      // tell you which family, the familyName suffix does.
+      final json = {
+        'id': 8,
+        'userId': 5,
+        'username': '李秀英',
+        'userAvatarUrl': 'https://r2.example/avatars/5.webp',
+        'familyId': 3,
+        'familyName': '李家',
+        'createdAt': '2026-07-18T09:00:00.000',
+        'content': '我们家今天包了饺子',
+        'mediaFiles': [
+          {
+            'type': 'image',
+            'content': 'https://r2.example/photos/5/dumpling.jpg',
+            'createdAt': '2026-07-18T09:00:00.000',
+          },
+        ],
+      };
+      final m = Moment.fromJson(json);
+      expect(m.familyId, 3);
+      expect(m.familyName, '李家');
+      expect(m.media.length, 1);
+    });
+
+    test('Moment.toJson round-trips familyId + familyName', () {
+      final m = Moment(
+        id: 1,
+        userId: 1,
+        username: 'me',
+        userAvatarUrl: null,
+        createdAt: DateTime.utc(2026, 7, 15, 2, 0, 0),
+        content: 'hi',
+        media: const [],
+        familyId: 42,
+        familyName: '王家',
+      );
+      final out = m.toJson();
+      expect(out['familyId'], 42);
+      expect(out['familyName'], '王家');
+      // Round-tripping back via fromJson reconstructs the same value.
+      final round = Moment.fromJson(out);
+      expect(round.familyId, 42);
+      expect(round.familyName, '王家');
+    });
+
+    test('Moment.toJson omits familyId / familyName when null', () {
+      // Both fields are JSON-optional — a row with neither set should
+      // not write them on the wire (the server only includes them
+      // on §7.3 rows). Required so a cached family-feed moment
+      // serialized and sent back survives without sprouting ghost
+      // fields.
+      final m = Moment(
+        id: 1,
+        userId: 1,
+        username: 'me',
+        userAvatarUrl: null,
+        createdAt: DateTime.utc(2026, 7, 15, 2, 0, 0),
+        content: 'hi',
+        media: const [],
+      );
+      final out = m.toJson();
+      expect(out.containsKey('familyId'), false);
+      expect(out.containsKey('familyName'), false);
+    });
   });
 
   group('LikerEntry / MomentLikeDetail', () {

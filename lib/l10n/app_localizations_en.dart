@@ -333,9 +333,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invite family members to start chatting';
 
   @override
-  String get conversationSpouseLabel => 'Spouse';
-
-  @override
   String get connectionErrorRetry => 'Retry';
 
   @override
@@ -1239,6 +1236,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageImageCache => 'Photo cache';
 
   @override
+  String get storageAvatarCache => 'Avatar cache';
+
+  @override
   String get storageVideoCache => 'Video cache';
 
   @override
@@ -1408,4 +1408,409 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthRecordEditHint => 'Tap a record to edit.';
+
+  @override
+  String get healthChartBpZoneLow => 'Low';
+
+  @override
+  String get healthChartBpZoneNormal => 'Normal';
+
+  @override
+  String get healthChartBpZoneElevated => 'Elevated';
+
+  @override
+  String get healthChartBpZoneHigh => 'High';
+
+  @override
+  String get healthChartBpDiastolicCap => 'Diastolic cap 80';
+
+  @override
+  String get familyFeedScopeMyFamily => 'My family';
+
+  @override
+  String get familyFeedScopeOthers => 'Other families';
+
+  @override
+  String get publishMomentPublicToggle => 'Post publicly';
+
+  @override
+  String get publishMomentPublicHint =>
+      'Public posts also appear in the cross-family feed for everyone to see.';
+
+  @override
+  String get publicMomentsTitle => 'Other families\' posts';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return 'From $familyName';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => 'No public posts yet';
+
+  @override
+  String get publicMomentsEmptyDesc =>
+      'Be the first family to share a public post.';
+
+  @override
+  String get publicMomentsLoadMoreError => 'Couldn\'t load more';
+
+  @override
+  String get profileBalanceLabel => 'Balance';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => 'Top up by contacting your family admin';
+
+  @override
+  String get redpacketHubTitle => 'My Redpackets';
+
+  @override
+  String get redpacketHubSubtitle => 'Red packets you\'ve sent and received';
+
+  @override
+  String get redpacketSendTitle => 'Send a Red Packet';
+
+  @override
+  String get redpacketTotalAmountLabel => 'Total amount';
+
+  @override
+  String get redpacketTotalAmountHint => 'In yuan, e.g. 100 or 88.88';
+
+  @override
+  String get redpacketTotalCountLabel => 'Number of shares';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return 'Up to $max';
+  }
+
+  @override
+  String get redpacketSendButton => 'Send Red Packet';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount yuan';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count shares';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '$count packets';
+  }
+
+  @override
+  String get redpacketCardLabel => 'Red packet';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name sent a red packet';
+  }
+
+  @override
+  String get redpacketStatusOngoing => 'Ongoing';
+
+  @override
+  String get redpacketStatusFinished => 'Fully claimed';
+
+  @override
+  String get redpacketStatusExpired => 'Expired';
+
+  @override
+  String get redpacketStatusRefunded => 'Refunded';
+
+  @override
+  String get redpacketGrabButton => 'Grab';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return 'You got ¥$amount';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed =>
+      'You\'ve already grabbed this red packet';
+
+  @override
+  String get redpacketGrabListTitle => 'Who has grabbed';
+
+  @override
+  String get redpacketGrabListEmpty => 'No one has grabbed yet';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total grabbed';
+  }
+
+  @override
+  String get redpacketExpiredNotice => 'This red packet has expired';
+
+  @override
+  String get redpacketEmptyNotice => 'This red packet is empty';
+
+  @override
+  String get redpacketSelfNotice => 'You sent this red packet';
+
+  @override
+  String get redpacketRecordsTitle => 'My Redpackets';
+
+  @override
+  String get redpacketRecordsTabSent => 'Sent';
+
+  @override
+  String get redpacketRecordsTabReceived => 'Received';
+
+  @override
+  String get redpacketRecordsEmpty => 'No red packets yet';
+
+  @override
+  String get redpacketErrorInvalidAmount =>
+      'Total amount must be at least the same as the number of shares (each share needs at least 1 cent).';
+
+  @override
+  String get redpacketErrorInsufficientFund =>
+      'Not enough balance to send this red packet.';
+
+  @override
+  String get redpacketErrorTooManyShares =>
+      'Number of shares can\'t exceed the number of conversation members.';
+
+  @override
+  String get redpacketErrorNotMember =>
+      'You\'re no longer a member of this conversation.';
+
+  @override
+  String get redpacketErrorExpired => 'This red packet has expired.';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed =>
+      'You\'ve already grabbed this red packet.';
+
+  @override
+  String get redpacketErrorEmpty => 'This red packet is empty.';
+
+  @override
+  String get redpacketErrorNotFound => 'Red packet not found.';
+
+  @override
+  String get redpacketMessageSendFailed =>
+      'Red packet created, but couldn\'t send the announcement message. Reopen the chat once you\'re back online.';
+
+  @override
+  String get chatRoomRedpacketOption => 'Red packet';
+
+  @override
+  String get chatMessageTypeRedpacket => '[Red Packet]';
+
+  @override
+  String get errorParamInvalid => 'Invalid request parameters.';
+
+  @override
+  String get errorUnauthorized =>
+      'Not logged in, or your session has expired. Please log in again.';
+
+  @override
+  String get errorForbidden => 'You don\'t have permission to do this.';
+
+  @override
+  String get errorResourceNotFound => 'The requested resource doesn\'t exist.';
+
+  @override
+  String get errorDataConflict =>
+      'Data conflict — please refresh and try again.';
+
+  @override
+  String get errorSystemBusy => 'The system is busy — please try again later.';
+
+  @override
+  String get errorEmptyFile => 'The uploaded file is empty.';
+
+  @override
+  String get errorFileSizeIllegal =>
+      'The file size doesn\'t meet the requirements.';
+
+  @override
+  String get errorFileTypeIllegal => 'This file type isn\'t supported.';
+
+  @override
+  String get errorFileNameIllegal => 'The file name isn\'t valid.';
+
+  @override
+  String get errorFileUploadFailed =>
+      'File upload failed — please try again later.';
+
+  @override
+  String get errorPhoneFormatInvalid =>
+      'Phone number format is incorrect — please check it.';
+
+  @override
+  String get errorPasswordFormatInvalid =>
+      'Password format doesn\'t meet the requirements — please check it.';
+
+  @override
+  String get errorNameFormatInvalid =>
+      'Nickname doesn\'t meet the requirements — please check it.';
+
+  @override
+  String get errorRegisterParamConflict =>
+      'Choose either a family name or an invite code, not both.';
+
+  @override
+  String get errorPhoneAlreadyExists =>
+      'This phone number is already registered.';
+
+  @override
+  String get errorLoginFailed => 'Incorrect phone number or password.';
+
+  @override
+  String get errorTokenInvalid =>
+      'Your session is no longer valid. Please log in again.';
+
+  @override
+  String get errorTokenExpired =>
+      'Your session has expired. Please log in again.';
+
+  @override
+  String get errorRefreshTokenInvalid =>
+      'Your session is no longer valid. Please log in again.';
+
+  @override
+  String get errorUserNotFound => 'This user doesn\'t exist.';
+
+  @override
+  String get errorFamilyNameEmpty => 'Please enter a family name.';
+
+  @override
+  String get errorInviteCodeEmpty => 'Please enter an invite code.';
+
+  @override
+  String get errorRelationTypeInvalid => 'Invalid family relation type.';
+
+  @override
+  String get errorFamilyNotFound => 'This family can\'t be found.';
+
+  @override
+  String get errorFamilyMemberNotFound => 'This family member can\'t be found.';
+
+  @override
+  String get errorInviteCodeInvalid =>
+      'This invite code doesn\'t exist or has expired.';
+
+  @override
+  String get errorRelationAnchorInvalid =>
+      'The selected relation anchor is invalid.';
+
+  @override
+  String get errorNotFamilyMember => 'You\'re not a member of this family.';
+
+  @override
+  String get errorNotFamilyAdmin => 'Only the family admin can do this.';
+
+  @override
+  String get errorFamilySaveFailed =>
+      'Failed to create the family — please try again later.';
+
+  @override
+  String get errorSpouseAlreadyExists => 'This person already has a spouse.';
+
+  @override
+  String get errorNoKnownParent =>
+      'Parent relationship is unknown — can\'t set up a sibling relation.';
+
+  @override
+  String get errorConversationNotFound => 'This conversation doesn\'t exist.';
+
+  @override
+  String get errorMessageTooLong => 'This message is too long.';
+
+  @override
+  String get errorMessageTypeInvalid => 'This message type isn\'t supported.';
+
+  @override
+  String get errorLocationCoordinateInvalid =>
+      'Location coordinates can\'t be empty.';
+
+  @override
+  String get errorLocationBatteryInvalid => 'Battery level value is invalid.';
+
+  @override
+  String get errorLocationTimestampMissing =>
+      'Location timestamp can\'t be empty.';
+
+  @override
+  String get errorLocationTimestampStale =>
+      'Location data has expired — please report your location again.';
+
+  @override
+  String get errorLocationTargetNotFamilyMember =>
+      'The target user isn\'t in the same family.';
+
+  @override
+  String get errorFenceRangeInvalid => 'Fence radius is invalid.';
+
+  @override
+  String get errorFenceNotFound => 'This fence doesn\'t exist.';
+
+  @override
+  String get errorNotFenceSetter =>
+      'Only the person who created this fence can do this.';
+
+  @override
+  String get errorMomentContentEmpty => 'A moment needs either text or media.';
+
+  @override
+  String get errorMomentMediaTypeInvalid => 'Invalid media type.';
+
+  @override
+  String get errorLikeRecordNotFound =>
+      'You haven\'t liked this yet, so there\'s nothing to undo.';
+
+  @override
+  String get errorMomentNotFound => 'This moment doesn\'t exist.';
+
+  @override
+  String get errorNotMomentOwner =>
+      'Only the person who posted this moment can do this.';
+
+  @override
+  String get errorCommentContentEmpty => 'Comment can\'t be empty.';
+
+  @override
+  String get errorCommentNotFound => 'This comment doesn\'t exist.';
+
+  @override
+  String get errorNotCommentOwner =>
+      'Only the person who wrote this comment can do this.';
+
+  @override
+  String get errorHealthMetricTypeInvalid => 'Invalid health metric type.';
+
+  @override
+  String get errorHealthRecordValueInvalid =>
+      'This health record\'s value is invalid.';
+
+  @override
+  String get errorNotSameFamily => 'The target user isn\'t in the same family.';
+
+  @override
+  String get errorRemindTimeInvalid => 'Reminder time format is incorrect.';
+
+  @override
+  String get errorHealthRecordNotFound => 'This health record doesn\'t exist.';
+
+  @override
+  String get errorNotHealthRecordOwner =>
+      'Only you can edit your own health records.';
+
+  @override
+  String get errorHealthRecordDateConflict =>
+      'A record for this metric already exists on this date.';
 }

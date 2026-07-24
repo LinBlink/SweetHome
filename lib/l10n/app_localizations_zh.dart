@@ -317,9 +317,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get conversationsEmptySubtitle => '邀请家人加入，开始聊天吧';
 
   @override
-  String get conversationSpouseLabel => '配偶';
-
-  @override
   String get connectionErrorRetry => '重试';
 
   @override
@@ -1187,6 +1184,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageImageCache => '图片缓存';
 
   @override
+  String get storageAvatarCache => '头像缓存';
+
+  @override
   String get storageVideoCache => '视频缓存';
 
   @override
@@ -1350,6 +1350,375 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get healthRecordEditHint => '点击记录以编辑';
+
+  @override
+  String get healthChartBpZoneLow => '偏低';
+
+  @override
+  String get healthChartBpZoneNormal => '正常';
+
+  @override
+  String get healthChartBpZoneElevated => '偏高';
+
+  @override
+  String get healthChartBpZoneHigh => '高';
+
+  @override
+  String get healthChartBpDiastolicCap => '舒张压上限 80';
+
+  @override
+  String get familyFeedScopeMyFamily => '自个儿家';
+
+  @override
+  String get familyFeedScopeOthers => '串串门';
+
+  @override
+  String get publishMomentPublicToggle => '公开发布';
+
+  @override
+  String get publishMomentPublicHint => '公开后这条动态及其评论会出现在跨家庭动态广场里';
+
+  @override
+  String get publicMomentsTitle => '串串门';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '来自 $familyName';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => '还没有人公开发布';
+
+  @override
+  String get publicMomentsEmptyDesc => '想做第一个分享的人？';
+
+  @override
+  String get publicMomentsLoadMoreError => '加载更多失败';
+
+  @override
+  String get profileBalanceLabel => '余额';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => '如需充值请联系家庭管理员';
+
+  @override
+  String get redpacketHubTitle => '我的红包';
+
+  @override
+  String get redpacketHubSubtitle => '查看我发出和收到的红包';
+
+  @override
+  String get redpacketSendTitle => '发红包';
+
+  @override
+  String get redpacketTotalAmountLabel => '总金额';
+
+  @override
+  String get redpacketTotalAmountHint => '单位：元，例如 100 或 88.88';
+
+  @override
+  String get redpacketTotalCountLabel => '红包个数';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return '最多 $max 个';
+  }
+
+  @override
+  String get redpacketSendButton => '塞钱进红包';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount 元';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count 份';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '$count 个红包';
+  }
+
+  @override
+  String get redpacketCardLabel => '红包';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name 发了一个红包';
+  }
+
+  @override
+  String get redpacketStatusOngoing => '进行中';
+
+  @override
+  String get redpacketStatusFinished => '已领完';
+
+  @override
+  String get redpacketStatusExpired => '已过期';
+
+  @override
+  String get redpacketStatusRefunded => '已退款';
+
+  @override
+  String get redpacketGrabButton => '开';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '你抢到了 ¥$amount';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => '你已经抢过这个红包了';
+
+  @override
+  String get redpacketGrabListTitle => '已领取的人';
+
+  @override
+  String get redpacketGrabListEmpty => '暂无人领取';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total 已领取';
+  }
+
+  @override
+  String get redpacketExpiredNotice => '红包已过期';
+
+  @override
+  String get redpacketEmptyNotice => '红包已被抢光了';
+
+  @override
+  String get redpacketSelfNotice => '你发出的红包';
+
+  @override
+  String get redpacketRecordsTitle => '我的红包';
+
+  @override
+  String get redpacketRecordsTabSent => '我发出的';
+
+  @override
+  String get redpacketRecordsTabReceived => '我收到的';
+
+  @override
+  String get redpacketRecordsEmpty => '暂无红包记录';
+
+  @override
+  String get redpacketErrorInvalidAmount => '总金额必须不少于红包个数（每份至少 1 分钱）。';
+
+  @override
+  String get redpacketErrorInsufficientFund => '余额不足，无法发送红包。';
+
+  @override
+  String get redpacketErrorTooManyShares => '红包个数不能超过会话成员数。';
+
+  @override
+  String get redpacketErrorNotMember => '你已不在该会话中。';
+
+  @override
+  String get redpacketErrorExpired => '红包已过期。';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => '你已经抢过这个红包。';
+
+  @override
+  String get redpacketErrorEmpty => '红包已被抢完。';
+
+  @override
+  String get redpacketErrorNotFound => '红包不存在。';
+
+  @override
+  String get redpacketMessageSendFailed => '红包已创建，但公告消息发送失败，网络恢复后重新打开会话查看。';
+
+  @override
+  String get chatRoomRedpacketOption => '红包';
+
+  @override
+  String get chatMessageTypeRedpacket => '[红包]';
+
+  @override
+  String get errorParamInvalid => '请求参数错误。';
+
+  @override
+  String get errorUnauthorized => '未登录或登录已过期，请重新登录。';
+
+  @override
+  String get errorForbidden => '没有权限执行该操作。';
+
+  @override
+  String get errorResourceNotFound => '请求的资源不存在。';
+
+  @override
+  String get errorDataConflict => '数据冲突，请刷新后重试。';
+
+  @override
+  String get errorSystemBusy => '系统繁忙，请稍后再试。';
+
+  @override
+  String get errorEmptyFile => '上传的文件为空。';
+
+  @override
+  String get errorFileSizeIllegal => '文件大小不符合要求。';
+
+  @override
+  String get errorFileTypeIllegal => '文件类型不符合要求。';
+
+  @override
+  String get errorFileNameIllegal => '文件名不符合要求。';
+
+  @override
+  String get errorFileUploadFailed => '文件上传失败，请稍后再试。';
+
+  @override
+  String get errorPhoneFormatInvalid => '手机号码格式不正确，请检查。';
+
+  @override
+  String get errorPasswordFormatInvalid => '密码格式不符合要求，请检查。';
+
+  @override
+  String get errorNameFormatInvalid => '昵称不符合要求，请检查。';
+
+  @override
+  String get errorRegisterParamConflict => '家庭名称与邀请码只能二选一。';
+
+  @override
+  String get errorPhoneAlreadyExists => '该手机号已被注册。';
+
+  @override
+  String get errorLoginFailed => '手机号或密码错误。';
+
+  @override
+  String get errorTokenInvalid => '登录已失效，请重新登录。';
+
+  @override
+  String get errorTokenExpired => '登录已过期，请重新登录。';
+
+  @override
+  String get errorRefreshTokenInvalid => '登录已失效，请重新登录。';
+
+  @override
+  String get errorUserNotFound => '用户不存在。';
+
+  @override
+  String get errorFamilyNameEmpty => '请输入家庭名称。';
+
+  @override
+  String get errorInviteCodeEmpty => '请输入邀请码。';
+
+  @override
+  String get errorRelationTypeInvalid => '无效的家庭关系类型。';
+
+  @override
+  String get errorFamilyNotFound => '找不到该家庭。';
+
+  @override
+  String get errorFamilyMemberNotFound => '找不到该家庭成员。';
+
+  @override
+  String get errorInviteCodeInvalid => '邀请码不存在或已过期。';
+
+  @override
+  String get errorRelationAnchorInvalid => '选择的关系对象无效。';
+
+  @override
+  String get errorNotFamilyMember => '你不是该家庭成员。';
+
+  @override
+  String get errorNotFamilyAdmin => '仅家庭管理员可执行该操作。';
+
+  @override
+  String get errorFamilySaveFailed => '家庭创建失败，请稍后再试。';
+
+  @override
+  String get errorSpouseAlreadyExists => '对方已经有配偶了。';
+
+  @override
+  String get errorNoKnownParent => '父母关系未知，无法建立兄弟姐妹关系。';
+
+  @override
+  String get errorConversationNotFound => '会话不存在。';
+
+  @override
+  String get errorMessageTooLong => '消息内容过长。';
+
+  @override
+  String get errorMessageTypeInvalid => '不支持的消息类型。';
+
+  @override
+  String get errorLocationCoordinateInvalid => '定位坐标不能为空。';
+
+  @override
+  String get errorLocationBatteryInvalid => '电量数值不合法。';
+
+  @override
+  String get errorLocationTimestampMissing => '定位时间戳不能为空。';
+
+  @override
+  String get errorLocationTimestampStale => '定位数据已过期，请重新上报。';
+
+  @override
+  String get errorLocationTargetNotFamilyMember => '目标用户不是同一家庭成员。';
+
+  @override
+  String get errorFenceRangeInvalid => '围栏半径不合法。';
+
+  @override
+  String get errorFenceNotFound => '围栏不存在。';
+
+  @override
+  String get errorNotFenceSetter => '仅围栏设置者可执行该操作。';
+
+  @override
+  String get errorMomentContentEmpty => '动态内容和媒体不能同时为空。';
+
+  @override
+  String get errorMomentMediaTypeInvalid => '媒体类型不正确。';
+
+  @override
+  String get errorLikeRecordNotFound => '尚未点赞，无法取消。';
+
+  @override
+  String get errorMomentNotFound => '动态不存在。';
+
+  @override
+  String get errorNotMomentOwner => '仅动态发布者本人可执行该操作。';
+
+  @override
+  String get errorCommentContentEmpty => '评论内容不能为空。';
+
+  @override
+  String get errorCommentNotFound => '评论不存在。';
+
+  @override
+  String get errorNotCommentOwner => '仅评论作者本人可执行该操作。';
+
+  @override
+  String get errorHealthMetricTypeInvalid => '健康指标类型不正确。';
+
+  @override
+  String get errorHealthRecordValueInvalid => '健康记录数值不合法。';
+
+  @override
+  String get errorNotSameFamily => '目标用户不是同一家庭成员。';
+
+  @override
+  String get errorRemindTimeInvalid => '提醒时间格式不正确。';
+
+  @override
+  String get errorHealthRecordNotFound => '健康记录不存在。';
+
+  @override
+  String get errorNotHealthRecordOwner => '仅本人可修改自己的健康记录。';
+
+  @override
+  String get errorHealthRecordDateConflict => '该日期已存在同指标的记录。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1665,9 +2034,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get conversationsEmptySubtitle => '邀请家人加入，开始聊天吧';
 
   @override
-  String get conversationSpouseLabel => '配偶';
-
-  @override
   String get connectionErrorRetry => '重试';
 
   @override
@@ -2535,6 +2901,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get storageImageCache => '图片缓存';
 
   @override
+  String get storageAvatarCache => '头像缓存';
+
+  @override
   String get storageVideoCache => '视频缓存';
 
   @override
@@ -2698,6 +3067,375 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get healthRecordEditHint => '点击记录以编辑';
+
+  @override
+  String get healthChartBpZoneLow => '偏低';
+
+  @override
+  String get healthChartBpZoneNormal => '正常';
+
+  @override
+  String get healthChartBpZoneElevated => '偏高';
+
+  @override
+  String get healthChartBpZoneHigh => '高';
+
+  @override
+  String get healthChartBpDiastolicCap => '舒张压上限 80';
+
+  @override
+  String get familyFeedScopeMyFamily => '自个儿家';
+
+  @override
+  String get familyFeedScopeOthers => '串串门';
+
+  @override
+  String get publishMomentPublicToggle => '公开发布';
+
+  @override
+  String get publishMomentPublicHint => '公开后这条动态及其评论会出现在跨家庭动态广场里';
+
+  @override
+  String get publicMomentsTitle => '串串门';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '来自 $familyName';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => '还没有人公开发布';
+
+  @override
+  String get publicMomentsEmptyDesc => '想做第一个分享的人？';
+
+  @override
+  String get publicMomentsLoadMoreError => '加载更多失败';
+
+  @override
+  String get profileBalanceLabel => '余额';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => '如需充值请联系家庭管理员';
+
+  @override
+  String get redpacketHubTitle => '我的红包';
+
+  @override
+  String get redpacketHubSubtitle => '查看我发出和收到的红包';
+
+  @override
+  String get redpacketSendTitle => '发红包';
+
+  @override
+  String get redpacketTotalAmountLabel => '总金额';
+
+  @override
+  String get redpacketTotalAmountHint => '单位：元，例如 100 或 88.88';
+
+  @override
+  String get redpacketTotalCountLabel => '红包个数';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return '最多 $max 个';
+  }
+
+  @override
+  String get redpacketSendButton => '塞钱进红包';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount 元';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count 份';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '$count 个红包';
+  }
+
+  @override
+  String get redpacketCardLabel => '红包';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name 发了一个红包';
+  }
+
+  @override
+  String get redpacketStatusOngoing => '进行中';
+
+  @override
+  String get redpacketStatusFinished => '已领完';
+
+  @override
+  String get redpacketStatusExpired => '已过期';
+
+  @override
+  String get redpacketStatusRefunded => '已退款';
+
+  @override
+  String get redpacketGrabButton => '开';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '你抢到了 ¥$amount';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => '你已经抢过这个红包了';
+
+  @override
+  String get redpacketGrabListTitle => '已领取的人';
+
+  @override
+  String get redpacketGrabListEmpty => '暂无人领取';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total 已领取';
+  }
+
+  @override
+  String get redpacketExpiredNotice => '红包已过期';
+
+  @override
+  String get redpacketEmptyNotice => '红包已被抢光了';
+
+  @override
+  String get redpacketSelfNotice => '你发出的红包';
+
+  @override
+  String get redpacketRecordsTitle => '我的红包';
+
+  @override
+  String get redpacketRecordsTabSent => '我发出的';
+
+  @override
+  String get redpacketRecordsTabReceived => '我收到的';
+
+  @override
+  String get redpacketRecordsEmpty => '暂无红包记录';
+
+  @override
+  String get redpacketErrorInvalidAmount => '总金额必须不少于红包个数（每份至少 1 分钱）。';
+
+  @override
+  String get redpacketErrorInsufficientFund => '余额不足，无法发送红包。';
+
+  @override
+  String get redpacketErrorTooManyShares => '红包个数不能超过会话成员数。';
+
+  @override
+  String get redpacketErrorNotMember => '你已不在该会话中。';
+
+  @override
+  String get redpacketErrorExpired => '红包已过期。';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => '你已经抢过这个红包。';
+
+  @override
+  String get redpacketErrorEmpty => '红包已被抢完。';
+
+  @override
+  String get redpacketErrorNotFound => '红包不存在。';
+
+  @override
+  String get redpacketMessageSendFailed => '红包已创建，但公告消息发送失败，网络恢复后重新打开会话查看。';
+
+  @override
+  String get chatRoomRedpacketOption => '红包';
+
+  @override
+  String get chatMessageTypeRedpacket => '[红包]';
+
+  @override
+  String get errorParamInvalid => '请求参数错误。';
+
+  @override
+  String get errorUnauthorized => '未登录或登录已过期，请重新登录。';
+
+  @override
+  String get errorForbidden => '没有权限执行该操作。';
+
+  @override
+  String get errorResourceNotFound => '请求的资源不存在。';
+
+  @override
+  String get errorDataConflict => '数据冲突，请刷新后重试。';
+
+  @override
+  String get errorSystemBusy => '系统繁忙，请稍后再试。';
+
+  @override
+  String get errorEmptyFile => '上传的文件为空。';
+
+  @override
+  String get errorFileSizeIllegal => '文件大小不符合要求。';
+
+  @override
+  String get errorFileTypeIllegal => '文件类型不符合要求。';
+
+  @override
+  String get errorFileNameIllegal => '文件名不符合要求。';
+
+  @override
+  String get errorFileUploadFailed => '文件上传失败，请稍后再试。';
+
+  @override
+  String get errorPhoneFormatInvalid => '手机号码格式不正确，请检查。';
+
+  @override
+  String get errorPasswordFormatInvalid => '密码格式不符合要求，请检查。';
+
+  @override
+  String get errorNameFormatInvalid => '昵称不符合要求，请检查。';
+
+  @override
+  String get errorRegisterParamConflict => '家庭名称与邀请码只能二选一。';
+
+  @override
+  String get errorPhoneAlreadyExists => '该手机号已被注册。';
+
+  @override
+  String get errorLoginFailed => '手机号或密码错误。';
+
+  @override
+  String get errorTokenInvalid => '登录已失效，请重新登录。';
+
+  @override
+  String get errorTokenExpired => '登录已过期，请重新登录。';
+
+  @override
+  String get errorRefreshTokenInvalid => '登录已失效，请重新登录。';
+
+  @override
+  String get errorUserNotFound => '用户不存在。';
+
+  @override
+  String get errorFamilyNameEmpty => '请输入家庭名称。';
+
+  @override
+  String get errorInviteCodeEmpty => '请输入邀请码。';
+
+  @override
+  String get errorRelationTypeInvalid => '无效的家庭关系类型。';
+
+  @override
+  String get errorFamilyNotFound => '找不到该家庭。';
+
+  @override
+  String get errorFamilyMemberNotFound => '找不到该家庭成员。';
+
+  @override
+  String get errorInviteCodeInvalid => '邀请码不存在或已过期。';
+
+  @override
+  String get errorRelationAnchorInvalid => '选择的关系对象无效。';
+
+  @override
+  String get errorNotFamilyMember => '你不是该家庭成员。';
+
+  @override
+  String get errorNotFamilyAdmin => '仅家庭管理员可执行该操作。';
+
+  @override
+  String get errorFamilySaveFailed => '家庭创建失败，请稍后再试。';
+
+  @override
+  String get errorSpouseAlreadyExists => '对方已经有配偶了。';
+
+  @override
+  String get errorNoKnownParent => '父母关系未知，无法建立兄弟姐妹关系。';
+
+  @override
+  String get errorConversationNotFound => '会话不存在。';
+
+  @override
+  String get errorMessageTooLong => '消息内容过长。';
+
+  @override
+  String get errorMessageTypeInvalid => '不支持的消息类型。';
+
+  @override
+  String get errorLocationCoordinateInvalid => '定位坐标不能为空。';
+
+  @override
+  String get errorLocationBatteryInvalid => '电量数值不合法。';
+
+  @override
+  String get errorLocationTimestampMissing => '定位时间戳不能为空。';
+
+  @override
+  String get errorLocationTimestampStale => '定位数据已过期，请重新上报。';
+
+  @override
+  String get errorLocationTargetNotFamilyMember => '目标用户不是同一家庭成员。';
+
+  @override
+  String get errorFenceRangeInvalid => '围栏半径不合法。';
+
+  @override
+  String get errorFenceNotFound => '围栏不存在。';
+
+  @override
+  String get errorNotFenceSetter => '仅围栏设置者可执行该操作。';
+
+  @override
+  String get errorMomentContentEmpty => '动态内容和媒体不能同时为空。';
+
+  @override
+  String get errorMomentMediaTypeInvalid => '媒体类型不正确。';
+
+  @override
+  String get errorLikeRecordNotFound => '尚未点赞，无法取消。';
+
+  @override
+  String get errorMomentNotFound => '动态不存在。';
+
+  @override
+  String get errorNotMomentOwner => '仅动态发布者本人可执行该操作。';
+
+  @override
+  String get errorCommentContentEmpty => '评论内容不能为空。';
+
+  @override
+  String get errorCommentNotFound => '评论不存在。';
+
+  @override
+  String get errorNotCommentOwner => '仅评论作者本人可执行该操作。';
+
+  @override
+  String get errorHealthMetricTypeInvalid => '健康指标类型不正确。';
+
+  @override
+  String get errorHealthRecordValueInvalid => '健康记录数值不合法。';
+
+  @override
+  String get errorNotSameFamily => '目标用户不是同一家庭成员。';
+
+  @override
+  String get errorRemindTimeInvalid => '提醒时间格式不正确。';
+
+  @override
+  String get errorHealthRecordNotFound => '健康记录不存在。';
+
+  @override
+  String get errorNotHealthRecordOwner => '仅本人可修改自己的健康记录。';
+
+  @override
+  String get errorHealthRecordDateConflict => '该日期已存在同指标的记录。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3011,9 +3749,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get conversationsEmptySubtitle => '邀請家人加入，開始聊天吧';
-
-  @override
-  String get conversationSpouseLabel => '配偶';
 
   @override
   String get connectionErrorRetry => '重試';
@@ -3883,6 +4618,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get storageImageCache => '圖片快取';
 
   @override
+  String get storageAvatarCache => '頭像快取';
+
+  @override
   String get storageVideoCache => '影片快取';
 
   @override
@@ -4046,4 +4784,373 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get healthRecordEditHint => '點擊記錄以編輯';
+
+  @override
+  String get healthChartBpZoneLow => '偏低';
+
+  @override
+  String get healthChartBpZoneNormal => '正常';
+
+  @override
+  String get healthChartBpZoneElevated => '偏高';
+
+  @override
+  String get healthChartBpZoneHigh => '高';
+
+  @override
+  String get healthChartBpDiastolicCap => '舒張壓上限 80';
+
+  @override
+  String get familyFeedScopeMyFamily => '自個兒家';
+
+  @override
+  String get familyFeedScopeOthers => '串串門';
+
+  @override
+  String get publishMomentPublicToggle => '公開發佈';
+
+  @override
+  String get publishMomentPublicHint => '公開後這則動態及其評論會出現在跨家庭動態廣場裡';
+
+  @override
+  String get publicMomentsTitle => '串串門';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '來自 $familyName';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => '還沒有人公開發佈';
+
+  @override
+  String get publicMomentsEmptyDesc => '想做第一個分享的人？';
+
+  @override
+  String get publicMomentsLoadMoreError => '載入更多失敗';
+
+  @override
+  String get profileBalanceLabel => '餘額';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => '如需儲值請聯絡家庭管理員';
+
+  @override
+  String get redpacketHubTitle => '我的紅包';
+
+  @override
+  String get redpacketHubSubtitle => '查看我發出和收到的紅包';
+
+  @override
+  String get redpacketSendTitle => '發紅包';
+
+  @override
+  String get redpacketTotalAmountLabel => '總金額';
+
+  @override
+  String get redpacketTotalAmountHint => '單位：元，例如 100 或 88.88';
+
+  @override
+  String get redpacketTotalCountLabel => '紅包個數';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return '最多 $max 個';
+  }
+
+  @override
+  String get redpacketSendButton => '塞錢進紅包';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount 元';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count 份';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '$count 個紅包';
+  }
+
+  @override
+  String get redpacketCardLabel => '紅包';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$name 發了一個紅包';
+  }
+
+  @override
+  String get redpacketStatusOngoing => '進行中';
+
+  @override
+  String get redpacketStatusFinished => '已領完';
+
+  @override
+  String get redpacketStatusExpired => '已過期';
+
+  @override
+  String get redpacketStatusRefunded => '已退款';
+
+  @override
+  String get redpacketGrabButton => '開';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '你搶到了 ¥$amount';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => '你已經搶過這個紅包了';
+
+  @override
+  String get redpacketGrabListTitle => '已領取的人';
+
+  @override
+  String get redpacketGrabListEmpty => '暫無人領取';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total 已領取';
+  }
+
+  @override
+  String get redpacketExpiredNotice => '紅包已過期';
+
+  @override
+  String get redpacketEmptyNotice => '紅包已被搶光了';
+
+  @override
+  String get redpacketSelfNotice => '你發出的紅包';
+
+  @override
+  String get redpacketRecordsTitle => '我的紅包';
+
+  @override
+  String get redpacketRecordsTabSent => '我發出的';
+
+  @override
+  String get redpacketRecordsTabReceived => '我收到的';
+
+  @override
+  String get redpacketRecordsEmpty => '暫無紅包記錄';
+
+  @override
+  String get redpacketErrorInvalidAmount => '總金額必須不少於紅包個數（每份至少 1 分錢）。';
+
+  @override
+  String get redpacketErrorInsufficientFund => '餘額不足，無法發送紅包。';
+
+  @override
+  String get redpacketErrorTooManyShares => '紅包個數不能超過對話成員數。';
+
+  @override
+  String get redpacketErrorNotMember => '你已不在該對話中。';
+
+  @override
+  String get redpacketErrorExpired => '紅包已過期。';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => '你已經搶過這個紅包。';
+
+  @override
+  String get redpacketErrorEmpty => '紅包已被搶完。';
+
+  @override
+  String get redpacketErrorNotFound => '紅包不存在。';
+
+  @override
+  String get redpacketMessageSendFailed => '紅包已建立，但公告訊息傳送失敗，網路恢復後重新開啟會話查看。';
+
+  @override
+  String get chatRoomRedpacketOption => '紅包';
+
+  @override
+  String get chatMessageTypeRedpacket => '[紅包]';
+
+  @override
+  String get errorParamInvalid => '請求參數錯誤。';
+
+  @override
+  String get errorUnauthorized => '未登入或登入已過期，請重新登入。';
+
+  @override
+  String get errorForbidden => '沒有權限執行該操作。';
+
+  @override
+  String get errorResourceNotFound => '請求的資源不存在。';
+
+  @override
+  String get errorDataConflict => '資料衝突，請重新整理後再試。';
+
+  @override
+  String get errorSystemBusy => '系統繁忙，請稍後再試。';
+
+  @override
+  String get errorEmptyFile => '上傳的檔案為空。';
+
+  @override
+  String get errorFileSizeIllegal => '檔案大小不符合要求。';
+
+  @override
+  String get errorFileTypeIllegal => '檔案類型不符合要求。';
+
+  @override
+  String get errorFileNameIllegal => '檔案名稱不符合要求。';
+
+  @override
+  String get errorFileUploadFailed => '檔案上傳失敗，請稍後再試。';
+
+  @override
+  String get errorPhoneFormatInvalid => '手機號碼格式不正確，請檢查。';
+
+  @override
+  String get errorPasswordFormatInvalid => '密碼格式不符合要求，請檢查。';
+
+  @override
+  String get errorNameFormatInvalid => '暱稱不符合要求，請檢查。';
+
+  @override
+  String get errorRegisterParamConflict => '家庭名稱與邀請碼只能擇一。';
+
+  @override
+  String get errorPhoneAlreadyExists => '該手機號碼已被註冊。';
+
+  @override
+  String get errorLoginFailed => '手機號碼或密碼錯誤。';
+
+  @override
+  String get errorTokenInvalid => '登入已失效，請重新登入。';
+
+  @override
+  String get errorTokenExpired => '登入已過期，請重新登入。';
+
+  @override
+  String get errorRefreshTokenInvalid => '登入已失效，請重新登入。';
+
+  @override
+  String get errorUserNotFound => '使用者不存在。';
+
+  @override
+  String get errorFamilyNameEmpty => '請輸入家庭名稱。';
+
+  @override
+  String get errorInviteCodeEmpty => '請輸入邀請碼。';
+
+  @override
+  String get errorRelationTypeInvalid => '無效的家庭關係類型。';
+
+  @override
+  String get errorFamilyNotFound => '找不到該家庭。';
+
+  @override
+  String get errorFamilyMemberNotFound => '找不到該家庭成員。';
+
+  @override
+  String get errorInviteCodeInvalid => '邀請碼不存在或已過期。';
+
+  @override
+  String get errorRelationAnchorInvalid => '選擇的關係對象無效。';
+
+  @override
+  String get errorNotFamilyMember => '你不是該家庭成員。';
+
+  @override
+  String get errorNotFamilyAdmin => '僅家庭管理員可執行該操作。';
+
+  @override
+  String get errorFamilySaveFailed => '家庭建立失敗，請稍後再試。';
+
+  @override
+  String get errorSpouseAlreadyExists => '對方已經有配偶了。';
+
+  @override
+  String get errorNoKnownParent => '父母關係未知，無法建立兄弟姊妹關係。';
+
+  @override
+  String get errorConversationNotFound => '對話不存在。';
+
+  @override
+  String get errorMessageTooLong => '訊息內容過長。';
+
+  @override
+  String get errorMessageTypeInvalid => '不支援的訊息類型。';
+
+  @override
+  String get errorLocationCoordinateInvalid => '定位座標不能為空。';
+
+  @override
+  String get errorLocationBatteryInvalid => '電量數值不合法。';
+
+  @override
+  String get errorLocationTimestampMissing => '定位時間戳記不能為空。';
+
+  @override
+  String get errorLocationTimestampStale => '定位資料已過期，請重新回報。';
+
+  @override
+  String get errorLocationTargetNotFamilyMember => '目標使用者不是同一家庭成員。';
+
+  @override
+  String get errorFenceRangeInvalid => '圍欄半徑不合法。';
+
+  @override
+  String get errorFenceNotFound => '圍欄不存在。';
+
+  @override
+  String get errorNotFenceSetter => '僅圍欄設置者可執行該操作。';
+
+  @override
+  String get errorMomentContentEmpty => '動態內容和媒體不能同時為空。';
+
+  @override
+  String get errorMomentMediaTypeInvalid => '媒體類型不正確。';
+
+  @override
+  String get errorLikeRecordNotFound => '尚未按讚，無法取消。';
+
+  @override
+  String get errorMomentNotFound => '動態不存在。';
+
+  @override
+  String get errorNotMomentOwner => '僅動態發布者本人可執行該操作。';
+
+  @override
+  String get errorCommentContentEmpty => '留言內容不能為空。';
+
+  @override
+  String get errorCommentNotFound => '留言不存在。';
+
+  @override
+  String get errorNotCommentOwner => '僅留言作者本人可執行該操作。';
+
+  @override
+  String get errorHealthMetricTypeInvalid => '健康指標類型不正確。';
+
+  @override
+  String get errorHealthRecordValueInvalid => '健康記錄數值不合法。';
+
+  @override
+  String get errorNotSameFamily => '目標使用者不是同一家庭成員。';
+
+  @override
+  String get errorRemindTimeInvalid => '提醒時間格式不正確。';
+
+  @override
+  String get errorHealthRecordNotFound => '健康記錄不存在。';
+
+  @override
+  String get errorNotHealthRecordOwner => '僅本人可修改自己的健康記錄。';
+
+  @override
+  String get errorHealthRecordDateConflict => '該日期已存在同指標的記錄。';
 }

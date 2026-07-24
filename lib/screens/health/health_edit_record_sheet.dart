@@ -20,11 +20,22 @@ class HealthEditRecordSheet extends StatefulWidget {
   const HealthEditRecordSheet({super.key, required this.record});
 
   static Future<void> show(BuildContext context, HealthRecord record) {
+    // `showModalBottomSheet` inserts its content as a new sibling
+    // route on the same Navigator, not a descendant of the calling
+    // route — so the new sheet's `BuildContext` does NOT inherit
+    // the `HealthProvider` that only wraps the home route inside
+    // `AuthGate`. Read it from the *caller's* context (which does
+    // see the provider) and re-supply it via `.value()` so the
+    // sheet's own `context.watch<HealthProvider>()` works.
+    final health = context.read<HealthProvider>();
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => HealthEditRecordSheet(record: record),
+      builder: (_) => ChangeNotifierProvider<HealthProvider>.value(
+        value: health,
+        child: HealthEditRecordSheet(record: record),
+      ),
     );
   }
 

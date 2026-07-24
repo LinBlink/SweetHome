@@ -25,17 +25,30 @@ class ConversationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final relationCode = conversation.relationCode;
     final l10n = AppLocalizations.of(context)!;
+    final auth = context.watch<AuthProvider>();
     String? relationLabel;
-    if (relationCode == 'S') {
-      // Spouse gets the plain, gender-neutral "配偶" label in the chat
-      // list instead of 丈夫/妻子 — unlike the family tree, this list
-      // is meant to read at a glance without needing gender context.
-      relationLabel = l10n.conversationSpouseLabel;
-    } else if (relationCode != null) {
+    if (relationCode != null) {
+      // `relationLabelFor` already resolves the bare spouse code `S`
+      // to the correct gendered term (丈夫/妻子) via `targetGender` —
+      // same as every other relation, and matching the family tree.
+      // It returns `null` (no label) rather than falling back to a
+      // generic "配偶" when the gender is unknown.
+      //
+      // `conversation.otherUserGender` isn't reliably populated by
+      // every backend version (some direct conversations come back
+      // with it null) — fall back to `AuthProvider.genderForUserId`,
+      // which is warmed from the family member roster's `gender`
+      // field (always present, unlike `otherUserGender`) by whichever
+      // screen last called `loadFamilyMembers()` (see that method's
+      // doc comment).
+      final targetGender = conversation.otherUserGender ??
+          (conversation.otherUserId != null
+              ? auth.genderForUserId(conversation.otherUserId!)
+              : null);
       relationLabel = relationLabelFor(
         relationCode: relationCode,
-        targetGender: conversation.otherUserGender,
-        viewerGender: genderFromString(context.watch<AuthProvider>().currentUser?.gender),
+        targetGender: targetGender,
+        viewerGender: genderFromString(auth.currentUser?.gender),
         appLocale: context.watch<LocaleProvider>().locale,
       );
     }
@@ -202,6 +215,14 @@ class _LastMessagePreview extends StatelessWidget {
       case MessageType.system:
         leading = Icons.info_outline;
         text = l10n.chatMessageTypeSystem;
+        break;
+      case MessageType.redpacket:
+        // §9 — the conversation tile's last-message preview is just
+        // a localized "[Red Packet]" placeholder instead of the raw
+        // id (the spec's "服务端只给结构化数据，不做展示层加工"
+        // principle: show the type, not the id).
+        leading = Icons.redeem_rounded;
+        text = l10n.chatMessageTypeRedpacket;
         break;
       case MessageType.text:
         leading = null;

@@ -55,7 +55,6 @@
   "conversationsNewTooltip": "စကားဝိုင်းအသစ်",
   "conversationsEmptyTitle": "မက်ဆေ့ချ် မရှိသေးပါ",
   "conversationsEmptySubtitle": "မိသားစုဝင်များကို ဖိတ်ခေါ်၍ စတင်စကားပြောပါ",
-  "conversationSpouseLabel": "အိမ်ထောင်ဖက်",
   "connectionErrorRetry": "ထပ်စမ်းရန်",
   "newConversationTitle": "စကားဝိုင်းအသစ်",
   "editProfileTitle": "ကိုယ်ရေးအချက်အလက် တည်းဖြတ်ရန်",
@@ -417,6 +416,7 @@
 "storageScreenTitle": "သိုလှောင်မှုနှင့် Cache",
 "storageTotalLabel": "စုစုပေါင်း {size}",
 "storageImageCache": "ဓာတ်ပုံ Cache",
+  "storageAvatarCache": "ပုံတူ Cache",
 "storageVideoCache": "ဗီဒီယို Cache",
 "storageAudioCache": "အသံ Cache",
 "storageChatHistory": "စကားပြောမှတ်တမ်း",
@@ -470,5 +470,188 @@
  "healthEditRecordNotFound": "ဤမှတ်တမ်း မရှိတော့ပါ။",
  "healthEditNotOwner": "ကိုယ်ပိုင်မှတ်တမ်းများကိုသာ တည်းဖြတ်နိုင်ပါသည်။",
  "healthEditFailed": "မှတ်တမ်းကို အပ်ဒိတ်မလုပ်နိုင်ပါ။",
- "healthRecordEditHint": "တည်းဖြတ်ရန် နှိပ်ပါ"
+ "healthRecordEditHint": "တည်းဖြတ်ရန် နှိပ်ပါ",
+ "healthChartBpZoneLow": "နိမ့်",
+ "healthChartBpZoneNormal": "ပုံမှန်",
+ "healthChartBpZoneElevated": "မြင့်",
+ "healthChartBpZoneHigh": "အလွန်မြင့်",
+ "healthChartBpDiastolicCap": "အောက်သွေးအမြင့်ဆုံး ၈၀",
+ "familyFeedScopeMyFamily": "ကျွန်တော်တို့ မိသားစု",
+ "familyFeedScopeOthers": "အခြား မိသားစုများ",
+ "publishMomentPublicToggle": "အများမြင်အဖြစ် တင်မည်",
+ "publishMomentPublicHint": "အများမြင်တင်သော ပို့စ်များကို အခြားမိသားစုများမှ ကြည့်ရှုနိုင်ပါသည်",
+ "publicMomentsTitle": "အခြားမိသားစု ပို့စ်များ",
+ "publicMomentsFromFamily": "{familyName} မှ",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+ "publicMomentsEmptyTitle": "အများမြင် ပို့စ်မရှိသေးပါ",
+ "publicMomentsEmptyDesc": "ပထမဆုံး မျှဝေသူ ဖြစ်လာပါစေ",
+ "publicMomentsLoadMoreError": "ထပ်မရနိုင်ပါ",
+ "profileBalanceLabel": "လက်ကျန်ငွေ",
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "ငွေဖြည့်ရန် မိသားစု စီမံခန့်ခွဲသူကို ဆက်သွယ်ပါ",
+ "redpacketHubTitle": "ကျွန်ုပ်၏ ဆန်တင်းကျီ",
+ "redpacketHubSubtitle": "ပို့ခဲ့သောနှင့် ရရှိခဲ့သော ဆန်တင်းကျီများ",
+ "redpacketSendTitle": "ဆန်တင်းကျီ ပို့မည်",
+ "redpacketTotalAmountLabel": "စုစုပေါင်း ပမာဏ",
+ "redpacketTotalAmountHint": "ယူအန်းဖြင့် (ဥပမာ 100 သို့မဟုတ် 88.88)",
+ "redpacketTotalCountLabel": "အရေအတွက်",
+ "redpacketTotalCountHint": "အများဆုံး {max} ခု",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "ဆန်တင်းကျီထဲ ထည့်မည်",
+ "redpacketAmountYuan": "{amount} ယူအန်း",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count} ခု",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "ဆန်တင်းကျီ {count} ခု",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "ဆန်တင်းကျီ",
+ "redpacketCardFromLabel": "{name} က ဆန်တင်းကျီ ပို့ခဲ့သည်",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "ဆက်လက်လုပ်ဆောင်နေသည်",
+ "redpacketStatusFinished": "အကုန်ယူပြီးပြီ",
+ "redpacketStatusExpired": "သက်တမ်းကုန်ပြီ",
+ "redpacketStatusRefunded": "ပြန်အမ်းပြီးပြီ",
+ "redpacketGrabButton": "ယူမည်",
+ "redpacketGrabSuccess": "¥{amount} ရရှိခဲ့သည်",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "ဤဆန်တင်းကျီကို ရယူပြီးပြီ",
+ "redpacketGrabListTitle": "ရယူထားသူများ",
+ "redpacketGrabListEmpty": "မည်သူမျှ မရယူရသေးပါ",
+ "redpacketGrabListCount": "{grabbed}/{total} ရယူပြီး",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "ဤဆန်တင်းကျီ သက်တမ်းကုန်ပါပြီ",
+ "redpacketEmptyNotice": "ဤဆန်တင်းကျီ ဗလာဖြစ်နေသည်",
+ "redpacketSelfNotice": "သင်ပို့ခဲ့သော ဆန်တင်းကျီ",
+ "redpacketRecordsTitle": "ကျွန်ုပ်၏ ဆန်တင်းကျီ",
+ "redpacketRecordsTabSent": "ပို့ခဲ့သည်",
+ "redpacketRecordsTabReceived": "ရရှိခဲ့သည်",
+ "redpacketRecordsEmpty": "ဆန်တင်းကျီ မှတ်တမ်း မရှိသေးပါ",
+ "redpacketErrorInvalidAmount": "စုစုပေါင်းပမာဏသည် အရေအတွက်ထက် မနည်းရ (တစ်ခုလျှင် 1 ဖန်မျှ ရှိရမည်)။",
+ "redpacketErrorInsufficientFund": "လက်ကျန်ငွေ မလုံလောက်ပါ။",
+ "redpacketErrorTooManyShares": "အရေအတွက်သည် စကားပြောအဖွဲ့ဝင် အရေအတွက်ထက် မကျော်ရပါ။",
+ "redpacketErrorNotMember": "ဤစကားပြောခန်း၏ အဖွဲ့ဝင် မဟုတ်တော့ပါ။",
+ "redpacketErrorExpired": "ဤဆန်တင်းကျီ သက်တမ်းကုန်ပါပြီ။",
+ "redpacketErrorAlreadyGrabbed": "ဤဆန်တင်းကျီကို ရယူပြီးပါပြီ။",
+ "redpacketErrorEmpty": "ဤဆန်တင်းကျီ ဗလာဖြစ်နေသည်။",
+ "redpacketErrorNotFound": "ဆန်တင်းကျီ မတွေ့ပါ။",
+ "redpacketMessageSendFailed": "ဆန်တင်းကျီ ဖန်တီးပြီးပါပြီ၊ သို့သော် အကြောင်းကြားစာတိုက်ပို့မှု မအောင်မြင်ပါ။ အင်တာနက်ပြန်ရရှိပါက စကားပြောခန်းကို ပြန်ဖွင့်ကြည့်ပါ။",
+ "chatRoomRedpacketOption": "ဆန်တင်းကျီ",
+ "chatMessageTypeRedpacket": "[ဆန်တင်းကျီ]",
+ "errorParamInvalid": "တောင်းဆိုမှု paramita မှားနေပါသည်။",
+ "errorUnauthorized": "မဝင်ရောက်ရသေးပါ သို့မဟုတ် Session သက်တမ်းကုန်သွားပါပြီ။ ပြန်လည်ဝင်ရောက်ပါ။",
+ "errorForbidden": "ဤလုပ်ဆောင်ချက်ကို လုပ်ဆောင်ရန် ခွင့်ပြုချက် မရှိပါ။",
+ "errorResourceNotFound": "တောင်းဆိုသည့် အရင်းအမြစ် မရှိပါ။",
+ "errorDataConflict": "ဒေတာပဋိပက္ခ ဖြစ်နေသည်။ Refresh လုပ်ပြီး ထပ်စမ်းကြည့်ပါ။",
+ "errorSystemBusy": "စနစ်အလုပ်များနေသည်။ နောက်မှ ထပ်စမ်းကြည့်ပါ။",
+ "errorEmptyFile": "အပ်လုဒ်လုပ်သော ဖိုင် ဗလာဖြစ်နေသည်။",
+ "errorFileSizeIllegal": "ဖိုင်အရွယ်အစား သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။",
+ "errorFileTypeIllegal": "ဤဖိုင်အမျိုးအစားကို ပံ့ပိုးမထားပါ။",
+ "errorFileNameIllegal": "ဖိုင်အမည် မမှန်ကန်ပါ။",
+ "errorFileUploadFailed": "ဖိုင်အပ်လုဒ် မအောင်မြင်ပါ။ နောက်မှ ထပ်စမ်းကြည့်ပါ။",
+ "errorPhoneFormatInvalid": "ဖုန်းနံပါတ် ပုံစံ မှားနေပါသည်။ စစ်ဆေးပါ။",
+ "errorPasswordFormatInvalid": "စကားဝှက် ပုံစံ သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။ စစ်ဆေးပါ။",
+ "errorNameFormatInvalid": "အမည်ခံ သတ်မှတ်ချက်နှင့် မကိုက်ညီပါ။ စစ်ဆေးပါ။",
+ "errorRegisterParamConflict": "မိသားစုအမည် သို့မဟုတ် ဖိတ်ခေါ်ကုဒ် တစ်ခုတည်းသာ ရွေးရပါမည်။",
+ "errorPhoneAlreadyExists": "ဤဖုန်းနံပါတ်ကို မှတ်ပုံတင်ပြီးသားဖြစ်သည်။",
+ "errorLoginFailed": "ဖုန်းနံပါတ် သို့မဟုတ် စကားဝှက် မှားနေပါသည်။",
+ "errorTokenInvalid": "Session မမှန်ကန်တော့ပါ။ ပြန်လည်ဝင်ရောက်ပါ။",
+ "errorTokenExpired": "Session သက်တမ်းကုန်သွားပါပြီ။ ပြန်လည်ဝင်ရောက်ပါ။",
+ "errorRefreshTokenInvalid": "Session မမှန်ကန်တော့ပါ။ ပြန်လည်ဝင်ရောက်ပါ။",
+ "errorUserNotFound": "အသုံးပြုသူ မရှိပါ။",
+ "errorFamilyNameEmpty": "မိသားစုအမည် ထည့်ပါ။",
+ "errorInviteCodeEmpty": "ဖိတ်ခေါ်ကုဒ် ထည့်ပါ။",
+ "errorRelationTypeInvalid": "မိသားစုဆက်ဆံရေး အမျိုးအစား မမှန်ကန်ပါ။",
+ "errorFamilyNotFound": "ဤမိသားစုကို ရှာမတွေ့ပါ။",
+ "errorFamilyMemberNotFound": "ဤမိသားစုဝင်ကို ရှာမတွေ့ပါ။",
+ "errorInviteCodeInvalid": "ဖိတ်ခေါ်ကုဒ် မရှိပါ သို့မဟုတ် သက်တမ်းကုန်ပါပြီ။",
+ "errorRelationAnchorInvalid": "ရွေးချယ်ထားသော ဆက်ဆံရေး anchor မမှန်ကန်ပါ။",
+ "errorNotFamilyMember": "သင်သည် ဤမိသားစု၏ အဖွဲ့ဝင် မဟုတ်ပါ။",
+ "errorNotFamilyAdmin": "ဤလုပ်ဆောင်ချက်ကို မိသားစု admin သာ လုပ်ဆောင်နိုင်သည်။",
+ "errorFamilySaveFailed": "မိသားစု ဖန်တီးမှု မအောင်မြင်ပါ။ နောက်မှ ထပ်စမ်းကြည့်ပါ။",
+ "errorSpouseAlreadyExists": "ထိုသူတွင် အိမ်ထောင်ဖက် ရှိပြီးသားဖြစ်သည်။",
+ "errorNoKnownParent": "မိဘဆက်ဆံရေး မသိရသေးသဖြင့် မောင်နှမဆက်ဆံရေး သတ်မှတ်၍ မရပါ။",
+ "errorConversationNotFound": "ဤစကားပြောခန်း မရှိပါ။",
+ "errorMessageTooLong": "မက်ဆေ့ချ် ရှည်လွန်းသည်။",
+ "errorMessageTypeInvalid": "ဤမက်ဆေ့ချ်အမျိုးအစားကို ပံ့ပိုးမထားပါ။",
+ "errorLocationCoordinateInvalid": "တည်နေရာ ကိုသော်တစ်များ ဗလာမဖြစ်ရပါ။",
+ "errorLocationBatteryInvalid": "ဘက်ထရီပမာဏ မမှန်ကန်ပါ။",
+ "errorLocationTimestampMissing": "တည်နေရာ အချိန်တံဆိပ် ဗလာမဖြစ်ရပါ။",
+ "errorLocationTimestampStale": "တည်နေရာဒေတာ သက်တမ်းကုန်ပါပြီ။ ပြန်လည်တင်ပါ။",
+ "errorLocationTargetNotFamilyMember": "ပစ်မှတ်အသုံးပြုသူသည် မိသားစုတူ အဖွဲ့ဝင် မဟုတ်ပါ။",
+ "errorFenceRangeInvalid": "ဝင်းစည်းရုံး အချင်းဝက် မမှန်ကန်ပါ။",
+ "errorFenceNotFound": "ဤဝင်းစည်းရုံး မရှိပါ။",
+ "errorNotFenceSetter": "ဤလုပ်ဆောင်ချက်ကို ဝင်းစည်းရုံး သတ်မှတ်သူသာ လုပ်ဆောင်နိုင်သည်။",
+ "errorMomentContentEmpty": "Moment တွင် စာသား သို့မဟုတ် မီဒီယာ လိုအပ်သည်။",
+ "errorMomentMediaTypeInvalid": "မီဒီယာအမျိုးအစား မှားနေပါသည်။",
+ "errorLikeRecordNotFound": "မလိုက်ကြည့်ရသေးသဖြင့် ပယ်ဖျက်၍ မရပါ။",
+ "errorMomentNotFound": "ဤ moment မရှိပါ။",
+ "errorNotMomentOwner": "ဤလုပ်ဆောင်ချက်ကို moment ပို့စ်တင်သူသာ လုပ်ဆောင်နိုင်သည်။",
+ "errorCommentContentEmpty": "မှတ်ချက် ဗလာမဖြစ်ရပါ။",
+ "errorCommentNotFound": "ဤမှတ်ချက် မရှိပါ။",
+ "errorNotCommentOwner": "ဤလုပ်ဆောင်ချက်ကို မှတ်ချက်ရေးသူသာ လုပ်ဆောင်နိုင်သည်။",
+ "errorHealthMetricTypeInvalid": "ကျန်းမာရေးညွှန်ကိန်း အမျိုးအစား မှားနေပါသည်။",
+ "errorHealthRecordValueInvalid": "ကျန်းမာရေးမှတ်တမ်း တန်ဖိုး မမှန်ကန်ပါ။",
+ "errorNotSameFamily": "ပစ်မှတ်အသုံးပြုသူသည် မိသားစုတူ အဖွဲ့ဝင် မဟုတ်ပါ။",
+ "errorRemindTimeInvalid": "သတိပေးချိန် ပုံစံ မှားနေပါသည်။",
+ "errorHealthRecordNotFound": "ဤကျန်းမာရေးမှတ်တမ်း မရှိပါ။",
+ "errorNotHealthRecordOwner": "မိမိကျန်းမာရေးမှတ်တမ်းကို မိမိကိုယ်တိုင်သာ ပြင်ဆင်နိုင်သည်။",
+ "errorHealthRecordDateConflict": "ဤရက်စွဲတွင် တူညီသောညွှန်ကိန်း မှတ်တမ်း ရှိပြီးသားဖြစ်သည်။"
 }

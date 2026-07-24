@@ -28,11 +28,34 @@ import '../services/auth_service.dart';
 /// `_myLikes` set of momentIds the current user has *expressed*
 /// liking (an optimistic intent). That set is the source of truth
 /// for the heart icon; on error we remove the id from it.
+/// Which of the two scopes (`family` vs `public`, §7.2 vs §7.3) the
+/// `FamilyFeedScreen` tab strip currently shows. Lifted out of any
+/// single widget so the choice survives:
+///   1. Screen re-mounts (`PageView` rebuilds when MainShell rebuilds).
+///   2. Tab switches away-and-back (the screen's `State` is preserved
+///      while the user is on another tab).
+///   3. App restarts (persisted to SharedPreferences, keyed by user).
+class MomentFeedScope {
+  final String labelKey;
+  const MomentFeedScope(this.labelKey);
+  static const family = MomentFeedScope('family');
+  static const public = MomentFeedScope('public');
+  static const values = [family, public];
+}
+
 class MomentProvider extends ChangeNotifier {
   MomentProvider({
     required AuthUser currentUser,
     required this.service,
-  }) : _currentUser = currentUser;
+  }) : _currentUser = currentUser {
+    // Hydrate the persisted active scope (no `await` — ctor can't be
+    // async). The FamilyFeedScreen's first render defaults to
+    // `family`, and once SharedPreferences resolves the screen
+    // rebuilds via `watch<MomentProvider>()` and snaps to the saved
+    // tab. Worst case: a one-frame flash. Better than blocking
+    // `main.dart` on disk I/O for every login.
+    _hydrateActiveFeedScope();
+  }
 
   final AuthUser _currentUser;
   final dynamic service; // `MomentService`; dynamic keeps imports
@@ -47,6 +70,34 @@ class MomentProvider extends ChangeNotifier {
   int _total = 0;
   String? _error;
   String? _loadMoreError;
+
+  /// §7.3 cross-family public feed (the "别人家动态" page). Kept
+  /// separate from [_moments] because the two lists render different
+  /// rows and share nothing beyond the comment/like caches (which are
+  /// keyed by momentId, so they transparently de-dupe even when both
+  /// lists contain the same row, e.g. the viewer's own public post
+  /// showing in both the family and the cross-family feeds).
+  final List<Moment> _publicMoments = [];
+  bool _isLoadingMorePublic = false;
+  bool _isRefreshingPublic = false;
+  bool _hasMorePublic = true;
+  // Unlike [_isInitialLoading] (which starts `true` because
+  // `main.dart` eagerly calls `loadInitial()` for the family feed
+  // at provider construction), the public feed is *lazy* — no one
+  // kicks `loadInitialPublic()` until the user opens the
+  // "串串门" subtab. Default `false` here so the subtab's
+  // first-mount "list empty && !loading → kick loader" guard in
+  // `_FeedListBodyState.initState` evaluates to true on the very
+  // first mount; otherwise that guard would gate on
+  // "loading already in progress" forever, no request would ever
+  // fire, and the subtab would spin forever. `loadInitialPublic()`
+  // sets this back to `true` for the duration of the in-flight
+  // fetch, then `false` on completion — same lifecycle as the
+  // family feed's flag, just starting from the opposite end.
+  bool _isInitialLoadingPublic = false;
+  int _publicTotal = 0;
+  String? _publicError;
+  String? _publicLoadMoreError;
 
   /// Server-derived counts, keyed by momentId. Maps to the latest
   /// count we observed (either from feed fetch or from
@@ -123,6 +174,58 @@ class MomentProvider extends ChangeNotifier {
 
   String get _cacheKey => 'moments_feed_cache_v1_${_currentUser.userId}';
 
+  /// SharedPreferences key for the globally-sticky feed scope
+  /// selector. Persists which tab (`family` vs `public`) the user
+  /// last picked, so a relaunch / re-tab lands them on the same view
+  /// instead of jolting back to the default. Keyed by user so two
+  /// logins on the same device don't trample each other.
+  String get _scopeKey => 'moments_feed_scope_v1_${_currentUser.userId}';
+
+  /// Currently selected scope for the FamilyFeedScreen tab strip.
+  /// Defaults to `family` until `_hydrateActiveFeedScope` resolves —
+  /// see [MomentFeedScope] for the persistence contract.
+  MomentFeedScope _activeFeedScope = MomentFeedScope.family;
+  MomentFeedScope get activeFeedScope => _activeFeedScope;
+
+  /// Switch the active scope. Idempotent (no notify if unchanged),
+  /// writes through to SharedPreferences via the same fire-and-forget
+  /// pattern as `_writeCache`. The FamilyFeedScreen owns the
+  /// matching `TabController` and `addListener`s on it to call this.
+  void setActiveFeedScope(MomentFeedScope scope) {
+    if (_activeFeedScope == scope) return;
+    _activeFeedScope = scope;
+    notifyListeners();
+    unawaited(_persistActiveFeedScope(scope));
+  }
+
+  Future<void> _persistActiveFeedScope(MomentFeedScope scope) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_scopeKey, scope.labelKey);
+    } catch (_) {
+      // Best-effort — losing one prefs write doesn't change which
+      // tab is selected for the current session; the in-memory
+      // value already drives that.
+    }
+  }
+
+  Future<void> _hydrateActiveFeedScope() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_scopeKey);
+      final scope = MomentFeedScope.values.firstWhere(
+        (s) => s.labelKey == raw,
+        orElse: () => MomentFeedScope.family,
+      );
+      if (scope != _activeFeedScope) {
+        _activeFeedScope = scope;
+        notifyListeners();
+      }
+    } catch (_) {
+      // Stays at the family default.
+    }
+  }
+
   /// Loads a still-fresh cached first page into [_moments], if any.
   /// Returns `false` (and leaves state untouched) on a cache miss,
   /// a stale entry, or any parse failure — callers fall through to
@@ -173,10 +276,15 @@ class MomentProvider extends ChangeNotifier {
       // an empty-feed behaviour in mock mode is the source of truth.
       _isInitialLoading = false;
       _moments.clear();
+      // Public feed is unused in mock mode but the screen still
+      // mounts; clear it too so it doesn't carry over from a prior
+      // non-mock session via the in-memory provider.
+      _publicMoments.clear();
       _likeCounts.clear();
       _myLikes.clear();
       _comments.clear();
       _hasMore = false;
+      _hasMorePublic = false;
       notifyListeners();
       return;
     }
@@ -259,6 +367,106 @@ class MomentProvider extends ChangeNotifier {
     }
   }
 
+  // ── public feed state (§7.3) ─────────────────────────────────────
+  List<Moment> get publicMoments => List.unmodifiable(_publicMoments);
+  bool get isPublicInitialLoading => _isInitialLoadingPublic;
+  bool get isPublicRefreshing => _isRefreshingPublic;
+  bool get isPublicLoadingMore => _isLoadingMorePublic;
+  bool get hasMorePublic => _hasMorePublic;
+  int get publicTotal => _publicTotal;
+  String? get publicError => _publicError;
+  String? get publicLoadMoreError => _publicLoadMoreError;
+
+  void clearPublicError() {
+    _publicError = null;
+    notifyListeners();
+  }
+
+  /// §7.3 first-page fetch for the cross-family "别人家动态" page.
+  /// Same sort + backfill treatment as the family feed but reads
+  /// `/moment/public` and stores into its own list (`_publicMoments`)
+  /// so the two pages don't interfere with each other's pagination
+  /// state. Not a cache hydration concern — public-feed content
+  /// changes more often than family feed (every public post from
+  /// every family appears here), so we skip the SharedPreferences
+  /// shortcut the family feed has.
+  Future<void> loadInitialPublic() async {
+    if (AppConfig.mockMode) {
+      _isInitialLoadingPublic = false;
+      _publicMoments.clear();
+      _hasMorePublic = false;
+      _publicTotal = 0;
+      notifyListeners();
+      return;
+    }
+    _isInitialLoadingPublic = true;
+    _publicError = null;
+    notifyListeners();
+    try {
+      final page = await service.fetchPublicMoments(page: 1);
+      _publicMoments
+        ..clear()
+        ..addAll(_sortedDesc(page.moments));
+      _publicTotal = page.total;
+      _hasMorePublic = _publicMoments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
+    } on ApiException catch (e) {
+      _publicError = e.message;
+    } catch (_) {
+      _publicError = "Couldn't load the public feed — pull to refresh.";
+    } finally {
+      _isInitialLoadingPublic = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshPublic() async {
+    if (_isRefreshingPublic) return;
+    _isRefreshingPublic = true;
+    notifyListeners();
+    try {
+      final page = await service.fetchPublicMoments(page: 1);
+      _publicMoments
+        ..clear()
+        ..addAll(_sortedDesc(page.moments));
+      _publicTotal = page.total;
+      _hasMorePublic = _publicMoments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
+    } on ApiException catch (e) {
+      _publicError = e.message;
+    } catch (_) {
+      _publicError = "Couldn't refresh the public feed.";
+    } finally {
+      _isRefreshingPublic = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMorePublic() async {
+    if (_isLoadingMorePublic || !_hasMorePublic) return;
+    _publicLoadMoreError = null;
+    _isLoadingMorePublic = true;
+    notifyListeners();
+    try {
+      final nextPage = _publicMoments.length ~/ 10 + 1;
+      final page = await service.fetchPublicMoments(page: nextPage);
+      _publicMoments.addAll(_sortedDesc(page.moments));
+      _sortInPlaceDescPublic();
+      _hasMorePublic = _publicMoments.length < page.total;
+      _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
+    } on ApiException catch (e) {
+      _publicLoadMoreError = e.message;
+    } catch (_) {
+      _publicLoadMoreError = "Couldn't load more.";
+    } finally {
+      _isLoadingMorePublic = false;
+      notifyListeners();
+    }
+  }
+
   /// §7.2's list response carries no per-moment like count (only
   /// §7.6's dedicated `/like-count` endpoint does), so the feed would
   /// otherwise render every heart as "0 likes" until the user
@@ -315,6 +523,10 @@ class MomentProvider extends ChangeNotifier {
 
   void _sortInPlaceDesc() {
     _moments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  void _sortInPlaceDescPublic() {
+    _publicMoments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   /// One-shot like increment. Bound to the heart's *tap* gesture.
@@ -385,26 +597,51 @@ class MomentProvider extends ChangeNotifier {
   /// rollback the optimistic removal.
   Future<void> deleteMoment(int momentId) async {
     final idx = _moments.indexWhere((m) => m.id == momentId);
-    if (idx < 0) return;
-    final removed = _moments.removeAt(idx);
+    final publicIdx = _publicMoments.indexWhere((m) => m.id == momentId);
+    if (idx < 0 && publicIdx < 0) return;
+    Moment? removedFromFamily;
+    Moment? removedFromPublic;
+    if (idx >= 0) removedFromFamily = _moments.removeAt(idx);
+    if (publicIdx >= 0) {
+      removedFromPublic = _publicMoments.removeAt(publicIdx);
+    }
     _likeCounts.remove(momentId);
     _myLikes.remove(momentId);
     _comments.remove(momentId);
     _commentsLoading.remove(momentId);
-    _total = _total > 0 ? _total - 1 : 0;
+    if (idx >= 0) _total = _total > 0 ? _total - 1 : 0;
+    if (publicIdx >= 0) _publicTotal = _publicTotal > 0 ? _publicTotal - 1 : 0;
     notifyListeners();
     try {
       await service.deleteMoment(momentId);
       unawaited(_writeCache());
     } on ApiException catch (e) {
-      _moments.insert(idx.clamp(0, _moments.length), removed);
-      _total = _total + 1;
+      if (removedFromFamily != null) {
+        _moments.insert(idx.clamp(0, _moments.length), removedFromFamily);
+        _total = _total + 1;
+      }
+      if (removedFromPublic != null) {
+        _publicMoments.insert(
+          publicIdx.clamp(0, _publicMoments.length),
+          removedFromPublic,
+        );
+        _publicTotal = _publicTotal + 1;
+      }
       _error = e.message;
       notifyListeners();
       rethrow;
     } catch (_) {
-      _moments.insert(idx.clamp(0, _moments.length), removed);
-      _total = _total + 1;
+      if (removedFromFamily != null) {
+        _moments.insert(idx.clamp(0, _moments.length), removedFromFamily);
+        _total = _total + 1;
+      }
+      if (removedFromPublic != null) {
+        _publicMoments.insert(
+          publicIdx.clamp(0, _publicMoments.length),
+          removedFromPublic,
+        );
+        _publicTotal = _publicTotal + 1;
+      }
       _error = "Couldn't delete — please try again.";
       notifyListeners();
       rethrow;
@@ -534,6 +771,7 @@ class MomentProvider extends ChangeNotifier {
   Future<void> publish({
     String? content,
     required List<MomentDraft> drafts,
+    bool isPublic = false,
   }) async {
     if (_isPublishing) return;
     if ((content == null || content.trim().isEmpty) && drafts.isEmpty) {
@@ -562,12 +800,21 @@ class MomentProvider extends ChangeNotifier {
       await service.publishMoment(
         content: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
         media: wireMedia,
+        isPublic: isPublic,
       );
       _isPublishing = false;
       _publishUploaded = 0;
       _publishTotal = 0;
       notifyListeners();
+      // Refresh whichever list the new post belongs to so the user
+      // sees their post immediately. A public post also belongs to
+      // the family feed per §7.2 (no isPublic filter), so we refresh
+      // both — small enough dedup that the duplicate round-trip is
+      // cheaper than the bookkeeping to determine which list to skip.
       await refresh();
+      if (isPublic) {
+        await refreshPublic();
+      }
     } on ApiException catch (e) {
       _isPublishing = false;
       _publishError = e.message;

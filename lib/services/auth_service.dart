@@ -12,7 +12,7 @@ class AuthService {
 
   static const _prefKeys = [
     'token', 'refreshToken', 'userId', 'name', 'phone',
-    'familyId', 'familyName', 'role', 'gender', 'avatarUrl',
+    'familyId', 'familyName', 'role', 'gender', 'avatarUrl', 'balance',
   ];
 
   static Future<AuthUser> login(LoginRequest req) async {

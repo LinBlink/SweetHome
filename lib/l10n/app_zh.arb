@@ -99,7 +99,6 @@
   "conversationsNewTooltip": "新建对话",
   "conversationsEmptyTitle": "还没有消息",
   "conversationsEmptySubtitle": "邀请家人加入，开始聊天吧",
-  "conversationSpouseLabel": "配偶",
   "connectionErrorRetry": "重试",
   "newConversationTitle": "新建对话",
   "editProfileTitle": "编辑资料",
@@ -417,6 +416,7 @@
 "storageScreenTitle": "存储空间",
 "storageTotalLabel": "共 {size}",
 "storageImageCache": "图片缓存",
+  "storageAvatarCache": "头像缓存",
 "storageVideoCache": "视频缓存",
 "storageAudioCache": "音频缓存",
 "storageChatHistory": "聊天记录",
@@ -470,5 +470,188 @@
  "healthEditRecordNotFound": "这条记录已不存在。",
  "healthEditNotOwner": "只能修改自己的记录。",
  "healthEditFailed": "更新记录失败。",
- "healthRecordEditHint": "点击记录以编辑"
+ "healthRecordEditHint": "点击记录以编辑",
+ "healthChartBpZoneLow": "偏低",
+ "healthChartBpZoneNormal": "正常",
+ "healthChartBpZoneElevated": "偏高",
+ "healthChartBpZoneHigh": "高",
+ "healthChartBpDiastolicCap": "舒张压上限 80",
+"familyFeedScopeMyFamily": "自个儿家",
+  "familyFeedScopeOthers": "串串门",
+ "publishMomentPublicToggle": "公开发布",
+ "publishMomentPublicHint": "公开后这条动态及其评论会出现在跨家庭动态广场里",
+ "publicMomentsTitle": "串串门",
+ "publicMomentsFromFamily": "来自 {familyName}",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+ "publicMomentsEmptyTitle": "还没有人公开发布",
+ "publicMomentsEmptyDesc": "想做第一个分享的人？",
+ "publicMomentsLoadMoreError": "加载更多失败",
+ "profileBalanceLabel": "余额",
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "如需充值请联系家庭管理员",
+ "redpacketHubTitle": "我的红包",
+ "redpacketHubSubtitle": "查看我发出和收到的红包",
+ "redpacketSendTitle": "发红包",
+ "redpacketTotalAmountLabel": "总金额",
+ "redpacketTotalAmountHint": "单位：元，例如 100 或 88.88",
+ "redpacketTotalCountLabel": "红包个数",
+ "redpacketTotalCountHint": "最多 {max} 个",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "塞钱进红包",
+ "redpacketAmountYuan": "{amount} 元",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count} 份",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "{count} 个红包",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "红包",
+ "redpacketCardFromLabel": "{name} 发了一个红包",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "进行中",
+ "redpacketStatusFinished": "已领完",
+ "redpacketStatusExpired": "已过期",
+ "redpacketStatusRefunded": "已退款",
+ "redpacketGrabButton": "开",
+ "redpacketGrabSuccess": "你抢到了 ¥{amount}",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "你已经抢过这个红包了",
+ "redpacketGrabListTitle": "已领取的人",
+ "redpacketGrabListEmpty": "暂无人领取",
+ "redpacketGrabListCount": "{grabbed}/{total} 已领取",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "红包已过期",
+ "redpacketEmptyNotice": "红包已被抢光了",
+ "redpacketSelfNotice": "你发出的红包",
+ "redpacketRecordsTitle": "我的红包",
+ "redpacketRecordsTabSent": "我发出的",
+ "redpacketRecordsTabReceived": "我收到的",
+ "redpacketRecordsEmpty": "暂无红包记录",
+ "redpacketErrorInvalidAmount": "总金额必须不少于红包个数（每份至少 1 分钱）。",
+ "redpacketErrorInsufficientFund": "余额不足，无法发送红包。",
+ "redpacketErrorTooManyShares": "红包个数不能超过会话成员数。",
+ "redpacketErrorNotMember": "你已不在该会话中。",
+ "redpacketErrorExpired": "红包已过期。",
+ "redpacketErrorAlreadyGrabbed": "你已经抢过这个红包。",
+ "redpacketErrorEmpty": "红包已被抢完。",
+ "redpacketErrorNotFound": "红包不存在。",
+ "redpacketMessageSendFailed": "红包已创建，但公告消息发送失败，网络恢复后重新打开会话查看。",
+ "chatRoomRedpacketOption": "红包",
+ "chatMessageTypeRedpacket": "[红包]",
+ "errorParamInvalid": "请求参数错误。",
+ "errorUnauthorized": "未登录或登录已过期，请重新登录。",
+ "errorForbidden": "没有权限执行该操作。",
+ "errorResourceNotFound": "请求的资源不存在。",
+ "errorDataConflict": "数据冲突，请刷新后重试。",
+ "errorSystemBusy": "系统繁忙，请稍后再试。",
+ "errorEmptyFile": "上传的文件为空。",
+ "errorFileSizeIllegal": "文件大小不符合要求。",
+ "errorFileTypeIllegal": "文件类型不符合要求。",
+ "errorFileNameIllegal": "文件名不符合要求。",
+ "errorFileUploadFailed": "文件上传失败，请稍后再试。",
+ "errorPhoneFormatInvalid": "手机号码格式不正确，请检查。",
+ "errorPasswordFormatInvalid": "密码格式不符合要求，请检查。",
+ "errorNameFormatInvalid": "昵称不符合要求，请检查。",
+ "errorRegisterParamConflict": "家庭名称与邀请码只能二选一。",
+ "errorPhoneAlreadyExists": "该手机号已被注册。",
+ "errorLoginFailed": "手机号或密码错误。",
+ "errorTokenInvalid": "登录已失效，请重新登录。",
+ "errorTokenExpired": "登录已过期，请重新登录。",
+ "errorRefreshTokenInvalid": "登录已失效，请重新登录。",
+ "errorUserNotFound": "用户不存在。",
+ "errorFamilyNameEmpty": "请输入家庭名称。",
+ "errorInviteCodeEmpty": "请输入邀请码。",
+ "errorRelationTypeInvalid": "无效的家庭关系类型。",
+ "errorFamilyNotFound": "找不到该家庭。",
+ "errorFamilyMemberNotFound": "找不到该家庭成员。",
+ "errorInviteCodeInvalid": "邀请码不存在或已过期。",
+ "errorRelationAnchorInvalid": "选择的关系对象无效。",
+ "errorNotFamilyMember": "你不是该家庭成员。",
+ "errorNotFamilyAdmin": "仅家庭管理员可执行该操作。",
+ "errorFamilySaveFailed": "家庭创建失败，请稍后再试。",
+ "errorSpouseAlreadyExists": "对方已经有配偶了。",
+ "errorNoKnownParent": "父母关系未知，无法建立兄弟姐妹关系。",
+ "errorConversationNotFound": "会话不存在。",
+ "errorMessageTooLong": "消息内容过长。",
+ "errorMessageTypeInvalid": "不支持的消息类型。",
+ "errorLocationCoordinateInvalid": "定位坐标不能为空。",
+ "errorLocationBatteryInvalid": "电量数值不合法。",
+ "errorLocationTimestampMissing": "定位时间戳不能为空。",
+ "errorLocationTimestampStale": "定位数据已过期，请重新上报。",
+ "errorLocationTargetNotFamilyMember": "目标用户不是同一家庭成员。",
+ "errorFenceRangeInvalid": "围栏半径不合法。",
+ "errorFenceNotFound": "围栏不存在。",
+ "errorNotFenceSetter": "仅围栏设置者可执行该操作。",
+ "errorMomentContentEmpty": "动态内容和媒体不能同时为空。",
+ "errorMomentMediaTypeInvalid": "媒体类型不正确。",
+ "errorLikeRecordNotFound": "尚未点赞，无法取消。",
+ "errorMomentNotFound": "动态不存在。",
+ "errorNotMomentOwner": "仅动态发布者本人可执行该操作。",
+ "errorCommentContentEmpty": "评论内容不能为空。",
+ "errorCommentNotFound": "评论不存在。",
+ "errorNotCommentOwner": "仅评论作者本人可执行该操作。",
+ "errorHealthMetricTypeInvalid": "健康指标类型不正确。",
+ "errorHealthRecordValueInvalid": "健康记录数值不合法。",
+ "errorNotSameFamily": "目标用户不是同一家庭成员。",
+ "errorRemindTimeInvalid": "提醒时间格式不正确。",
+ "errorHealthRecordNotFound": "健康记录不存在。",
+ "errorNotHealthRecordOwner": "仅本人可修改自己的健康记录。",
+ "errorHealthRecordDateConflict": "该日期已存在同指标的记录。"
 }

@@ -9,6 +9,7 @@ import '../providers/location_provider.dart';
 import 'family_tree_screen.dart';
 import 'health/health_home_screen.dart';
 import 'location_hub_screen.dart';
+import 'redpacket/redpacket_records_screen.dart';
 
 /// "鎴戠殑锟? tab 锟?the **sub-app entry hub** for the bottom nav.
 /// Each tile here opens a self-contained sub-app.
@@ -90,6 +91,34 @@ class MyHomeScreen extends StatelessWidget {
                     value: context.read<HealthProvider>(),
                     child: const HealthHomeScreen(),
                   ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            HomeSectionHeader(
+              title: l10n.redpacketHubTitle,
+              accentIcon: Icons.redeem_rounded,
+            ),
+            // §9 red packet records hub — view-only. Per the user's
+            // choice, *sending* is reserved to the chat-room media
+            // sheet (matches the §9.1 spec's
+            // "前端需再自行往该会话发一条" model); this tile is a
+            // read-only "My Redpackets" entry that opens the
+            // Sent / Received tabbed list.
+            _HubTile(
+              icon: Icons.redeem_rounded,
+              title: l10n.redpacketHubTitle,
+              subtitle: l10n.redpacketHubSubtitle,
+              color: AppColors.danger,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  // Unlike the location/health tiles above,
+                  // RedpacketRecordsScreen only needs AuthProvider
+                  // (root-scoped, already visible everywhere) — it
+                  // fetches §9.5/§9.6 directly via RedpacketService,
+                  // so no provider re-wrap is needed here.
+                  builder: (_) => const RedpacketRecordsScreen(),
                 ),
               ),
             ),

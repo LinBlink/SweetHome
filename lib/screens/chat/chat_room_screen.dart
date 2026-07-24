@@ -19,6 +19,7 @@ import '../../providers/chat_provider.dart';
 import '../../widgets/emoji_picker.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/message_bubble.dart';
+import '../redpacket/send_redpacket_screen.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final int conversationId;
@@ -68,6 +69,26 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   /// off-screen item's Element yet.
   final Map<String, GlobalKey> _bubbleKeys = {};
   String? _highlightClientId;
+
+  /// Captured in [didChangeDependencies] — NOT looked up fresh inside
+  /// [dispose]. `context.read<ChatProvider>()` does an ancestor
+  /// `InheritedWidget` lookup, which asserts if the element is already
+  /// deactivated by the time it runs; when this whole screen and its
+  /// `ChatProvider` ancestor get torn down together in the same frame
+  /// (e.g. a logout mid-session recreates `ChatProvider`, per
+  /// `CLAUDE.md`'s "torn down/recreated on every login/logout cycle"),
+  /// `dispose()` running after `deactivate()` hits exactly that "Looking
+  /// up a deactivated widget's ancestor is unsafe" assertion. Storing
+  /// the reference while the widget is still active sidesteps it
+  /// entirely — `ChatProvider` itself isn't `BuildContext`-bound, so
+  /// holding onto it is safe.
+  ChatProvider? _chatProviderRef;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatProviderRef = context.read<ChatProvider>();
+  }
 
   @override
   void initState() {
@@ -133,8 +154,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   void dispose() {
     // So a `NEW_MESSAGE` pushed for this conversation after the user
     // navigates away doesn't get auto-marked read by ChatProvider — see
-    // ChatProvider.clearActiveConversation.
-    context.read<ChatProvider>().clearActiveConversation(widget.conversationId);
+    // ChatProvider.clearActiveConversation. Uses the reference captured
+    // in `didChangeDependencies`, not a fresh `context.read` — see that
+    // field's doc comment for why a fresh lookup here is unsafe.
+    _chatProviderRef?.clearActiveConversation(widget.conversationId);
     _textCtrl.dispose();
     _textFocus.dispose();
     _scrollCtrl.dispose();
@@ -346,6 +369,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         } else {
           _showSnack(l10n.chatRoomVoiceUploadFailed);
         }
+      } on ApiException catch (e) {
+        // Surfaces the actual §2.6 upload error (e.g. `FILE_TYPE_ILLEGAL`,
+        // `FILE_SIZE_ILLEGAL`, `EMPTY_FILE`, `401 UNAUTHORIZED`) instead of
+        // the generic fallback below — mirrors `_pickAndSendVideo`'s
+        // handling, now reachable because `ChatProvider._sendMediaMessage`
+        // rethrows instead of swallowing the exception.
+        if (!mounted) return;
+        _showSnack(localizeErrorMessage(e.message, l10n));
       } catch (_) {
         if (!mounted) return;
         _showSnack(l10n.chatRoomVoiceUploadFailed);
@@ -450,8 +481,61 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   _toggleVoiceRecording();
                 },
               ),
+            // §9 red packet — same sheet, same chat-room scope.
+            // Per the user's choice the red packet entry point lives
+            // *only* on the chat room (not as a separate hub tile for
+            // sending); the MyHome "My Redpackets" hub tile is
+            // view-only. Available for both group and direct chats —
+            // the server enforces `totalCount <= memberCount` and the
+            // send form prefills the limit accordingly.
+            ListTile(
+              leading: Icon(Icons.redeem_rounded, color: AppColors.danger),
+              title: Text(l10n.chatRoomRedpacketOption),
+              onTap: () {
+                Navigator.pop(ctx);
+                _openSendRedpacketScreen();
+              },
+            ),
             const SizedBox(height: 6),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Pushes the §9.1 send form. We pull the conversation's member
+  /// count + is-group flag off the chat provider (it's loaded with
+  /// every §4.1 conversation); a missing member count is treated as
+  /// `2` (the direct-chat minimum) rather than crashing. The
+  /// `isGroup` flag drives the share-count field — direct chats force
+  /// it to 1 and hide the input entirely.
+  Future<void> _openSendRedpacketScreen() async {
+    final chat = context.read<ChatProvider>();
+    final conv = chat.conversations.firstWhere(
+      (c) => c.id == widget.conversationId,
+      orElse: () => chat.conversations.first,
+    );
+    final memberCount = conv.memberCount > 0 ? conv.memberCount : 2;
+    if (!mounted) return;
+    // `ChatProvider` lives in the auth-gated `MultiProvider` built inside
+    // `AuthGate`'s own route content, not above the app's single
+    // `Navigator` — so a plain `Navigator.push` here would hand
+    // `SendRedpacketScreen` a `BuildContext` with no `ChatProvider`
+    // ancestor at all (`ProviderNotFoundError` the moment `_submit` calls
+    // `context.read<ChatProvider>()`). Every other screen pushed this way
+    // that needs `ChatProvider` (`ChatRoomScreen` itself, from
+    // `ConversationListScreen`; `SearchMessagesScreen`) re-injects the
+    // same instance via `ChangeNotifierProvider.value` for exactly this
+    // reason — this was the one call site missing that wrapper.
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: chat,
+          child: SendRedpacketScreen(
+            conversationId: widget.conversationId,
+            conversationMemberCount: memberCount,
+            isGroup: conv.isGroup,
+          ),
         ),
       ),
     );

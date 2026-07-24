@@ -99,7 +99,6 @@
   "conversationsNewTooltip": "새 대화",
   "conversationsEmptyTitle": "아직 메시지가 없습니다",
   "conversationsEmptySubtitle": "가족을 초대하여 대화를 시작해보세요",
-  "conversationSpouseLabel": "배우자",
   "connectionErrorRetry": "다시 시도",
   "newConversationTitle": "새 대화",
   "editProfileTitle": "프로필 편집",
@@ -417,6 +416,7 @@
 "storageScreenTitle": "저장공간 및 캐시",
 "storageTotalLabel": "총 {size}",
 "storageImageCache": "이미지 캐시",
+  "storageAvatarCache": "아바타 캐시",
 "storageVideoCache": "동영상 캐시",
 "storageAudioCache": "오디오 캐시",
 "storageChatHistory": "채팅 기록",
@@ -470,5 +470,188 @@
  "healthEditRecordNotFound": "이 기록은 더 이상 존재하지 않습니다.",
  "healthEditNotOwner": "자신의 기록만 편집할 수 있습니다.",
  "healthEditFailed": "기록을 업데이트할 수 없습니다.",
- "healthRecordEditHint": "탭하여 편집"
+ "healthRecordEditHint": "탭하여 편집",
+ "healthChartBpZoneLow": "낮음",
+ "healthChartBpZoneNormal": "정상",
+ "healthChartBpZoneElevated": "높음",
+ "healthChartBpZoneHigh": "고혈압",
+ "healthChartBpDiastolicCap": "이완기 상한 80",
+ "familyFeedScopeMyFamily": "우리 가족",
+ "familyFeedScopeOthers": "다른 가족",
+ "publishMomentPublicToggle": "전체 공개",
+ "publishMomentPublicHint": "공개한 게시글은 다른 가족의 피드에도 표시됩니다",
+ "publicMomentsTitle": "다른 가족의 게시글",
+ "publicMomentsFromFamily": "{familyName}에서",
+ "@publicMomentsFromFamily": {
+   "placeholders": {
+     "familyName": {
+       "type": "String"
+     }
+   }
+ },
+ "publicMomentsEmptyTitle": "아직 공개 게시글이 없어요",
+ "publicMomentsEmptyDesc": "첫 번째로 공유해 보세요!",
+ "publicMomentsLoadMoreError": "더 불러오지 못했어요",
+ "profileBalanceLabel": "잔액",
+ "balanceValue": "¥{amount}",
+ "@balanceValue": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "editProfileBalanceHint": "충전은 가족 관리자에게 문의하세요",
+ "redpacketHubTitle": "내 홍바오",
+ "redpacketHubSubtitle": "보내거나 받은 홍바오를 확인하세요",
+ "redpacketSendTitle": "홍바오 보내기",
+ "redpacketTotalAmountLabel": "총 금액",
+ "redpacketTotalAmountHint": "단위: 위안 (예: 100 또는 88.88)",
+ "redpacketTotalCountLabel": "홍바오 개수",
+ "redpacketTotalCountHint": "최대 {max}개",
+ "@redpacketTotalCountHint": {
+   "placeholders": {
+     "max": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketSendButton": "홍바오에 넣기",
+ "redpacketAmountYuan": "{amount} 위안",
+ "@redpacketAmountYuan": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketShareCountSuffix": "{count}개",
+ "@redpacketShareCountSuffix": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCountUnit": "홍바오 {count}개",
+ "@redpacketCountUnit": {
+   "placeholders": {
+     "count": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketCardLabel": "홍바오",
+ "redpacketCardFromLabel": "{name}님이 홍바오를 보냈습니다",
+ "@redpacketCardFromLabel": {
+   "placeholders": {
+     "name": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketStatusOngoing": "진행 중",
+ "redpacketStatusFinished": "모두 받음",
+ "redpacketStatusExpired": "만료됨",
+ "redpacketStatusRefunded": "환불됨",
+ "redpacketGrabButton": "받기",
+ "redpacketGrabSuccess": "¥{amount}을(를) 받았습니다",
+ "@redpacketGrabSuccess": {
+   "placeholders": {
+     "amount": {
+       "type": "String"
+     }
+   }
+ },
+ "redpacketAlreadyGrabbed": "이미 받은 홍바오입니다",
+ "redpacketGrabListTitle": "받은 사람",
+ "redpacketGrabListEmpty": "아직 아무도 받지 않았습니다",
+ "redpacketGrabListCount": "{grabbed}/{total} 받음",
+ "@redpacketGrabListCount": {
+   "placeholders": {
+     "grabbed": {
+       "type": "int"
+     },
+     "total": {
+       "type": "int"
+     }
+   }
+ },
+ "redpacketExpiredNotice": "이 홍바오는 만료되었습니다",
+ "redpacketEmptyNotice": "이 홍바오는 비어 있습니다",
+ "redpacketSelfNotice": "내가 보낸 홍바오입니다",
+ "redpacketRecordsTitle": "내 홍바오",
+ "redpacketRecordsTabSent": "보낸 것",
+ "redpacketRecordsTabReceived": "받은 것",
+ "redpacketRecordsEmpty": "홍바오 기록이 없습니다",
+ "redpacketErrorInvalidAmount": "총 금액은 홍바오 개수 이상이어야 합니다 (각 1분 이상).",
+ "redpacketErrorInsufficientFund": "잔액이 부족하여 홍바오를 보낼 수 없습니다.",
+ "redpacketErrorTooManyShares": "홍바오 개수는 대화 멤버 수를 초과할 수 없습니다.",
+ "redpacketErrorNotMember": "이 대화의 멤버가 아닙니다.",
+ "redpacketErrorExpired": "이 홍바오는 만료되었습니다.",
+ "redpacketErrorAlreadyGrabbed": "이미 받은 홍바오입니다.",
+ "redpacketErrorEmpty": "이 홍바오는 비어 있습니다.",
+ "redpacketErrorNotFound": "홍바오를 찾을 수 없습니다.",
+ "redpacketMessageSendFailed": "홍바오는 생성되었지만 알림 메시지 전송에 실패했습니다. 온라인 상태가 되면 채팅방을 다시 열어보세요.",
+ "chatRoomRedpacketOption": "홍바오",
+ "chatMessageTypeRedpacket": "[홍바오]",
+ "errorParamInvalid": "요청 파라미터가 올바르지 않습니다.",
+ "errorUnauthorized": "로그인되어 있지 않거나 세션이 만료되었습니다. 다시 로그인해 주세요.",
+ "errorForbidden": "이 작업을 수행할 권한이 없습니다.",
+ "errorResourceNotFound": "요청한 리소스가 존재하지 않습니다.",
+ "errorDataConflict": "데이터 충돌이 발생했습니다. 새로고침 후 다시 시도해 주세요.",
+ "errorSystemBusy": "시스템이 혼잡합니다. 잠시 후 다시 시도해 주세요.",
+ "errorEmptyFile": "업로드한 파일이 비어 있습니다.",
+ "errorFileSizeIllegal": "파일 크기가 요구 사항을 충족하지 않습니다.",
+ "errorFileTypeIllegal": "이 파일 형식은 지원되지 않습니다.",
+ "errorFileNameIllegal": "파일 이름이 유효하지 않습니다.",
+ "errorFileUploadFailed": "파일 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+ "errorPhoneFormatInvalid": "전화번호 형식이 올바르지 않습니다. 확인해 주세요.",
+ "errorPasswordFormatInvalid": "비밀번호 형식이 요구 사항을 충족하지 않습니다. 확인해 주세요.",
+ "errorNameFormatInvalid": "닉네임이 요구 사항을 충족하지 않습니다. 확인해 주세요.",
+ "errorRegisterParamConflict": "가족 이름과 초대 코드 중 하나만 선택해야 합니다.",
+ "errorPhoneAlreadyExists": "이 전화번호는 이미 등록되어 있습니다.",
+ "errorLoginFailed": "전화번호 또는 비밀번호가 올바르지 않습니다.",
+ "errorTokenInvalid": "세션이 더 이상 유효하지 않습니다. 다시 로그인해 주세요.",
+ "errorTokenExpired": "세션이 만료되었습니다. 다시 로그인해 주세요.",
+ "errorRefreshTokenInvalid": "세션이 더 이상 유효하지 않습니다. 다시 로그인해 주세요.",
+ "errorUserNotFound": "이 사용자는 존재하지 않습니다.",
+ "errorFamilyNameEmpty": "가족 이름을 입력해 주세요.",
+ "errorInviteCodeEmpty": "초대 코드를 입력해 주세요.",
+ "errorRelationTypeInvalid": "가족 관계 유형이 유효하지 않습니다.",
+ "errorFamilyNotFound": "이 가족을 찾을 수 없습니다.",
+ "errorFamilyMemberNotFound": "이 가족 구성원을 찾을 수 없습니다.",
+ "errorInviteCodeInvalid": "이 초대 코드는 존재하지 않거나 만료되었습니다.",
+ "errorRelationAnchorInvalid": "선택한 관계 기준 대상이 유효하지 않습니다.",
+ "errorNotFamilyMember": "당신은 이 가족의 구성원이 아닙니다.",
+ "errorNotFamilyAdmin": "이 작업은 가족 관리자만 수행할 수 있습니다.",
+ "errorFamilySaveFailed": "가족 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+ "errorSpouseAlreadyExists": "상대방에게 이미 배우자가 있습니다.",
+ "errorNoKnownParent": "부모 관계를 알 수 없어 형제자매 관계를 설정할 수 없습니다.",
+ "errorConversationNotFound": "이 대화는 존재하지 않습니다.",
+ "errorMessageTooLong": "메시지가 너무 깁니다.",
+ "errorMessageTypeInvalid": "이 메시지 유형은 지원되지 않습니다.",
+ "errorLocationCoordinateInvalid": "위치 좌표는 비워둘 수 없습니다.",
+ "errorLocationBatteryInvalid": "배터리 값이 유효하지 않습니다.",
+ "errorLocationTimestampMissing": "위치 타임스탬프는 비워둘 수 없습니다.",
+ "errorLocationTimestampStale": "위치 데이터가 만료되었습니다. 다시 보고해 주세요.",
+ "errorLocationTargetNotFamilyMember": "대상 사용자는 같은 가족 구성원이 아닙니다.",
+ "errorFenceRangeInvalid": "펜스 반경이 유효하지 않습니다.",
+ "errorFenceNotFound": "이 펜스는 존재하지 않습니다.",
+ "errorNotFenceSetter": "이 작업은 펜스를 설정한 사람만 수행할 수 있습니다.",
+ "errorMomentContentEmpty": "게시물에는 텍스트 또는 미디어가 필요합니다.",
+ "errorMomentMediaTypeInvalid": "미디어 유형이 올바르지 않습니다.",
+ "errorLikeRecordNotFound": "아직 좋아요를 누르지 않아 취소할 수 없습니다.",
+ "errorMomentNotFound": "이 게시물은 존재하지 않습니다.",
+ "errorNotMomentOwner": "이 작업은 게시물 작성자만 수행할 수 있습니다.",
+ "errorCommentContentEmpty": "댓글은 비워둘 수 없습니다.",
+ "errorCommentNotFound": "이 댓글은 존재하지 않습니다.",
+ "errorNotCommentOwner": "이 작업은 댓글 작성자만 수행할 수 있습니다.",
+ "errorHealthMetricTypeInvalid": "건강 지표 유형이 올바르지 않습니다.",
+ "errorHealthRecordValueInvalid": "건강 기록 값이 유효하지 않습니다.",
+ "errorNotSameFamily": "대상 사용자는 같은 가족 구성원이 아닙니다.",
+ "errorRemindTimeInvalid": "알림 시간 형식이 올바르지 않습니다.",
+ "errorHealthRecordNotFound": "이 건강 기록은 존재하지 않습니다.",
+ "errorNotHealthRecordOwner": "본인의 건강 기록은 본인만 수정할 수 있습니다.",
+ "errorHealthRecordDateConflict": "이 날짜에는 이미 동일한 지표의 기록이 있습니다."
 }

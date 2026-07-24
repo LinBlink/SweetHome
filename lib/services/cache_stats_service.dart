@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'avatar_cache.dart';
 import 'chat_local_cache.dart';
 import 'media_cache.dart';
 
@@ -16,15 +17,17 @@ import 'media_cache.dart';
 ///
 /// Not meaningful on web: there's no filesystem to walk (media caches
 /// there live in IndexedDB via `flutter_cache_manager`'s web backend),
-/// so [imageCacheSize]/[videoCacheSize]/[audioCacheSize] report `null`
-/// there. `emptyCache()` itself still works on web, so clearing is
-/// still offered — it just can't be sized first.
+/// so [imageCacheSize]/[videoCacheSize]/[audioCacheSize]/
+/// [avatarCacheSize] report `null` there. `emptyCache()` itself still
+/// works on web, so clearing is still offered — it just can't be
+/// sized first.
 class CacheStatsService {
   const CacheStatsService();
 
   Future<int?> imageCacheSize() => _directorySize(MediaCache.images.config.cacheKey);
   Future<int?> videoCacheSize() => _directorySize(MediaCache.videos.config.cacheKey);
   Future<int?> audioCacheSize() => _directorySize(MediaCache.audio.config.cacheKey);
+  Future<int?> avatarCacheSize() => _directorySize(AvatarCache.cacheDirectoryKey);
 
   /// Size of the locally-persisted chat history blob.
   Future<int> chatHistorySize() => ChatLocalCache().sizeBytes();
@@ -50,9 +53,22 @@ class CacheStatsService {
   Future<void> clearImages() => MediaCache.images.emptyCache();
   Future<void> clearVideos() => MediaCache.videos.emptyCache();
   Future<void> clearAudio() => MediaCache.audio.emptyCache();
+  Future<void> clearAvatars() => AvatarCache.empty();
 
   Future<void> clearAllMedia() async {
-    await Future.wait([clearImages(), clearVideos(), clearAudio()]);
+    // Image / video / audio caches and the avatar cache live in
+    // independent `CacheManager` directories on disk. The storage
+    // settings' "Clear all" button triggers this so the user gets one
+    // shot at resetting all four. Chat history is cleared separately
+    // (and intentionally not bundled with media clears, since the
+    // dialog titles differ and chat-history clear has its own UX
+    // confirmation copy — see `ChatProvider.clearLocalChatHistory`).
+    await Future.wait([
+      clearImages(),
+      clearVideos(),
+      clearAudio(),
+      clearAvatars(),
+    ]);
   }
 }
 

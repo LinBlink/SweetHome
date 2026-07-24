@@ -1,5 +1,7 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
@@ -36,7 +38,11 @@ class ChatExportPdfResult {
 /// package's built-in Latin-only font — PDFs still generate with
 /// images intact but CJK/emoji text won't render correctly.
 class ChatExportPdfService {
-  const ChatExportPdfService();
+  ChatExportPdfService();
+
+  /// Cache for the emoji→PNG renderings so a chat full of the same
+  /// "❤️" doesn't re-render the same glyph a hundred times.
+  final Map<String, Uint8List> _emojiImageCache = <String, Uint8List>{};
 
   /// Base font first, in the order a mixed-script fallback chain
   /// should try them. Simplified Chinese is this app's default locale
@@ -205,10 +211,159 @@ class ChatExportPdfService {
         return pw.Text('[$voiceLabel]', style: const pw.TextStyle(fontSize: 11));
       case MessageType.video:
         return pw.Text('[$videoLabel]', style: const pw.TextStyle(fontSize: 11));
+      case MessageType.redpacket:
+        // §9 — red packet card. Export the localized "[Red Packet]"
+        // label rather than the raw id string (per the same
+        // "服务端只给结构化数据" principle the in-app bubble follows).
+        return pw.Text(
+          '[${m.content}]',
+          style: const pw.TextStyle(fontSize: 11),
+        );
       case MessageType.text:
       case MessageType.system:
-        return pw.Text(m.content, style: const pw.TextStyle(fontSize: 11));
+        return _renderTextWithEmoji(m.content, fontSize: 11);
     }
+  }
+
+  // ── Emoji-as-image rendering ───────────────────────────────────────
+  //
+  // The bundled `NotoEmoji-Regular.ttf` is the COLOR variant (its
+  // TTF tables include COLR / CPAL / SVG-in-OT). The `pdf` package's
+  // TTF parser only handles standard outline (`glyf`) glyphs, so any
+  // emoji code point that exists only in color tables comes out as
+  // missing-glyph rectangles — which is what a chat message full of
+  // "❤️👍😊" looks like today.
+  //
+  // Workaround: walk the message text, split it into runs of plain
+  // text and runs of emoji code points (including ZWJ sequences like
+  // 👨‍👩‍👧 that the standard emoji test range misses), render each
+  // emoji run as a PNG via Flutter's own `TextPainter` (which uses
+  // the OS / web-bundled color emoji font and DOES render correctly),
+  // then assemble the result as a `pw.RichText` with `TextSpan` for
+  // plain runs and `WidgetSpan` for the inline PNGs. The PNGs are
+  // cached so a long chat of repeated emoji doesn't re-render the
+  // same glyph a hundred times.
+
+  /// Matches a single emoji cluster: one base pictographic codepoint
+  /// plus optional variation selector (`\u{FE0F}`) and any ZWJ-
+  /// joined follow-up pictographics. The ranges below cover every
+  /// emoji block currently defined; `\p{Extended_Pictographic}` would
+  /// be more accurate but Dart's RegExp engine doesn't expose it
+  /// portably, so the explicit ranges stand in.
+  static final RegExp _emojiCluster = RegExp(
+    '([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}'
+    '\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}])'
+    '\u{FE0F}?'
+    '(\u{200D}([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}'
+    '\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}])'
+    '\u{FE0F}?)*',
+    unicode: true,
+  );
+
+  /// Render [text] as a PDF widget, splitting any emoji runs into
+  /// inline images and the rest as a regular `TextSpan`. Pure-text
+  /// messages (no emoji) take the fast path and just return
+  /// `pw.Text` so the common case doesn't pay for the `RichText`
+  /// overhead.
+  Future<pw.Widget> _renderTextWithEmoji(
+    String text, {
+    required double fontSize,
+  }) async {
+    if (!_emojiCluster.hasMatch(text)) {
+      return pw.Text(text, style: pw.TextStyle(fontSize: fontSize));
+    }
+
+    final spans = <pw.InlineSpan>[];
+    var cursor = 0;
+    for (final match in _emojiCluster.allMatches(text)) {
+      if (match.start > cursor) {
+        spans.add(
+          pw.TextSpan(
+            text: text.substring(cursor, match.start),
+            style: pw.TextStyle(fontSize: fontSize),
+          ),
+        );
+      }
+      final emoji = match.group(0)!;
+      // Get-or-create in the cache — `Map.putIfAbsent` is sync, so
+      // for the cold-cache path we await the renderer and stash the
+      // result. A repeat hit short-circuits.
+      Uint8List? png = _emojiImageCache[emoji];
+      if (png == null) {
+        png = await _renderEmojiToPng(emoji);
+        if (png != null) _emojiImageCache[emoji] = png;
+      }
+      if (png != null) {
+        // `WidgetSpan` lets us inline an image at the text baseline;
+        // the `FontSize` matches the surrounding text so emoji sits
+        // roughly on the cap-height of regular glyphs.
+        spans.add(
+          pw.WidgetSpan(
+            child: pw.SizedBox(
+              width: fontSize + 2,
+              height: fontSize + 2,
+              child: pw.Image(pw.MemoryImage(png), fit: pw.BoxFit.contain),
+            ),
+          ),
+        );
+      } else {
+        // Render failed — fall back to the raw glyph and let the
+        // pdf package print whatever its font can muster. Better a
+        // missing-glyph box than a blank spot in the export.
+        spans.add(
+          pw.TextSpan(
+            text: emoji,
+            style: pw.TextStyle(fontSize: fontSize),
+          ),
+        );
+      }
+      cursor = match.end;
+    }
+    if (cursor < text.length) {
+      spans.add(
+        pw.TextSpan(
+          text: text.substring(cursor),
+          style: pw.TextStyle(fontSize: fontSize),
+        ),
+      );
+    }
+    // `pw.RichText.text` is a single `InlineSpan` (the root span),
+    // not a list. Wrap the run list in a parent `TextSpan` with
+    // `children:` so the layout engine treats it as one block of
+    // mixed text + inline images.
+    return pw.RichText(text: pw.TextSpan(children: spans));
+  }
+
+  /// Render [emoji] as a transparent PNG using Flutter's `TextPainter`,
+  /// which honors the platform's color emoji font (Apple Color Emoji
+  /// on iOS/macOS, Noto Color Emoji on most Linux/Android, the
+  /// browser's bundled font on web). The result is a tightly-cropped
+  /// PNG sized to the glyph's measured bounds plus 2px of padding.
+  Future<Uint8List?> _renderEmojiToPng(String emoji) async {
+    if (emoji.isEmpty) return null;
+    const fontSize = 16.0;
+    final painter = TextPainter(
+      text: TextSpan(text: emoji, style: TextStyle(fontSize: fontSize)),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    if (painter.width <= 0 || painter.height <= 0) return null;
+
+    final w = painter.width.ceil() + 4;
+    final h = painter.height.ceil() + 4;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(
+      recorder,
+      Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble()),
+    );
+    // Center the glyph in the captured area (TextPainter's origin
+    // is top-left of the layout box, so 2px padding works out).
+    painter.paint(canvas, const Offset(2, 2));
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(w, h);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    picture.dispose();
+    image.dispose();
+    return bytes?.buffer.asUint8List();
   }
 
   Future<Uint8List?> _fetchBytes(String url) async {

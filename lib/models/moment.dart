@@ -23,6 +23,14 @@ class Moment {
   final String? content;
   final List<MomentMedia> media;
 
+  /// Family-scoped identifier. Populated by `GET /moment/public` (§7.3)
+  /// and `null` in the family-only responses (§7.2) — same DTO is used
+  /// for both, the difference is which fields the backend happens to
+  /// fill. Pure client-UI: the public feed needs "来自 李家" badges,
+  /// while within one family that's noise.
+  final int? familyId;
+  final String? familyName;
+
   const Moment({
     required this.id,
     required this.userId,
@@ -31,6 +39,8 @@ class Moment {
     required this.createdAt,
     required this.content,
     required this.media,
+    this.familyId,
+    this.familyName,
   });
 
   factory Moment.fromJson(Map<String, dynamic> json) {
@@ -48,6 +58,11 @@ class Moment {
       media: mediaRaw
           .map((e) => MomentMedia.fromJson(e as Map<String, dynamic>))
           .toList(),
+      // Both fields are optional in §7.2 and only §7.3 carries them;
+      // a row missing either field isn't an error — the public-feed
+      // card just omits the "来自 …" badge.
+      familyId: json['familyId'] as int?,
+      familyName: json['familyName'] as String?,
     );
   }
 
@@ -63,6 +78,8 @@ class Moment {
       'createdAt': createdAt.toIso8601String(),
       'content': content,
       'mediaFiles': media.map((m) => m.toJson()).toList(),
+      if (familyId != null) 'familyId': familyId,
+      if (familyName != null) 'familyName': familyName,
     };
   }
 }

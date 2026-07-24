@@ -320,9 +320,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get conversationsEmptySubtitle => '家族を招待してチャットを始めましょう';
 
   @override
-  String get conversationSpouseLabel => '配偶者';
-
-  @override
   String get connectionErrorRetry => '再試行';
 
   @override
@@ -1192,6 +1189,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get storageImageCache => '画像キャッシュ';
 
   @override
+  String get storageAvatarCache => 'アバターキャッシュ';
+
+  @override
   String get storageVideoCache => '動画キャッシュ';
 
   @override
@@ -1356,4 +1356,374 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get healthRecordEditHint => 'タップして編集';
+
+  @override
+  String get healthChartBpZoneLow => '低め';
+
+  @override
+  String get healthChartBpZoneNormal => '正常';
+
+  @override
+  String get healthChartBpZoneElevated => '高め';
+
+  @override
+  String get healthChartBpZoneHigh => '高い';
+
+  @override
+  String get healthChartBpDiastolicCap => '拡張期上限 80';
+
+  @override
+  String get familyFeedScopeMyFamily => '自分の家族';
+
+  @override
+  String get familyFeedScopeOthers => '他の家族';
+
+  @override
+  String get publishMomentPublicToggle => '公開投稿';
+
+  @override
+  String get publishMomentPublicHint => '公開した投稿は他家庭のフィードにも表示されます';
+
+  @override
+  String get publicMomentsTitle => '他の家族の投稿';
+
+  @override
+  String publicMomentsFromFamily(String familyName) {
+    return '$familyNameより';
+  }
+
+  @override
+  String get publicMomentsEmptyTitle => 'まだ公開投稿がありません';
+
+  @override
+  String get publicMomentsEmptyDesc => '最初の投稿者になりませんか?';
+
+  @override
+  String get publicMomentsLoadMoreError => 'もっと読み込めませんでした';
+
+  @override
+  String get profileBalanceLabel => '残高';
+
+  @override
+  String balanceValue(String amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get editProfileBalanceHint => 'チャージは家族管理者にお問い合わせください';
+
+  @override
+  String get redpacketHubTitle => '私の红包';
+
+  @override
+  String get redpacketHubSubtitle => '送った・受け取った红包を確認';
+
+  @override
+  String get redpacketSendTitle => '红包を送る';
+
+  @override
+  String get redpacketTotalAmountLabel => '総額';
+
+  @override
+  String get redpacketTotalAmountHint => '単位：円（例：100 または 88.88）';
+
+  @override
+  String get redpacketTotalCountLabel => '红包の個数';
+
+  @override
+  String redpacketTotalCountHint(int max) {
+    return '最大 $max 個';
+  }
+
+  @override
+  String get redpacketSendButton => '红包に入れる';
+
+  @override
+  String redpacketAmountYuan(String amount) {
+    return '$amount 円';
+  }
+
+  @override
+  String redpacketShareCountSuffix(int count) {
+    return '$count 個';
+  }
+
+  @override
+  String redpacketCountUnit(int count) {
+    return '$count 個の红包';
+  }
+
+  @override
+  String get redpacketCardLabel => '红包';
+
+  @override
+  String redpacketCardFromLabel(String name) {
+    return '$nameさんが红包を送りました';
+  }
+
+  @override
+  String get redpacketStatusOngoing => '開催中';
+
+  @override
+  String get redpacketStatusFinished => '全て取得済み';
+
+  @override
+  String get redpacketStatusExpired => '期限切れ';
+
+  @override
+  String get redpacketStatusRefunded => '返金済み';
+
+  @override
+  String get redpacketGrabButton => '開く';
+
+  @override
+  String redpacketGrabSuccess(String amount) {
+    return '¥$amountを取得しました';
+  }
+
+  @override
+  String get redpacketAlreadyGrabbed => 'この红包は既に取得済みです';
+
+  @override
+  String get redpacketGrabListTitle => '取得者リスト';
+
+  @override
+  String get redpacketGrabListEmpty => 'まだ誰も取得していません';
+
+  @override
+  String redpacketGrabListCount(int grabbed, int total) {
+    return '$grabbed/$total 取得';
+  }
+
+  @override
+  String get redpacketExpiredNotice => 'この红包は期限切れです';
+
+  @override
+  String get redpacketEmptyNotice => 'この红包は空です';
+
+  @override
+  String get redpacketSelfNotice => 'あなたが送った红包です';
+
+  @override
+  String get redpacketRecordsTitle => '私の红包';
+
+  @override
+  String get redpacketRecordsTabSent => '送信済み';
+
+  @override
+  String get redpacketRecordsTabReceived => '受信済み';
+
+  @override
+  String get redpacketRecordsEmpty => '红包の履歴はまだありません';
+
+  @override
+  String get redpacketErrorInvalidAmount => '総額は红包の個数以上である必要があります（各份は1分以上）。';
+
+  @override
+  String get redpacketErrorInsufficientFund => '残高が不足しているため、紅包を送れません。';
+
+  @override
+  String get redpacketErrorTooManyShares => '红包の個数は会話のメンバー数を超えることはできません。';
+
+  @override
+  String get redpacketErrorNotMember => 'この会話のメンバーではありません。';
+
+  @override
+  String get redpacketErrorExpired => 'この红包は期限切れです。';
+
+  @override
+  String get redpacketErrorAlreadyGrabbed => 'この红包は既に取得済みです。';
+
+  @override
+  String get redpacketErrorEmpty => 'この红包は空です。';
+
+  @override
+  String get redpacketErrorNotFound => '红包が見つかりません。';
+
+  @override
+  String get redpacketMessageSendFailed =>
+      '红包は作成されましたが、通知メッセージの送信に失敗しました。オンラインに戻ったらチャットを開き直してください。';
+
+  @override
+  String get chatRoomRedpacketOption => '红包';
+
+  @override
+  String get chatMessageTypeRedpacket => '[红包]';
+
+  @override
+  String get errorParamInvalid => 'リクエストパラメータが正しくありません。';
+
+  @override
+  String get errorUnauthorized => '未ログイン、またはセッションの有効期限が切れています。再度ログインしてください。';
+
+  @override
+  String get errorForbidden => 'この操作を行う権限がありません。';
+
+  @override
+  String get errorResourceNotFound => 'リクエストされたリソースが存在しません。';
+
+  @override
+  String get errorDataConflict => 'データが競合しています。更新してから再度お試しください。';
+
+  @override
+  String get errorSystemBusy => 'システムが混雑しています。しばらくしてから再度お試しください。';
+
+  @override
+  String get errorEmptyFile => 'アップロードされたファイルが空です。';
+
+  @override
+  String get errorFileSizeIllegal => 'ファイルサイズが要件を満たしていません。';
+
+  @override
+  String get errorFileTypeIllegal => 'このファイル形式はサポートされていません。';
+
+  @override
+  String get errorFileNameIllegal => 'ファイル名が無効です。';
+
+  @override
+  String get errorFileUploadFailed => 'ファイルのアップロードに失敗しました。しばらくしてから再度お試しください。';
+
+  @override
+  String get errorPhoneFormatInvalid => '電話番号の形式が正しくありません。確認してください。';
+
+  @override
+  String get errorPasswordFormatInvalid => 'パスワードの形式が要件を満たしていません。確認してください。';
+
+  @override
+  String get errorNameFormatInvalid => 'ニックネームが要件を満たしていません。確認してください。';
+
+  @override
+  String get errorRegisterParamConflict => '家族名か招待コードのどちらか一方だけを指定してください。';
+
+  @override
+  String get errorPhoneAlreadyExists => 'この電話番号はすでに登録されています。';
+
+  @override
+  String get errorLoginFailed => '電話番号またはパスワードが間違っています。';
+
+  @override
+  String get errorTokenInvalid => 'セッションが無効になりました。再度ログインしてください。';
+
+  @override
+  String get errorTokenExpired => 'セッションの有効期限が切れました。再度ログインしてください。';
+
+  @override
+  String get errorRefreshTokenInvalid => 'セッションが無効になりました。再度ログインしてください。';
+
+  @override
+  String get errorUserNotFound => 'このユーザーは存在しません。';
+
+  @override
+  String get errorFamilyNameEmpty => '家族名を入力してください。';
+
+  @override
+  String get errorInviteCodeEmpty => '招待コードを入力してください。';
+
+  @override
+  String get errorRelationTypeInvalid => '家族関係の種類が無効です。';
+
+  @override
+  String get errorFamilyNotFound => 'この家族が見つかりません。';
+
+  @override
+  String get errorFamilyMemberNotFound => 'この家族メンバーが見つかりません。';
+
+  @override
+  String get errorInviteCodeInvalid => 'この招待コードは存在しないか、期限切れです。';
+
+  @override
+  String get errorRelationAnchorInvalid => '選択した関係の起点が無効です。';
+
+  @override
+  String get errorNotFamilyMember => 'あなたはこの家族のメンバーではありません。';
+
+  @override
+  String get errorNotFamilyAdmin => 'この操作は家族の管理者のみ行えます。';
+
+  @override
+  String get errorFamilySaveFailed => '家族の作成に失敗しました。しばらくしてから再度お試しください。';
+
+  @override
+  String get errorSpouseAlreadyExists => 'この方にはすでに配偶者がいます。';
+
+  @override
+  String get errorNoKnownParent => '親の関係が不明なため、兄弟姉妹関係を設定できません。';
+
+  @override
+  String get errorConversationNotFound => 'この会話は存在しません。';
+
+  @override
+  String get errorMessageTooLong => 'メッセージが長すぎます。';
+
+  @override
+  String get errorMessageTypeInvalid => 'このメッセージ形式はサポートされていません。';
+
+  @override
+  String get errorLocationCoordinateInvalid => '位置情報の座標を空にすることはできません。';
+
+  @override
+  String get errorLocationBatteryInvalid => 'バッテリー残量の値が無効です。';
+
+  @override
+  String get errorLocationTimestampMissing => '位置情報のタイムスタンプを空にすることはできません。';
+
+  @override
+  String get errorLocationTimestampStale => '位置情報データの期限が切れています。再度送信してください。';
+
+  @override
+  String get errorLocationTargetNotFamilyMember => '対象ユーザーは同じ家族のメンバーではありません。';
+
+  @override
+  String get errorFenceRangeInvalid => 'フェンスの半径が無効です。';
+
+  @override
+  String get errorFenceNotFound => 'このフェンスは存在しません。';
+
+  @override
+  String get errorNotFenceSetter => 'この操作はフェンスを設定した本人のみ行えます。';
+
+  @override
+  String get errorMomentContentEmpty => '投稿にはテキストかメディアのいずれかが必要です。';
+
+  @override
+  String get errorMomentMediaTypeInvalid => 'メディアの形式が正しくありません。';
+
+  @override
+  String get errorLikeRecordNotFound => 'まだ「いいね」していないため取り消せません。';
+
+  @override
+  String get errorMomentNotFound => 'この投稿は存在しません。';
+
+  @override
+  String get errorNotMomentOwner => 'この操作は投稿者本人のみ行えます。';
+
+  @override
+  String get errorCommentContentEmpty => 'コメントを空にすることはできません。';
+
+  @override
+  String get errorCommentNotFound => 'このコメントは存在しません。';
+
+  @override
+  String get errorNotCommentOwner => 'この操作はコメント投稿者本人のみ行えます。';
+
+  @override
+  String get errorHealthMetricTypeInvalid => '健康指標の種類が正しくありません。';
+
+  @override
+  String get errorHealthRecordValueInvalid => '健康記録の数値が無効です。';
+
+  @override
+  String get errorNotSameFamily => '対象ユーザーは同じ家族のメンバーではありません。';
+
+  @override
+  String get errorRemindTimeInvalid => 'リマインダーの時刻形式が正しくありません。';
+
+  @override
+  String get errorHealthRecordNotFound => 'この健康記録は存在しません。';
+
+  @override
+  String get errorNotHealthRecordOwner => '自分の健康記録は本人のみ編集できます。';
+
+  @override
+  String get errorHealthRecordDateConflict => 'この日付にはすでに同じ指標の記録があります。';
 }

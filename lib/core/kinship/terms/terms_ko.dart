@@ -70,4 +70,12 @@ final KinshipTermSet koKinshipTerms = KinshipTermSet(
     'S.yZ#male': '처제',
     'S.yZ#female': '아가씨',
   },
+  // 3-depth ancestor chain. 한국어로는 친(父系) / 외(母系) 구분이
+  // 있어 4가지 모두 등록. 4세대 위(고조부모)는 거의 쓰이지 않으므
+  // 로 null 로 두고 일반 컴포지션(아버지의 아버지의 아버지)으로
+  // 폴백.
+  greatGrandfatherPat: '증조부',
+  greatGrandmotherPat: '증조모',
+  greatGrandfatherMat: '외증조부',
+  greatGrandmotherMat: '외증조모',
 );

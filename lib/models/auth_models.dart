@@ -53,6 +53,16 @@ class AuthUser {
   final String gender;
   final String? avatarUrl;
 
+  /// §2.1 wallet balance, in **分** (same convention as §9 red packet
+  /// amounts — display layers divide by 100). Defaulted to `0` for
+  /// §1.1 / §1.2 register / login responses that don't carry the
+  /// field, and refreshed by [AuthProvider] after every `GET /users/me`
+  /// round-trip. Used by:
+  /// - the profile / edit-profile screens to render the user's balance
+  /// - [SendRedpacketScreen] to gate the "send" button when the user
+  ///   can't afford the requested amount
+  final int balance;
+
   const AuthUser({
     required this.token,
     required this.refreshToken,
@@ -64,13 +74,15 @@ class AuthUser {
     required this.role,
     required this.gender,
     this.avatarUrl,
+    this.balance = 0,
   });
 
   /// Parses the §1.1 / §1.2 register / login response envelope. Those
-  /// responses do **not** include `gender` or `avatarUrl` — callers should
-  /// follow up with `GET /users/me` (§2.1) to populate them, otherwise the
-  /// viewer-gender-dependent kinship terms and the profile-screen avatar
-  /// will fall back to defaults.
+  /// responses do **not** include `gender`, `avatarUrl` or `balance` —
+  /// callers should follow up with `GET /users/me` (§2.1) to populate
+  /// them, otherwise the viewer-gender-dependent kinship terms, the
+  /// profile-screen avatar and the balance pill will fall back to
+  /// defaults (balance `0`).
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>? ?? json;
     return AuthUser(
@@ -84,6 +96,7 @@ class AuthUser {
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
       avatarUrl: user['avatarUrl'] as String?,
+      balance: user['balance'] as int? ?? 0,
     );
   }
 
@@ -105,6 +118,7 @@ class AuthUser {
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
       avatarUrl: user['avatarUrl'] as String?,
+      balance: user['balance'] as int? ?? 0,
     );
   }
 
@@ -116,6 +130,7 @@ class AuthUser {
     String? role,
     String? gender,
     String? avatarUrl,
+    int? balance,
   }) =>
       AuthUser(
         token: token ?? this.token,
@@ -128,6 +143,7 @@ class AuthUser {
         role: role ?? this.role,
         gender: gender ?? this.gender,
         avatarUrl: avatarUrl ?? this.avatarUrl,
+        balance: balance ?? this.balance,
       );
 
   Map<String, String> toPrefs() => {
@@ -142,6 +158,7 @@ class AuthUser {
         'gender': gender,
         // ignore: use_null_aware_elements
         if (avatarUrl != null) 'avatarUrl': avatarUrl!,
+        'balance': balance.toString(),
       };
 
   static AuthUser? fromPrefs(Map<String, String?> prefs) {
@@ -157,6 +174,10 @@ class AuthUser {
       role: prefs['role'] ?? 'member',
       gender: prefs['gender'] ?? 'male',
       avatarUrl: prefs['avatarUrl'],
+      // Pre-§9 prefs files won't have a balance row — `int.parse`
+      // on null would throw, so coalesce through the empty string
+      // to keep older installs loading without crashing.
+      balance: int.tryParse(prefs['balance'] ?? '') ?? 0,
     );
   }
 }

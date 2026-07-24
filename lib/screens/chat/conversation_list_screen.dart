@@ -4,6 +4,7 @@ import '../../core/app_colors.dart';
 import '../../core/error_messages.dart';
 import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../widgets/conversation_tile.dart';
 import '../../widgets/error_banner.dart';
@@ -23,6 +24,13 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ChatProvider>().loadConversations();
+      // Warms `AuthProvider.genderForUserId` (see its doc comment) so
+      // `ConversationTile`'s spouse label has a gender to fall back on
+      // even if the user opens the message list before ever visiting
+      // the contacts/family-tree screens. Fire-and-forget: the tiles
+      // just render without a relation label until this resolves.
+      // ignore: discarded_futures
+      context.read<AuthProvider>().loadFamilyMembers();
     });
   }
 
@@ -31,59 +39,86 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: HomeAppBar(
-        title: l10n.navMessages,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: context.read<ChatProvider>(),
-                  child: const SearchMessagesScreen(),
-                ),
-              ));
-            },
-            tooltip: l10n.conversationsSearchTooltip,
-          ),
-        ],
-      ),
-      body: PaperBackground(
-        child: Consumer<ChatProvider>(
-          builder: (ctx, chat, _) {
-            Widget body = _buildBody(ctx, chat, l10n);
-            if (chat.connectionError != null) {
-              body = _ConnectionErrorBanner(
-                // `connectionError` is a sentinel/code, not
-                // pre-localized text — `localizeErrorMessage`
-                // is what maps it to the active locale's
-                // display string.
-                message: localizeErrorMessage(
-                  chat.connectionError!,
-                  l10n,
-                ),
-                retryLabel: l10n.connectionErrorRetry,
-                onRetry: chat.reconnect,
-                onDismiss: chat.dismissConnectionError,
-                child: body,
-              );
-            }
-            if (chat.error != null) {
-              body = Column(
+      body: SafeArea(
+        top: true,
+        bottom: false,
+        child: Column(
+          children: [
+            // Replaces the old HomeAppBar — title + search action,
+            // naked against the PaperBackground so it reads as part
+            // of the screen rather than a chrome strip floating
+            // above it.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 12, 6),
+              child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: ErrorBanner(
-                      message: localizeErrorMessage(chat.error!, l10n),
-                      onDismiss: chat.clearError,
+                  Expanded(
+                    child: Text(
+                      l10n.navMessages,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                        letterSpacing: 0.4,
+                      ),
                     ),
                   ),
-                  Expanded(child: body),
+                  IconButton(
+                    icon: const Icon(Icons.search_rounded),
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => ChangeNotifierProvider.value(
+                          value: context.read<ChatProvider>(),
+                          child: const SearchMessagesScreen(),
+                        ),
+                      ));
+                    },
+                    tooltip: l10n.conversationsSearchTooltip,
+                  ),
                 ],
-              );
-            }
-            return body;
-          },
+              ),
+            ),
+            Expanded(
+              child: PaperBackground(
+                child: Consumer<ChatProvider>(
+                  builder: (ctx, chat, _) {
+                    Widget body = _buildBody(ctx, chat, l10n);
+                    if (chat.connectionError != null) {
+                      body = _ConnectionErrorBanner(
+                        // `connectionError` is a sentinel/code, not
+                        // pre-localized text — `localizeErrorMessage`
+                        // is what maps it to the active locale's
+                        // display string.
+                        message: localizeErrorMessage(
+                          chat.connectionError!,
+                          l10n,
+                        ),
+                        retryLabel: l10n.connectionErrorRetry,
+                        onRetry: chat.reconnect,
+                        onDismiss: chat.dismissConnectionError,
+                        child: body,
+                      );
+                    }
+                    if (chat.error != null) {
+                      body = Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: ErrorBanner(
+                              message: localizeErrorMessage(chat.error!, l10n),
+                              onDismiss: chat.clearError,
+                            ),
+                          ),
+                          Expanded(child: body),
+                        ],
+                      );
+                    }
+                    return body;
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

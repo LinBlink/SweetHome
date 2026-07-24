@@ -18,6 +18,7 @@ import '_web_image_stub.dart'
     if (dart.library.html) '_web_image_web.dart';
 import 'avatar_widget.dart';
 import 'fullscreen_video_player.dart';
+import 'redpacket_bubble.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -165,6 +166,8 @@ class _BubbleContent extends StatelessWidget {
           icon: Icons.info_outline,
           isMe: isMe,
         );
+      case MessageType.redpacket:
+        return RedpacketBubble(message: message);
       case MessageType.text:
         // Emoji-only messages get a much larger font so the bubble
         // doesn't look like an empty bubble with a tiny pixel — see

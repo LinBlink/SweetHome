@@ -65,6 +65,14 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
   Timer? _elapsedTimer;
   bool _draftRestored = false;
 
+  /// §7.1 publish toggled off the family-only default. Mirrors the
+  /// server's `isPublic` boolean — when `true` the post lands in both
+  /// the family feed and the cross-family "别人家动态" 广场 (§7.3).
+  /// Restored from the saved draft so a partially-written public
+  /// post doesn't quietly revert to family-only when the user backs
+  /// out and returns.
+  bool _isPublic = false;
+
   @override
   void initState() {
     super.initState();
@@ -92,6 +100,15 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     }
   }
 
+  /// Whether the composer has anything that should survive a "Save
+  /// draft" tap. The toggle alone counts — even with an empty caption
+  /// and no media, a public draft is something the user clearly
+  /// committed to and shouldn't be silently dropped.
+  bool get _hasAnyDraftableState =>
+      _contentCtrl.text.trim().isNotEmpty ||
+      _drafts.isNotEmpty ||
+      _isPublic;
+
   bool get _anyDraftUploading =>
       _drafts.any((d) => d.uploadStatus == MomentUploadStatus.uploading);
 
@@ -114,10 +131,16 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
         if (draft != null) restored.add(draft);
       }
     }
-    if (snapshot.content.trim().isEmpty && restored.isEmpty) return;
+    // A public-only draft (toggle on, no caption, no media) is still
+    // a draft the user committed to — promote it to the visible
+    // "draft restored" banner just like text-only drafts.
+    final hasAnything =
+        snapshot.content.trim().isNotEmpty || restored.isNotEmpty || snapshot.isPublic;
+    if (!hasAnything) return;
     setState(() {
       _contentCtrl.text = snapshot.content;
       _drafts.addAll(restored);
+      _isPublic = snapshot.isPublic;
       _draftRestored = true;
     });
     _onContentChanged();
@@ -187,7 +210,11 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     final userId = _userId;
     if (userId == null) return;
     final content = _contentCtrl.text;
-    if (content.trim().isEmpty && _drafts.isEmpty) {
+    // Same "is there anything to restore?" gate as
+    // `_maybeRestoreDraft`: clear the slot if everything is empty
+    // AND the public toggle is off, otherwise persist the toggle
+    // state alongside the text/media.
+    if (!_hasAnyDraftableState) {
       await MomentDraftStore.clear(userId);
       return;
     }
@@ -195,6 +222,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
       userId,
       MomentDraftSnapshot(
         content: content,
+        isPublic: _isPublic,
         media: [
           for (final d in _drafts)
             MomentDraftMediaSnapshot(
@@ -220,6 +248,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     setState(() {
       _contentCtrl.clear();
       _drafts.clear();
+      _isPublic = false;
       _draftRestored = false;
     });
     _onContentChanged();
@@ -335,6 +364,16 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
                         ),
                         style: const TextStyle(fontSize: 16, height: 1.5),
                       ),
+                      // §7.1 / §7.3 publish-mode toggle. Sits between
+                      // the caption and the media strip so the user
+                      // answers "who will see this?" before picking
+                      // what to attach — flipping it later still
+                      // works, but forward placement matches the
+                      // privacy-first mental model.
+                      _PublicToggle(
+                        value: _isPublic,
+                        onChanged: (v) => setState(() => _isPublic = v),
+                      ),
                       const SizedBox(height: 12),
                       if (_drafts.isNotEmpty)
                         _DraftsStrip(
@@ -398,7 +437,11 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     final provider = context.read<MomentProvider>();
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    await provider.publish(content: _contentCtrl.text, drafts: _drafts);
+    await provider.publish(
+      content: _contentCtrl.text,
+      drafts: _drafts,
+      isPublic: _isPublic,
+    );
     if (!mounted) return;
     if (provider.publishError != null) {
       messenger.showSnackBar(
@@ -410,6 +453,7 @@ class _PublishMomentScreenState extends State<PublishMomentScreen>
     await _clearSavedDraft();
     _contentCtrl.clear();
     _drafts.clear();
+    _isPublic = false;
     _hasUnsavedContent = false;
     navigator.pop();
   }
@@ -1582,6 +1626,74 @@ class _DraftAudioPreviewState extends State<_DraftAudioPreview> {
       backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(l10n.publishMomentMediaTypeAudio)),
       body: Center(child: body),
+    );
+  }
+}
+
+/// §7.1/`isPublic` toggle that switches the upcoming post between
+/// family-only (default, §7.2 feed) and cross-family public (§7.3
+/// "别人家动态" feed). Uses the same fixed-track + fixed-thumb color
+/// split as the health-record switches so the on-state lands as
+/// "primary tarmac, paper thumb" instead of a uniformly-tinted blob —
+/// see that fix for the rationale.
+class _PublicToggle extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  const _PublicToggle({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: AppColors.primaryLight.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            value
+                ? Icons.public_rounded
+                : Icons.lock_outline_rounded,
+            size: 18,
+            color: value ? AppColors.primary : AppColors.inkFaded,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.publishMomentPublicToggle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                  ),
+                ),
+                Text(
+                  l10n.publishMomentPublicHint,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.inkFaded,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: AppColors.primary,
+            activeThumbColor: AppColors.surface,
+            inactiveTrackColor: AppColors.divider,
+            inactiveThumbColor: AppColors.inkFaded,
+          ),
+        ],
+      ),
     );
   }
 }

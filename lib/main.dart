@@ -239,6 +239,7 @@ class _MainShellState extends State<MainShell> {
   // _kMyHomeIndex is the center slot — the nav row leaves a gap for
   // it and the raised FAB sits on top of that gap.
   static const int _kMyHomeIndex = 2;
+  static const int _kProfileIndex = 4;
 
   int _currentIndex = 0;
 
@@ -250,13 +251,28 @@ class _MainShellState extends State<MainShell> {
   /// in-progress upload cycle survives a swipe-away-and-back.
   final PageController _pageController = PageController();
 
-  static const _screens = [
-    ConversationListScreen(),
-    ContactsScreen(),
-    MyHomeScreen(),
-    FamilyFeedScreen(),
-    ProfileScreen(),
-  ];
+  /// Page widgets are built per-build (instead of `static const`)
+  /// because [FamilyFeedScreen] needs two callbacks that close over
+  /// `_pageController` so it can hand off its boundary horizontal
+  /// swipes ("自个儿家 right-fling → MyHome", "串串门 left-fling →
+  /// Profile") back to this outer PageView. The other four children
+  /// are const-constructed the same way they used to be — they live
+  /// in the same list so the index↔tab mapping (0 Messages,
+  /// 1 Contacts, 2 MyHome, 3 FamilyFeed, 4 Profile) stays put.
+  List<Widget> get _screens => [
+        const ConversationListScreen(),
+        const ContactsScreen(),
+        const MyHomeScreen(),
+        FamilyFeedScreen(
+          // Right-drag from 自个儿家 → animate the outer PageView to
+          // the MyHome slot (index _kMyHomeIndex = 2).
+          onSwipeToPrevPage: () => _goTo(_kMyHomeIndex),
+          // Left-drag from 串串门 → animate the outer PageView to
+          // the Profile slot (last tab).
+          onSwipeToNextPage: () => _goTo(_kProfileIndex),
+        ),
+        const ProfileScreen(),
+      ];
 
   @override
   void dispose() {

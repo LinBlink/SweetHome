@@ -54,6 +54,13 @@ final KinshipTermSet zhHansKinshipTerms = KinshipTermSet(
     'yZ.Dau': '外甥女',
     'Son.S': '儿媳',
     'Dau.S': '女婿',
+    // Grandchild's spouse — without these the localizer would
+    // compose the literal "孙女的配偶" / "儿子的女儿的配偶" instead
+    // of the actual short colloquial terms.
+    'Son.Son.S': '孙媳',
+    'Son.Dau.S': '孙女婿',
+    'Dau.Son.S': '外孙媳',
+    'Dau.Dau.S': '外孙女婿',
     'S.F#male': '岳父',
     'S.F#female': '公公',
     'S.M#male': '岳母',
@@ -66,5 +73,40 @@ final KinshipTermSet zhHansKinshipTerms = KinshipTermSet(
     'S.eZ#female': '大姑子',
     'S.yZ#male': '小姨子',
     'S.yZ#female': '小姑子',
+    // Generation +2 in-laws: in Chinese, 岳父 (S.F) is socially
+    // "父亲", so 岳父的父母 = 爷爷奶奶; 岳母 (S.M) is socially "母亲",
+    // so 岳母的父母 = 外公外婆. Without these mappings the kinship
+    // localizer falls through to base-term composition and emits the
+    // literal "配偶的母亲的父亲" etc., which reads awkwardly.
+    'S.F.F': '爷爷',
+    'S.F.M': '奶奶',
+    'S.M.F': '外公',
+    'S.M.M': '外婆',
   },
+  // Depth-3 / depth-4 ancestor chains. Without these the localizer
+  // would emit "父亲的父亲的父亲" for F.F.F, which reads as a run-on
+  // Chinese word salad. The terms below are the classical short
+  // forms (曾祖父 / 高祖父 / 外曾祖父 / 外高祖父 etc.) — see
+  // kinship_localizer.dart for the algorithm that also accepts a
+  // leading parent prefix (M.F.F → 母亲的爷爷) when the chain is
+  // three tokens of the same direction.
+  greatGrandfatherPat: '曾祖父',
+  greatGrandmotherPat: '曾祖母',
+  greatGrandfatherMat: '外曾祖父',
+  greatGrandmotherMat: '外曾祖母',
+  ggGrandfatherPat: '高祖父',
+  ggGrandmotherPat: '高祖母',
+  ggGrandfatherMat: '外高祖父',
+  ggGrandmotherMat: '外高祖母',
+  // Depth-3 / depth-4 descendant chains — the Son/Dau mirror of the
+  // ancestor fields above. Without these, e.g. Son.Son.Son would
+  // compose as "儿子的儿子的儿子" instead of "曾孙".
+  greatGrandsonPat: '曾孙',
+  greatGranddaughterPat: '曾孙女',
+  greatGrandsonMat: '外曾孙',
+  greatGranddaughterMat: '外曾孙女',
+  ggGrandsonPat: '玄孙',
+  ggGranddaughterPat: '玄孙女',
+  ggGrandsonMat: '外玄孙',
+  ggGranddaughterMat: '外玄孙女',
 );
