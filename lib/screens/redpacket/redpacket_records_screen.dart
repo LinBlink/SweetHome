@@ -272,7 +272,15 @@ class _SentTile extends StatelessWidget {
       child: HomeCard(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => RedpacketDetailScreen(redpacketId: redpacket.id),
+            // §9.1/§9.2's `RedpacketVO` doesn't carry a `conversationId`,
+            // so unlike opening this from a chat bubble, there's no way
+            // to know here whether the source conversation is a group
+            // chat — `isGroup: false` keeps the safer, more restrictive
+            // behavior (matches direct-chat self-grab rules).
+            builder: (_) => RedpacketDetailScreen(
+              redpacketId: redpacket.id,
+              isGroup: false,
+            ),
           ),
         ),
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -361,8 +369,14 @@ class _ReceivedTile extends StatelessWidget {
       child: HomeCard(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) =>
-                RedpacketDetailScreen(redpacketId: grab.redpacketId),
+            // `isGroup` only affects the self-grab block, which never
+            // triggers here anyway (the current user is the grabber,
+            // not `redpacket.userId` the owner) — `false` is just the
+            // required default, same reasoning as the sent tab above.
+            builder: (_) => RedpacketDetailScreen(
+              redpacketId: grab.redpacketId,
+              isGroup: false,
+            ),
           ),
         ),
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),

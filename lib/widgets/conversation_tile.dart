@@ -36,15 +36,21 @@ class ConversationTile extends StatelessWidget {
       //
       // `conversation.otherUserGender` isn't reliably populated by
       // every backend version (some direct conversations come back
-      // with it null) — fall back to `AuthProvider.genderForUserId`,
-      // which is warmed from the family member roster's `gender`
-      // field (always present, unlike `otherUserGender`) by whichever
-      // screen last called `loadFamilyMembers()` (see that method's
-      // doc comment).
+      // with it null, confirmed against a real backend response —
+      // and in that same response `otherUserId` came back null too,
+      // so the `userId`-keyed fallback below can't even be attempted)
+      // — fall back through `AuthProvider.genderForUserId`, then all
+      // the way to `genderForName` keyed on the conversation's own
+      // `name` (a direct conversation's `name` IS the other
+      // participant's display name — see docs/api.md §4.1), both
+      // warmed from the family member roster's `gender` field (always
+      // present, unlike `otherUserGender`) by whichever screen last
+      // called `loadFamilyMembers()` (see that method's doc comment).
       final targetGender = conversation.otherUserGender ??
           (conversation.otherUserId != null
               ? auth.genderForUserId(conversation.otherUserId!)
-              : null);
+              : null) ??
+          auth.genderForName(conversation.name);
       relationLabel = relationLabelFor(
         relationCode: relationCode,
         targetGender: targetGender,

@@ -212,16 +212,23 @@ class AuthProvider extends ChangeNotifier {
   /// locale into the fetch itself, or the label goes stale when the user
   /// switches language without re-fetching).
   ///
-  /// Side effect: caches each member's `gender` by `userId` (see
-  /// [genderForUserId]) — the conversation-list's spouse label needs a
-  /// gender to pick "丈夫" vs "妻子" for the bare `S` relation code, but
-  /// the conversation payload's own `otherUserGender` field isn't
-  /// reliably populated by every backend version, and unlike that field,
-  /// `family_members`' `gender` always has a real value (see
-  /// `FamilyMemberVm.gender`, never null). Any caller of this method —
-  /// contacts screen, family tree, etc. — warms this cache as a side
-  /// effect, so the fallback works regardless of which screen the user
-  /// happened to visit first.
+  /// Side effect: caches each member's `gender` by both `userId` (see
+  /// [genderForUserId]) and `name` (see [genderForName]) — the
+  /// conversation-list's spouse label needs a gender to pick "丈夫" vs
+  /// "妻子" for the bare `S` relation code, but the conversation
+  /// payload's own `otherUserGender` (and, confirmed against a real
+  /// backend response, sometimes even `otherUserId`) isn't reliably
+  /// populated. `family_members`' `gender` always has a real value (see
+  /// `FamilyMemberVm.gender`, never null), so it's used as the
+  /// fallback — by `userId` when available, or by `name` (a direct
+  /// conversation's `name` is the other participant's display name,
+  /// per docs/api.md §4.1) when `otherUserId` itself is missing too.
+  /// Name matching is a last resort — it'll misfire if two family
+  /// members share an identical display name — but it's strictly
+  /// better than showing no relation label at all. Any caller of this
+  /// method — contacts screen, family tree, etc. — warms both caches
+  /// as a side effect, so the fallback works regardless of which
+  /// screen the user happened to visit first.
   Future<List<FamilyMemberVm>> loadFamilyMembers() async {
     final user = _currentUser;
     if (user == null) return const [];
@@ -234,16 +241,26 @@ class AuthProvider extends ChangeNotifier {
         _memberGenderByUserId[m.userId] = m.gender;
         changed = true;
       }
+      if (_memberGenderByName[m.name] != m.gender) {
+        _memberGenderByName[m.name] = m.gender;
+        changed = true;
+      }
     }
     if (changed) notifyListeners();
     return members;
   }
 
   final Map<int, Gender> _memberGenderByUserId = {};
+  final Map<String, Gender> _memberGenderByName = {};
 
   /// See [loadFamilyMembers]'s doc comment — fallback gender source for
   /// `Conversation.otherUserGender` when that field comes back null.
   Gender? genderForUserId(int userId) => _memberGenderByUserId[userId];
+
+  /// See [loadFamilyMembers]'s doc comment — last-resort fallback for
+  /// when `otherUserId` itself is also missing, keyed by display name
+  /// instead.
+  Gender? genderForName(String name) => _memberGenderByName[name];
 
   Future<void> updateProfile(String name) async {
     final user = _currentUser;

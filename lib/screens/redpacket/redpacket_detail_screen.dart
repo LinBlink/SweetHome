@@ -107,17 +107,46 @@ class _RedpacketDetailScreenState extends State<RedpacketDetailScreen> {
   }
 
   Future<List<RedpacketGrab>> _fetchGrabs() async {
+    final List<RedpacketGrab> list;
     if (AppConfig.mockMode) {
-      final list = MockDataSource.mockRedpacketGrabs(widget.redpacketId);
-      if (!mounted) return list;
-      setState(() => _grabs = list);
-      return list;
+      list = MockDataSource.mockRedpacketGrabs(widget.redpacketId);
+    } else {
+      final token = context.read<AuthProvider>().currentUser!.token;
+      final service = RedpacketService(() => token);
+      list = await service.listGrabs(widget.redpacketId);
     }
-    final token = context.read<AuthProvider>().currentUser!.token;
-    final service = RedpacketService(() => token);
-    final list = await service.listGrabs(widget.redpacketId);
     if (!mounted) return list;
-    setState(() => _grabs = list);
+    final currentUserId = context.read<AuthProvider>().currentUser?.userId;
+    setState(() {
+      // `_grab()` splices an enriched (real name/avatar) version of
+      // the current user's own row into `_grabs` the instant a grab
+      // succeeds, ahead of the async DB write §9.4 reads from. If
+      // *this* fetch is the background reconciliation `_grab()`
+      // kicks off right after and the write still hasn't landed yet,
+      // the fresh `list` won't have that row — replacing `_grabs`
+      // wholesale would make the just-spliced name flicker away and
+      // then reappear (or, if no further fetch ever runs, never
+      // reappear) even though nothing is actually wrong. Preserve the
+      // already-known row from the *old* `_grabs` in that case;
+      // everyone else's rows still come straight from the fresh list.
+      final alreadyInFreshList = list.any((g) => g.userId == currentUserId);
+      final existingMine = currentUserId != null && !alreadyInFreshList
+          ? _grabs.where((g) => g.userId == currentUserId)
+          : const <RedpacketGrab>[];
+      _grabs = existingMine.isEmpty ? list : [...list, existingMine.first];
+      // If the server-confirmed list already has the current user's
+      // own grab — e.g. reopening this screen after a *previous*
+      // session already grabbed it, which is the common case this
+      // fixes — reflect that in `_myGrab` too. Without this,
+      // `_ActionArea` kept showing the grab button on every fresh
+      // page load even for a red packet the user had already grabbed,
+      // because `_myGrab` used to only ever get set inside `_grab()`'s
+      // own success handler, never from history.
+      if (currentUserId != null) {
+        final mine = list.where((g) => g.userId == currentUserId);
+        if (mine.isNotEmpty) _myGrab = mine.first;
+      }
+    });
     return list;
   }
 
@@ -166,19 +195,45 @@ class _RedpacketDetailScreenState extends State<RedpacketDetailScreen> {
         authProvider.refreshBalance();
       }
       if (!mounted) return;
+      final currentUser = context.read<AuthProvider>().currentUser;
       setState(() {
         // `grabAmount` is the authoritative, immediately-known result
         // (per the §9 preamble) — used for the "you got ¥X.XX" pill
         // right away, no round-trip needed for that part.
         _myGrab = grab;
-        // But *don't* splice `grab` itself into the "who has grabbed"
-        // list: §9.3's response never fills in `username`/
-        // `userAvatarUrl` (see `RedpacketGrab`'s doc comment) — those
-        // only come back from §9.2/§9.4 — so a spliced-in row would
-        // render as a nameless, avatar-less "User #N" until the next
-        // full reload. Re-fetch both the red packet (its `status` may
-        // now be `finished`) and the grab list instead, so the new
-        // row shows up with real name/avatar like every other row.
+        // Splice MY OWN row into the "who has grabbed" list right
+        // now, rather than waiting for a fresh §9.4 fetch to surface
+        // it: per the §9 preamble, the grab lands in Redis instantly
+        // but the DB row §9.4 reads from is written asynchronously,
+        // so re-querying immediately after this can still momentarily
+        // miss this very grab — the list would otherwise look
+        // "unrefreshed" right after grabbing (most noticeable when a
+        // group sender grabs their own red packet and expects to see
+        // themselves show up immediately). Unlike other people's
+        // rows — whose name/avatar genuinely aren't known until the
+        // list fetch fills them in — *my own* are already known from
+        // `AuthProvider`, so there's no nameless "User#N" trade-off
+        // here. Dedup on `userId`, not `id` (§9.3's response always
+        // has `id: null` — see `RedpacketGrab.id`'s doc comment).
+        final mine = RedpacketGrab(
+          id: grab.id,
+          redpacketId: grab.redpacketId,
+          userId: grab.userId,
+          grabAmount: grab.grabAmount,
+          createdAt: grab.createdAt,
+          username: currentUser?.name,
+          userAvatarUrl: currentUser?.avatarUrl,
+        );
+        _grabs = [
+          for (final g in _grabs)
+            if (g.userId != grab.userId) g,
+          mine,
+        ];
+        // Still re-fetch both in the background: the red packet's
+        // `status` may now be `finished`, and the list refresh
+        // reconciles this row with the server's real `id` once the
+        // async DB write lands (and picks up anyone else who grabbed
+        // concurrently).
         _loadFuture = _fetchRedpacket();
         _grabsFuture = _fetchGrabs();
       });
@@ -370,13 +425,17 @@ class _StatusPill extends StatelessWidget {
 }
 
 /// The grab button + result line, mutually exclusive. Walks through:
-/// 1. I sent it → "you sent this" notice (no grab button).
+/// 1. I sent it in a direct (1:1) chat → "you sent this" notice, no
+///    grab button — there's only the one other person to give it to.
+///    In a *group* chat the sender can still grab a share of their own
+///    red packet, so this step is skipped there.
 /// 2. I've already grabbed → "you got ¥X.XX" + "already grabbed" notice.
 /// 3. status != ongoing → status-specific notice ("expired" / "empty").
 /// 4. otherwise → show the Grab button.
 class _ActionArea extends StatelessWidget {
   final Redpacket redpacket;
   final int? currentUserId;
+  final bool isGroup;
   final RedpacketGrab? myGrab;
   final bool grabbing;
   final String? errorText;
@@ -386,6 +445,7 @@ class _ActionArea extends StatelessWidget {
   const _ActionArea({
     required this.redpacket,
     required this.currentUserId,
+    required this.isGroup,
     required this.myGrab,
     required this.grabbing,
     required this.errorText,
@@ -396,7 +456,7 @@ class _ActionArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelf = currentUserId != null && redpacket.userId == currentUserId;
-    if (isSelf) {
+    if (isSelf && !isGroup) {
       return _Notice(text: l10n.redpacketSelfNotice);
     }
     if (myGrab != null) {

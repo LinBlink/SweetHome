@@ -440,5 +440,32 @@ void main() {
       expect(drops[2].parent, 'M');
       expect(drops[2].children, ['SELF']);
     });
+
+    test(
+        "M.eB/M.yZ drop: mother's siblings connect up to the maternal "
+        'grandparents', () {
+      // Regression: `M.eB` (mother's elder brother) starts with `M.`,
+      // so it used to fall into the ancestor-chain branch and try
+      // bogus, never-present candidates like `M.eB.F`/`M.eB.M` instead
+      // of being recognized as a sibling-of-`M` token. A sibling token
+      // doesn't add a generation, so `M.eB`'s parent should be exactly
+      // whatever `M`'s own parent resolves to (the maternal
+      // grandparents) — same rule one level up as an uncle sharing
+      // the viewer's own grandparents.
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '母', 'M', g: Gender.female),
+        vm(3, '外公', 'M.F'),
+        vm(4, '外婆', 'M.M', g: Gender.female),
+        vm(5, '舅舅', 'M.eB'),
+        vm(6, '姨妈', 'M.yZ', g: Gender.female),
+      ]);
+      final drops = computeInterRowDropCodes(b.rows);
+      // M.F/M.M (gen -2) → M/M.eB/M.yZ (gen -1) → SELF (gen 0).
+      final grandparentDrop =
+          drops.firstWhere((d) => d.children.contains('M.eB'));
+      expect(grandparentDrop.children, containsAll(['M', 'M.eB', 'M.yZ']));
+      expect(['M.F', 'M.M'], contains(grandparentDrop.parent));
+    });
   });
 }

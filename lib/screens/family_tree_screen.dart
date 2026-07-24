@@ -1051,6 +1051,24 @@ String? _ancestorInUpperRows(
       code == 'eZ' || code == 'yZ') {
     return null;
   }
+  // Sibling-of-X (e.g. `M.eB`, `F.F.yZ`): the sibling token is always
+  // the LAST segment (the kinship engine only ever reduces "parent,
+  // then parent's other child" into a sibling token as the final
+  // step — see docs/api.md §七 §7.4), and doesn't add a generation of
+  // its own. So whoever X's own parent-in-upper-rows resolves to is
+  // this sibling's parent too — mother's brother's parent is the same
+  // maternal grandparents as mother's own parent. Without this case,
+  // a code like `M.eB` falls through to the ancestor-chain branch
+  // below (it starts with `M.`) and produces bogus, never-present
+  // candidates like `M.eB.F`/`M.eB.M`, leaving 母亲的兄弟姐妹 with no
+  // line up to their parents at all.
+  if (code.contains('.')) {
+    final lastDot = code.lastIndexOf('.');
+    final lastSeg = code.substring(lastDot + 1);
+    if (lastSeg == 'eB' || lastSeg == 'yB' || lastSeg == 'eZ' || lastSeg == 'yZ') {
+      return _ancestorInUpperRows(code.substring(0, lastDot), upperCodes);
+    }
+  }
   // Descendant chain (Son, Dau, or any Son.* / Dau.*):
   // strip the last dot-segment to get the parent's relationCode.
   if (code == 'Son' || code == 'Dau' ||

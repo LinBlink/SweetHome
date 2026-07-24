@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chat_models.dart';
+import '../providers/chat_provider.dart';
 import '../screens/redpacket/redpacket_detail_screen.dart';
 
 /// Inline chat card for `MessageType.redpacket` messages — the §9.1
@@ -24,9 +26,22 @@ class RedpacketBubble extends StatelessWidget {
       onTap: () {
         final id = message.redpacketId;
         if (id == null) return;
+        // `RedpacketDetailScreen` needs to know whether this red
+        // packet's conversation is a group chat (a group-chat sender
+        // can still grab a share of their own packet; a direct-chat
+        // sender can't) — look it up off the already-loaded
+        // conversation this bubble is rendered inside of.
+        final chat = context.read<ChatProvider>();
+        final conv = chat.conversations.firstWhere(
+          (c) => c.id == message.conversationId,
+          orElse: () => chat.conversations.first,
+        );
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => RedpacketDetailScreen(redpacketId: id),
+            builder: (_) => RedpacketDetailScreen(
+              redpacketId: id,
+              isGroup: conv.isGroup,
+            ),
           ),
         );
       },
