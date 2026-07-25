@@ -3,16 +3,36 @@ import 'kinship_graph.dart';
 /// Primitive/composite relation step. Keep in sync with docs/api.md §七
 /// (亲属称谓计算算法) — this is the direct Dart implementation of that
 /// algorithm, used client-side in mock mode.
+/// Primitive/composite relation step.
+///
+/// Spouse steps carry the spouse's gender ([husband]/[wife]) rather than being
+/// a single neutral `S`. With a neutral token the spouse's gender was simply
+/// absent from the code: `S` couldn't say husband vs wife, and `S.F` couldn't
+/// say 岳父 (wife's father) vs 公公 (husband's father). The localizer worked
+/// around that by taking the *viewer's* gender and assuming the marriage was
+/// heterosexual — a workaround that breaks as soon as the spouse step is in the
+/// middle of a path (`Wi.eB.Son`) and is simply wrong for same-sex marriages.
+///
+/// The neutral tokens ([parent], [child], [spouse], [elderSibling],
+/// [youngerSibling]) are for members whose gender was never recorded. The
+/// client engine (mock mode) always knows genders and won't emit them, but the
+/// backend can, so the localizer must still be able to render them.
 enum RelToken {
   father, // F
   mother, // M
-  spouse, // S
+  parent, // P  — gender unknown
   son, // Son
   daughter, // Dau
+  child, // C  — gender unknown
+  husband, // Hu
+  wife, // Wi
+  spouse, // S  — gender unknown
   elderBrother, // eB
   youngerBrother, // yB
   elderSister, // eZ
   youngerSister, // yZ
+  elderSibling, // eX — gender unknown
+  youngerSibling, // yX — gender unknown
   ;
 
   String get code {
@@ -21,12 +41,20 @@ enum RelToken {
         return 'F';
       case RelToken.mother:
         return 'M';
-      case RelToken.spouse:
-        return 'S';
+      case RelToken.parent:
+        return 'P';
       case RelToken.son:
         return 'Son';
       case RelToken.daughter:
         return 'Dau';
+      case RelToken.child:
+        return 'C';
+      case RelToken.husband:
+        return 'Hu';
+      case RelToken.wife:
+        return 'Wi';
+      case RelToken.spouse:
+        return 'S';
       case RelToken.elderBrother:
         return 'eB';
       case RelToken.youngerBrother:
@@ -35,11 +63,33 @@ enum RelToken {
         return 'eZ';
       case RelToken.youngerSister:
         return 'yZ';
+      case RelToken.elderSibling:
+        return 'eX';
+      case RelToken.youngerSibling:
+        return 'yX';
     }
   }
 
-  bool get isBlood => this != RelToken.spouse;
+  bool get isBlood => !isSpouse;
+
+  /// A marriage step (any gender). Used as the tie-break weight that makes
+  /// blood paths win over affinal ones.
+  bool get isSpouse =>
+      this == RelToken.husband || this == RelToken.wife || this == RelToken.spouse;
+
+  bool get isParentStep =>
+      this == RelToken.father || this == RelToken.mother || this == RelToken.parent;
+
+  bool get isChildStep =>
+      this == RelToken.son || this == RelToken.daughter || this == RelToken.child;
 }
+
+/// The spouse token for a member of the given gender.
+RelToken spouseTokenFor(Gender? gender) => switch (gender) {
+      Gender.male => RelToken.husband,
+      Gender.female => RelToken.wife,
+      null => RelToken.spouse,
+    };
 
 const String kSelfRelationCode = 'SELF';
 
@@ -117,7 +167,9 @@ List<_Step> _neighbors(FamilyGraph graph, int id) {
     steps.add(_Step(child.gender == Gender.male ? RelToken.son : RelToken.daughter, childId));
   }
   for (final spouseId in graph.spousesOf(id)) {
-    steps.add(_Step(RelToken.spouse, spouseId));
+    // The token depends on whose direction we're walking: stepping *to* the
+    // spouse, so it's that person's gender that names the step.
+    steps.add(_Step(spouseTokenFor(graph.memberById(spouseId)?.gender), spouseId));
   }
   return steps;
 }
@@ -130,13 +182,22 @@ List<RelToken> _reduce(FamilyGraph graph, _NodePath path) {
   while (reducedAny) {
     reducedAny = false;
     for (var i = 0; i + 1 < tokens.length; i++) {
-      final isParentStep = tokens[i] == RelToken.father || tokens[i] == RelToken.mother;
-      final isChildStep = tokens[i + 1] == RelToken.son || tokens[i + 1] == RelToken.daughter;
-      if (!isParentStep || !isChildStep) continue;
-      if (nodes[i] == nodes[i + 2]) continue;
+      final RelToken folded;
+      if (tokens[i].isParentStep && tokens[i + 1].isChildStep) {
+        // "my parent's other child" is my sibling, not a two-hop path
+        if (nodes[i] == nodes[i + 2]) continue;
+        folded = _siblingToken(graph, fromId: nodes[i], siblingId: nodes[i + 2]);
+      } else if (tokens[i].isChildStep && tokens[i + 1].isParentStep) {
+        // "my child's other parent" is my spouse. Reachable when the couple
+        // has no SPOUSE_OF row but both PARENT_OF rows exist — without this
+        // the UI would literally read "my son's mother".
+        if (nodes[i] == nodes[i + 2]) continue;
+        folded = spouseTokenFor(graph.memberById(nodes[i + 2])?.gender);
+      } else {
+        continue;
+      }
 
-      final sibling = _siblingToken(graph, fromId: nodes[i], siblingId: nodes[i + 2]);
-      tokens = [...tokens.sublist(0, i), sibling, ...tokens.sublist(i + 2)];
+      tokens = [...tokens.sublist(0, i), folded, ...tokens.sublist(i + 2)];
       nodes = [...nodes.sublist(0, i + 1), ...nodes.sublist(i + 2)];
       reducedAny = true;
       break;

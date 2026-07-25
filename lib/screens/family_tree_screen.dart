@@ -45,15 +45,38 @@ int generationOfRelationCode(String relationCode) {
       case 'M':
         gen -= 1;
         break;
+      case 'P': // parent, gender unknown
+        gen -= 1;
+        break;
       case 'Son':
       case 'Dau':
+      case 'C': // child, gender unknown
         gen += 1;
         break;
-      // S, eB, yB, eZ, yZ — no change in generation
+      // Hu, Wi, S, eB, yB, eZ, yZ, eX, yX — no change in generation
     }
   }
   return gen;
 }
+
+/// Whether [relationCode] is a bare spouse relation. Spouse tokens carry the
+/// spouse's gender (`Hu`/`Wi`), with `S` reserved for gender-unknown, so the
+/// three must be checked together — a plain `== 'S'` silently stopped matching
+/// real couples once the gendered tokens landed.
+bool isSpouseRelationCode(String relationCode) =>
+    relationCode == 'Hu' || relationCode == 'Wi' || relationCode == 'S';
+
+/// `"F.eB.Wi"` → `"F.eB"`; returns null when [code] doesn't end in a spouse
+/// token. Used to pair a blood relative with the person married to them.
+String? _withoutTrailingSpouse(String code) {
+  final lastDot = code.lastIndexOf('.');
+  if (lastDot < 0) return null;
+  if (!isSpouseRelationCode(code.substring(lastDot + 1))) return null;
+  return code.substring(0, lastDot);
+}
+
+/// Sibling tokens, including the gender-unknown pair (`eX`/`yX`).
+const Set<String> _siblingTokenCodes = {'eB', 'yB', 'eZ', 'yZ', 'eX', 'yX'};
 
 /// Marquee-scrolling single-line label for the family-tree cards.
 ///
@@ -371,11 +394,16 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
 ///                          model.
 bool _isMarriedCouple(String a, String b) {
   // Canonical viewer-gen couple.
-  if ((a == 'SELF' && b == 'S') || (a == 'S' && b == 'SELF')) return true;
-  // Generic blood-member + spouse pair (suffix `.S` is the kinship
-  // engine's marker for "married into this family at this level").
-  if (a.endsWith('.S') && b == a.substring(0, a.length - 2)) return true;
-  if (b.endsWith('.S') && a == b.substring(0, b.length - 2)) return true;
+  if ((a == 'SELF' && isSpouseRelationCode(b)) ||
+      (isSpouseRelationCode(a) && b == 'SELF')) {
+    return true;
+  }
+  // Generic blood-member + spouse pair (a trailing spouse token is the
+  // kinship engine's marker for "married into this family at this level").
+  final aBase = _withoutTrailingSpouse(a);
+  if (aBase != null && b == aBase) return true;
+  final bBase = _withoutTrailingSpouse(b);
+  if (bBase != null && a == bBase) return true;
   // Generic "X's father" ↔ "X's mother" pair, to arbitrary depth.
   final aParts = a.split('.');
   final bParts = b.split('.');
@@ -468,7 +496,7 @@ class _FamilyTreeCanvas extends StatelessWidget {
     if (align != _RowAlign.viewerCentered) {
       return count * _cardWidth + (count - 1) * _hGap;
     }
-    final hasSpouse = members.any((m) => m.relationCode == 'S');
+    final hasSpouse = members.any((m) => isSpouseRelationCode(m.relationCode));
     final hasSelf = members.any((m) => m.relationCode == 'SELF');
     final sibCount =
         count - (hasSpouse ? 1 : 0) - (hasSelf ? 1 : 0);
@@ -687,7 +715,7 @@ class _FamilyTreeCanvas extends StatelessWidget {
       // otherwise on the right of SELF). Spouse always pins to
       // SELF's right with a small marriage gap.
       final viewerIdx = viewerIndexInRow >= 0 ? viewerIndexInRow : 0;
-      final spouseIdx = members.indexWhere((m) => m.relationCode == 'S');
+      final spouseIdx = members.indexWhere((m) => isSpouseRelationCode(m.relationCode));
       final hasSpouse = spouseIdx >= 0;
 
       // Identify sibling indices (everyone except SELF and S).
@@ -1047,8 +1075,7 @@ String? _ancestorInUpperRows(
     return null;
   }
   // Spouse/siblings — no upper-row parent.
-  if (code == 'S' || code == 'eB' || code == 'yB' ||
-      code == 'eZ' || code == 'yZ') {
+  if (isSpouseRelationCode(code) || _siblingTokenCodes.contains(code)) {
     return null;
   }
   // Sibling-of-X (e.g. `M.eB`, `F.F.yZ`): the sibling token is always
@@ -1065,14 +1092,14 @@ String? _ancestorInUpperRows(
   if (code.contains('.')) {
     final lastDot = code.lastIndexOf('.');
     final lastSeg = code.substring(lastDot + 1);
-    if (lastSeg == 'eB' || lastSeg == 'yB' || lastSeg == 'eZ' || lastSeg == 'yZ') {
+    if (_siblingTokenCodes.contains(lastSeg)) {
       return _ancestorInUpperRows(code.substring(0, lastDot), upperCodes);
     }
   }
   // Descendant chain (Son, Dau, or any Son.* / Dau.*):
   // strip the last dot-segment to get the parent's relationCode.
-  if (code == 'Son' || code == 'Dau' ||
-      code.startsWith('Son.') || code.startsWith('Dau.')) {
+  if (code == 'Son' || code == 'Dau' || code == 'C' ||
+      code.startsWith('Son.') || code.startsWith('Dau.') || code.startsWith('C.')) {
     if (!code.contains('.')) {
       // Son / Dau's direct parent is the viewer (SELF).
       return 'SELF';

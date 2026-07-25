@@ -53,7 +53,7 @@ void main() {
     test('SELF is at generation 0, parents at -1, children at +1', () {
       final b = bucketFamilyTreeMembers([
         vm(1, '我', 'SELF'),
-        vm(2, '妻', 'S', g: Gender.female),
+        vm(2, '妻', 'Wi', g: Gender.female),
         vm(3, '父', 'F'),
         vm(4, '子', 'Son'),
       ]);
@@ -63,12 +63,10 @@ void main() {
       // index 1 = SELF's row, index 2 = children (most recent).
       expect(b.rows.map((r) => r.generation).toList(), [-1, 0, 1]);
       expect(idsAt(b, -1), [3]);
-      // Generation 0 is sorted alphabetically by relationCode; 'S'
-      // (1 char) < 'SELF' (4 chars) lexicographically, so the spouse
-      // (userId 2) lands before SELF (userId 1). That's fine — the
-      // canvas anchors SELF's X-position by relationCode, not by row
-      // index, so the actual left-to-right visual order in the row
-      // is fine; we only care that both ended up at gen 0.
+      // Generation 0 is sorted alphabetically by relationCode. Either
+      // order is fine here — the canvas anchors SELF's X-position by
+      // relationCode, not by row index, so we only care that the spouse
+      // (userId 2) and SELF (userId 1) both ended up at gen 0.
       expect(idsAt(b, 0), containsAll([1, 2]));
       expect(idsAt(b, 1), [4]);
     });
@@ -142,9 +140,9 @@ void main() {
         vm(1, '我', 'SELF'),
         vm(2, '爷', 'F.F'),
         vm(3, '太爷', 'F.F.F'),
-        vm(4, '岳太爷', 'S.F.F.F'),
+        vm(4, '岳太爷', 'Wi.F.F.F'),
       ]);
-      expect(codesAt(b, -3), ['F.F.F', 'S.F.F.F']);
+      expect(codesAt(b, -3), ['F.F.F', 'Wi.F.F.F']);
     });
 
     test('spouse\'s siblings land in generation 0 (same as viewer) '
@@ -157,21 +155,21 @@ void main() {
       // token-walking and end up at the right depth.
       final b = bucketFamilyTreeMembers([
         vm(1, '我', 'SELF'),
-        vm(2, '妻', 'S', g: Gender.female),
+        vm(2, '妻', 'Wi', g: Gender.female),
         vm(3, '哥', 'eB'),
-        vm(4, '大舅子', 'S.eB'),
+        vm(4, '大舅子', 'Wi.eB'),
         vm(5, '侄子', 'eB.Son', g: Gender.male),
-        vm(6, '外甥', 'S.eB.Son'),
+        vm(6, '外甥', 'Wi.eB.Son'),
       ]);
       // SELF + S + eB + S.eB all at generation 0 (S and S.xB are
       // sibling-equivalent to eB, sharing F+M as a generation
       // anchor... wait, S.xB is the spouse's sibling, same gen as
       // viewer; eB is the viewer's sibling, same gen as viewer).
       // Both land in generation 0 along with SELF and S.
-      expect(codesAt(b, 0), containsAll(['SELF', 'S', 'eB', 'S.eB']));
+      expect(codesAt(b, 0), containsAll(['SELF', 'Wi', 'eB', 'Wi.eB']));
       // eB.Son is viewer's nephew (one gen down). S.eB.Son is
       // spouse's nephew (also one gen down). Both at generation +1.
-      expect(codesAt(b, 1), containsAll(['eB.Son', 'S.eB.Son']));
+      expect(codesAt(b, 1), containsAll(['eB.Son', 'Wi.eB.Son']));
     });
 
     test('F.eB (paternal uncle) lands in its own row at -1, not in '
@@ -194,13 +192,13 @@ void main() {
       final b = bucketFamilyTreeMembers([
         vm(1, '我', 'SELF'),
         vm(2, '子', 'Son'),
-        vm(3, '儿媳', 'Son.S', g: Gender.female),
+        vm(3, '儿媳', 'Son.Wi', g: Gender.female),
         vm(4, '女', 'Dau', g: Gender.female),
-        vm(5, '女婿', 'Dau.S'),
+        vm(5, '女婿', 'Dau.Hu'),
       ]);
       // Children row: SELF + 4 (Dau) + 5 (Dau.S) + 2 (Son) + 3 (Son.S)
       // — sorted by relationCode alphabetically: Dau, Dau.S, Son, Son.S.
-      expect(codesAt(b, 1), ['Dau', 'Dau.S', 'Son', 'Son.S']);
+      expect(codesAt(b, 1), ['Dau', 'Dau.Hu', 'Son', 'Son.Wi']);
     });
 
     test('an in-law spouse whose blood counterpart is missing still '
@@ -209,9 +207,9 @@ void main() {
         vm(1, '我', 'SELF'),
         vm(2, '女', 'Dau', g: Gender.female),
         // No 'Son' in this family, so this Son.S can't be paired.
-        vm(3, '儿媳', 'Son.S', g: Gender.female),
+        vm(3, '儿媳', 'Son.Wi', g: Gender.female),
       ]);
-      expect(codesAt(b, 1), ['Dau', 'Son.S']);
+      expect(codesAt(b, 1), ['Dau', 'Son.Wi']);
     });
 
     test('every member lands in exactly one row, no "extended" '
@@ -220,17 +218,17 @@ void main() {
       // previous design had to special-case.
       final b = bucketFamilyTreeMembers([
         vm(1, '我', 'SELF'),
-        vm(2, '妻', 'S', g: Gender.female),
+        vm(2, '妻', 'Wi', g: Gender.female),
         vm(3, '父', 'F'),
         vm(4, '母', 'M', g: Gender.female),
-        vm(5, '岳父', 'S.F'),
-        vm(6, '岳母', 'S.M', g: Gender.female),
+        vm(5, '岳父', 'Wi.F'),
+        vm(6, '岳母', 'Wi.M', g: Gender.female),
         vm(7, '哥', 'eB'),
         vm(8, '姑', 'F.eZ', g: Gender.female),
         vm(9, '堂兄', 'F.eB.Son'),
         vm(10, '子', 'Son'),
         vm(11, '女', 'Dau', g: Gender.female),
-        vm(12, '儿媳', 'Son.S', g: Gender.female),
+        vm(12, '儿媳', 'Son.Wi', g: Gender.female),
         vm(13, '孙', 'Son.Son'),
         vm(14, '孙女', 'Son.Dau', g: Gender.female),
         vm(15, '外孙', 'Dau.Son'),
@@ -247,9 +245,9 @@ void main() {
       // generation. F.eB.Son (cousin, the viewer's father's brother's
       // son) also walks to -1 + 0 + 1 = 0 — same gen as the viewer.
       expect(rowAt(b, -2), isNull);
-      expect(codesAt(b, -1), containsAll(['F', 'M', 'S.F', 'S.M', 'F.eZ']));
-      expect(codesAt(b, 0), containsAll(['SELF', 'S', 'eB', 'F.eB.Son']));
-      expect(codesAt(b, 1), containsAll(['Dau', 'Son', 'Son.S']));
+      expect(codesAt(b, -1), containsAll(['F', 'M', 'Wi.F', 'Wi.M', 'F.eZ']));
+      expect(codesAt(b, 0), containsAll(['SELF', 'Wi', 'eB', 'F.eB.Son']));
+      expect(codesAt(b, 1), containsAll(['Dau', 'Son', 'Son.Wi']));
       expect(codesAt(b, 2), containsAll(['Dau.Son', 'Son.Dau', 'Son.Son']));
       expect(codesAt(b, 3), containsAll(['Son.Son.Son']));
     });
@@ -362,16 +360,16 @@ void main() {
       expect(drops[3].children, ['SELF']);
     });
 
-    test('S (spouse) is never treated as a child of the upper row', () {
-      // The spouse S is at the viewer's generation. Its
-      // relationCode is 'S' (no dot), and [_parentRelationCodeOf]
-      // returns null for S because the single-token S/eB/yB/eZ/yZ
+    test('a spouse is never treated as a child of the upper row', () {
+      // The spouse is at the viewer's generation. Its relationCode is a
+      // bare spouse token ('Wi' here — no dot), and [_parentRelationCodeOf]
+      // returns null for those because the single-token spouse/sibling
       // shapes have no parent above them in the family tree.
-      // The builder must therefore NOT add an F→S drop, even
+      // The builder must therefore NOT add an F→spouse drop, even
       // though it does add an F→SELF drop in the same data.
       final b = bucketFamilyTreeMembers([
         vm(1, '我', 'SELF'),
-        vm(2, '妻', 'S', g: Gender.female),
+        vm(2, '妻', 'Wi', g: Gender.female),
         vm(3, '父', 'F'),
       ]);
       final drops = computeInterRowDropCodes(b.rows);

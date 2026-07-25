@@ -9,13 +9,19 @@ final KinshipTermSet zhHansKinshipTerms = KinshipTermSet(
   baseTerms: const {
     RelToken.father: '父亲',
     RelToken.mother: '母亲',
+    RelToken.parent: '家长',
+    RelToken.husband: '丈夫',
+    RelToken.wife: '妻子',
     RelToken.spouse: '配偶',
     RelToken.son: '儿子',
     RelToken.daughter: '女儿',
+    RelToken.child: '孩子',
     RelToken.elderBrother: '哥哥',
     RelToken.youngerBrother: '弟弟',
     RelToken.elderSister: '姐姐',
     RelToken.youngerSister: '妹妹',
+    RelToken.elderSibling: '兄姐',
+    RelToken.youngerSibling: '弟妹',
   },
   table: const {
     'F': '爸爸',
@@ -52,36 +58,50 @@ final KinshipTermSet zhHansKinshipTerms = KinshipTermSet(
     'eZ.Dau': '外甥女',
     'yZ.Son': '外甥',
     'yZ.Dau': '外甥女',
-    'Son.S': '儿媳',
-    'Dau.S': '女婿',
+    // Spouse, now gendered by the token itself rather than by a
+    // separately-passed target gender.
+    'Hu': '丈夫',
+    'Wi': '妻子',
+    'Son.Wi': '儿媳',
+    'Dau.Hu': '女婿',
     // Grandchild's spouse — without these the localizer would
     // compose the literal "孙女的配偶" / "儿子的女儿的配偶" instead
     // of the actual short colloquial terms.
-    'Son.Son.S': '孙媳',
-    'Son.Dau.S': '孙女婿',
-    'Dau.Son.S': '外孙媳',
-    'Dau.Dau.S': '外孙女婿',
-    'S.F#male': '岳父',
-    'S.F#female': '公公',
-    'S.M#male': '岳母',
-    'S.M#female': '婆婆',
-    'S.eB#male': '大舅子',
-    'S.eB#female': '大伯子',
-    'S.yB#male': '小舅子',
-    'S.yB#female': '小叔子',
-    'S.eZ#male': '大姨子',
-    'S.eZ#female': '大姑子',
-    'S.yZ#male': '小姨子',
-    'S.yZ#female': '小姑子',
-    // Generation +2 in-laws: in Chinese, 岳父 (S.F) is socially
-    // "父亲", so 岳父的父母 = 爷爷奶奶; 岳母 (S.M) is socially "母亲",
+    'Son.Son.Wi': '孙媳',
+    'Son.Dau.Hu': '孙女婿',
+    'Dau.Son.Wi': '外孙媳',
+    'Dau.Dau.Hu': '外孙女婿',
+    // In-laws. These were previously one code (`S.F`) with a
+    // `#male`/`#female` suffix keyed on the *viewer's* gender, because a
+    // neutral `S` had discarded the spouse's gender and the viewer's was
+    // the only way to guess it back. Now the marriage side is in the code:
+    // Wi.* = 妻子那边（岳家）, Hu.* = 丈夫那边（婆家）.
+    'Wi.F': '岳父',
+    'Hu.F': '公公',
+    'Wi.M': '岳母',
+    'Hu.M': '婆婆',
+    'Wi.eB': '大舅子',
+    'Hu.eB': '大伯子',
+    'Wi.yB': '小舅子',
+    'Hu.yB': '小叔子',
+    'Wi.eZ': '大姨子',
+    'Hu.eZ': '大姑子',
+    'Wi.yZ': '小姨子',
+    'Hu.yZ': '小姑子',
+    // Generation +2 in-laws: in Chinese, 岳父 (Wi.F) is socially
+    // "父亲", so 岳父的父母 = 爷爷奶奶; 岳母 (Wi.M) is socially "母亲",
     // so 岳母的父母 = 外公外婆. Without these mappings the kinship
     // localizer falls through to base-term composition and emits the
-    // literal "配偶的母亲的父亲" etc., which reads awkwardly.
-    'S.F.F': '爷爷',
-    'S.F.M': '奶奶',
-    'S.M.F': '外公',
-    'S.M.M': '外婆',
+    // literal "妻子的母亲的父亲" etc., which reads awkwardly.
+    // Same reasoning applies on the husband's side.
+    'Wi.F.F': '爷爷',
+    'Wi.F.M': '奶奶',
+    'Wi.M.F': '外公',
+    'Wi.M.M': '外婆',
+    'Hu.F.F': '爷爷',
+    'Hu.F.M': '奶奶',
+    'Hu.M.F': '外公',
+    'Hu.M.M': '外婆',
   },
   // Depth-3 / depth-4 ancestor chains. Without these the localizer
   // would emit "父亲的父亲的父亲" for F.F.F, which reads as a run-on

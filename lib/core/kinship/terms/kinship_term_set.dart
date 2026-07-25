@@ -103,7 +103,13 @@ class KinshipTermSet {
 
 /// relationCodes whose term depends on the *viewer's* own gender rather than
 /// being fully determined by the path tokens.
-const Set<String> viewerGenderDependentCodes = {
-  'eB', 'eZ', //
-  'S.F', 'S.M', 'S.eB', 'S.yB', 'S.eZ', 'S.yZ',
-};
+///
+/// This used to also list the in-law codes `S.F`/`S.M`/`S.eB`/… — not because
+/// those genuinely depend on the viewer, but because the neutral `S` token had
+/// thrown away the spouse's gender and the viewer's gender was the only way to
+/// guess it back (assuming a heterosexual marriage). Now that the code carries
+/// the spouse's gender directly (`Wi.F`=岳父, `Hu.F`=公公), those are ordinary
+/// unambiguous table keys and only the genuinely viewer-dependent ones remain:
+/// in Korean, one's own elder sibling is 형/오빠 (or 누나/언니) depending on the
+/// *speaker's* gender.
+const Set<String> viewerGenderDependentCodes = {'eB', 'eZ'};

@@ -70,15 +70,17 @@ String? localizeRelation(
 /// of truth for kinship-term translation — the backend never localizes,
 /// it only ever produces the code (see docs/api.md §七).
 ///
-/// [targetGender] only matters for the bare spouse code `S`:
-/// - `Gender.male`   → `spouseOfMale` (e.g. 丈夫 / Husband)
-/// - `Gender.female` → `spouseOfFemale` (e.g. 妻子 / Wife)
-/// - `null`          → `null` (no label — we refuse to print a neutral
-///                    "配偶"/"Spouse" because the product rule is "show
-///                    丈夫 or 妻子, nothing else")
-/// Callers must pass the API's actual `senderGender` / `otherUserGender`
-/// straight through — **do not fall back to `Gender.male` on null**, or
-/// female spouses get rendered as "husband" (the old bug).
+/// Spouse gender no longer needs [targetGender] to be recovered: the code
+/// itself carries it (`Hu`=husband, `Wi`=wife), so `Hu`/`Wi`/`Wi.F`/`Hu.F` are
+/// plain table lookups. Previously the bare code `S` returned `null` whenever
+/// `targetGender` was unknown, which is why spouse labels rendered blank
+/// wherever the caller had no gender to pass. The only remaining `S` is the
+/// explicitly-gender-unknown one, which now renders a neutral term instead of
+/// nothing — showing "配偶" beats showing an empty string.
+///
+/// [targetGender] is therefore only a refinement for a trailing neutral `S`
+/// in the compose fallback; [viewerGender] still matters for the codes in
+/// [viewerGenderDependentCodes] (Korean 형/오빠).
 String? localizeRelationCode(
   String code, {
   Gender? targetGender,
@@ -87,12 +89,6 @@ String? localizeRelationCode(
 }) {
   final terms = termSetFor(localeCode);
   if (code == kSelfRelationCode) return terms.selfTerm;
-
-  if (code == 'S') {
-    if (targetGender == Gender.male) return terms.spouseOfMale;
-    if (targetGender == Gender.female) return terms.spouseOfFemale;
-    return null;
-  }
 
   if (viewerGenderDependentCodes.contains(code)) {
     final gender = viewerGender ?? Gender.male;

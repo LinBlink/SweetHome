@@ -48,14 +48,26 @@ void main() {
     expect(localizeRelation(path, targetGender: Gender.male, localeCode: 'zh_Hans'), '儿子');
   });
 
-  test('spouse resolves via target gender (husband vs wife)', () {
+  test('spouse gender lives in the code itself (Wi vs Hu)', () {
+    // These two directions used to produce the same code 'S', so the
+    // spouse's gender had to be supplied separately for the localizer to
+    // pick 妻子 vs 丈夫 — and rendered blank whenever it wasn't known.
     final toWife = computeRelationPath(graph, 1, 2);
-    expect(relationCode(toWife), 'S');
-    expect(localizeRelation(toWife, targetGender: Gender.female, localeCode: 'zh_Hans'), '妻子');
+    expect(relationCode(toWife), 'Wi');
+    expect(localizeRelation(toWife, localeCode: 'zh_Hans'), '妻子');
 
     final toHusband = computeRelationPath(graph, 2, 1);
-    expect(relationCode(toHusband), 'S');
-    expect(localizeRelation(toHusband, targetGender: Gender.male, localeCode: 'zh_Hans'), '丈夫');
+    expect(relationCode(toHusband), 'Hu');
+    expect(localizeRelation(toHusband, localeCode: 'zh_Hans'), '丈夫');
+  });
+
+  test('spouse label no longer needs a gender argument to render', () {
+    // The old contract returned null for 'S' with no targetGender, which is
+    // why spouse labels showed up empty in chat.
+    expect(localizeRelationCode('Wi', localeCode: 'zh_Hans'), '妻子');
+    expect(localizeRelationCode('Hu', localeCode: 'zh_Hans'), '丈夫');
+    // Gender genuinely unknown still yields a neutral term rather than null.
+    expect(localizeRelationCode('S', localeCode: 'zh_Hans'), '配偶');
   });
 
   test('sibling reduction: younger sister via shared parent collapses to yZ', () {
@@ -92,26 +104,35 @@ void main() {
     expect(relationCode(path), 'eZ');
   });
 
-  test('in-law term depends on viewer gender (Chinese distinguishes 岳父/公公)', () {
-    // extend graph: 1 has a spouse's father (id 6) via a synthetic spouse-of-spouse edge
+  test('in-law side is encoded in the path, not inferred from viewer gender '
+      '(Chinese distinguishes 岳父/公公)', () {
+    // 王建国(1, male) — 张美玲(2, female) married; 张父(6) is 张美玲's father,
+    // and 王父(7) is 王建国's father.
     final extended = FamilyGraph(
       members: const [
         FamilyMember(id: 1, name: '王建国', gender: Gender.male),
         FamilyMember(id: 2, name: '张美玲', gender: Gender.female),
         FamilyMember(id: 6, name: '张父', gender: Gender.male),
+        FamilyMember(id: 7, name: '王父', gender: Gender.male),
       ],
       relations: const [
         FamilyRelation(subjectId: 1, type: RelationEdgeType.spouseOf, objectId: 2),
         FamilyRelation(subjectId: 6, type: RelationEdgeType.parentOf, objectId: 2),
+        FamilyRelation(subjectId: 7, type: RelationEdgeType.parentOf, objectId: 1),
       ],
     );
-    final path = computeRelationPath(extended, 1, 6);
-    expect(relationCode(path), 'S.F');
-    expect(
-      localizeRelation(path,
-          targetGender: Gender.male, viewerGender: Gender.male, localeCode: 'zh_Hans'),
-      '岳父',
-    );
+
+    // Wife's father = 岳父. Previously this was 'S.F' plus a viewer-gender
+    // suffix, which only worked by assuming the marriage was heterosexual.
+    final toWifesFather = computeRelationPath(extended, 1, 6);
+    expect(relationCode(toWifesFather), 'Wi.F');
+    expect(localizeRelation(toWifesFather, localeCode: 'zh_Hans'), '岳父');
+
+    // Husband's father = 公公. Same shape, different code — no viewer gender
+    // needed to tell them apart any more.
+    final toHusbandsFather = computeRelationPath(extended, 2, 7);
+    expect(relationCode(toHusbandsFather), 'Hu.F');
+    expect(localizeRelation(toHusbandsFather, localeCode: 'zh_Hans'), '公公');
   });
 
   test('deep/uncommon path collapses to a short ancestor term, not the literal base-terms composition', () {
@@ -207,22 +228,12 @@ void main() {
         'composes into a 3+ segment run-on chain', () {
       test('a grandchild\'s spouse uses the colloquial compound term, '
           'not "孙女的配偶"', () {
-        expect(
-          localizeRelationCode('Son.Dau.S', targetGender: Gender.male, localeCode: 'zh_Hans'),
-          '孙女婿',
-        );
-        expect(
-          localizeRelationCode('Son.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
-          '孙媳',
-        );
-        expect(
-          localizeRelationCode('Dau.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
-          '外孙媳',
-        );
-        expect(
-          localizeRelationCode('Dau.Dau.S', targetGender: Gender.male, localeCode: 'zh_Hans'),
-          '外孙女婿',
-        );
+        // The spouse's gender is in the code now, so these need no
+        // targetGender argument at all.
+        expect(localizeRelationCode('Son.Dau.Hu', localeCode: 'zh_Hans'), '孙女婿');
+        expect(localizeRelationCode('Son.Son.Wi', localeCode: 'zh_Hans'), '孙媳');
+        expect(localizeRelationCode('Dau.Son.Wi', localeCode: 'zh_Hans'), '外孙媳');
+        expect(localizeRelationCode('Dau.Dau.Hu', localeCode: 'zh_Hans'), '外孙女婿');
       });
 
       test('a pure depth-3 Son/Dau chain collapses to the idiomatic '
@@ -254,14 +265,13 @@ void main() {
         // gendered spouse term: "曾孙的妻子", not "儿子的儿子的
         // 儿子的配偶".
         expect(
-          localizeRelationCode('Son.Son.Son.S',
-              targetGender: Gender.female, localeCode: 'zh_Hans'),
+          localizeRelationCode('Son.Son.Son.Wi', localeCode: 'zh_Hans'),
           '曾孙的妻子',
         );
         // A nephew's wife — no table entry for this combination at
         // all, but the `eB.Son` prefix is still reused: "侄子的妻子".
         expect(
-          localizeRelationCode('eB.Son.S', targetGender: Gender.female, localeCode: 'zh_Hans'),
+          localizeRelationCode('eB.Son.Wi', localeCode: 'zh_Hans'),
           '侄子的妻子',
         );
       });
