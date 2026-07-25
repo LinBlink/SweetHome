@@ -88,6 +88,60 @@ void main() {
     expect(localizeRelation(path, targetGender: Gender.male, localeCode: 'zh_Hans'), '爷爷');
   });
 
+  group('sibling seniority: birth date first, birthOrder as fallback', () {
+    // Must match KinshipEngine.endIsElder on the backend exactly.
+    FamilyGraph siblingGraph({
+      DateTime? aBirth,
+      DateTime? bBirth,
+      int? aOrder,
+      int? bOrder,
+    }) =>
+        FamilyGraph(
+          members: [
+            FamilyMember(
+                id: 10, name: 'A', gender: Gender.male, birthDate: aBirth, birthOrder: aOrder),
+            FamilyMember(
+                id: 11, name: 'B', gender: Gender.male, birthDate: bBirth, birthOrder: bOrder),
+            const FamilyMember(id: 12, name: 'P', gender: Gender.male),
+          ],
+          relations: const [
+            FamilyRelation(subjectId: 12, type: RelationEdgeType.parentOf, objectId: 10),
+            FamilyRelation(subjectId: 12, type: RelationEdgeType.parentOf, objectId: 11),
+          ],
+        );
+
+    test('birth date decides when both are known', () {
+      final g = siblingGraph(aBirth: DateTime(1995, 8, 20), bBirth: DateTime(1990, 3, 1));
+      expect(relationCode(computeRelationPath(g, 10, 11)), 'eB');
+      expect(relationCode(computeRelationPath(g, 11, 10)), 'yB');
+    });
+
+    test('birth date wins over a contradicting birthOrder', () {
+      final g = siblingGraph(
+        aBirth: DateTime(1995, 8, 20),
+        bBirth: DateTime(1990, 3, 1),
+        aOrder: 1,
+        bOrder: 2,
+      );
+      expect(relationCode(computeRelationPath(g, 10, 11)), 'eB');
+    });
+
+    test('falls back to birthOrder when only one birth date is known', () {
+      final g = siblingGraph(aBirth: DateTime(1995, 8, 20), aOrder: 2, bOrder: 1);
+      expect(relationCode(computeRelationPath(g, 10, 11)), 'eB');
+    });
+
+    test('identical birth dates fall through to birthOrder, then to elder', () {
+      final twins = DateTime(1990, 3, 1);
+      final withOrder = siblingGraph(aBirth: twins, bBirth: twins, aOrder: 2, bOrder: 1);
+      expect(relationCode(computeRelationPath(withOrder, 10, 11)), 'eB');
+
+      final withoutOrder = siblingGraph(aBirth: twins, bBirth: twins);
+      expect(relationCode(computeRelationPath(withoutOrder, 10, 11)), 'eB');
+      expect(relationCode(computeRelationPath(withoutOrder, 11, 10)), 'eB');
+    });
+  });
+
   test('unknown birthOrder defaults sibling to elder', () {
     final graphNoOrder = FamilyGraph(
       members: const [

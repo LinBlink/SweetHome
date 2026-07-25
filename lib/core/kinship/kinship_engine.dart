@@ -209,7 +209,7 @@ List<RelToken> _reduce(FamilyGraph graph, _NodePath path) {
 RelToken _siblingToken(FamilyGraph graph, {required int fromId, required int siblingId}) {
   final sibling = graph.memberById(siblingId);
   final self = graph.memberById(fromId);
-  final siblingIsElder = _isElder(self?.birthOrder, sibling?.birthOrder);
+  final siblingIsElder = _isElder(self, sibling);
   final isMale = sibling?.gender == Gender.male;
   if (isMale) {
     return siblingIsElder ? RelToken.elderBrother : RelToken.youngerBrother;
@@ -217,9 +217,28 @@ RelToken _siblingToken(FamilyGraph graph, {required int fromId, required int sib
   return siblingIsElder ? RelToken.elderSister : RelToken.youngerSister;
 }
 
-/// Lower birthOrder = older. Unknown birthOrder defaults to treating the
-/// sibling as elder (documented precision trade-off, docs/api.md §7.4).
-bool _isElder(int? selfBirthOrder, int? siblingBirthOrder) {
-  if (selfBirthOrder == null || siblingBirthOrder == null) return true;
-  return siblingBirthOrder < selfBirthOrder;
+/// Whether [sibling] is older than [self], with three levels of fallback —
+/// must stay identical to `KinshipEngine.endIsElder` on the backend:
+///  1. birth date (earlier = older) — the reliable signal;
+///  2. birthOrder (lower = older) — needs hand entry, so usually null;
+///  3. default to treating the sibling as elder (docs/api.md §11.4). This is
+///     not a rare edge case: until birth dates are populated it covers nearly
+///     all traffic, i.e. nearly every sibling shows up as 哥/姐.
+///
+/// Both sides need a value for a level to decide anything — one sibling's
+/// birthday alone says nothing about who's older.
+bool _isElder(FamilyMember? self, FamilyMember? sibling) {
+  final selfBirth = self?.birthDate;
+  final siblingBirth = sibling?.birthDate;
+  if (selfBirth != null && siblingBirth != null && !selfBirth.isAtSameMomentAs(siblingBirth)) {
+    return siblingBirth.isBefore(selfBirth);
+  }
+
+  final selfOrder = self?.birthOrder;
+  final siblingOrder = sibling?.birthOrder;
+  if (selfOrder != null && siblingOrder != null && selfOrder != siblingOrder) {
+    return siblingOrder < selfOrder;
+  }
+
+  return true;
 }

@@ -11,14 +11,22 @@ class FamilyMember {
   final String name;
   final Gender gender;
 
-  /// Sibling age ranking within the same parents; lower = older. Null = unknown
-  /// (the algorithm then defaults to treating the member as the elder side).
+  /// Date of birth — the primary signal for elder/younger among siblings
+  /// (earlier = older). Preferred over [birthOrder] because it's a field users
+  /// fill in anyway, whereas birthOrder asks them to understand and hand-enter
+  /// "where am I in the sibling order" and is in practice almost always null.
+  final DateTime? birthDate;
+
+  /// Sibling age ranking **among the same parents' children**; lower = older.
+  /// Only a fallback for when [birthDate] can't decide. Null = unknown (the
+  /// algorithm then defaults to treating the member as the elder side).
   final int? birthOrder;
 
   const FamilyMember({
     required this.id,
     required this.name,
     required this.gender,
+    this.birthDate,
     this.birthOrder,
   });
 }
