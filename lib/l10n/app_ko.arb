@@ -232,6 +232,7 @@
   "familyTreeTitle": "가계도",
   "familyTreeViewerYou": "나",
   "familyTreeViewerLabel": "본인",
+  "familyTreeAgeYears": "{age}세",
   "familyTreeEmpty": "아직 가족이 없습니다",
   "familyTreeEmptyDesc": "가족이 가입하면 관계가 여기에 표시됩니다.",
   "familyTreeOtherFamily": "기타 친척",

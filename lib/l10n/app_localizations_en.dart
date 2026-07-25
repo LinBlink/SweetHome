@@ -768,6 +768,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get familyTreeViewerLabel => 'You';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age yrs';
+  }
+
+  @override
   String get familyTreeEmpty => 'No family members yet';
 
   @override

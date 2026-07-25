@@ -1,17 +1,11 @@
+import '../core/time/birth_date.dart';
+
 class LoginRequest {
   final String phone;
   final String password;
   const LoginRequest({required this.phone, required this.password});
   Map<String, dynamic> toJson() => {'phone': phone, 'password': password};
 }
-
-/// Formats a date as the ISO-8601 calendar date the API expects
-/// (`YYYY-MM-DD`) — deliberately *not* `DateTime.toIso8601String()`, which
-/// appends a time component the backend's `LocalDate` won't parse.
-String formatApiDate(DateTime d) =>
-    '${d.year.toString().padLeft(4, '0')}-'
-    '${d.month.toString().padLeft(2, '0')}-'
-    '${d.day.toString().padLeft(2, '0')}';
 
 class RegisterRequest {
   final String name;
@@ -68,6 +62,12 @@ class AuthUser {
   final String familyName;
   final String role;
   final String gender;
+
+  /// From `GET /users/me` (§2.1). Lives on `family_members.birth_date`, so the
+  /// §1.1/§1.2 register/login envelopes don't carry it — it arrives on the
+  /// follow-up /users/me call, same as `gender`.
+  final DateTime? birthDate;
+
   final String? avatarUrl;
 
   /// §2.1 wallet balance, in **分** (same convention as §9 red packet
@@ -90,6 +90,7 @@ class AuthUser {
     required this.familyName,
     required this.role,
     required this.gender,
+    this.birthDate,
     this.avatarUrl,
     this.balance = 0,
   });
@@ -112,6 +113,7 @@ class AuthUser {
       familyName: user['familyName'] as String,
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
+      birthDate: parseApiDate(user['birthDate'] as String?),
       avatarUrl: user['avatarUrl'] as String?,
       balance: user['balance'] as int? ?? 0,
     );
@@ -134,6 +136,7 @@ class AuthUser {
       familyName: user['familyName'] as String,
       role: user['role'] as String? ?? 'member',
       gender: user['gender'] as String? ?? 'male',
+      birthDate: parseApiDate(user['birthDate'] as String?),
       avatarUrl: user['avatarUrl'] as String?,
       balance: user['balance'] as int? ?? 0,
     );
@@ -146,6 +149,7 @@ class AuthUser {
     String? familyName,
     String? role,
     String? gender,
+    DateTime? birthDate,
     String? avatarUrl,
     int? balance,
   }) =>
@@ -159,6 +163,7 @@ class AuthUser {
         familyName: familyName ?? this.familyName,
         role: role ?? this.role,
         gender: gender ?? this.gender,
+        birthDate: birthDate ?? this.birthDate,
         avatarUrl: avatarUrl ?? this.avatarUrl,
         balance: balance ?? this.balance,
       );
@@ -173,6 +178,7 @@ class AuthUser {
         'familyName': familyName,
         'role': role,
         'gender': gender,
+        if (birthDate != null) 'birthDate': formatApiDate(birthDate!),
         // ignore: use_null_aware_elements
         if (avatarUrl != null) 'avatarUrl': avatarUrl!,
         'balance': balance.toString(),
@@ -190,6 +196,7 @@ class AuthUser {
       familyName: prefs['familyName'] ?? '',
       role: prefs['role'] ?? 'member',
       gender: prefs['gender'] ?? 'male',
+      birthDate: parseApiDate(prefs['birthDate']),
       avatarUrl: prefs['avatarUrl'],
       // Pre-§9 prefs files won't have a balance row — `int.parse`
       // on null would throw, so coalesce through the empty string

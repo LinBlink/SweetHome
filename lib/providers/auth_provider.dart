@@ -264,14 +264,14 @@ class AuthProvider extends ChangeNotifier {
   /// instead.
   Gender? genderForName(String name) => _memberGenderByName[name];
 
-  Future<void> updateProfile(String name) async {
+  Future<void> updateProfile(String name, {DateTime? birthDate}) async {
     final user = _currentUser;
     if (user == null) return;
     if (AppConfig.mockMode) {
       await Future.delayed(const Duration(milliseconds: 300));
-      _currentUser = user.copyWith(name: name);
+      _currentUser = user.copyWith(name: name, birthDate: birthDate);
     } else {
-      _currentUser = await AuthService.updateMe(user, name: name);
+      _currentUser = await AuthService.updateMe(user, name: name, birthDate: birthDate);
       await AuthService.persistUser(_currentUser!);
     }
     notifyListeners();

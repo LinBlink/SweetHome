@@ -747,6 +747,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get familyTreeViewerLabel => '본인';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age세';
+  }
+
+  @override
   String get familyTreeEmpty => '아직 가족이 없습니다';
 
   @override

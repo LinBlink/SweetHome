@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/time/birth_date.dart';
 import '../core/error_messages.dart';
 import '../core/image_mime.dart';
 import '../core/money/money_formatter.dart';
@@ -21,6 +22,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
+  DateTime? _birthDate;
   bool _saving = false;
   bool _uploadingAvatar = false;
   String? _error;
@@ -28,13 +30,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: context.read<AuthProvider>().currentUser?.name ?? '');
+    final user = context.read<AuthProvider>().currentUser;
+    _nameCtrl = TextEditingController(text: user?.name ?? '');
+    _birthDate = user?.birthDate;
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     super.dispose();
+  }
+
+  /// Editable because it can be entered wrong at registration, and because
+  /// members who joined before the field existed have none at all — leaving it
+  /// read-only would strand them on the "everyone is 哥/姐" fallback forever.
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime(now.year - 30, now.month, now.day),
+      firstDate: DateTime(now.year - 120),
+      lastDate: now,
+      locale: Localizations.localeOf(context),
+    );
+    if (picked == null) return;
+    setState(() => _birthDate = picked);
+  }
+
+  Widget _buildBirthDateField(AppLocalizations l10n) {
+    final age = ageFrom(_birthDate);
+    return InkWell(
+      onTap: _pickBirthDate,
+      borderRadius: BorderRadius.circular(12),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: l10n.registerBirthDateLabel,
+          helperText: l10n.registerBirthDateWhy,
+          prefixIcon: Icon(Icons.cake_outlined, color: AppColors.primary),
+        ),
+        child: Text(
+          _birthDate == null
+              ? l10n.registerBirthDateHint
+              : '${formatApiDate(_birthDate!)}'
+                  '${age == null ? '' : '  ·  ${l10n.familyTreeAgeYears(age)}'}',
+          style: TextStyle(
+            fontSize: 16,
+            color: _birthDate == null ? AppColors.textHint : AppColors.textPrimary,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _save(AppLocalizations l10n) async {
@@ -44,7 +89,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _error = null;
     });
     try {
-      await context.read<AuthProvider>().updateProfile(_nameCtrl.text.trim());
+      await context
+          .read<AuthProvider>()
+          .updateProfile(_nameCtrl.text.trim(), birthDate: _birthDate);
       if (mounted) Navigator.pop(context);
     } catch (_) {
       setState(() => _error = localizeErrorMessage(kNetworkErrorSentinel, l10n));
@@ -167,6 +214,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? l10n.registerNicknameRequired : null,
                 ),
+                const SizedBox(height: 20),
+                _buildBirthDateField(l10n),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _saving ? null : () => _save(l10n),

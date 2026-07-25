@@ -6,7 +6,7 @@ import '../../core/error_messages.dart';
 import '../../core/kinship/kinship_graph.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api_exception.dart';
-import '../../models/auth_models.dart';
+import '../../core/time/birth_date.dart';
 import '../../models/family_member_vm.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/error_banner.dart';

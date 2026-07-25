@@ -232,6 +232,7 @@
   "familyTreeTitle": "မိသားစု မျိုးရိုးစဉ်",
   "familyTreeViewerYou": "ကျွန်ုပ်",
   "familyTreeViewerLabel": "ကိုယ်တိုင်",
+  "familyTreeAgeYears": "{age} နှစ်",
   "familyTreeEmpty": "မိသားစုဝင် မရှိသေးပါ",
   "familyTreeEmptyDesc": "မိသားစုဝင်များ ပါဝင်လာသောအခါ ၎င်းတို့၏ ဆွေမျိုးဆက်ဆံရေးကို ဤနေရာတွင် ပြသပါမည်။",
   "familyTreeOtherFamily": "အခြား ဆွေမျိုးများ",

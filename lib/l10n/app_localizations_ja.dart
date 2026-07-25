@@ -745,6 +745,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get familyTreeViewerLabel => '本人';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age歳';
+  }
+
+  @override
   String get familyTreeEmpty => '家族はまだいません';
 
   @override

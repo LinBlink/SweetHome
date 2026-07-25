@@ -232,6 +232,7 @@
   "familyTreeTitle": "族譜",
   "familyTreeViewerYou": "你",
   "familyTreeViewerLabel": "本人",
+  "familyTreeAgeYears": "{age}歲",
   "familyTreeEmpty": "還沒有家人",
   "familyTreeEmptyDesc": "家人加入後，他們的關係會顯示在這裡。",
   "familyTreeOtherFamily": "其他親屬",

@@ -1,5 +1,6 @@
 import '../core/kinship/kinship_graph.dart';
 import '../core/time/backend_time.dart';
+import '../core/time/birth_date.dart';
 
 /// A family member as shown to the current viewer — `relationCode` is
 /// already relative to whoever requested this (see docs/api.md §3.2/§七).
@@ -14,6 +15,12 @@ class FamilyMemberVm {
   final bool isOnline;
   final String role;
 
+  /// `family_members.birth_date`, null when never recorded. The family tree
+  /// derives age and "birthday today" from it — the server sends the date, not
+  /// the age, since age changes on the member's birthday and would go stale in
+  /// any cached response.
+  final DateTime? birthDate;
+
   const FamilyMemberVm({
     required this.userId,
     required this.name,
@@ -22,6 +29,7 @@ class FamilyMemberVm {
     required this.role,
     this.avatarUrl,
     this.isOnline = false,
+    this.birthDate,
   });
 
   factory FamilyMemberVm.fromJson(Map<String, dynamic> json) {
@@ -33,6 +41,7 @@ class FamilyMemberVm {
       role: json['role'] as String? ?? 'member',
       avatarUrl: json['avatarUrl'] as String?,
       isOnline: json['isOnline'] as bool? ?? false,
+      birthDate: parseApiDate(json['birthDate'] as String?),
     );
   }
 }

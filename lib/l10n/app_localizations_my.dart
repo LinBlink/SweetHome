@@ -769,6 +769,11 @@ class AppLocalizationsMy extends AppLocalizations {
   String get familyTreeViewerLabel => 'ကိုယ်တိုင်';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age နှစ်';
+  }
+
+  @override
   String get familyTreeEmpty => 'မိသားစုဝင် မရှိသေးပါ';
 
   @override

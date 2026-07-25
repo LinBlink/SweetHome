@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/app_config.dart';
+import '../core/time/birth_date.dart';
 import '../models/auth_models.dart';
 import 'api_client.dart';
 import 'upload_service.dart';
@@ -57,12 +58,21 @@ class AuthService {
     return AuthUser.fromUserFields(data, token: current.token, refreshToken: current.refreshToken);
   }
 
-  static Future<AuthUser> updateMe(AuthUser current, {required String name}) async {
+  /// `PUT /users/me` is a *partial* update: omitted fields keep their current
+  /// value, so [birthDate] is only sent when the caller actually changed it.
+  static Future<AuthUser> updateMe(
+    AuthUser current, {
+    required String name,
+    DateTime? birthDate,
+  }) async {
     final resp = await http
         .put(
           Uri.parse('${AppConfig.apiBaseUrl}/users/me'),
           headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${current.token}'},
-          body: jsonEncode({'name': name}),
+          body: jsonEncode({
+            'name': name,
+            if (birthDate != null) 'birthDate': formatApiDate(birthDate),
+          }),
         )
         .timeout(const Duration(seconds: 10));
     final data = ApiClient.unwrap(resp) as Map<String, dynamic>;

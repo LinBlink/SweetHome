@@ -1498,6 +1498,12 @@ abstract class AppLocalizations {
   /// **'You'**
   String get familyTreeViewerLabel;
 
+  /// Age in completed years shown under a family-tree member card
+  ///
+  /// In en, this message translates to:
+  /// **'{age} yrs'**
+  String familyTreeAgeYears(int age);
+
   /// No description provided for @familyTreeEmpty.
   ///
   /// In en, this message translates to:

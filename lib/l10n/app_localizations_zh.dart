@@ -742,6 +742,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get familyTreeViewerLabel => '本人';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age岁';
+  }
+
+  @override
   String get familyTreeEmpty => '还没有家人';
 
   @override
@@ -2471,6 +2476,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get familyTreeViewerLabel => '本人';
 
   @override
+  String familyTreeAgeYears(int age) {
+    return '$age岁';
+  }
+
+  @override
   String get familyTreeEmpty => '还没有家人';
 
   @override
@@ -4198,6 +4208,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get familyTreeViewerLabel => '本人';
+
+  @override
+  String familyTreeAgeYears(int age) {
+    return '$age歲';
+  }
 
   @override
   String get familyTreeEmpty => '還沒有家人';

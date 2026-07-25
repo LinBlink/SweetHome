@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// `show DateFormat` deliberately: intl also exports a TextDirection enum that
+// otherwise shadows Flutter's and breaks the TextPainter calls below.
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
 import '../core/avatar_label.dart';
@@ -6,6 +9,7 @@ import '../core/error_messages.dart';
 import '../core/home_widgets.dart';
 import '../core/kinship/kinship_graph.dart';
 import '../core/kinship/kinship_localizer.dart';
+import '../core/time/birth_date.dart';
 import '../l10n/app_localizations.dart';
 import '../models/api_exception.dart';
 import '../models/family_member_vm.dart';
@@ -428,7 +432,10 @@ class _FamilyTreeCanvas extends StatelessWidget {
 
   /// Card / spacing metrics — kept local so the canvas is self-contained.
   static const double _cardWidth = 92;
-  static const double _cardHeight = 110;
+  // Bumped from 110 to fit the third line (age / birthday) under the
+  // relation term. Every row position is derived from this constant, so
+  // changing it here reflows the whole canvas consistently.
+  static const double _cardHeight = 124;
   static const double _hGap = 16;
   static const double _vGap = 24;
   static const double _rowVerticalSpacing = 96;
@@ -1429,6 +1436,52 @@ class _PersonCard extends StatelessWidget {
               ),
               maxWidth: _FamilyTreeCanvas._cardWidth - 6 * 2 - 4,
             ),
+          _buildAgeLine(l10n, locale),
+        ],
+      ),
+    );
+  }
+
+  /// Birthday (month/day) and age, plus a cake on the day itself.
+  ///
+  /// Renders nothing when the birth date was never recorded — a blank slot
+  /// reads better on a dense canvas than a row of "—" placeholders, and every
+  /// member who joined before the field existed has no date.
+  ///
+  /// Only month/day is shown, not the year: on a 92px card the year costs the
+  /// space the age needs, and "when do I wish them happy birthday" is the
+  /// question a family tree is actually being asked. The full date lives on the
+  /// member list. Formatting goes through [DateFormat.Md] so the order follows
+  /// the app's language (3/1 vs 1/3 vs 3月1日) instead of being hardcoded.
+  Widget _buildAgeLine(AppLocalizations l10n, Locale locale) {
+    final birthDate = member.birthDate;
+    final age = ageFrom(birthDate);
+    if (birthDate == null || age == null) return const SizedBox.shrink();
+
+    final birthdayToday = isBirthdayToday(birthDate);
+    final monthDay = DateFormat.Md(locale.toLanguageTag()).format(birthDate);
+    return Padding(
+      padding: const EdgeInsets.only(top: 1),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (birthdayToday) ...[
+            Icon(Icons.cake, size: 9, color: AppColors.primary),
+            const SizedBox(width: 2),
+          ],
+          Flexible(
+            child: Text(
+              '$monthDay · ${l10n.familyTreeAgeYears(age)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 9,
+                color: birthdayToday ? AppColors.primary : AppColors.textHint,
+                fontWeight: birthdayToday ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+          ),
         ],
       ),
     );

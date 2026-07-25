@@ -292,6 +292,15 @@
   "familyTreeTitle": "Family Tree",
   "familyTreeViewerYou": "You",
   "familyTreeViewerLabel": "You",
+  "familyTreeAgeYears": "{age} yrs",
+  "@familyTreeAgeYears": {
+    "description": "Age in completed years shown under a family-tree member card",
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
   "familyTreeEmpty": "No family members yet",
   "familyTreeEmptyDesc": "Once your family joins, their relationships will appear here.",
   "familyTreeOtherFamily": "Other relatives",

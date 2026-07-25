@@ -232,6 +232,7 @@
   "familyTreeTitle": "家系図",
   "familyTreeViewerYou": "自分",
   "familyTreeViewerLabel": "本人",
+  "familyTreeAgeYears": "{age}歳",
   "familyTreeEmpty": "家族はまだいません",
   "familyTreeEmptyDesc": "家族が参加すると、ここに親戚関係が表示されます。",
   "familyTreeOtherFamily": "その他の親戚",
