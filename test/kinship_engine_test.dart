@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sweethome_flutter/core/kinship/kinship_engine.dart';
 import 'package:sweethome_flutter/core/kinship/kinship_graph.dart';
@@ -86,6 +88,85 @@ void main() {
     final path = computeRelationPath(graph, 4, 3);
     expect(relationCode(path), 'F.F');
     expect(localizeRelation(path, targetGender: Gender.male, localeCode: 'zh_Hans'), '爷爷');
+  });
+
+  group('path selection is deterministic and blood-first', () {
+    // Mirrors KinshipEngineTest.resultIsIndependentOfRelationOrder on the
+    // backend: the relation list order must not affect the result, because
+    // the query that produces it has no ORDER BY and the database is free to
+    // return rows however it likes.
+    //
+    // The fixture is a child with two recorded fathers (biological + adoptive)
+    // — an ordinary situation, and the sharpest probe of the old algorithm.
+    // The old code asked the graph for "the" father via a first-matching-row
+    // scan, so whichever PARENT_OF row came back first won and *the other
+    // father disappeared from the tree entirely*, along with everything above
+    // him. Shuffling this fixture through the old engine yields two different
+    // outcomes, one of which drops 生父+his father, the other 养父+his father.
+    const members = [
+      FamilyMember(id: 1, name: '我', gender: Gender.male),
+      FamilyMember(id: 2, name: '生父', gender: Gender.male),
+      FamilyMember(id: 3, name: '养父', gender: Gender.male),
+      FamilyMember(id: 4, name: '生父的爸爸', gender: Gender.male),
+      FamilyMember(id: 5, name: '养父的爸爸', gender: Gender.male),
+    ];
+    const relations = [
+      FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 1),
+      FamilyRelation(subjectId: 3, type: RelationEdgeType.parentOf, objectId: 1),
+      FamilyRelation(subjectId: 4, type: RelationEdgeType.parentOf, objectId: 2),
+      FamilyRelation(subjectId: 5, type: RelationEdgeType.parentOf, objectId: 3),
+    ];
+
+    test('every permutation of the relation list yields the same codes', () {
+      String codesFor(List<FamilyRelation> rels) {
+        final g = FamilyGraph(members: members, relations: rels);
+        return members.map((m) => relationCode(computeRelationPath(g, 1, m.id))).join('|');
+      }
+
+      // Both fathers and both grandfathers must resolve — the old engine
+      // reached only one branch and left the other unreachable.
+      expect(codesFor(relations), 'SELF|F|F|F.F|F.F');
+
+      final shuffled = List<FamilyRelation>.from(relations);
+      for (var seed = 0; seed < 200; seed++) {
+        shuffled.shuffle(Random(seed));
+        expect(codesFor(shuffled), 'SELF|F|F|F.F|F.F', reason: 'permutation seed=$seed');
+      }
+    });
+
+    test('a blood path beats an equal-length path through a marriage', () {
+      // The child (3) is reachable directly (Son) or via the spouse (Wi.Son).
+      final g = FamilyGraph(
+        members: const [
+          FamilyMember(id: 1, name: 'me', gender: Gender.male),
+          FamilyMember(id: 2, name: 'spouse', gender: Gender.female),
+          FamilyMember(id: 3, name: 'child', gender: Gender.male),
+        ],
+        relations: const [
+          FamilyRelation(subjectId: 1, type: RelationEdgeType.spouseOf, objectId: 2),
+          FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 3),
+          FamilyRelation(subjectId: 1, type: RelationEdgeType.parentOf, objectId: 3),
+        ],
+      );
+      expect(relationCode(computeRelationPath(g, 1, 3)), 'Son');
+    });
+
+    test('a child\'s other parent collapses to a spouse token', () {
+      // No SPOUSE_OF row at all — reachable only as Son.M, which must fold to
+      // Wi rather than rendering "my son's mother".
+      final g = FamilyGraph(
+        members: const [
+          FamilyMember(id: 1, name: 'me', gender: Gender.male),
+          FamilyMember(id: 2, name: 'co-parent', gender: Gender.female),
+          FamilyMember(id: 3, name: 'son', gender: Gender.male),
+        ],
+        relations: const [
+          FamilyRelation(subjectId: 1, type: RelationEdgeType.parentOf, objectId: 3),
+          FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 3),
+        ],
+      );
+      expect(relationCode(computeRelationPath(g, 1, 2)), 'Wi');
+    });
   });
 
   group('sibling seniority: birth date first, birthOrder as fallback', () {

@@ -58,19 +58,16 @@ class FamilyGraph {
 
   Iterable<FamilyMember> get members => _members.values;
 
-  int? fatherOf(int id) => _parentOf(id, Gender.male);
-
-  int? motherOf(int id) => _parentOf(id, Gender.female);
-
-  int? _parentOf(int id, Gender gender) {
-    for (final r in _relations) {
-      if (r.type == RelationEdgeType.parentOf && r.objectId == id) {
-        final parent = _members[r.subjectId];
-        if (parent != null && parent.gender == gender) return parent.id;
-      }
-    }
-    return null;
-  }
+  /// Every parent of [id], in relation-list order.
+  ///
+  /// Deliberately returns *all* of them rather than "the father" and "the
+  /// mother": the backend builds one graph edge per PARENT_OF row, so picking
+  /// a single parent per gender here would make the two engines walk different
+  /// graphs. It also can't represent a parent whose gender was never recorded.
+  List<int> parentsOf(int id) => [
+        for (final r in _relations)
+          if (r.type == RelationEdgeType.parentOf && r.objectId == id) r.subjectId,
+      ];
 
   List<int> childrenOf(int id) => [
         for (final r in _relations)

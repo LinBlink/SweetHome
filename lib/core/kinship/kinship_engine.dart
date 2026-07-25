@@ -91,6 +91,20 @@ RelToken spouseTokenFor(Gender? gender) => switch (gender) {
       null => RelToken.spouse,
     };
 
+/// The upward (parent) token for a member of the given gender.
+RelToken parentTokenFor(Gender? gender) => switch (gender) {
+      Gender.male => RelToken.father,
+      Gender.female => RelToken.mother,
+      null => RelToken.parent,
+    };
+
+/// The downward (child) token for a member of the given gender.
+RelToken childTokenFor(Gender? gender) => switch (gender) {
+      Gender.male => RelToken.son,
+      Gender.female => RelToken.daughter,
+      null => RelToken.child,
+    };
+
 const String kSelfRelationCode = 'SELF';
 
 /// BFS shortest path from [viewerId] to [targetId] over the family graph,
@@ -130,41 +144,104 @@ class _NodePath {
   const _NodePath(this.nodes, this.tokens);
 }
 
+/// A candidate path under construction. [affinalHops] counts marriage steps,
+/// which is how "blood relations win" is expressed as a sort key.
+class _Candidate {
+  final List<int> nodes;
+  final List<RelToken> tokens;
+  final int affinalHops;
+  const _Candidate(this.nodes, this.tokens, this.affinalHops);
+
+  int get last => nodes.last;
+}
+
+/// The canonical total order over paths — **must stay byte-identical to
+/// `KinshipEngine.PATH_ORDER` on the backend**, or the two engines will pick
+/// different paths for the same family and render different kinship terms for
+/// the same pair of people.
+///
+/// Compares, in order: hop count → affinal hop count (blood wins) → token
+/// spelling → member ids. Nothing in that list depends on the order the
+/// relations arrived in, so the winner is unique and reproducible.
+int _comparePaths(_Candidate a, _Candidate b) {
+  final byLength = a.tokens.length.compareTo(b.tokens.length);
+  if (byLength != 0) return byLength;
+
+  final byAffinal = a.affinalHops.compareTo(b.affinalHops);
+  if (byAffinal != 0) return byAffinal;
+
+  for (var i = 0; i < a.tokens.length && i < b.tokens.length; i++) {
+    final byToken = a.tokens[i].code.compareTo(b.tokens[i].code);
+    if (byToken != 0) return byToken;
+  }
+
+  for (var i = 0; i < a.nodes.length && i < b.nodes.length; i++) {
+    final byNode = a.nodes[i].compareTo(b.nodes[i]);
+    if (byNode != 0) return byNode;
+  }
+  return a.nodes.length.compareTo(b.nodes.length);
+}
+
+/// Canonical shortest path from [viewerId] to [targetId].
+///
+/// This is Dijkstra ordered by [_comparePaths] rather than a plain FIFO BFS.
+/// The old BFS marked nodes visited on *enqueue*, so whichever neighbour
+/// happened to be reached first won permanently — and since neighbours were
+/// emitted in relation-list order, reordering the relations (or the database
+/// returning rows in a different order, as it may: the query has no ORDER BY)
+/// could change the resulting kinship term. Selecting the global minimum under
+/// a total order removes that dependency entirely.
+///
+/// Only settled nodes are expanded, and only into unsettled ones, so every
+/// path stays simple (no node repeats) — which is what lets [_reduce] assume
+/// `nodes[i] != nodes[i + 2]`.
 _NodePath? _bfsPath(FamilyGraph graph, int viewerId, int targetId) {
-  final visited = <int>{viewerId};
-  final queue = <List<int>>[
-    [viewerId]
-  ];
-  final tokenTrail = <int, List<RelToken>>{viewerId: const []};
+  final settled = <int>{viewerId};
+  final queue = <_Candidate>[];
+
+  void pushNeighbours(_Candidate base) {
+    for (final step in _neighbors(graph, base.last)) {
+      if (settled.contains(step.toId)) continue;
+      queue.add(_Candidate(
+        [...base.nodes, step.toId],
+        [...base.tokens, step.token],
+        base.affinalHops + (step.token.isSpouse ? 1 : 0),
+      ));
+    }
+  }
+
+  pushNeighbours(_Candidate([viewerId], const [], 0));
 
   while (queue.isNotEmpty) {
-    final nodePath = queue.removeAt(0);
-    final current = nodePath.last;
-    if (current == targetId) {
-      return _NodePath(nodePath, tokenTrail[current]!);
+    // Take the global minimum. Family graphs are small, so a linear scan is
+    // cheaper and far clearer than maintaining a heap.
+    var bestIndex = 0;
+    for (var i = 1; i < queue.length; i++) {
+      if (_comparePaths(queue[i], queue[bestIndex]) < 0) bestIndex = i;
     }
-    for (final step in _neighbors(graph, current)) {
-      if (visited.contains(step.toId)) continue;
-      visited.add(step.toId);
-      tokenTrail[step.toId] = [...tokenTrail[current]!, step.token];
-      queue.add([...nodePath, step.toId]);
-    }
+    final best = queue.removeAt(bestIndex);
+
+    if (!settled.add(best.last)) continue; // already reached by a better path
+    if (best.last == targetId) return _NodePath(best.nodes, best.tokens);
+
+    pushNeighbours(best);
   }
   return null;
 }
 
-/// Blood edges (F/M/Son/Dau) before marriage edges (S) — tie-break rule
-/// from docs/api.md §7.3.
+/// One graph edge per relation row, mirroring `KinshipEngine.buildGraph`.
+/// Emission order is irrelevant to the result — [_comparePaths] is a total
+/// order — but it mirrors the backend anyway to keep the two readable side by
+/// side.
 List<_Step> _neighbors(FamilyGraph graph, int id) {
   final steps = <_Step>[];
-  final father = graph.fatherOf(id);
-  if (father != null) steps.add(_Step(RelToken.father, father));
-  final mother = graph.motherOf(id);
-  if (mother != null) steps.add(_Step(RelToken.mother, mother));
+  for (final parentId in graph.parentsOf(id)) {
+    steps.add(_Step(parentTokenFor(graph.memberById(parentId)?.gender), parentId));
+  }
   for (final childId in graph.childrenOf(id)) {
     final child = graph.memberById(childId);
     if (child == null) continue;
-    steps.add(_Step(child.gender == Gender.male ? RelToken.son : RelToken.daughter, childId));
+    steps.add(_Step(childTokenFor(child.gender), childId));
   }
   for (final spouseId in graph.spousesOf(id)) {
     // The token depends on whose direction we're walking: stepping *to* the
