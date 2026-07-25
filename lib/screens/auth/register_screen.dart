@@ -6,6 +6,7 @@ import '../../core/error_messages.dart';
 import '../../core/kinship/kinship_graph.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api_exception.dart';
+import '../../models/auth_models.dart';
 import '../../models/family_member_vm.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/error_banner.dart';
@@ -31,6 +32,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   _RegisterMode _mode = _RegisterMode.create;
   Country _selectedCountry = Countries.defaultCountry;
   Gender? _gender = Gender.male;
+  DateTime? _birthDate;
+  bool _birthDateTouched = false;
   final _joinFormKey = GlobalKey<JoinFamilyFormState>();
   bool _submitting = false;
 
@@ -44,8 +47,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _submit() async {
+    // Surface the birth-date error even if the user never opened the picker.
+    setState(() => _birthDateTouched = true);
     if (!_formKey.currentState!.validate()) return;
     if (_gender == null) return;
+    if (_birthDate == null) return;
     if (_mode == _RegisterMode.join) {
       final selection = _joinFormKey.currentState?.getSelection();
       if (selection == null) return;
@@ -64,6 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             PhoneInputField.fullPhone(_selectedCountry, _phoneCtrl),
             _passwordCtrl.text,
             gender: _gender == Gender.male ? 'male' : 'female',
+            birthDate: _birthDate!,
             familyName: _familyCtrl.text.trim(),
           );
       if (mounted && context.read<AuthProvider>().isAuthenticated) {
@@ -87,6 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             PhoneInputField.fullPhone(_selectedCountry, _phoneCtrl),
             _passwordCtrl.text,
             gender: _gender == Gender.male ? 'male' : 'female',
+            birthDate: _birthDate!,
             inviteCode: join.inviteCode,
             relationToMemberId: join.relationAnchorMemberId,
             relationType: join.relationType.apiValue,
@@ -149,6 +157,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
                     _buildGenderToggle(l10n),
+                    const SizedBox(height: 16),
+                    _buildBirthDateField(l10n),
                     const SizedBox(height: 16),
                     PhoneInputField(
                       controller: _phoneCtrl,
@@ -226,6 +236,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Birth date is **required**: it's the only signal that decides elder vs
+  /// younger among siblings (哥哥 vs 弟弟 are different words), and the sole
+  /// fallback — `birth_order` — is never collected anywhere, so without this
+  /// nearly every sibling would render as 哥/姐. See API.md §11.4.
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime(now.year - 30, now.month, now.day),
+      firstDate: DateTime(now.year - 120),
+      // No future birthdays; also stops "elder" comparisons from going haywire.
+      lastDate: now,
+      // Match the app's chosen language rather than the device locale.
+      locale: Localizations.localeOf(context),
+    );
+    if (picked == null) return;
+    setState(() {
+      _birthDate = picked;
+      _birthDateTouched = true;
+    });
+  }
+
+  Widget _buildBirthDateField(AppLocalizations l10n) {
+    final hasError = _birthDateTouched && _birthDate == null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: _pickBirthDate,
+          borderRadius: BorderRadius.circular(12),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: l10n.registerBirthDateLabel,
+              prefixIcon: Icon(Icons.cake_outlined, color: AppColors.primary),
+              errorText: hasError ? l10n.registerBirthDateRequired : null,
+            ),
+            child: Text(
+              _birthDate == null
+                  ? l10n.registerBirthDateHint
+                  : formatApiDate(_birthDate!),
+              style: TextStyle(
+                fontSize: 16,
+                color: _birthDate == null
+                    ? AppColors.textHint
+                    : AppColors.textPrimary,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.registerBirthDateWhy,
+          style: TextStyle(fontSize: 12, color: AppColors.textHint),
+        ),
+      ],
     );
   }
 

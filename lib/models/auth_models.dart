@@ -5,11 +5,26 @@ class LoginRequest {
   Map<String, dynamic> toJson() => {'phone': phone, 'password': password};
 }
 
+/// Formats a date as the ISO-8601 calendar date the API expects
+/// (`YYYY-MM-DD`) — deliberately *not* `DateTime.toIso8601String()`, which
+/// appends a time component the backend's `LocalDate` won't parse.
+String formatApiDate(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-'
+    '${d.month.toString().padLeft(2, '0')}-'
+    '${d.day.toString().padLeft(2, '0')}';
+
 class RegisterRequest {
   final String name;
   final String phone;
   final String password;
   final String gender;
+
+  /// Required at registration. It's what decides elder/younger among siblings
+  /// (中文里「哥哥」和「弟弟」是两个词，光知道是兄弟姐妹还不够), and the only
+  /// fallback is `birth_order`, which no flow ever collects — so leaving this
+  /// optional meant nearly every sibling rendered as 哥/姐. See API.md §11.4.
+  final DateTime birthDate;
+
   final String? familyName;
   final String? inviteCode;
   final int? relationToMemberId;
@@ -20,6 +35,7 @@ class RegisterRequest {
     required this.phone,
     required this.password,
     required this.gender,
+    required this.birthDate,
     this.familyName,
     this.inviteCode,
     this.relationToMemberId,
@@ -32,6 +48,7 @@ class RegisterRequest {
       'phone': phone,
       'password': password,
       'gender': gender,
+      'birthDate': formatApiDate(birthDate),
     };
     if (familyName != null) map['familyName'] = familyName;
     if (inviteCode != null) map['inviteCode'] = inviteCode;

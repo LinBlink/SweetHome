@@ -82,6 +82,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerGenderRequired => 'Please select a gender';
 
   @override
+  String get registerBirthDateLabel => 'Date of birth';
+
+  @override
+  String get registerBirthDateHint => 'Tap to choose';
+
+  @override
+  String get registerBirthDateRequired => 'Please choose your date of birth';
+
+  @override
+  String get registerBirthDateWhy =>
+      'Used to work out who is the elder sibling when showing family titles.';
+
+  @override
   String get registerCreateFamilyTab => 'Create a Family';
 
   @override

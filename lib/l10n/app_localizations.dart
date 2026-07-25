@@ -250,6 +250,30 @@ abstract class AppLocalizations {
   /// **'Please select a gender'**
   String get registerGenderRequired;
 
+  /// No description provided for @registerBirthDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get registerBirthDateLabel;
+
+  /// No description provided for @registerBirthDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose'**
+  String get registerBirthDateHint;
+
+  /// No description provided for @registerBirthDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose your date of birth'**
+  String get registerBirthDateRequired;
+
+  /// No description provided for @registerBirthDateWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Used to work out who is the elder sibling when showing family titles.'**
+  String get registerBirthDateWhy;
+
   /// No description provided for @registerCreateFamilyTab.
   ///
   /// In en, this message translates to:

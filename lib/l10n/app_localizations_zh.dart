@@ -81,6 +81,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get registerGenderRequired => '请选择性别';
 
   @override
+  String get registerBirthDateLabel => '出生日期';
+
+  @override
+  String get registerBirthDateHint => '点击选择';
+
+  @override
+  String get registerBirthDateRequired => '请选择出生日期';
+
+  @override
+  String get registerBirthDateWhy => '用于计算称谓时区分兄弟姐妹的长幼（哥哥/弟弟、姐姐/妹妹）。';
+
+  @override
   String get registerCreateFamilyTab => '创建新家庭';
 
   @override
@@ -1798,6 +1810,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get registerGenderRequired => '请选择性别';
 
   @override
+  String get registerBirthDateLabel => '出生日期';
+
+  @override
+  String get registerBirthDateHint => '点击选择';
+
+  @override
+  String get registerBirthDateRequired => '请选择出生日期';
+
+  @override
+  String get registerBirthDateWhy => '用于计算称谓时区分兄弟姐妹的长幼（哥哥/弟弟、姐姐/妹妹）。';
+
+  @override
   String get registerCreateFamilyTab => '创建新家庭';
 
   @override
@@ -3513,6 +3537,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get registerGenderRequired => '請選擇性別';
+
+  @override
+  String get registerBirthDateLabel => '出生日期';
+
+  @override
+  String get registerBirthDateHint => '點擊選擇';
+
+  @override
+  String get registerBirthDateRequired => '請選擇出生日期';
+
+  @override
+  String get registerBirthDateWhy => '用於計算稱謂時區分兄弟姊妹的長幼（哥哥/弟弟、姐姐/妹妹）。';
 
   @override
   String get registerCreateFamilyTab => '建立新家庭';

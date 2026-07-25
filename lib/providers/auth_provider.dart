@@ -150,6 +150,7 @@ class AuthProvider extends ChangeNotifier {
     String phone,
     String password, {
     required String gender,
+    required DateTime birthDate,
     String? familyName,
     String? inviteCode,
     int? relationToMemberId,
@@ -169,6 +170,7 @@ class AuthProvider extends ChangeNotifier {
             phone: phone,
             password: password,
             gender: gender,
+            birthDate: birthDate,
             familyName: familyName,
             inviteCode: inviteCode,
             relationToMemberId: relationToMemberId,

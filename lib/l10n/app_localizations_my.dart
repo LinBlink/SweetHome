@@ -82,6 +82,19 @@ class AppLocalizationsMy extends AppLocalizations {
   String get registerGenderRequired => 'ကျား/မ ရွေးချယ်ပါ';
 
   @override
+  String get registerBirthDateLabel => 'မွေးသက္ကရာဇ်';
+
+  @override
+  String get registerBirthDateHint => 'ရွေးရန် နှိပ်ပါ';
+
+  @override
+  String get registerBirthDateRequired => 'မွေးသက္ကရာဇ် ရွေးပါ';
+
+  @override
+  String get registerBirthDateWhy =>
+      'မိသားစုခေါ်ဝေါ်မှုတွင် ညီအစ်ကိုမောင်နှမ အကြီးအငယ် ခွဲခြားရန် အသုံးပြုသည်။';
+
+  @override
   String get registerCreateFamilyTab => 'မိသားစုအသစ်ဖန်တီးရန်';
 
   @override

@@ -81,6 +81,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get registerGenderRequired => '性別を選択してください';
 
   @override
+  String get registerBirthDateLabel => '生年月日';
+
+  @override
+  String get registerBirthDateHint => 'タップして選択';
+
+  @override
+  String get registerBirthDateRequired => '生年月日を選択してください';
+
+  @override
+  String get registerBirthDateWhy => '続柄を表示する際に、兄弟姉妹の年上・年下を判定するために使います。';
+
+  @override
   String get registerCreateFamilyTab => '新しい家族を作る';
 
   @override

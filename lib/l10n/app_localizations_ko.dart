@@ -81,6 +81,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get registerGenderRequired => '성별을 선택해주세요';
 
   @override
+  String get registerBirthDateLabel => '생년월일';
+
+  @override
+  String get registerBirthDateHint => '탭하여 선택';
+
+  @override
+  String get registerBirthDateRequired => '생년월일을 선택해 주세요';
+
+  @override
+  String get registerBirthDateWhy => '호칭을 표시할 때 형제자매의 손위·손아래를 구분하는 데 사용됩니다.';
+
+  @override
   String get registerCreateFamilyTab => '새 가족 만들기';
 
   @override
