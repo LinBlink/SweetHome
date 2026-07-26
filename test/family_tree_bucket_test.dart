@@ -465,5 +465,74 @@ void main() {
       expect(grandparentDrop.children, containsAll(['M', 'M.eB', 'M.yZ']));
       expect(['M.F', 'M.M'], contains(grandparentDrop.parent));
     });
+
+    test('Hu→Hu.F drop: a wife sees her husband joined to his parents', () {
+      // Regression: the ancestor-chain branch used to be gated on the code
+      // STARTING with `F.`/`M.`, and a bare spouse token returned null
+      // outright. From a wife's viewpoint her husband is `Hu` and his
+      // parents are `Hu.F`/`Hu.M`, none of which match that gate — so the
+      // whole upper generation came out with NO connector at all (the drop
+      // list was literally empty), and the husband plus both parents-in-law
+      // rendered as floating cards.
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF', g: Gender.female),
+        vm(2, '丈夫', 'Hu'),
+        vm(3, '公公', 'Hu.F'),
+        vm(4, '婆婆', 'Hu.M', g: Gender.female),
+      ]);
+      final drops = computeInterRowDropCodes(b.rows);
+      final husbandDrop = drops.firstWhere((d) => d.children.contains('Hu'));
+      expect(['Hu.F', 'Hu.M'], contains(husbandDrop.parent));
+      // The viewer herself has no blood parent in this data, so she must
+      // NOT be pulled onto her husband's parents' trunk.
+      expect(husbandDrop.children, isNot(contains('SELF')));
+    });
+
+    test('in-law ancestors above the spouse also connect (Hu.F → Hu.F.F)', () {
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF', g: Gender.female),
+        vm(2, '丈夫', 'Hu'),
+        vm(3, '公公', 'Hu.F'),
+        vm(4, '丈夫的爷爷', 'Hu.F.F'),
+      ]);
+      final drops = computeInterRowDropCodes(b.rows);
+      expect(drops.firstWhere((d) => d.children.contains('Hu.F')).parent,
+          'Hu.F.F');
+      expect(drops.firstWhere((d) => d.children.contains('Hu')).parent, 'Hu.F');
+    });
+
+    test('a bare sibling shares SELF-s parents and rides the same trunk', () {
+      // `eB`/`eZ` add no generation and have the same parents as the
+      // viewer — the same rule the `M.eB` case above applies one
+      // generation up. Previously they returned null and siblings hung
+      // unconnected beside a properly-connected SELF.
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '哥', 'eB'),
+        vm(3, '妹', 'yZ', g: Gender.female),
+        vm(4, '父', 'F'),
+        vm(5, '母', 'M', g: Gender.female),
+      ]);
+      final drops = computeInterRowDropCodes(b.rows);
+      final drop = drops.firstWhere((d) => d.children.contains('eB'));
+      expect(drop.parent, 'F');
+      expect(drop.children, containsAll(['SELF', 'eB', 'yZ']));
+    });
+
+    test('a gender-unknown parent (P) still gets a connector', () {
+      // The server emits `P`/`C`/`S` when the member's gender was never
+      // recorded. `P` matched neither the F/M gate nor SELF's F-then-M
+      // lookup, so an unknown-gender parent was left unconnected. Only the
+      // relationCode drives the drop topology, so the card's own [Gender]
+      // (which has no `unknown` member on this client) is irrelevant here.
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '家长', 'P'),
+      ]);
+      final drops = computeInterRowDropCodes(b.rows);
+      expect(drops, hasLength(1));
+      expect(drops[0].parent, 'P');
+      expect(drops[0].children, ['SELF']);
+    });
   });
 }

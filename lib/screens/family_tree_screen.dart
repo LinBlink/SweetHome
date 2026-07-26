@@ -1067,23 +1067,30 @@ List<_InterRowDrop> computeInterRowDrops(List<_RowLayout> placedRows) {
 ///     then same-direction. Whichever candidate is present in
 ///     [upperCodes] wins.
 ///
-/// Spouse/sibling tokens (`S`, `eB`, `yB`, `eZ`, `yZ`) live at the
-/// viewer's generation and have no upward parent in the family
-/// tree.
+/// A bare sibling token (`eB`, `yB`, `eZ`, `yZ`, `eX`, `yX`) shares
+/// SELF's parents, so it resolves to whatever SELF resolves to — the
+/// same rule the `M.eB` case applies one generation up.
+///
+/// A bare spouse token (`Hu`, `Wi`, `S`) does NOT share SELF's parents;
+/// the spouse's parents are the parents-in-law, whose codes are `Hu.F` /
+/// `Hu.M` (公公/婆婆). Those are found by the generic append rule below,
+/// which is why it must not be gated on the chain *starting* with `F`/`M`.
 String? _ancestorInUpperRows(
   String code,
   Iterable<String> upperCodes,
 ) {
   if (code == 'SELF') {
     // SELF has no relationCode; its parent is the closest blood
-    // parent in the upper rows (F preferred, then M).
+    // parent in the upper rows (F preferred, then M, then the
+    // gender-unknown P).
     if (upperCodes.contains('F')) return 'F';
     if (upperCodes.contains('M')) return 'M';
+    if (upperCodes.contains('P')) return 'P';
     return null;
   }
-  // Spouse/siblings — no upper-row parent.
-  if (isSpouseRelationCode(code) || _siblingTokenCodes.contains(code)) {
-    return null;
+  // A bare sibling token adds no generation and shares SELF's parents.
+  if (_siblingTokenCodes.contains(code)) {
+    return _ancestorInUpperRows('SELF', upperCodes);
   }
   // Sibling-of-X (e.g. `M.eB`, `F.F.yZ`): the sibling token is always
   // the LAST segment (the kinship engine only ever reduces "parent,
@@ -1103,10 +1110,23 @@ String? _ancestorInUpperRows(
       return _ancestorInUpperRows(code.substring(0, lastDot), upperCodes);
     }
   }
+  final lastSeg =
+      code.contains('.') ? code.substring(code.lastIndexOf('.') + 1) : code;
+
   // Descendant chain (Son, Dau, or any Son.* / Dau.*):
   // strip the last dot-segment to get the parent's relationCode.
-  if (code == 'Son' || code == 'Dau' || code == 'C' ||
-      code.startsWith('Son.') || code.startsWith('Dau.') || code.startsWith('C.')) {
+  //
+  // Excludes chains that END in a spouse token: `Son.Wi` (daughter-in-law)
+  // must not strip to `Son`, which would draw the son as his own wife's
+  // parent. Her parent is `Son.Wi.F`, handled by the append rule below.
+  // In practice the two never differ today (a spouse sits in the same
+  // generation row as the person they married, and drops are only drawn
+  // between different rows), but relying on that coincidence is fragile.
+  if ((code == 'Son' || code == 'Dau' || code == 'C' ||
+          code.startsWith('Son.') ||
+          code.startsWith('Dau.') ||
+          code.startsWith('C.')) &&
+      !isSpouseRelationCode(lastSeg)) {
     if (!code.contains('.')) {
       // Son / Dau's direct parent is the viewer (SELF).
       return 'SELF';
@@ -1124,15 +1144,32 @@ String? _ancestorInUpperRows(
   // [code] itself (not to a stripped prefix — stripping would
   // produce a same-generation relative, which is what the
   // descendant-chain branch above handles).
-  if (code == 'F' || code == 'M' ||
-      code.startsWith('F.') || code.startsWith('M.')) {
-    final lastChar = code.endsWith('.F') || code == 'F' ? 'F' : 'M';
-    final opposite = lastChar == 'F' ? 'M' : 'F';
-    final candidates = <String>['$code.$opposite', '$code.$lastChar'];
-    for (final candidate in candidates) {
-      if (upperCodes.contains(candidate)) return candidate;
-    }
+  //
+  // The rule is keyed on how the chain ENDS, not how it starts. Appending
+  // `.F` to any code X yields "X's father", which is X's parent in the
+  // family graph no matter what route the engine took to reach X — so this
+  // one branch covers blood ancestors (`F`, `M.F`), the gender-unknown
+  // parent (`P`), the viewer's own spouse (`Hu` → `Hu.F`, the 公公), and
+  // in-law ancestors (`Hu.F` → `Hu.F.F`) alike. Gating it on
+  // `startsWith('F.')` was what left a wife's husband, his parents, and
+  // every in-law above them as disconnected floating cards.
+  final upTokens = {'F', 'M', 'P'};
+  if (!upTokens.contains(lastSeg) && !isSpouseRelationCode(lastSeg)) {
     return null;
+  }
+  // For an F/M chain, try the opposite-gender parent first so a
+  // mixed-direction chain still connects when the data carries only one
+  // half. A spouse or `P` segment has no direction, so it just tries
+  // F → M → P, matching SELF's preference order.
+  final candidates = <String>[
+    if (lastSeg == 'F') '$code.M',
+    if (lastSeg == 'M') '$code.F',
+    '$code.F',
+    '$code.M',
+    '$code.P',
+  ];
+  for (final candidate in candidates) {
+    if (upperCodes.contains(candidate)) return candidate;
   }
   return null;
 }
