@@ -7,9 +7,15 @@ import 'package:flutter/widgets.dart';
 ///
 /// This stub is only reachable if someone removes the `kIsWeb` guard and
 /// calls it on iOS/Android — return the fallback so nothing crashes.
+/// The signature must match `_web_image_web.dart` exactly — a conditional
+/// import only compiles if both sides expose the same API.
 Widget buildPlatformImage({
   required String url,
-  required double size,
   required Widget fallback,
+  double? width,
+  double? height,
+  BoxFit fit = BoxFit.cover,
+  bool circle = false,
+  double cornerRadius = 0,
 }) =>
     fallback;

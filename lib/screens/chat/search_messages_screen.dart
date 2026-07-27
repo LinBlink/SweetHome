@@ -5,6 +5,8 @@ import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/chat_models.dart';
 import '../../providers/chat_provider.dart';
+import '../../core/app_icons.dart';
+import '../../widgets/app_icon.dart';
 import '../../widgets/conversation_tile.dart';
 import 'chat_room_screen.dart';
 
@@ -57,7 +59,7 @@ class _SearchMessagesScreenState extends State<SearchMessagesScreen> {
       appBar: HomeAppBar(
         title: l10n.conversationsSearchTooltip,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const AppIcon(AppIcons.actionBack),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
       ),
@@ -72,15 +74,15 @@ class _SearchMessagesScreenState extends State<SearchMessagesScreen> {
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: l10n.conversationsSearchHint,
-                  prefixIcon: Icon(
-                    Icons.search_rounded,
+                  prefixIcon: AppIcon(
+                    AppIcons.actionSearch,
                     color: AppColors.textHint,
                   ),
                   suffixIcon: _query.isEmpty
                       ? null
                       : IconButton(
-                          icon: Icon(
-                            Icons.close_rounded,
+                          icon: AppIcon(
+                            AppIcons.actionClose,
                             color: AppColors.textHint,
                             size: 18,
                           ),
@@ -115,8 +117,8 @@ class _EmptyHint extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_rounded,
+            AppIcon(
+              AppIcons.actionSearch,
               size: 44,
               color: AppColors.primary.withValues(alpha: 0.5),
             ),
@@ -150,8 +152,8 @@ class _NoResults extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_off_rounded,
+            AppIcon(
+              AppIcons.emptySearch,
               size: 44,
               color: AppColors.textHint,
             ),

@@ -2074,6 +2074,30 @@ abstract class AppLocalizations {
   /// **'Choose appearance'**
   String get profileAppearanceSheetTitle;
 
+  /// No description provided for @profileIconPackRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Icons'**
+  String get profileIconPackRow;
+
+  /// No description provided for @profileIconPackSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an icon set'**
+  String get profileIconPackSheetTitle;
+
+  /// No description provided for @profileIconPackStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Default icons'**
+  String get profileIconPackStandard;
+
+  /// No description provided for @profileIconPackPlayful.
+  ///
+  /// In en, this message translates to:
+  /// **'Playful icons'**
+  String get profileIconPackPlayful;
+
   /// No description provided for @profileThemeModeSection.
   ///
   /// In en, this message translates to:

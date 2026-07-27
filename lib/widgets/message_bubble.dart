@@ -239,7 +239,12 @@ class _ImageBubble extends StatelessWidget {
     if (kIsWeb) {
       img = buildPlatformImage(
         url: url,
-        size: 220,
+        width: 220,
+        height: 220,
+        // The bubble's asymmetric corners can't be expressed in a single
+        // CSS radius, and the outer ClipRRect can't clip a platform view,
+        // so web settles for the uniform 18px.
+        cornerRadius: 18,
         fallback: placeholder,
       );
     } else {
@@ -779,7 +784,7 @@ class _FullImagePreview extends StatelessWidget {
     if (kIsWeb) {
       image = buildPlatformImage(
         url: url,
-        size: size.width,
+        fit: BoxFit.contain,
         fallback: placeholder,
       );
     } else {

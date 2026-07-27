@@ -1060,6 +1060,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileAppearanceSheetTitle => '选择外观模式';
 
   @override
+  String get profileIconPackRow => '图标风格';
+
+  @override
+  String get profileIconPackSheetTitle => '选择图标风格';
+
+  @override
+  String get profileIconPackStandard => '默认图标';
+
+  @override
+  String get profileIconPackPlayful => '减龄图标';
+
+  @override
   String get profileThemeModeSection => '外观模式';
 
   @override
@@ -2794,6 +2806,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get profileAppearanceSheetTitle => '选择外观模式';
 
   @override
+  String get profileIconPackRow => '图标风格';
+
+  @override
+  String get profileIconPackSheetTitle => '选择图标风格';
+
+  @override
+  String get profileIconPackStandard => '默认图标';
+
+  @override
+  String get profileIconPackPlayful => '减龄图标';
+
+  @override
   String get profileThemeModeSection => '外观模式';
 
   @override
@@ -4526,6 +4550,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileAppearanceSheetTitle => '選擇外觀模式';
+
+  @override
+  String get profileIconPackRow => '圖示風格';
+
+  @override
+  String get profileIconPackSheetTitle => '選擇圖示風格';
+
+  @override
+  String get profileIconPackStandard => '預設圖示';
+
+  @override
+  String get profileIconPackPlayful => '減齡圖示';
 
   @override
   String get profileThemeModeSection => '外觀模式';

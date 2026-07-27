@@ -21,6 +21,7 @@ dependencies:
   http_parser: ^4.0.2
   image_picker: ^1.1.2
   flutter_image_compress: ^2.4.0
+  flutter_svg: ^2.0.10
   jpush_flutter: ^3.4.7
   just_audio: ^0.9.42
   latlong2: ^0.9.1
@@ -37,10 +38,18 @@ dependencies:
   share_plus: ^13.2.1
   pdf: ^3.12.0
   printing: ^5.15.0
+  # Not used by our own code, but Flutter's Cupertino widgets (reached
+  # through Material's adaptive paths) declare IconData in this
+  # package's font family. Without the dependency the font isn't
+  # bundled and those glyphs render as empty boxes — that's the
+  # "Expected to find fonts for (... cupertino_icons/CupertinoIcons)"
+  # build warning.
+  cupertino_icons: ^1.0.8
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
 
 dependency_overrides:
   record_linux: ^2.0.0
@@ -57,3 +66,62 @@ flutter:
     - assets/fonts/NotoSansKR-Regular.ttf
     - assets/fonts/NotoSansMyanmar-Regular.ttf
     - assets/fonts/NotoEmoji-Regular.ttf
+    # Directory form, not file-by-file: new icons get picked up by a
+    # `flutter pub get` without touching this file. One directory per
+    # icon pack — the user picks between them in profile settings, so
+    # both ship; see `assets/icons/README.md`.
+    - assets/icons/svg/
+    - assets/icons/svg_playful/
+
+  # Bundled UI text fonts. These are NOT the same files as the six
+  # above: those are full-coverage fonts read at runtime only when
+  # exporting a PDF, these are small per-script subsets built by
+  # `scripts/build_ui_fonts.py` and rendered on every screen.
+  #
+  # They exist because CanvasKit cannot see system fonts — anything it
+  # can't find in a registered font it fetches from
+  # fonts.gstatic.com mid-render, which costs a round trip everywhere
+  # and fails outright behind the GFW, leaving Chinese text as tofu
+  # boxes. Between them these cover every character in every
+  # `lib/l10n/*.arb` file plus the 3755 most common hanzi.
+  fonts:
+    - family: SweetHomeUI
+      fonts:
+        - asset: assets/fonts/ui/ui_sc.ttf
+    - family: SweetHomeUI TC
+      fonts:
+        - asset: assets/fonts/ui/ui_tc.ttf
+    - family: SweetHomeUI JP
+      fonts:
+        - asset: assets/fonts/ui/ui_jp.ttf
+    - family: SweetHomeUI KR
+      fonts:
+        - asset: assets/fonts/ui/ui_kr.ttf
+    - family: SweetHomeUI MY
+      fonts:
+        - asset: assets/fonts/ui/ui_my.ttf
+    - family: SweetHomeUI Emoji
+      fonts:
+        - asset: assets/fonts/ui/ui_emoji.ttf
+
+flutter_launcher_icons:
+  image_path: "assets/icons/app_icon.png"
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true          # iOS 不允许透明通道
+  min_sdk_android: 21
+  # 自适应图标（Android 8+ 圆形/方形自动裁切）
+  # 背景层取 app_icon.png 的底色，前景层直接复用同一张图并内缩 20%：
+  # 两层底色一致，内缩边界不可见，效果就是图形收进安全区、不会被裁掉。
+  adaptive_icon_background: "#D76549"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  adaptive_icon_foreground_inset: 20
+  web:
+    generate: true
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+  windows:
+    generate: true
+    icon_size: 256
+  macos:
+    generate: true

@@ -5,6 +5,22 @@ import 'app_palette.dart';
 class AppTheme {
   AppTheme._();
 
+  /// Family names from `pubspec.yaml`'s `fonts:` section. Built by
+  /// `scripts/build_ui_fonts.py`; rerun it after editing any ARB file
+  /// so newly introduced characters stay covered offline.
+  static const String _uiFontFamily = 'SweetHomeUI';
+  static const List<String> _uiFontFallback = <String>[
+    'SweetHomeUI TC',
+    'SweetHomeUI JP',
+    'SweetHomeUI KR',
+    'SweetHomeUI MY',
+    // Last: it carries nothing the text fonts have, so it only ever
+    // resolves codepoints they don't. Colour (COLRv1) — it's the
+    // largest font here by far; see scripts/build_ui_fonts.py for why
+    // it has to ship rather than being fetched on demand.
+    'SweetHomeUI Emoji',
+  ];
+
   /// The "过家家 · Sweet Home" theme.
   ///
   /// [palette] drives the brand identity (primary / primaryDark /
@@ -48,6 +64,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: isDark ? Brightness.dark : Brightness.light,
+      // Bundled subsets, declared in pubspec.yaml. Without these the
+      // web build has no font covering CJK and CanvasKit fetches one
+      // from fonts.gstatic.com per script, mid-render — a round trip
+      // on first paint everywhere, and tofu boxes behind the GFW.
+      // Simplified Chinese leads because it's the default locale; the
+      // rest chain after it so a mixed-script screen still resolves.
+      fontFamily: _uiFontFamily,
+      fontFamilyFallback: _uiFontFallback,
       extensions: <ThemeExtension<dynamic>>[palette],
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,

@@ -1064,6 +1064,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileAppearanceSheetTitle => '外観を選択';
 
   @override
+  String get profileIconPackRow => 'アイコン';
+
+  @override
+  String get profileIconPackSheetTitle => 'アイコンを選ぶ';
+
+  @override
+  String get profileIconPackStandard => '標準アイコン';
+
+  @override
+  String get profileIconPackPlayful => 'ポップアイコン';
+
+  @override
   String get profileThemeModeSection => '外観';
 
   @override

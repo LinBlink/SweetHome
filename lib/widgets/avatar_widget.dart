@@ -64,7 +64,9 @@ class AvatarWidget extends StatelessWidget {
       // `CachedNetworkImage` (also XHR-based on web) would take.
       return buildPlatformImage(
         url: url,
-        size: radius * 2,
+        width: radius * 2,
+        height: radius * 2,
+        circle: true,
         fallback: fallback,
       );
     }
@@ -129,7 +131,9 @@ class GroupAvatarWidget extends StatelessWidget {
     if (kIsWeb && imageUrl != null && imageUrl!.isNotEmpty) {
       avatar = buildPlatformImage(
         url: imageUrl!,
-        size: radius * 2,
+        width: radius * 2,
+        height: radius * 2,
+        circle: true,
         fallback: fallback,
       );
     } else if (imageUrl != null && imageUrl!.isNotEmpty) {

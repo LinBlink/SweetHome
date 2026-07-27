@@ -6,6 +6,8 @@ import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
+import '../../core/app_icons.dart';
+import '../../widgets/app_icon.dart';
 import '../../widgets/conversation_tile.dart';
 import '../../widgets/error_banner.dart';
 import 'chat_room_screen.dart';
@@ -64,14 +66,16 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.search_rounded),
+                    icon: const AppIcon(AppIcons.actionSearch),
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => ChangeNotifierProvider.value(
-                          value: context.read<ChatProvider>(),
-                          child: const SearchMessagesScreen(),
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ChangeNotifierProvider.value(
+                            value: context.read<ChatProvider>(),
+                            child: const SearchMessagesScreen(),
+                          ),
                         ),
-                      ));
+                      );
                     },
                     tooltip: l10n.conversationsSearchTooltip,
                   ),
@@ -124,39 +128,52 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, ChatProvider chat, AppLocalizations l10n) {
-    if (chat.isLoadingConversations) {
-      return Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+  Widget _buildBody(
+    BuildContext context,
+    ChatProvider chat,
+    AppLocalizations l10n,
+  ) {
+    // Only the true cold start blocks. With a cached inbox on screen
+    // the refresh happens underneath it and the rows just update if
+    // the server disagrees.
+    if (chat.isLoadingInitialConversations) {
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (chat.conversations.isEmpty) {
       return _EmptyState(l10n: l10n);
     }
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 6, bottom: 24),
-      itemCount: chat.conversations.length,
-      itemBuilder: (ctx, i) {
-        final conv = chat.conversations[i];
-        return ConversationTile(
-          conversation: conv,
-          onTap: () {
-            chat.setActiveConversation(conv.id);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: chat,
-                  child: ChatRoomScreen(
-                    conversationId: conv.id,
-                    conversationName: conv.name,
+    // The list no longer blanks itself while refreshing, so this is
+    // now the only way for the user to ask for a round-trip and see
+    // that one is happening.
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: chat.loadConversations,
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 6, bottom: 24),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: chat.conversations.length,
+        itemBuilder: (ctx, i) {
+          final conv = chat.conversations[i];
+          return ConversationTile(
+            conversation: conv,
+            onTap: () {
+              chat.setActiveConversation(conv.id);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: chat,
+                    child: ChatRoomScreen(
+                      conversationId: conv.id,
+                      conversationName: conv.name,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -187,8 +204,8 @@ class _EmptyState extends StatelessWidget {
                 ),
               ),
               alignment: Alignment.center,
-              child: Icon(
-                Icons.forum_rounded,
+              child: AppIcon(
+                AppIcons.emptyConversations,
                 size: 44,
                 color: AppColors.primary.withValues(alpha: 0.6),
               ),
@@ -252,15 +269,16 @@ class _ConnectionErrorBanner extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              const Icon(Icons.wifi_off, color: AppColors.warning, size: 16),
+              const AppIcon(
+                AppIcons.statusOffline,
+                color: AppColors.warning,
+                size: 16,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   message,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.ink,
-                  ),
+                  style: TextStyle(fontSize: 12, color: AppColors.ink),
                 ),
               ),
               TextButton(
@@ -281,8 +299,8 @@ class _ConnectionErrorBanner extends StatelessWidget {
               const SizedBox(width: 4),
               GestureDetector(
                 onTap: onDismiss,
-                child: Icon(
-                  Icons.close,
+                child: AppIcon(
+                  AppIcons.actionClose,
                   color: AppColors.inkFaded,
                   size: 16,
                 ),

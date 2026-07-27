@@ -535,4 +535,92 @@ void main() {
       expect(drops[0].children, ['SELF']);
     });
   });
+
+  group('row order keeps couples adjacent', () {
+    // The painter only draws a marriage bus between cards that end up
+    // SPATIALLY next to each other, and only treats a parent as half of
+    // a couple (so the child trunk drops from their midpoint rather than
+    // from one card) when it found that bus. So "married ⇒ adjacent" is
+    // a correctness invariant of the row order, not a cosmetic one.
+    //
+    // Plain alphabetical order satisfied it by luck for a male viewer
+    // (`F` < `M` < `Wi.F` < `Wi.M`) and broke it for a female one
+    // (`F` < `Hu.F` < `Hu.M` < `M`), which is why showing both sets of
+    // parents looked fine for a husband and scrambled for a wife.
+
+    /// Every relationCode pair in [codes] that [FamilyTreeRow] placed in
+    /// the same row, is a couple, and yet is not side by side.
+    List<String> separatedCouples(List<String> codes) {
+      final b = bucketFamilyTreeMembers([
+        for (var i = 0; i < codes.length; i++) vm(i + 1, 'p$i', codes[i]),
+      ]);
+      final broken = <String>[];
+      for (final row in b.rows) {
+        final inRow = [for (final m in row.members) m.relationCode];
+        for (var i = 0; i < inRow.length; i++) {
+          for (var j = i + 2; j < inRow.length; j++) {
+            if (isMarriedCoupleForTest(inRow[i], inRow[j])) {
+              broken.add('${inRow[i]}+${inRow[j]} in [${inRow.join(" ")}]');
+            }
+          }
+        }
+      }
+      return broken;
+    }
+
+    test('a wife seeing both sets of parents keeps F next to M', () {
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF', g: Gender.female),
+        vm(2, '丈夫', 'Hu'),
+        vm(3, '父', 'F'),
+        vm(4, '母', 'M', g: Gender.female),
+        vm(5, '公公', 'Hu.F'),
+        vm(6, '婆婆', 'Hu.M', g: Gender.female),
+      ]);
+      // Own parents first, then the husband's — each couple contiguous.
+      expect(codesAt(b, -1), ['F', 'M', 'Hu.F', 'Hu.M']);
+    });
+
+    test('a husband seeing both sets of parents is unchanged', () {
+      final b = bucketFamilyTreeMembers([
+        vm(1, '我', 'SELF'),
+        vm(2, '妻子', 'Wi', g: Gender.female),
+        vm(3, '父', 'F'),
+        vm(4, '母', 'M', g: Gender.female),
+        vm(5, '岳父', 'Wi.F'),
+        vm(6, '岳母', 'Wi.M', g: Gender.female),
+      ]);
+      expect(codesAt(b, -1), ['F', 'M', 'Wi.F', 'Wi.M']);
+    });
+
+    test('no couple is split apart, across every family shape', () {
+      final shapes = <String, List<String>>{
+        'wife, both parents':
+            ['SELF', 'Hu', 'F', 'M', 'Hu.F', 'Hu.M'],
+        'wife, both grandparents': [
+          'SELF', 'Hu', 'F', 'M', 'Hu.F', 'Hu.M',
+          'F.F', 'F.M', 'M.F', 'M.M', 'Hu.F.F', 'Hu.F.M',
+        ],
+        'children and their spouses':
+            ['SELF', 'Wi', 'Son', 'Son.Wi', 'Dau', 'Dau.Hu'],
+        'siblings and their spouses':
+            ['SELF', 'Hu', 'eB', 'eB.Wi', 'yZ', 'yZ.Hu', 'F', 'M'],
+        'gender-unknown spouse':
+            ['SELF', 'S', 'F', 'M', 'S.F', 'S.M'],
+        'gender-unknown parent':
+            ['SELF', 'Hu', 'P', 'Hu.F', 'Hu.M'],
+        'aunts and uncles in the parents row': [
+          'SELF', 'F', 'M', 'F.eB', 'F.eB.Wi',
+          'M.yZ', 'M.yZ.Hu', 'Hu.F', 'Hu.M',
+        ],
+        'three generations of in-laws': [
+          'SELF', 'Hu', 'Hu.F', 'Hu.M', 'Hu.F.F', 'Hu.F.M',
+          'F', 'M', 'F.F', 'F.M',
+        ],
+      };
+      shapes.forEach((label, codes) {
+        expect(separatedCouples(codes), isEmpty, reason: label);
+      });
+    });
+  });
 }

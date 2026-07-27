@@ -1104,6 +1104,18 @@ class AppLocalizationsMy extends AppLocalizations {
   String get profileAppearanceSheetTitle => 'မျက်နှာပြင်ပုံစံ ရွေးပါ';
 
   @override
+  String get profileIconPackRow => 'အိုင်ကွန်';
+
+  @override
+  String get profileIconPackSheetTitle => 'အိုင်ကွန်ပုံစံ ရွေးပါ';
+
+  @override
+  String get profileIconPackStandard => 'ပုံမှန် အိုင်ကွန်';
+
+  @override
+  String get profileIconPackPlayful => 'ကလေးဆန် အိုင်ကွန်';
+
+  @override
   String get profileThemeModeSection => 'မျက်နှာပြင်ပုံစံ';
 
   @override

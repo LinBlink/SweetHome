@@ -420,7 +420,9 @@ class _MomentsImageTile extends StatelessWidget {
     if (kIsWeb) {
       img = buildPlatformImage(
         url: url,
-        size: 600,
+        // No explicit size: the tile is sized by the grid, and a fixed
+        // 600px here had nothing to do with the box it actually lands in.
+        cornerRadius: 8,
         fallback: placeholder,
       );
     } else {
@@ -971,7 +973,7 @@ class _MomentsFullscreenImage extends StatelessWidget {
     if (kIsWeb) {
       image = buildPlatformImage(
         url: url,
-        size: size.width,
+        fit: BoxFit.contain,
         fallback: const Center(
           child: Icon(Icons.broken_image_outlined, size: 64),
         ),

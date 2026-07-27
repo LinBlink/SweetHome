@@ -13,8 +13,156 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>过家家 · Sweet Home</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- The engine and the app bundle are both multi-MB and both are
+       needed before anything paints. Fetching them at high priority
+       from the first HTML byte, rather than waiting for
+       flutter_bootstrap.js to ask, overlaps the two biggest downloads
+       with each other instead of running them back to back. -->
+  <link rel="preload" href="main.dart.js" as="script">
+  <script>
+    // The CanvasKit preload has to name a specific file, but which one
+    // the engine actually loads depends on the browser: Flutter's
+    // default `canvasKitVariant: auto` gives Chromium the trimmed
+    // `chromium/canvaskit.wasm` and everyone else the full
+    // `canvaskit.wasm`. Hard-coding the Chromium one meant Safari
+    // downloaded 5.5MB it would never use, *and* still had to fetch
+    // the 6.9MB it needed — bandwidth and peak memory that iOS in
+    // particular cannot spare, delaying first paint. So pick here.
+    //
+    // Chrome on iOS reports CriOS and is WebKit underneath, so it must
+    // NOT match; the explicit Chrome/Chromium/Edg test leaves it out.
+    // Opera reports both OPR and Chrome and uses the Chromium engine,
+    // so matching it on Chrome is correct.
+    (function () {
+      var ua = navigator.userAgent;
+      var chromium = /Chrome|Chromium|Edg/.test(ua) && !/CriOS/.test(ua);
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'fetch';
+      link.type = 'application/wasm';
+      link.crossOrigin = 'anonymous';
+      link.href = chromium
+        ? 'canvaskit/chromium/canvaskit.wasm'
+        : 'canvaskit/canvaskit.wasm';
+      document.head.appendChild(link);
+    })();
+  </script>
+
+  <style>
+    /* Inlined rather than a stylesheet: this is the only CSS that runs
+       before the app exists, and a separate file would be one more
+       blocking request in front of the paint it's meant to cover. */
+    html, body { margin: 0; padding: 0; height: 100%; background: #FFF8F0; }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #1A1512; }
+    }
+
+    #boot-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: #FFF8F0;
+      opacity: 1;
+      transition: opacity 320ms ease-out;
+      /* Above the canvas Flutter inserts, until we take it away. */
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      #boot-splash { background: #1A1512; }
+    }
+    #boot-splash.boot-splash--done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .boot-splash__mark {
+      width: 96px;
+      height: 96px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #D76549, #E8944F);
+      box-shadow: 0 8px 18px rgba(215, 101, 73, 0.4);
+      border: 3px solid #FFF8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: boot-pulse 1.6s ease-in-out infinite;
+    }
+    @media (prefers-color-scheme: dark) {
+      .boot-splash__mark { border-color: #242019; }
+    }
+    .boot-splash__mark svg { width: 52px; height: 52px; fill: #fff; }
+
+    @keyframes boot-pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.05); }
+    }
+    /* Anyone who asked the OS for less motion gets a static mark. */
+    @media (prefers-reduced-motion: reduce) {
+      .boot-splash__mark { animation: none; }
+    }
+
+    .boot-splash__name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #3D2B1F;
+    }
+    @media (prefers-color-scheme: dark) {
+      .boot-splash__name { color: #EDE4D9; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Static first paint. Without it the page is blank until
+       main.dart.js has parsed and CanvasKit has initialised, which on
+       a cold cache is seconds of white screen. -->
+  <div id="boot-splash">
+    <div class="boot-splash__mark">
+      <!-- The house mark, inline so it costs no request. -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/>
+      </svg>
+    </div>
+    <div class="boot-splash__name">过家家</div>
+  </div>
+
+  <script>
+    // Owned here, not in flutter_bootstrap.js, because the splash is
+    // this file's markup and this file's CSS transition. Dart calls it
+    // from a post-frame callback once a real frame is on screen — see
+    // lib/core/_boot_splash_web.dart for why that signal, and not a
+    // requestAnimationFrame guess, is what dismisses the splash.
+    (function () {
+      var done = false;
+      window.dismissBootSplash = function () {
+        // Idempotent: Dart may call on more than one frame, and the
+        // timeout below can race a normal dismissal.
+        if (done) return;
+        done = true;
+        var splash = document.getElementById('boot-splash');
+        if (!splash) return;
+        splash.classList.add('boot-splash--done');
+        // Matches the CSS transition; removing it frees the layer.
+        window.setTimeout(function () {
+          if (splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 400);
+      };
+
+      // Safety net. If the engine fails to boot, or the app throws
+      // before its first frame, an un-dismissed splash would sit over
+      // the page forever and hide whatever Flutter did manage to
+      // render. Better to reveal a broken app than to show a splash
+      // that never ends.
+      window.setTimeout(window.dismissBootSplash, 8000);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

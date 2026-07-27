@@ -41,6 +41,22 @@ class ChatProvider extends ChangeNotifier {
 
   List<Conversation> get conversations => _conversations;
   bool get isLoadingConversations => _isLoadingConversations;
+
+  /// True only when there is genuinely nothing to paint yet — no
+  /// cached list from a previous run and no server reply.
+  ///
+  /// This is the flag the conversation list screen blocks on.
+  /// [isLoadingConversations] is deliberately *not*: the cache is
+  /// hydrated before the first frame, so gating the list on "a request
+  /// is in flight" replaced a perfectly good list with a spinner on
+  /// every cold start, which is exactly what made the app feel slow.
+  bool get isLoadingInitialConversations =>
+      _isLoadingConversations && _conversations.isEmpty;
+
+  /// True while refreshing a list the user can already see — for a
+  /// quiet inline hint, not a blocking spinner.
+  bool get isRevalidatingConversations =>
+      _isLoadingConversations && _conversations.isNotEmpty;
   String? get connectionError => _connectionError;
   String? get error => _error;
   List<Message> messagesFor(int convId) => _messages[convId] ?? [];
@@ -136,23 +152,58 @@ class ChatProvider extends ChangeNotifier {
   Future<void> loadConversations() async {
     _isLoadingConversations = true;
     notifyListeners();
+    var changed = false;
     try {
+      final List<Conversation> fresh;
       if (AppConfig.mockMode) {
         await Future.delayed(const Duration(milliseconds: 400));
-        _conversations = List.from(MockDataSource.conversations);
+        fresh = List.from(MockDataSource.conversations);
       } else {
-        _conversations = await _chatService.fetchConversations();
+        fresh = await _chatService.fetchConversations();
       }
+      // Swapping in an identical list would rebuild every tile and
+      // re-run every avatar/relation lookup for nothing. On the common
+      // path — reopening the app to an unchanged inbox — this makes the
+      // refresh completely invisible, which is the point.
+      changed = !_sameConversations(_conversations, fresh);
+      if (changed) _conversations = fresh;
     } on ApiException catch (e) {
       _handleApiException(e);
-      if (_conversations.isEmpty) _conversations = [];
     } catch (_) {
-      if (_conversations.isEmpty) _conversations = [];
+      // Keep whatever the cache gave us; an offline launch should
+      // still show the last known inbox.
     } finally {
       _isLoadingConversations = false;
       notifyListeners();
     }
-    _persistCache();
+    if (changed) _persistCache();
+  }
+
+  /// Compares the fields the conversation row actually renders. The
+  /// model has no `==`, and a full deep compare would be both more
+  /// code and more work than the repaint it is trying to avoid.
+  static bool _sameConversations(
+    List<Conversation> a,
+    List<Conversation> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.id != y.id ||
+          x.name != y.name ||
+          x.lastMessage != y.lastMessage ||
+          x.lastMessageAt != y.lastMessageAt ||
+          x.lastMessageType != y.lastMessageType ||
+          x.unreadCount != y.unreadCount ||
+          x.memberCount != y.memberCount ||
+          x.avatarUrl != y.avatarUrl ||
+          x.otherUserId != y.otherUserId ||
+          x.relationCode != y.relationCode) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /// Read the on-disk blob at construction time and seed in-memory

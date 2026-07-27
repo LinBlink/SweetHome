@@ -22,7 +22,7 @@
          photo capture) — same class of gap as RECORD_AUDIO above. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <application
-        android:label="sweethome_flutter"
+        android:label="过家家"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

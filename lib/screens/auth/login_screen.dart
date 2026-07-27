@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icons.dart';
 import '../../core/countries.dart';
 import '../../core/error_messages.dart';
 import '../../core/home_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_icon.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/language_picker.dart';
 import '../../widgets/phone_input_field.dart';
@@ -95,8 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
             border: Border.all(color: AppColors.linen, width: 3),
           ),
           alignment: Alignment.center,
-          child: const Icon(
-            Icons.cottage_rounded,
+          child: const AppIcon(
+            AppIcons.navHome,
             color: Colors.white,
             size: 52,
           ),

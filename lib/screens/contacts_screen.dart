@@ -31,22 +31,33 @@ class ContactsScreen extends StatefulWidget {
 }
 
 class _ContactsScreenState extends State<ContactsScreen> {
-  late Future<List<FamilyMemberVm>> _future;
+  /// Only surfaced when the list is empty *and* unknown — once there
+  /// are contacts on screen, a failed background refresh stays quiet
+  /// rather than replacing them with an error.
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _future = _load();
+    // The list itself comes from `AuthProvider.familyMembers`, which
+    // is served from disk on the first frame (see its doc comment).
+    // This call is the revalidation that runs behind it.
+    _load();
   }
 
-  Future<List<FamilyMemberVm>> _load() {
-    return context.read<AuthProvider>().loadFamilyMembers();
+  Future<void> _load({bool force = false}) async {
+    final auth = context.read<AuthProvider>();
+    try {
+      await auth.loadFamilyMembers(force: force);
+      if (mounted) setState(() => _error = null);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      if (mounted) setState(() => _error = kNetworkErrorSentinel);
+    }
   }
 
-  Future<void> _refresh() async {
-    setState(() => _future = _load());
-    await _future;
-  }
+  Future<void> _refresh() => _load(force: true);
 
   Future<void> _startChat(FamilyMemberVm member) async {
     final l10n = AppLocalizations.of(context)!;
@@ -83,34 +94,31 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currentUserId = context.watch<AuthProvider>().currentUser?.userId;
+    final auth = context.watch<AuthProvider>();
+    final currentUserId = auth.currentUser?.userId;
+    final members = auth.familyMembers;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: HomeAppBar(title: l10n.contactsTitle),
       body: PaperBackground(
-        child: FutureBuilder<List<FamilyMemberVm>>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+        child: Builder(
+          builder: (context) {
+            if (members == null) {
+              // First ever load on this device: nothing cached to show.
+              if (_error != null) {
+                return ErrorBanner(
+                  message: localizeErrorMessage(_error!, l10n),
+                  onDismiss: _refresh,
+                );
+              }
               return Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
-              );
-            }
-            if (snapshot.hasError) {
-              return ErrorBanner(
-                message: localizeErrorMessage(
-                  (snapshot.error is ApiException)
-                      ? (snapshot.error as ApiException).message
-                      : kNetworkErrorSentinel,
-                  l10n,
-                ),
-                onDismiss: _refresh,
               );
             }
             // Filter self out — chatting with yourself is meaningless
             // and the family-member list always includes the current
             // user.
-            final others = (snapshot.data ?? const [])
+            final others = members
                 .where((m) => m.userId != currentUserId)
                 .toList();
             if (others.isEmpty) {

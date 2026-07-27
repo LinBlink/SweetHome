@@ -1066,6 +1066,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileAppearanceSheetTitle => '화면 모드 선택';
 
   @override
+  String get profileIconPackRow => '아이콘';
+
+  @override
+  String get profileIconPackSheetTitle => '아이콘 선택';
+
+  @override
+  String get profileIconPackStandard => '기본 아이콘';
+
+  @override
+  String get profileIconPackPlayful => '캐주얼 아이콘';
+
+  @override
   String get profileThemeModeSection => '화면 모드';
 
   @override

@@ -1107,6 +1107,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAppearanceSheetTitle => 'Choose appearance';
 
   @override
+  String get profileIconPackRow => 'Icons';
+
+  @override
+  String get profileIconPackSheetTitle => 'Choose an icon set';
+
+  @override
+  String get profileIconPackStandard => 'Default icons';
+
+  @override
+  String get profileIconPackPlayful => 'Playful icons';
+
+  @override
   String get profileThemeModeSection => 'Appearance';
 
   @override

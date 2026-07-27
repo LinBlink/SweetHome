@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'core/app_config.dart';
+import 'core/app_icons.dart';
+import 'core/boot_splash.dart';
 import 'core/app_theme.dart';
 import 'core/app_colors.dart';
 import 'core/brand_colors.dart';
@@ -30,6 +32,7 @@ import 'screens/contacts_screen.dart';
 import 'screens/family_feed_screen.dart';
 import 'screens/my_home_screen.dart';
 import 'screens/profile_screen.dart';
+import 'widgets/app_icon.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +43,15 @@ void main() async {
   // service is no-op on web/desktop, so this is cheap regardless.
   unawaited(pushService.restoreCachedRegistrationId());
   unawaited(pushService.setup(production: !AppConfig.mockMode));
-  await Future.wait([localeProvider.restore(), themeProvider.restore()]);
+  // Probe the custom icon set once, before the first frame, so
+  // `AppIcon` can decide SVG-vs-Material-fallback synchronously inside
+  // `build`. Icons still being drawn simply keep their Material
+  // fallback; see `assets/icons/README.md`.
+  await Future.wait([
+    localeProvider.restore(),
+    themeProvider.restore(),
+    AppIconAssets.warmUp(),
+  ]);
   runApp(
     MultiProvider(
       providers: [
@@ -131,6 +142,17 @@ class _AuthGateState extends State<AuthGate> {
         isAuthenticated: () => context.read<AuthProvider>().isAuthenticated,
       )..start();
     }
+    // Hand off from `web/index.html`'s boot splash once this gate has
+    // actually painted. Mounted here rather than on `_SplashScreen`
+    // because a fast session restore can skip that screen entirely and
+    // go straight to `LoginScreen` — `AuthGate` is the one ancestor
+    // both paths share, so it is the only place guaranteed to run.
+    //
+    // `addPostFrameCallback` fires *after* the frame is rasterised, so
+    // by the time the splash fades there is a real Flutter frame
+    // underneath it. That ordering is the whole fix; see
+    // `core/_boot_splash_web.dart`.
+    WidgetsBinding.instance.addPostFrameCallback((_) => dismissBootSplash());
   }
 
   @override
@@ -369,8 +391,8 @@ class _MainShellState extends State<MainShell> {
             ],
           ),
           alignment: Alignment.center,
-          child: Icon(
-            Icons.cottage_rounded,
+          child: const AppIcon(
+            AppIcons.navHome,
             color: Colors.white,
             size: 28,
           ),
@@ -414,8 +436,8 @@ class _MainShellState extends State<MainShell> {
             children: [
               Expanded(
                 child: _buildNavItem(
-                  icon: Icons.chat_bubble_outline,
-                  activeIcon: Icons.chat_bubble_rounded,
+                  icon: AppIcons.navMessages,
+                  activeIcon: AppIcons.navMessagesActive,
                   label: l10n.navMessages,
                   isSelected: _currentIndex == 0,
                   onTap: () => _goTo(0),
@@ -424,8 +446,8 @@ class _MainShellState extends State<MainShell> {
               ),
               Expanded(
                 child: _buildNavItem(
-                  icon: Icons.people_alt_outlined,
-                  activeIcon: Icons.people_alt_rounded,
+                  icon: AppIcons.navContacts,
+                  activeIcon: AppIcons.navContactsActive,
                   label: l10n.navContacts,
                   isSelected: _currentIndex == 1,
                   onTap: () => _goTo(1),
@@ -435,8 +457,8 @@ class _MainShellState extends State<MainShell> {
               const SizedBox(width: 64),
               Expanded(
                 child: _buildNavItem(
-                  icon: Icons.timeline_outlined,
-                  activeIcon: Icons.timeline_rounded,
+                  icon: AppIcons.navFeed,
+                  activeIcon: AppIcons.navFeedActive,
                   label: l10n.navFamilyFeed,
                   isSelected: _currentIndex == 3,
                   onTap: () => _goTo(3),
@@ -444,8 +466,8 @@ class _MainShellState extends State<MainShell> {
               ),
               Expanded(
                 child: _buildNavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person_rounded,
+                  icon: AppIcons.navProfile,
+                  activeIcon: AppIcons.navProfileActive,
                   label: l10n.navProfile,
                   isSelected: _currentIndex == 4,
                   onTap: () => _goTo(4),
@@ -472,8 +494,8 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
+    required AppIconSpec icon,
+    required AppIconSpec activeIcon,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
@@ -494,7 +516,7 @@ class _MainShellState extends State<MainShell> {
                 padding: const EdgeInsets.only(top: 4),
                 child: _ShakingIcon(
                   shaking: badgeCount > 0,
-                  child: Icon(
+                  child: AppIcon(
                     isSelected ? activeIcon : icon,
                     color: fg,
                     size: 23,
@@ -679,8 +701,8 @@ class _SplashScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Center(
-                    child: Icon(
-                      Icons.cottage_rounded,
+                    child: AppIcon(
+                      AppIcons.navHome,
                       color: Colors.white,
                       size: 48,
                     ),

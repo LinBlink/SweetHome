@@ -44,6 +44,23 @@ class FamilyMemberVm {
       birthDate: parseApiDate(json['birthDate'] as String?),
     );
   }
+
+  /// The exact inverse of [FamilyMemberVm.fromJson], so a member can be
+  /// written to the local cache and read back as itself. Field names
+  /// match the server's on purpose: the cached blob is the same shape
+  /// as the response it came from, which means an older build reading a
+  /// newer blob degrades the same way it degrades against a newer
+  /// server (unknown fields ignored, missing ones defaulted).
+  Map<String, dynamic> toJson() => {
+        'userId': userId,
+        'name': name,
+        'gender': gender.name,
+        'relationCode': relationCode,
+        'role': role,
+        'avatarUrl': avatarUrl,
+        'isOnline': isOnline,
+        'birthDate': birthDate == null ? null : formatApiDate(birthDate!),
+      };
 }
 
 /// A family member preview shown during the "join family" flow, before the

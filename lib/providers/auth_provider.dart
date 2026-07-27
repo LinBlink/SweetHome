@@ -11,6 +11,7 @@ import '../models/family_member_vm.dart';
 import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/family_service.dart';
+import '../services/local_cache_store.dart';
 import '../services/push_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -85,8 +86,12 @@ class AuthProvider extends ChangeNotifier {
       return;
     }
     try {
-      _currentUser = await AuthService.loadUser();
+      final restored = await AuthService.loadUser();
+      // A test pinned a session while this was in flight; it wins.
+      if (_debugSessionPinned) return;
+      _currentUser = restored;
     } catch (_) {
+      if (_debugSessionPinned) return;
       _currentUser = null;
     }
     // Best-effort: refresh from /users/me so persisted-but-stale fields
@@ -231,12 +236,155 @@ class AuthProvider extends ChangeNotifier {
   /// method — contacts screen, family tree, etc. — warms both caches
   /// as a side effect, so the fallback works regardless of which
   /// screen the user happened to visit first.
-  Future<List<FamilyMemberVm>> loadFamilyMembers() async {
+  /// ---
+  ///
+  /// Cache-first, and shared. Nine screens call this — contacts, the
+  /// family tree, both fence screens, health, location history, member
+  /// admin, new-conversation, and the message list warming genders —
+  /// and before, every one of them meant its own `GET
+  /// /families/{id}/members` and its own full-screen spinner, on every
+  /// entry. Now:
+  ///
+  ///   * the last known list is read from disk once per session and
+  ///     served immediately, so a screen that opens with a cached list
+  ///     never shows a spinner again;
+  ///   * concurrent callers share one in-flight request instead of
+  ///     firing N identical ones (the app opens on the message list,
+  ///     which warms genders, while contacts is one swipe away);
+  ///   * the revalidation runs in the background and only notifies
+  ///     listeners if the server actually returned something different,
+  ///     so an unchanged family costs zero rebuilds.
+  ///
+  /// Pass `force: true` for pull-to-refresh, where the user is asking
+  /// for a round-trip and expects to wait for it.
+  Future<List<FamilyMemberVm>> loadFamilyMembers({bool force = false}) async {
     final user = _currentUser;
     if (user == null) return const [];
-    final members = AppConfig.mockMode
-        ? MockDataSource.membersFor(viewerId: user.userId)
-        : await _familyService.fetchMembers(user.familyId);
+    await _ensureMembersCacheRead(user);
+
+    final cached = _familyMembers;
+    if (!force && cached != null) {
+      // Serve the cache now, check the server after. Errors are
+      // swallowed on this path on purpose: nobody is waiting on it and
+      // the screen already has something correct enough to show.
+      unawaited(_fetchMembers(user).catchError(
+        (_) => cached,
+      ));
+      return cached;
+    }
+    return _fetchMembers(user);
+  }
+
+  /// The last known family list, or `null` when this device has never
+  /// successfully loaded one. Screens render this synchronously and let
+  /// [loadFamilyMembers] refresh it underneath them.
+  List<FamilyMemberVm>? get familyMembers => _familyMembers;
+
+  /// True while a background revalidation is in flight *and* there is
+  /// already a list on screen — the cue for a quiet inline indicator,
+  /// never for a blocking spinner.
+  bool get isRevalidatingFamilyMembers =>
+      _membersInFlight != null && _familyMembers != null;
+
+  static const LocalCacheStore _membersCache =
+      LocalCacheStore('family_members');
+
+  /// Test seams. The cache-first / single-flight / only-notify-on-change
+  /// behaviour above is the whole point of this code and is invisible
+  /// from the outside without a way to (a) have a session at all and
+  /// (b) count and control fetches. Both are null in production, where
+  /// the real session restore and the real [FamilyService] are used.
+  @visibleForTesting
+  Future<List<FamilyMemberVm>> Function(AuthUser user)? debugFetchMembers;
+
+  bool _debugSessionPinned = false;
+
+  @visibleForTesting
+  void debugSetSession(AuthUser? user) {
+    _currentUser = user;
+    // The constructor's `_restoreSession()` is already in flight and
+    // would otherwise land a moment later and null this back out.
+    _debugSessionPinned = true;
+    _familyMembers = null;
+    _membersInFlight = null;
+    _membersCacheScope = null;
+  }
+
+  /// The last cache write, so [logout] can be sure it is deleting a
+  /// blob that has finished being written. Without this the sequence
+  /// "refresh, log out immediately" loses the race and leaves the
+  /// previous account's family list on the device.
+  Future<void> _membersWrite = Future<void>.value();
+
+  List<FamilyMemberVm>? _familyMembers;
+  Future<List<FamilyMemberVm>>? _membersInFlight;
+
+  /// Whose cache `_familyMembers` holds. Guards against serving the
+  /// previous account's family after a logout/login on one device.
+  int? _membersCacheScope;
+
+  Future<void> _ensureMembersCacheRead(AuthUser user) async {
+    if (_membersCacheScope == user.userId) return;
+    _membersCacheScope = user.userId;
+    _familyMembers = null;
+    final raw = await _membersCache.read(user.userId.toString());
+    if (raw is! List) return;
+    List<FamilyMemberVm> restored;
+    try {
+      restored = raw
+          .cast<Map<String, dynamic>>()
+          .map(FamilyMemberVm.fromJson)
+          .toList();
+    } catch (_) {
+      // Shape we don't understand — behave as a cache miss.
+      return;
+    }
+    // A fetch that landed while this read was in flight wins; it is
+    // strictly newer than what was on disk.
+    if (_familyMembers != null || restored.isEmpty) return;
+    _familyMembers = restored;
+    _indexGenders(restored);
+    notifyListeners();
+  }
+
+  /// One request at a time, whoever asks. The returned future is shared
+  /// by every caller that arrives while it is in flight.
+  Future<List<FamilyMemberVm>> _fetchMembers(AuthUser user) {
+    final existing = _membersInFlight;
+    if (existing != null) return existing;
+    late final Future<List<FamilyMemberVm>> pending;
+    pending = _runMemberFetch(user).whenComplete(() {
+      // Only clear if it is still ours — a `force` refresh started
+      // after this one shouldn't be cancelled by our completion.
+      if (identical(_membersInFlight, pending)) _membersInFlight = null;
+    });
+    _membersInFlight = pending;
+    return pending;
+  }
+
+  Future<List<FamilyMemberVm>> _runMemberFetch(AuthUser user) async {
+    final override = debugFetchMembers;
+    final members = override != null
+        ? await override(user)
+        : AppConfig.mockMode
+            ? MockDataSource.membersFor(viewerId: user.userId)
+            : await _familyService.fetchMembers(user.familyId);
+    final genderChanged = _indexGenders(members);
+    final listChanged = !_sameMembers(_familyMembers, members);
+    if (listChanged) {
+      _familyMembers = members;
+      _membersWrite = _membersCache.write(
+        user.userId.toString(),
+        members.map((m) => m.toJson()).toList(),
+      );
+      unawaited(_membersWrite);
+    }
+    if (listChanged || genderChanged) notifyListeners();
+    return members;
+  }
+
+  /// Warms the gender fallback maps. Returns whether anything moved.
+  bool _indexGenders(List<FamilyMemberVm> members) {
     var changed = false;
     for (final m in members) {
       if (_memberGenderByUserId[m.userId] != m.gender) {
@@ -248,8 +396,21 @@ class AuthProvider extends ChangeNotifier {
         changed = true;
       }
     }
-    if (changed) notifyListeners();
-    return members;
+    return changed;
+  }
+
+  /// Value comparison over the serialized form — the model has no
+  /// `==`, and comparing what we would have cached is exactly the
+  /// question being asked: "is this worth a repaint and a write?"
+  static bool _sameMembers(
+    List<FamilyMemberVm>? a,
+    List<FamilyMemberVm> b,
+  ) {
+    if (a == null || a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (!mapEquals(a[i].toJson(), b[i].toJson())) return false;
+    }
+    return true;
   }
 
   final Map<int, Gender> _memberGenderByUserId = {};
@@ -370,7 +531,21 @@ class AuthProvider extends ChangeNotifier {
     final refresh = user?.refreshToken ?? '';
     _currentUser = null;
     _cancelTokenRefresh();
+    // Who is in this family is not something to leave on a device the
+    // user just signed out of, and the in-memory copy must go too or
+    // the next account would briefly render the previous one's list.
+    _familyMembers = null;
+    _membersInFlight = null;
+    _membersCacheScope = null;
+    _memberGenderByUserId.clear();
+    _memberGenderByName.clear();
     notifyListeners();
+    if (user != null) {
+      // Let any write that was already on its way finish first, or it
+      // would land after this delete and resurrect the blob.
+      await _membersWrite.catchError((_) {});
+      await _membersCache.clear(user.userId.toString());
+    }
     // §2.7.2: deregister the JPush token BEFORE wiping local credentials
     // — the call needs the live JWT in its Authorization header. Wait
     // for it (with a short timeout via the service's internal clock)

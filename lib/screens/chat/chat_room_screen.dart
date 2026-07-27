@@ -16,6 +16,8 @@ import '../../core/image_mime.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/api_exception.dart';
 import '../../providers/chat_provider.dart';
+import '../../core/app_icons.dart';
+import '../../widgets/app_icon.dart';
 import '../../widgets/emoji_picker.dart';
 import '../../widgets/error_banner.dart';
 import '../../widgets/message_bubble.dart';
@@ -623,12 +625,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           },
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const AppIcon(AppIcons.actionBack),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_horiz_rounded),
+            icon: const AppIcon(AppIcons.chatMore),
             tooltip: l10n.chatRoomMoreTooltip,
             onPressed: () {},
           ),
@@ -782,7 +784,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   ),
                 )
               : IconButton(
-                  icon: Icon(Icons.add_circle_outline,
+                  icon: AppIcon(AppIcons.chatAttach,
                       color: AppColors.primary),
                   onPressed: _openMediaSheet,
                   tooltip: l10n.chatRoomSendImageTooltip,
@@ -835,16 +837,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.send_rounded,
+                      child: const AppIcon(AppIcons.chatSend,
                           color: Colors.white, size: 20),
                     ),
                   )
                 : IconButton(
                     key: const ValueKey('emoji'),
-                    icon: Icon(
+                    icon: AppIcon(
                       _showEmoji
-                          ? Icons.keyboard_alt_outlined
-                          : Icons.emoji_emotions_outlined,
+                          ? AppIcons.chatKeyboard
+                          : AppIcons.chatEmoji,
                       color: _showEmoji
                           ? AppColors.primary
                           : AppColors.textSecondary,

@@ -164,13 +164,15 @@ class MomentProvider extends ChangeNotifier {
   /// re-tapping starts fresh from the cleared count.
   bool hasMyLike(int momentId) => _myLikes.contains(momentId);
 
-  /// How long a cached first page is trusted before `loadInitial()`
-  /// falls back to the backend again. Family-feed content doesn't
-  /// change second-to-second, so a short TTL is enough to avoid
-  /// re-querying on every screen visit/app relaunch while still
-  /// catching up reasonably quickly. Pull-to-refresh (`refresh()`)
-  /// always bypasses this and hits the network.
-  static const _cacheTtl = Duration(minutes: 3);
+  /// There is deliberately no TTL on the cached first page any more.
+  ///
+  /// A TTL only decides *when to show a spinner instead of content* —
+  /// past it, the user got a blank screen for the length of a round
+  /// trip even though a perfectly displayable feed was sitting on
+  /// disk. Now any cached page is painted immediately, however old,
+  /// and [_revalidateFeed] checks the server behind it and swaps the
+  /// list in only if it actually differs. Staleness is measured in the
+  /// milliseconds until that returns, not in minutes.
 
   String get _cacheKey => 'moments_feed_cache_v1_${_currentUser.userId}';
 
@@ -226,18 +228,16 @@ class MomentProvider extends ChangeNotifier {
     }
   }
 
-  /// Loads a still-fresh cached first page into [_moments], if any.
-  /// Returns `false` (and leaves state untouched) on a cache miss,
-  /// a stale entry, or any parse failure — callers fall through to
-  /// the normal network fetch in that case.
+  /// Loads the cached first page into [_moments], if any. Returns
+  /// `false` (and leaves state untouched) on a cache miss or any parse
+  /// failure — callers fall through to the normal network fetch in
+  /// that case.
   Future<bool> _hydrateFromCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_cacheKey);
       if (raw == null) return false;
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      final ts = DateTime.fromMillisecondsSinceEpoch(decoded['ts'] as int);
-      if (DateTime.now().difference(ts) > _cacheTtl) return false;
       final list = (decoded['moments'] as List<dynamic>)
           .map((e) => Moment.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -294,6 +294,8 @@ class MomentProvider extends ChangeNotifier {
       notifyListeners();
       _backfillLikeCounts(_moments);
       _backfillComments(_moments);
+      // Painted from disk; now go find out whether it is still true.
+      unawaited(_revalidateFeed());
       return;
     }
     _isInitialLoading = true;
@@ -317,6 +319,51 @@ class MomentProvider extends ChangeNotifier {
       _isInitialLoading = false;
       notifyListeners();
     }
+  }
+
+  /// The silent half of the cache-first path: fetch page 1, and only
+  /// disturb the UI if the server disagrees with what is already on
+  /// screen.
+  ///
+  /// Distinct from [refresh] in two ways that matter: it never sets
+  /// `_isRefreshing` (no spinner — the user did not ask for this), and
+  /// it never surfaces an error (a failed background check on a feed
+  /// the user is already reading is not news; the cached page stays).
+  Future<void> _revalidateFeed() async {
+    if (_isRefreshing) return;
+    try {
+      final page = await service.fetchFamilyMoments(page: 1);
+      final fresh = _sortedDesc(page.moments);
+      if (_sameMoments(_moments, fresh) && _total == page.total) return;
+      _moments
+        ..clear()
+        ..addAll(fresh);
+      _total = page.total;
+      _hasMore = _moments.length < page.total;
+      notifyListeners();
+      _backfillLikeCounts(page.moments);
+      _backfillComments(page.moments);
+      unawaited(_writeCache());
+    } catch (_) {
+      // Cached page stays on screen. Pull-to-refresh is still there if
+      // the user wants to be told about the failure.
+    }
+  }
+
+  /// Identity by id + last-edit stamp, which is what the feed renders
+  /// off. Cheaper than comparing whole moments, and the fields that a
+  /// server-side edit would move.
+  static bool _sameMoments(List<Moment> a, List<Moment> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id ||
+          a[i].content != b[i].content ||
+          a[i].createdAt != b[i].createdAt ||
+          a[i].media.length != b[i].media.length) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Future<void> refresh() async {

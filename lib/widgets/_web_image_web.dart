@@ -30,13 +30,32 @@ import 'package:flutter/widgets.dart';
 ///   [fallback] on error). Fine for avatars, where loading is brief.
 class _PlatformImage extends StatefulWidget {
   final String url;
-  final double size;
   final Widget fallback;
+
+  /// null => fill whatever the parent lays out for us. Callers that know
+  /// their box (avatars, chat bubbles) pass explicit numbers; grid tiles
+  /// and lightboxes leave these null so the shape follows the layout.
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+
+  /// Shape is the caller's decision, not this widget's — an avatar wants
+  /// a circle, a moment tile wants an 8px corner, a lightbox wants
+  /// neither. Rounding happens in CSS rather than via an outer
+  /// `ClipRRect` because this is a platform view: the browser composites
+  /// the `<img>` above Flutter's canvas, where Flutter's own clips don't
+  /// reliably reach it.
+  final bool circle;
+  final double cornerRadius;
 
   const _PlatformImage({
     required this.url,
-    required this.size,
     required this.fallback,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.circle = false,
+    this.cornerRadius = 0,
   });
 
   @override
@@ -52,6 +71,11 @@ class _PlatformImageState extends State<_PlatformImage> {
   late final String _viewType;
   bool _errored = false;
 
+  /// Kept so [didUpdateWidget] can repoint an existing `<img>` at a new
+  /// URL — the view factory runs once, so its captured `widget.url` goes
+  /// stale the moment this widget is recycled onto another image.
+  html.ImageElement? _element;
+
   @override
   void initState() {
     super.initState();
@@ -59,11 +83,17 @@ class _PlatformImageState extends State<_PlatformImage> {
     ui_web.platformViewRegistry.registerViewFactory(
       _viewType,
       (int viewId) {
+        // A null width/height becomes CSS `100%`, letting the `<img>`
+        // fill the box Flutter hands the HtmlElementView. That's what
+        // keeps a grid tile sized by its grid and a lightbox sized by
+        // the viewport, instead of by a hardcoded pixel count here.
         final img = html.ImageElement(src: widget.url)
-          ..style.width = '${widget.size}px'
-          ..style.height = '${widget.size}px'
-          ..style.objectFit = 'cover'
-          ..style.borderRadius = '50%';
+          ..style.width = widget.width == null ? '100%' : '${widget.width}px'
+          ..style.height = widget.height == null ? '100%' : '${widget.height}px'
+          ..style.objectFit = widget.fit == BoxFit.contain ? 'contain' : 'cover'
+          ..style.borderRadius =
+              widget.circle ? '50%' : '${widget.cornerRadius}px';
+        _element = img;
         img.onError.listen((_) {
           if (mounted) setState(() => _errored = true);
         });
@@ -76,12 +106,10 @@ class _PlatformImageState extends State<_PlatformImage> {
   void didUpdateWidget(_PlatformImage old) {
     super.didUpdateWidget(old);
     if (old.url != widget.url) {
-      // New image — clear any previous error so we attempt the load
-      // again. The viewType is fixed for this widget instance, so the
-      // existing `<img>` is still bound to it; we let the browser
-      // re-fetch via src change is not how <img> works — instead we
-      // just re-show the image. The next error/load will fire
-      // appropriately.
+      // The viewType is fixed for this widget instance, so the existing
+      // `<img>` stays bound to it — repoint its src by hand and clear any
+      // previous error so the new URL gets its own chance to load.
+      _element?.src = widget.url;
       setState(() => _errored = false);
     }
   }
@@ -89,18 +117,30 @@ class _PlatformImageState extends State<_PlatformImage> {
   @override
   Widget build(BuildContext context) {
     if (_errored) return widget.fallback;
-    return SizedBox(
-      width: widget.size,
-      height: widget.size,
-      child: HtmlElementView(viewType: _viewType),
-    );
+    final view = HtmlElementView(viewType: _viewType);
+    // No SizedBox when both are null: it would collapse to zero rather
+    // than defer to the parent's constraints.
+    if (widget.width == null && widget.height == null) return view;
+    return SizedBox(width: widget.width, height: widget.height, child: view);
   }
 }
 
 Widget buildPlatformImage({
   required String url,
-  required double size,
   required Widget fallback,
+  double? width,
+  double? height,
+  BoxFit fit = BoxFit.cover,
+  bool circle = false,
+  double cornerRadius = 0,
 }) {
-  return _PlatformImage(url: url, size: size, fallback: fallback);
+  return _PlatformImage(
+    url: url,
+    fallback: fallback,
+    width: width,
+    height: height,
+    fit: fit,
+    circle: circle,
+    cornerRadius: cornerRadius,
+  );
 }

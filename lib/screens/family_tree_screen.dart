@@ -269,24 +269,41 @@ class FamilyTreeScreen extends StatefulWidget {
 }
 
 class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
-  late Future<List<FamilyMemberVm>> _future;
+  /// Only ever shown when there is nothing cached to draw — with a
+  /// tree on screen, a failed background refresh is not worth
+  /// replacing it with an error.
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _future = context.read<AuthProvider>().loadFamilyMembers();
+    // Draws from `AuthProvider.familyMembers` (cache-first, see its
+    // doc comment) and lets this call update it underneath us, so
+    // reopening the tree is instant and the refresh is invisible
+    // unless something actually changed.
+    _load();
   }
 
-  Future<void> _refresh() async {
-    final next = context.read<AuthProvider>().loadFamilyMembers();
-    setState(() => _future = next);
-    await next;
+  Future<void> _load({bool force = false}) async {
+    final auth = context.read<AuthProvider>();
+    try {
+      await auth.loadFamilyMembers(force: force);
+      if (mounted) setState(() => _error = null);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      if (mounted) setState(() => _error = kNetworkErrorSentinel);
+    }
   }
+
+  Future<void> _refresh() => _load(force: true);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final me = context.watch<AuthProvider>().currentUser;
+    final auth = context.watch<AuthProvider>();
+    final me = auth.currentUser;
+    final members = auth.familyMembers;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: HomeAppBar(
@@ -300,28 +317,21 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         ],
       ),
       body: PaperBackground(
-        child: FutureBuilder<List<FamilyMemberVm>>(
-        future: _future,
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting &&
-              !snap.hasData) {
+        child: Builder(
+        builder: (context) {
+          if (members == null) {
+            // Nothing cached and nothing fetched yet — the only state
+            // that still earns a full-screen spinner.
+            if (_error != null) {
+              return ErrorBanner(
+                message: localizeErrorMessage(_error!, l10n),
+                onDismiss: _refresh,
+              );
+            }
             return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
-          if (snap.hasError) {
-            final isApi = snap.error is ApiException;
-            return ErrorBanner(
-              message: localizeErrorMessage(
-                isApi
-                    ? (snap.error as ApiException).message
-                    : kNetworkErrorSentinel,
-                l10n,
-              ),
-              onDismiss: _refresh,
-            );
-          }
-          final members = snap.data ?? const <FamilyMemberVm>[];
           if (members.isEmpty) {
             return RefreshIndicator(
               color: AppColors.primary,
@@ -418,6 +428,63 @@ bool _isMarriedCouple(String a, String b) {
     return true;
   }
   return false;
+}
+
+/// The painter's own couple predicate, exposed so a test can assert
+/// "every couple this recognizes is adjacent in its row" against the
+/// real rule rather than a copy of it that could drift.
+@visibleForTesting
+bool isMarriedCoupleForTest(String a, String b) => _isMarriedCouple(a, b);
+
+/// Ordering key for one row, chosen so that every pair
+/// [_isMarriedCouple] recognizes ends up in adjacent slots.
+///
+/// That adjacency is load-bearing, not cosmetic: marriage buses are
+/// only drawn between spatially neighbouring cards, and a trunk drops
+/// from a couple's midpoint only when the painter can see that couple.
+/// Whatever changes here has to keep step with [_isMarriedCouple].
+///
+/// The key is `(group, rank)`, compared in that order and falling back
+/// to the raw code so the sort stays total and deterministic:
+///
+///   * `X.F` / `X.M` / `X.P` — a couple reached as somebody's parents.
+///     Group is the shared prefix `X` (empty for the viewer's own
+///     `F`/`M`), rank orders father, mother, then the gender-unknown
+///     parent. This is the case plain alphabetical order got wrong.
+///   * `X.S` / `X.Hu` / `X.Wi` — somebody married into the family.
+///     Group is `X`, ranked after `X` itself so the spouse lands
+///     immediately to their partner's right.
+///   * Anything else groups under its own code.
+({String group, int rank}) _rowSortKey(String code) {
+  final lastDot = code.lastIndexOf('.');
+  final lastSeg = lastDot < 0 ? code : code.substring(lastDot + 1);
+  final prefix = lastDot < 0 ? '' : code.substring(0, lastDot);
+
+  // Married-in spouse: sits with the blood relative they married.
+  // A bare `Hu`/`Wi`/`S` (the viewer's own spouse) has no prefix to
+  // group under and is positioned by the viewer-centred layout
+  // anyway, so it falls through to grouping under itself.
+  if (lastDot >= 0 && isSpouseRelationCode(lastSeg)) {
+    return (group: prefix, rank: 1);
+  }
+  // Parent couple. `prefix` is '' for the viewer's own parents, which
+  // groups them ahead of every in-law branch.
+  const parentRank = {'F': 0, 'M': 1, 'P': 2};
+  final rank = parentRank[lastSeg];
+  if (rank != null) {
+    return (group: prefix, rank: rank);
+  }
+  return (group: code, rank: 0);
+}
+
+int _compareRowOrder(String a, String b) {
+  final ka = _rowSortKey(a);
+  final kb = _rowSortKey(b);
+  final byGroup = ka.group.compareTo(kb.group);
+  if (byGroup != 0) return byGroup;
+  final byRank = ka.rank.compareTo(kb.rank);
+  if (byRank != 0) return byRank;
+  return a.compareTo(b);
 }
 
 /// The actual canvas: any number of rows (one per generation) of
@@ -855,13 +922,17 @@ class FamilyTreeRow {
 /// great-grandparents, great-great-grandparents, cousins-of-
 /// uncle's-child, etc. all find their own row.
 ///
-/// Within a single row, members are sorted alphabetically by their
-/// `relationCode` string. This isn't a perfect family-tree ordering
-/// (it doesn't special-case "F before M"), but it gives stable,
-/// deterministic, locale-neutral placement — and the painter paints
-/// marriage buses by detecting adjacent `X` / `X.S` pairs (or the
-/// F/M couple), which is robust to whatever order alphabetical
-/// sort produces.
+/// Within a single row, members are ordered by [_rowSortKey], which
+/// groups each married couple onto adjacent slots. Plain alphabetical
+/// order does not: the painter only draws a marriage bus between
+/// SPATIALLY adjacent cards, so any code that happens to sort between
+/// two spouses silently breaks their line. With the viewer's wife that
+/// never bites (`F` < `M` < `Wi.F` < `Wi.M`), but with the viewer's
+/// husband it always does — `F` < `Hu.F` < `Hu.M` < `M` wedges the
+/// parents-in-law between the viewer's own parents, dropping the F–M
+/// marriage line and making the F→SELF trunk fall from F's own centre
+/// instead of the couple's midpoint, so it hooks across under two
+/// unrelated cards.
 ///
 /// Crucially: this function no longer produces an `extended`
 /// fallback. Every member — including cousins, in-laws of distant
@@ -876,9 +947,9 @@ FamilyTreeBuckets bucketFamilyTreeMembers(List<FamilyMemberVm> all) {
     final gen = generationOfRelationCode(m.relationCode);
     (byGeneration[gen] ??= <FamilyMemberVm>[]).add(m);
   }
-  // Stable alphabetical sort within each row.
+  // Couple-grouping sort within each row.
   for (final list in byGeneration.values) {
-    list.sort((a, b) => a.relationCode.compareTo(b.relationCode));
+    list.sort((a, b) => _compareRowOrder(a.relationCode, b.relationCode));
   }
   // Emit rows sorted by generation ASCENDING (most ancestors at
   // index 0, viewer at the visual center, descendants at the end).

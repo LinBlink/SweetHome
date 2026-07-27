@@ -3,10 +3,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/app_colors.dart';
+import '../core/app_icons.dart';
 import '../core/app_palette.dart';
 
 const String _kPalettePrefKey = 'theme_palette_id';
 const String _kThemeModePrefKey = 'theme_mode';
+const String _kIconPackPrefKey = 'icon_pack';
 
 /// Holds the user's selected [AppPalette] and light/dark [ThemeMode].
 /// Both survive app restarts (persisted to SharedPreferences) and
@@ -27,6 +29,12 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
   AppPalette get palette => _palette;
   ThemeMode get themeMode => _themeMode;
 
+  /// The icon artwork the whole app draws from. Same deal as
+  /// `AppColors`: the state widgets actually read lives in a static
+  /// (`AppIconAssets.pack`, which every `AppIcon` listens to), and this
+  /// provider is the one place that writes it and persists it.
+  AppIconPack get iconPack => AppIconAssets.pack.value;
+
   /// Resolves `ThemeMode.system` against the OS's current brightness
   /// — `AppColors` only has one static "is dark" flag, so "system"
   /// has to be collapsed to a concrete light/dark before applying it.
@@ -46,6 +54,8 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     _palette = AppPalette.byId(prefs.getString(_kPalettePrefKey));
     _themeMode = _themeModeFromString(prefs.getString(_kThemeModePrefKey));
+    AppIconAssets.pack.value =
+        AppIconPack.byId(prefs.getString(_kIconPackPrefKey));
     AppColors.applyPalette(_palette);
     AppColors.applyBrightness(_effectiveIsDark);
     WidgetsBinding.instance.addObserver(this);
@@ -75,6 +85,17 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kPalettePrefKey, palette.id);
+  }
+
+  Future<void> setIconPack(AppIconPack pack) async {
+    if (pack == AppIconAssets.pack.value) return;
+    // Repaints every AppIcon on its own — they listen to the notifier,
+    // not to this provider. The notify below is for the settings row
+    // that shows which pack is active.
+    AppIconAssets.pack.value = pack;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kIconPackPrefKey, pack.id);
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {

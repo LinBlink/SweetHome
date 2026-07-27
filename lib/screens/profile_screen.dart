@@ -11,6 +11,8 @@ import '../providers/chat_provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/avatar_widget.dart';
+import '../core/app_icons.dart';
+import '../widgets/app_icon.dart';
 import '../widgets/language_picker.dart';
 import 'chat_export_screen.dart';
 import 'edit_profile_screen.dart';
@@ -69,13 +71,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.people_alt_rounded,
+                  icon: AppIcons.profileMembers,
                   color: AppColors.primary,
                 ),
                 title: l10n.profileFamilyMembersRow,
                 subtitle: l10n.profileFamilyMembersSubtitle,
-                trailing: Icon(
-                  Icons.chevron_right,
+                trailing: AppIcon(
+                  AppIcons.rowChevron,
                   color: AppColors.inkFaded,
                   size: 20,
                 ),
@@ -91,13 +93,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: HomeListItem(
                 leading: const _LeadingIcon(
-                  icon: Icons.qr_code_2_rounded,
+                  icon: AppIcons.profileJoinFamily,
                   color: AppColors.sage,
                 ),
                 title: l10n.joinFamilyTitle,
                 subtitle: l10n.profileJoinFamilySubtitle,
-                trailing: Icon(
-                  Icons.chevron_right,
+                trailing: AppIcon(
+                  AppIcons.rowChevron,
                   color: AppColors.inkFaded,
                   size: 20,
                 ),
@@ -114,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () => showThemePickerSheet(context),
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.palette_rounded,
+                  icon: AppIcons.profileTheme,
                   color: AppColors.primaryDark,
                 ),
                 title: l10n.profileThemeRow,
@@ -131,8 +133,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(
-                      Icons.chevron_right,
+                    AppIcon(
+                      AppIcons.rowChevron,
                       color: AppColors.inkFaded,
                       size: 20,
                     ),
@@ -147,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () => showAppearancePickerSheet(context),
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.dark_mode_rounded,
+                  icon: AppIcons.profileAppearance,
                   color: AppColors.primaryDark,
                 ),
                 title: l10n.profileAppearanceRow,
@@ -165,8 +167,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(
-                      Icons.chevron_right,
+                    AppIcon(
+                      AppIcons.rowChevron,
+                      color: AppColors.inkFaded,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                showSeparator: false,
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeCard(
+              padding: EdgeInsets.zero,
+              onTap: () => showIconPackPickerSheet(context),
+              child: HomeListItem(
+                leading: _LeadingIcon(
+                  icon: AppIcons.profileIconPack,
+                  color: AppColors.primaryDark,
+                ),
+                title: l10n.profileIconPackRow,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _iconPackDisplayName(
+                        context.watch<ThemeProvider>().iconPack,
+                        l10n,
+                      ),
+                      style: TextStyle(
+                        color: AppColors.inkFaded,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    AppIcon(
+                      AppIcons.rowChevron,
                       color: AppColors.inkFaded,
                       size: 20,
                     ),
@@ -181,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () => showLanguagePickerSheet(context),
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.translate_rounded,
+                  icon: AppIcons.profileLanguage,
                   color: AppColors.primaryDark,
                 ),
                 title: l10n.profileLanguageRow,
@@ -198,8 +234,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(
-                      Icons.chevron_right,
+                    AppIcon(
+                      AppIcons.rowChevron,
                       color: AppColors.inkFaded,
                       size: 20,
                     ),
@@ -219,13 +255,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.delete_sweep_rounded,
+                  icon: AppIcons.profileStorage,
                   color: AppColors.danger,
                 ),
                 title: l10n.profileStorageRow,
                 subtitle: l10n.profileStorageSubtitle,
-                trailing: Icon(
-                  Icons.chevron_right,
+                trailing: AppIcon(
+                  AppIcons.rowChevron,
                   color: AppColors.inkFaded,
                   size: 20,
                 ),
@@ -243,13 +279,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: HomeListItem(
                 leading: _LeadingIcon(
-                  icon: Icons.ios_share_rounded,
+                  icon: AppIcons.profileExport,
                   color: AppColors.sage,
                 ),
                 title: l10n.profileExportChatRow,
                 subtitle: l10n.profileExportChatSubtitle,
-                trailing: Icon(
-                  Icons.chevron_right,
+                trailing: AppIcon(
+                  AppIcons.rowChevron,
                   color: AppColors.inkFaded,
                   size: 20,
                 ),
@@ -356,8 +392,8 @@ void showThemePickerSheet(BuildContext context) {
                 ),
                 title: Text(_paletteDisplayName(p)),
                 trailing: p.id == provider.palette.id
-                    ? Icon(
-                        Icons.check_circle_rounded,
+                    ? AppIcon(
+                        AppIcons.stateSelected,
                         color: AppColors.primary,
                       )
                     : null,
@@ -403,11 +439,11 @@ void showAppearancePickerSheet(BuildContext context) {
             const SizedBox(height: 12),
             for (final mode in ThemeMode.values)
               ListTile(
-                leading: Icon(
+                leading: AppIcon(
                   switch (mode) {
-                    ThemeMode.system => Icons.brightness_auto_rounded,
-                    ThemeMode.light => Icons.light_mode_rounded,
-                    ThemeMode.dark => Icons.dark_mode_rounded,
+                    ThemeMode.system => AppIcons.appearanceAuto,
+                    ThemeMode.light => AppIcons.appearanceLight,
+                    ThemeMode.dark => AppIcons.appearanceDark,
                   },
                   color: AppColors.primary,
                 ),
@@ -417,8 +453,8 @@ void showAppearancePickerSheet(BuildContext context) {
                   ThemeMode.dark => l10n.profileThemeModeDark,
                 }),
                 trailing: mode == provider.themeMode
-                    ? Icon(
-                        Icons.check_circle_rounded,
+                    ? AppIcon(
+                        AppIcons.stateSelected,
                         color: AppColors.primary,
                       )
                     : null,
@@ -433,6 +469,100 @@ void showAppearancePickerSheet(BuildContext context) {
       );
     },
   );
+}
+
+/// Bottom-sheet icon-set picker.
+///
+/// Each row previews the pack it offers rather than describing it —
+/// the whole setting is about how the icons look, so the names alone
+/// would be guesswork. The previews deliberately bypass [AppIcon]:
+/// that widget always draws the *active* pack, which would make both
+/// rows look identical.
+void showIconPackPickerSheet(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  final provider = context.read<ThemeProvider>();
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (ctx) {
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Text(
+              l10n.profileIconPackSheetTitle,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (final p in AppIconPack.values)
+              ListTile(
+                leading: _IconPackPreview(pack: p),
+                title: Text(_iconPackDisplayName(p, l10n)),
+                trailing: p == provider.iconPack
+                    ? AppIcon(
+                        AppIcons.stateSelected,
+                        color: AppColors.primary,
+                      )
+                    : null,
+                onTap: () {
+                  provider.setIconPack(p);
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+/// Three icons from [pack], as a sample of what picking it does.
+class _IconPackPreview extends StatelessWidget {
+  final AppIconPack pack;
+  const _IconPackPreview({required this.pack});
+
+  static const _sample = [
+    AppIcons.navContactsActive,
+    AppIcons.chatEmoji,
+    AppIcons.profileTheme,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final spec in _sample)
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: AppIconArtwork(
+              spec,
+              pack: pack,
+              size: 20,
+              // Only reaches the tintable pack; the painted one keeps
+              // its own colours and ignores this.
+              color: AppColors.primary,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+String _iconPackDisplayName(AppIconPack pack, AppLocalizations l10n) {
+  return switch (pack) {
+    AppIconPack.standard => l10n.profileIconPackStandard,
+    AppIconPack.playful => l10n.profileIconPackPlayful,
+  };
 }
 
 String _themeModeDisplayName(ThemeMode mode, AppLocalizations l10n) {
@@ -562,8 +692,8 @@ class _ProfileCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.cottage_rounded,
+                        const AppIcon(
+                          AppIcons.navHome,
                           color: Colors.white70,
                           size: 13,
                         ),
@@ -599,8 +729,8 @@ class _ProfileCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.account_balance_wallet_rounded,
+                          const AppIcon(
+                            AppIcons.profileWallet,
                             color: Colors.white,
                             size: 12,
                           ),
@@ -620,8 +750,8 @@ class _ProfileCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.edit_outlined,
+              const AppIcon(
+                AppIcons.profileEdit,
                 color: Color(0xCCEFE0D0),
                 size: 20,
               ),
@@ -634,7 +764,7 @@ class _ProfileCard extends StatelessWidget {
 }
 
 class _LeadingIcon extends StatelessWidget {
-  final IconData icon;
+  final AppIconSpec icon;
   final Color color;
   const _LeadingIcon({required this.icon, required this.color});
 
@@ -648,7 +778,7 @@ class _LeadingIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: color, size: 20),
+      child: AppIcon(icon, color: color, size: 20),
     );
   }
 }
