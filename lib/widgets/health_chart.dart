@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
+import '../core/app_theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/health_record.dart';
 
@@ -364,10 +365,10 @@ class _HealthChartPainter extends CustomPainter {
       final tp = TextPainter(
         text: TextSpan(
           text: _formatAxisValue(value),
-          style: TextStyle(
+          style: AppTheme.ui(TextStyle(
             fontSize: 10,
             color: AppColors.inkFaded,
-          ),
+          )),
         ),
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: _leftAxisWidth - 4);
@@ -388,10 +389,10 @@ class _HealthChartPainter extends CustomPainter {
       final tp = TextPainter(
         text: TextSpan(
           text: text,
-          style: TextStyle(
+          style: AppTheme.ui(TextStyle(
             fontSize: 10,
             color: AppColors.inkFaded,
-          ),
+          )),
         ),
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: 80);
@@ -508,11 +509,11 @@ class _HealthChartPainter extends CustomPainter {
         final tp = TextPainter(
           text: TextSpan(
             text: label,
-            style: TextStyle(
+            style: AppTheme.ui(TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: band.color.withValues(alpha: 0.85),
-            ),
+            )),
           ),
           textDirection: TextDirection.ltr,
         )..layout(maxWidth: chartRect.width);
@@ -546,11 +547,11 @@ class _HealthChartPainter extends CustomPainter {
       final tp = TextPainter(
         text: TextSpan(
           text: label,
-          style: TextStyle(
+          style: AppTheme.ui(TextStyle(
             fontSize: 9,
             fontStyle: FontStyle.italic,
             color: AppColors.inkFaded.withValues(alpha: 0.8),
-          ),
+          )),
         ),
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: chartRect.width);

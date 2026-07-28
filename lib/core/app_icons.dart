@@ -224,6 +224,21 @@ abstract final class AppIconAssets {
   static final ValueNotifier<AppIconPack> pack =
       ValueNotifier<AppIconPack>(AppIconPack.standard);
 
+  /// Ticks once [warmUp] finishes, so icons already on screen can swap
+  /// their Material fallback for the real artwork.
+  ///
+  /// The probe used to be awaited before `runApp`, which meant the
+  /// first frame waited on ~70 asset round-trips — on the web those are
+  /// HTTP requests, and on HTTP/1.1 they serialise six at a time, so
+  /// the splash sat there for multiple RTTs' worth of icons that the
+  /// user cannot even see yet. Now the app paints immediately with
+  /// Material fallbacks (which [isDrawn] already returns before the
+  /// probe runs) and the artwork arrives a beat later.
+  ///
+  /// A counter rather than a bool because [debugReset] can un-warm the
+  /// cache between tests; listeners only care that *something* changed.
+  static final ValueNotifier<int> revision = ValueNotifier<int>(0);
+
   static bool get isWarm => _warm;
 
   /// True once [spec] has artwork in [pack] (defaults to the active one).
@@ -258,19 +273,21 @@ abstract final class AppIconAssets {
   /// switching packs later is a synchronous repaint with no async gap
   /// where icons would flicker back to their Material fallbacks.
   ///
-  /// Cheap enough to await before `runApp`: the files are a few hundred
-  /// bytes each, and every probe is issued at once.
+  /// **Do not await this before `runApp`.** Start it and let the first
+  /// frame go; [revision] fires when it lands and the icons swap
+  /// themselves. Blocking on it costs real start-up time for artwork
+  /// nobody can see yet: on the web `rootBundle.load` is an HTTP fetch,
+  /// not a file read, and this issues one per spec per pack. Measured
+  /// on a release build over localhost — no network latency at all —
+  /// that was 71 requests spanning 295ms, all of it in front of the
+  /// first frame. Over HTTP/1.1 the browser runs six at a time, so on a
+  /// mobile connection the same set is ~12 sequential round-trips.
   ///
-  /// The concurrency is not a micro-optimisation — it is the difference
-  /// between a working start-up and a broken one on the web. There,
-  /// `rootBundle.load` is an HTTP fetch, not a file read, so awaiting
-  /// each probe in turn serialises `AppIconPack.values.length *
-  /// AppIcons.all.length` round-trips (currently 90, a fifth of them
-  /// 404s for specs whose artwork is still unfilled). At a mobile
-  /// network's latency that is several seconds of blank screen before
-  /// `runApp` is even called. Issued together they overlap into
-  /// roughly one round-trip. On mobile and desktop, where these are
-  /// local reads, the shape costs nothing either way.
+  /// The concurrency below still matters for the same reason: awaiting
+  /// each probe in turn would serialise every one of them instead of
+  /// overlapping them into roughly one round-trip. On mobile and
+  /// desktop, where these are local reads, the shape costs little
+  /// either way.
   static Future<void> warmUp({AssetBundle? bundle}) async {
     final b = bundle ?? rootBundle;
     await Future.wait([
@@ -278,6 +295,7 @@ abstract final class AppIconAssets {
         for (final spec in AppIcons.all) _probe(b, p, spec),
     ]);
     _warm = true;
+    revision.value++;
     if (kDebugMode) {
       for (final p in AppIconPack.values) {
         final n = AppIcons.all.where((s) => isDrawn(s, p)).length;
@@ -333,6 +351,7 @@ abstract final class AppIconAssets {
       ..clear()
       ..addAll(multicolor.map((s) => _key(inPack, s)));
     _warm = true;
+    revision.value++;
   }
 
   @visibleForTesting
@@ -341,5 +360,6 @@ abstract final class AppIconAssets {
     _multicolor.clear();
     pack.value = AppIconPack.standard;
     _warm = false;
+    revision.value++;
   }
 }

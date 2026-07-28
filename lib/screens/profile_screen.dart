@@ -126,6 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       _paletteDisplayName(
                         context.watch<ThemeProvider>().palette,
+                        l10n,
                       ),
                       style: TextStyle(
                         color: AppColors.inkFaded,
@@ -390,7 +391,7 @@ void showThemePickerSheet(BuildContext context) {
                   palette: p,
                   selected: p.id == provider.palette.id,
                 ),
-                title: Text(_paletteDisplayName(p)),
+                title: Text(_paletteDisplayName(p, l10n)),
                 trailing: p.id == provider.palette.id
                     ? AppIcon(
                         AppIcons.stateSelected,
@@ -573,18 +574,22 @@ String _themeModeDisplayName(ThemeMode mode, AppLocalizations l10n) {
   };
 }
 
-String _paletteDisplayName(AppPalette p) {
+/// Palette names were hardcoded as `'Terracotta 赭'` etc., so a Korean,
+/// Japanese, English or Burmese user was shown Chinese characters in the theme
+/// picker — the only labels on this screen that ignored the active locale.
+/// Routed through l10n like [_iconPackDisplayName] / [_themeModeDisplayName].
+String _paletteDisplayName(AppPalette p, AppLocalizations l10n) {
   switch (p.id) {
     case 'terracotta':
-      return 'Terracotta 赭';
+      return l10n.profilePaletteTerracotta;
     case 'ocean':
-      return 'Ocean 溟';
+      return l10n.profilePaletteOcean;
     case 'forest':
-      return 'Forest 翠';
+      return l10n.profilePaletteForest;
     case 'lavender':
-      return 'Lavender 黛';
+      return l10n.profilePaletteLavender;
     case 'slate':
-      return 'Slate 苍';
+      return l10n.profilePaletteSlate;
     default:
       return p.id;
   }

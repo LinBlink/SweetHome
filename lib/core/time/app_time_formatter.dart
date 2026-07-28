@@ -23,9 +23,19 @@ import 'package:intl/intl.dart';
 /// `Localizations.localeOf(context)` — passing it in keeps this
 /// formatter stateless and easy to unit-test.
 class AppTimeFormatter {
-  AppTimeFormatter(this.locale);
+  AppTimeFormatter(this.locale, {DateTime Function()? clock})
+      : _clock = clock ?? DateTime.now;
 
   final Locale locale;
+
+  /// Source of "now" for the relative branches (just-now / today /
+  /// yesterday / this week). Production uses the wall clock; tests
+  /// inject a fixed instant so the assertions don't depend on what
+  /// time of day the suite happens to run at — asserting that
+  /// "today 14:30" renders as `14:30` silently fails every morning,
+  /// because before 14:30 that timestamp is in the *future* and
+  /// lands in the "just now" branch instead.
+  final DateTime Function() _clock;
 
   bool get _isZh =>
       locale.languageCode == 'zh' ||
@@ -39,7 +49,7 @@ class AppTimeFormatter {
   /// intra-week form (`E HH:mm`) uses `DateFormat.E()` so the day
   /// name is localized (周一 vs Mon vs 月).
   String forMessageBubble(DateTime local) {
-    final now = DateTime.now();
+    final now = _clock();
     if (local.day == now.day &&
         local.month == now.month &&
         local.year == now.year) {
@@ -64,18 +74,28 @@ class AppTimeFormatter {
     required String Function(int minutes) timeMinutesAgo,
     required String timeYesterday,
   }) {
-    final now = DateTime.now();
+    final now = _clock();
     final diff = now.difference(local);
     if (diff.inMinutes < 1) return timeJustNow;
     if (diff.inHours < 1) return timeMinutesAgo(diff.inMinutes);
-    if (local.day == now.day &&
-        local.month == now.month &&
-        local.year == now.year) {
-      return DateFormat('HH:mm', _bcp47).format(local);
-    }
-    if (diff.inDays == 1) return timeYesterday;
+
+    // "Today" and "yesterday" are *calendar* questions, so they're answered by
+    // comparing calendar days — not by how many 24h blocks have elapsed.
+    // `diff.inDays == 1` gets both directions wrong: a message sent yesterday
+    // at 20:00 and read today at 09:00 is only 13h old, so it fell through to
+    // the bare date instead of "yesterday"; and one sent two days ago at 23:00
+    // and read at 00:30 is 25h old, so it claimed "yesterday" when it wasn't.
+    final daysApart = _midnight(now).difference(_midnight(local)).inDays;
+    if (daysApart == 0) return DateFormat('HH:mm', _bcp47).format(local);
+    if (daysApart == 1) return timeYesterday;
     return DateFormat(_isZh ? 'M月d日' : 'MM/dd', _bcp47).format(local);
   }
+
+  /// Local midnight of [d]'s calendar day. Subtracting two of these gives a
+  /// whole number of calendar days regardless of the time of day on either
+  /// side. Constructed via the local-date constructor rather than by
+  /// subtracting a `Duration`, so DST transitions can't shift the boundary.
+  static DateTime _midnight(DateTime d) => DateTime(d.year, d.month, d.day);
 
   /// Long-form "yyyy-MM-dd HH:mm" used by fence, join-request, alarm
   /// screens. CJK locales get `MMMd HH:mm` for the same shape.

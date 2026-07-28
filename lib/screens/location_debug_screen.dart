@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/app_theme.dart';
 import '../providers/location_provider.dart';
 
 /// Debug-only screen (only reachable via the bug icon in
@@ -283,6 +284,11 @@ class _CoordsCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'monospace',
+                // CanvasKit has no generic families: 'monospace' matches
+                // nothing registered, so without this chain every
+                // codepoint here counts as missing and the engine loops
+                // on the 404ing font fallback. See AppTheme.ui.
+                fontFamilyFallback: AppTheme.uiFontChain,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -338,6 +344,11 @@ class _StatusCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'monospace',
+                        // CanvasKit has no generic families: 'monospace' matches
+                        // nothing registered, so without this chain every
+                        // codepoint here counts as missing and the engine loops
+                        // on the 404ing font fallback. See AppTheme.ui.
+                        fontFamilyFallback: AppTheme.uiFontChain,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -411,6 +422,11 @@ class _LogView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontFamily: 'monospace',
+                    // CanvasKit has no generic families: 'monospace' matches
+                    // nothing registered, so without this chain every
+                    // codepoint here counts as missing and the engine loops
+                    // on the 404ing font fallback. See AppTheme.ui.
+                    fontFamilyFallback: AppTheme.uiFontChain,
                     color: AppColors.textHint,
                   ),
                 ),
@@ -419,6 +435,11 @@ class _LogView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontFamily: 'monospace',
+                    // CanvasKit has no generic families: 'monospace' matches
+                    // nothing registered, so without this chain every
+                    // codepoint here counts as missing and the engine loops
+                    // on the 404ing font fallback. See AppTheme.ui.
+                    fontFamilyFallback: AppTheme.uiFontChain,
                     color: isError ? AppColors.danger : AppColors.textPrimary,
                   ),
                 ),

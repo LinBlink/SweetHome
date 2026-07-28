@@ -1134,6 +1134,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileThemeColorSection => 'Color';
 
   @override
+  String get profilePaletteTerracotta => 'Terracotta';
+
+  @override
+  String get profilePaletteOcean => 'Ocean';
+
+  @override
+  String get profilePaletteForest => 'Forest';
+
+  @override
+  String get profilePaletteLavender => 'Lavender';
+
+  @override
+  String get profilePaletteSlate => 'Slate';
+
+  @override
   String get momentCommentSectionTitle => 'Comments';
 
   @override

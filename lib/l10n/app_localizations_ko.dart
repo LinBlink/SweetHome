@@ -1093,6 +1093,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileThemeColorSection => '색상';
 
   @override
+  String get profilePaletteTerracotta => '테라코타';
+
+  @override
+  String get profilePaletteOcean => '오션';
+
+  @override
+  String get profilePaletteForest => '포레스트';
+
+  @override
+  String get profilePaletteLavender => '라벤더';
+
+  @override
+  String get profilePaletteSlate => '슬레이트';
+
+  @override
   String get momentCommentSectionTitle => '댓글';
 
   @override

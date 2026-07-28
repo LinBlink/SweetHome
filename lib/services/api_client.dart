@@ -20,7 +20,23 @@ class ApiClient {
   static void Function()? onUnauthorized;
 
   static dynamic unwrap(http.Response resp) {
-    final body = jsonDecode(resp.body) as Map<String, dynamic>;
+    // Not every response that reaches us is the envelope. A gateway 502/504
+    // serves an HTML error page, an idle-timeout kill serves an empty body,
+    // and a misrouted request can serve anything at all. Decoding those blind
+    // throws `FormatException`/`TypeError` — neither of which is an
+    // `ApiException`, so every `catch (ApiException)` in the app misses it and
+    // the failure surfaces as a raw crash instead of the localized network
+    // error. Treat "not the envelope" as exactly that: a network-level error.
+    final Map<String, dynamic> body;
+    try {
+      final decoded = jsonDecode(resp.body);
+      if (decoded is! Map<String, dynamic>) throw const FormatException();
+      body = decoded;
+    } on FormatException {
+      if (resp.statusCode == 401) onUnauthorized?.call();
+      throw ApiException(resp.statusCode, kNetworkErrorSentinel);
+    }
+
     final code = body['code'] as int? ?? resp.statusCode;
     if (code == 401) {
       onUnauthorized?.call();

@@ -1087,6 +1087,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileThemeColorSection => '配色';
 
   @override
+  String get profilePaletteTerracotta => '赭色';
+
+  @override
+  String get profilePaletteOcean => '溟蓝';
+
+  @override
+  String get profilePaletteForest => '翠绿';
+
+  @override
+  String get profilePaletteLavender => '黛紫';
+
+  @override
+  String get profilePaletteSlate => '苍灰';
+
+  @override
   String get momentCommentSectionTitle => '评论';
 
   @override
@@ -2833,6 +2848,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get profileThemeColorSection => '配色';
 
   @override
+  String get profilePaletteTerracotta => '赭色';
+
+  @override
+  String get profilePaletteOcean => '溟蓝';
+
+  @override
+  String get profilePaletteForest => '翠绿';
+
+  @override
+  String get profilePaletteLavender => '黛紫';
+
+  @override
+  String get profilePaletteSlate => '苍灰';
+
+  @override
   String get momentCommentSectionTitle => '评论';
 
   @override
@@ -4577,6 +4607,21 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get profileThemeColorSection => '配色';
+
+  @override
+  String get profilePaletteTerracotta => '赭色';
+
+  @override
+  String get profilePaletteOcean => '溟藍';
+
+  @override
+  String get profilePaletteForest => '翠綠';
+
+  @override
+  String get profilePaletteLavender => '黛紫';
+
+  @override
+  String get profilePaletteSlate => '蒼灰';
 
   @override
   String get momentCommentSectionTitle => '評論';

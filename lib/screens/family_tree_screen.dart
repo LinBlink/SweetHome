@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/app_theme.dart';
 import '../core/avatar_label.dart';
 import '../core/error_messages.dart';
 import '../core/home_widgets.dart';
@@ -133,10 +134,30 @@ class _MarqueeTextState extends State<_MarqueeText>
     }
   }
 
+  /// The style to *measure* with: what the `Text` below will actually
+  /// render with, not what was passed in.
+  ///
+  /// A `Text` merges its style onto the ambient `DefaultTextStyle`; a
+  /// [TextPainter] merges nothing. Measuring the raw `widget.style` is
+  /// therefore wrong twice over. The mild problem is accuracy — the
+  /// inherited size and height are missing, so the measurement is not of
+  /// the text being drawn. The severe one is that `widget.style` names no
+  /// font family at all, and on web CanvasKit a font-less paragraph sends
+  /// the engine to the (deliberately 404ing) font fallback URL for every
+  /// codepoint above U+009F it contains — every name, every kinship term,
+  /// on every frame this marquee animates. See [AppTheme.ui].
+  ///
+  /// The [AppTheme.ui] stamp is a belt-and-braces guard for the case where
+  /// the ambient style has no family either; in the app it always does.
+  TextStyle get _measuredStyle {
+    final inherited = DefaultTextStyle.of(context).style.merge(widget.style);
+    return inherited.fontFamily == null ? AppTheme.ui(inherited) : inherited;
+  }
+
   void _measureAndMaybeStart() {
     if (!mounted) return;
     final tp = TextPainter(
-      text: TextSpan(text: widget.text, style: widget.style),
+      text: TextSpan(text: widget.text, style: _measuredStyle),
       textDirection:
           Directionality.maybeOf(context) ?? TextDirection.ltr,
       maxLines: 1,
@@ -178,7 +199,7 @@ class _MarqueeTextState extends State<_MarqueeText>
     // here makes this widget self-contained regardless of what
     // ancestor constraints it ends up under.
     final lineHeightTp = TextPainter(
-      text: TextSpan(text: widget.text, style: widget.style),
+      text: TextSpan(text: widget.text, style: _measuredStyle),
       textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
       maxLines: 1,
     )..layout();
@@ -208,7 +229,7 @@ class _MarqueeTextState extends State<_MarqueeText>
                 animation: _ctrl,
                 builder: (ctx, _) {
                   final tp = TextPainter(
-                    text: TextSpan(text: widget.text, style: widget.style),
+                    text: TextSpan(text: widget.text, style: _measuredStyle),
                     textDirection: Directionality.of(ctx),
                     maxLines: 1,
                   )..layout();

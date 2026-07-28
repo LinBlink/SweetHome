@@ -412,4 +412,36 @@ void main() {
       });
     });
   });
+
+  // Regression: a relation row can outlive the member it points at (someone
+  // leaves the family and the row isn't soft-deleted with them). The backend's
+  // `buildGraph` drops both directions of such an edge; here only the *child*
+  // direction was filtered, so a ghost parent stayed in the graph — reachable
+  // as an endpoint and, worse, walkable as a transit node to whoever sits
+  // behind it. Two engines walking different graphs is exactly what
+  // `_comparePaths` being byte-identical to the backend's is supposed to rule
+  // out.
+  group('relation rows pointing at a missing member are not walkable', () {
+    // 2 is the ghost: rows reference it, but it has no FamilyMember entry.
+    // Without the filter, 1 -> 2 (P) is a valid step and 1 -> 2 -> 3 (P.Son)
+    // reaches 3, whom the backend considers unreachable entirely.
+    final ghostGraph = FamilyGraph(
+      members: const [
+        FamilyMember(id: 1, name: 'me', gender: Gender.male),
+        FamilyMember(id: 3, name: 'behind the ghost', gender: Gender.male),
+      ],
+      relations: const [
+        FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 1),
+        FamilyRelation(subjectId: 2, type: RelationEdgeType.parentOf, objectId: 3),
+      ],
+    );
+
+    test('the ghost itself is unreachable', () {
+      expect(computeRelationPath(ghostGraph, 1, 2), isEmpty);
+    });
+
+    test('nobody is reachable *through* the ghost either', () {
+      expect(computeRelationPath(ghostGraph, 1, 3), isEmpty);
+    });
+  });
 }

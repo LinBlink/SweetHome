@@ -822,7 +822,7 @@ class AppLocalizationsMy extends AppLocalizations {
   String get profileSectionSettingsTitle => 'ဆက်တင်များ';
 
   @override
-  String get profileFamilyMembersSubtitle => '�ိသားစုဝင်အားလုံး ကြည့်ရှုရန်';
+  String get profileFamilyMembersSubtitle => 'မိသားစုဝင်အားလုံး ကြည့်ရှုရန်';
 
   @override
   String get profileJoinFamilySubtitle =>
@@ -1129,6 +1129,21 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get profileThemeColorSection => 'အရောင်';
+
+  @override
+  String get profilePaletteTerracotta => 'အုတ်ရောင်';
+
+  @override
+  String get profilePaletteOcean => 'သမုဒ္ဒရာပြာ';
+
+  @override
+  String get profilePaletteForest => 'သစ်တောစိမ်း';
+
+  @override
+  String get profilePaletteLavender => 'လာဗင်ဒါခရမ်း';
+
+  @override
+  String get profilePaletteSlate => 'မီးခိုးရောင်';
 
   @override
   String get momentCommentSectionTitle => 'မှတ်ချက်များ';

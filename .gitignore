@@ -33,6 +33,14 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Mirror of the Flutter Web engine's fallback fonts: 724 files, ~21MB of
+# immutable woff2 that nobody edits and that `scripts/fetch_gfonts_mirror.py`
+# reproduces exactly from the Flutter SDK. Kept out of git for its size, but
+# it is NOT optional at build time — without it the engine's font fallback
+# 404s, and a failed fallback download is one it never stops retrying. See
+# docs/web-deploy.md.
+/web/gfonts/
+
 # Symbolication related
 app.*.symbols
 

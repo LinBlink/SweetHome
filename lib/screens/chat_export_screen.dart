@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/app_colors.dart';
+import '../core/app_theme.dart';
 import '../core/home_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
@@ -559,6 +560,11 @@ class _ChatExportScreenState extends State<ChatExportScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'monospace',
+                      // CanvasKit has no generic families: 'monospace' matches
+                      // nothing registered, so without this chain every
+                      // codepoint here counts as missing and the engine loops
+                      // on the 404ing font fallback. See AppTheme.ui.
+                      fontFamilyFallback: AppTheme.uiFontChain,
                       color: AppColors.ink,
                       height: 1.5,
                     ),

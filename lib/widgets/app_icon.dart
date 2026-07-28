@@ -56,13 +56,22 @@ class AppIcon extends StatelessWidget {
       );
     }
 
-    // Rebuilds this icon — and only the icons — when the user switches
-    // packs in profile settings. Nothing else in the tree has to know.
-    return ValueListenableBuilder<AppIconPack>(
-      valueListenable: AppIconAssets.pack,
-      builder: (_, pack, _) => AppIconArtwork(
+    // Rebuilds this icon — and only the icons — on the two events that
+    // can change what it should draw. Nothing else in the tree has to
+    // know about either.
+    //
+    //  - `pack`: the user switched icon packs in profile settings.
+    //  - `revision`: the asset probe finished. The probe no longer
+    //    blocks the first frame, so the first build of every icon
+    //    happens while `isDrawn` is still false and renders the
+    //    Material fallback; this is what swaps in the real artwork
+    //    once it is known. Without it the app would keep the fallbacks
+    //    until something else happened to rebuild the subtree.
+    return ListenableBuilder(
+      listenable: Listenable.merge([AppIconAssets.pack, AppIconAssets.revision]),
+      builder: (_, _) => AppIconArtwork(
         spec,
-        pack: pack,
+        pack: AppIconAssets.pack.value,
         size: resolvedSize,
         color: resolvedColor,
         semanticLabel: semanticLabel,

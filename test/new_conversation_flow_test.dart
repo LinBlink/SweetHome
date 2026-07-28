@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sweethome_flutter/core/app_config.dart';
 import 'package:sweethome_flutter/data/mock_data.dart';
 import 'package:sweethome_flutter/models/chat_models.dart';
 import 'package:sweethome_flutter/providers/chat_provider.dart';
@@ -46,8 +47,18 @@ void main() {
         currentUser: MockDataSource.mockUser,
       );
 
+  // `AppConfig.mockMode` is a compile-time const (`bool.fromEnvironment`), so
+  // it can't be flipped from inside the test — the two provider tests below
+  // only exercise the mock path when the suite is run with the dart-define in
+  // the header comment. Under a plain `flutter test` they'd otherwise hit the
+  // real `apiBaseUrl` and fail on the empty response body, which is noise, not
+  // a regression. Skip them explicitly instead of leaving two permanent reds.
+  // (`Conversation.fromJson` below is pure parsing and always runs.)
+  const mockOnly =
+      AppConfig.mockMode ? null : 'needs --dart-define=MOCK_MODE=true';
+
   test('startDirectConversation creates a direct conversation with the target',
-      () async {
+      skip: mockOnly, () async {
     final chat = newProvider();
     await chat.loadConversations();
 
@@ -63,7 +74,7 @@ void main() {
   });
 
   test('startDirectConversation is idempotent (reuses an existing direct chat)',
-      () async {
+      skip: mockOnly, () async {
     final chat = newProvider();
     await chat.loadConversations();
 

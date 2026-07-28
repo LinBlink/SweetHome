@@ -100,9 +100,21 @@ flutter:
     - family: SweetHomeUI MY
       fonts:
         - asset: assets/fonts/ui/ui_my.ttf
-    - family: SweetHomeUI Emoji
+    - family: SweetHomeUI Symbols
       fonts:
-        - asset: assets/fonts/ui/ui_emoji.ttf
+        - asset: assets/fonts/ui/ui_symbols.ttf
+    - family: SweetHomeUI Symbols 2
+      fonts:
+        - asset: assets/fonts/ui/ui_symbols2.ttf
+    # No emoji family here on purpose. Emoji come from the fallback
+    # mirror (`web/gfonts/notocoloremoji/`, see
+    # scripts/fetch_gfonts_mirror.py), which is the complete upstream
+    # Noto Color Emoji rather than a subset of it. Bundling one cost
+    # 3.8MB on every first paint — everything listed here is eagerly
+    # loaded at engine init — to ship *worse* coverage: subsetting
+    # dropped ZWJ and ~9500 glyphs, so family emoji and flags were
+    # broken. Fetched on demand it is ~150KB per chunk, only for the
+    # emoji actually shown.
 
 flutter_launcher_icons:
   image_path: "assets/icons/app_icon.png"

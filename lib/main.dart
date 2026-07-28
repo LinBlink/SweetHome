@@ -43,14 +43,22 @@ void main() async {
   // service is no-op on web/desktop, so this is cheap regardless.
   unawaited(pushService.restoreCachedRegistrationId());
   unawaited(pushService.setup(production: !AppConfig.mockMode));
-  // Probe the custom icon set once, before the first frame, so
-  // `AppIcon` can decide SVG-vs-Material-fallback synchronously inside
-  // `build`. Icons still being drawn simply keep their Material
-  // fallback; see `assets/icons/README.md`.
+  // Probe the custom icon set, but do NOT wait for it. Every `AppIcon`
+  // renders its Material fallback until the probe lands and then swaps
+  // itself (`AppIconAssets.revision` drives the rebuild), so holding the
+  // first frame for it buys nothing and costs a lot: it is one asset
+  // fetch per spec per pack — 71 requests / ~295ms even over localhost,
+  // and on HTTP/1.1 the browser only runs six at a time, so on mobile
+  // it is a dozen sequential round-trips of icons the user cannot see
+  // yet. See `AppIconAssets.warmUp`.
+  unawaited(AppIconAssets.warmUp());
+  // These two do have to finish first — they decide the locale and the
+  // theme the very first frame is painted with, and getting them late
+  // means a visible re-render in the wrong language or colours. Both
+  // read a single SharedPreferences key.
   await Future.wait([
     localeProvider.restore(),
     themeProvider.restore(),
-    AppIconAssets.warmUp(),
   ]);
   runApp(
     MultiProvider(

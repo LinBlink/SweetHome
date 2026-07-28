@@ -1091,6 +1091,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileThemeColorSection => 'カラー';
 
   @override
+  String get profilePaletteTerracotta => 'テラコッタ';
+
+  @override
+  String get profilePaletteOcean => 'オーシャン';
+
+  @override
+  String get profilePaletteForest => 'フォレスト';
+
+  @override
+  String get profilePaletteLavender => 'ラベンダー';
+
+  @override
+  String get profilePaletteSlate => 'スレート';
+
+  @override
   String get momentCommentSectionTitle => 'コメント';
 
   @override

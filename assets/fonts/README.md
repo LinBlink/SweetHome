@@ -28,18 +28,30 @@ Until the file is present, `ChatExportPdfService` falls back to the `pdf`
 package's built-in Latin-only font — PDFs still generate successfully with
 images embedded, but CJK text will not render correctly.
 
-## Emoji font — use the monochrome variant, not the color one
+## Emoji font — PDF export only
 
-`assets/fonts/NotoEmoji-Regular.ttf` should be the **monochrome** build
-("Noto Emoji", not "Noto Color Emoji"). Download the static TTF from Google
-Fonts:
+`assets/fonts/NotoEmoji-Regular.ttf` is, despite its name, **Noto Color
+Emoji** (COLRv1). Verify with fontTools rather than trusting the filename:
 
+```python
+from fontTools.ttLib import TTFont
+f = TTFont('assets/fonts/NotoEmoji-Regular.ttf')
+print(f['name'].getDebugName(4), 'COLR' in f)   # -> Noto Color Emoji True
 ```
-https://fonts.google.com/noto/specimen/Noto+Emoji
-```
 
-The `pdf` package's font parser (`ttf_parser.dart`) renders standard TrueType
-outline (`glyf`) glyphs reliably, but colour formats (COLR/CPAL, CBDT/CBLC,
-SVG) need special handling that the parser's limited bitmap path doesn't
-always support. The monochrome variant uses plain outline glyphs in the `glyf`
-table, which render correctly in black/white — standard for document exports.
+> This section used to say the opposite — that the file should be the
+> monochrome "Noto Emoji", because the `pdf` package's `ttf_parser.dart`
+> only draws plain `glyf` outlines. The reasoning about the parser is
+> correct; the claim about the file was not, and had been wrong long
+> enough that several comments elsewhere repeated it.
+
+Its only consumer is `ChatExportPdfService`. Because the base glyphs of a
+COLR font have empty `glyf` outlines, emoji drawn as pdf *text* come out
+blank — so the service rasterises each one to a PNG with Flutter's
+`TextPainter` and embeds that instead. The font is registered on demand
+with `FontLoader` when an export runs.
+
+It is deliberately **not** in `pubspec.yaml`'s `fonts:` section: entries
+there are loaded eagerly at engine init, and 3.9MB on every first paint
+is a lot to pay for a feature most sessions never open. On-screen emoji
+come from the `/gfonts/` fallback mirror instead — see `docs/web-deploy.md`.

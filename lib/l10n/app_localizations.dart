@@ -2128,6 +2128,36 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get profileThemeColorSection;
 
+  /// No description provided for @profilePaletteTerracotta.
+  ///
+  /// In en, this message translates to:
+  /// **'Terracotta'**
+  String get profilePaletteTerracotta;
+
+  /// No description provided for @profilePaletteOcean.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get profilePaletteOcean;
+
+  /// No description provided for @profilePaletteForest.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest'**
+  String get profilePaletteForest;
+
+  /// No description provided for @profilePaletteLavender.
+  ///
+  /// In en, this message translates to:
+  /// **'Lavender'**
+  String get profilePaletteLavender;
+
+  /// No description provided for @profilePaletteSlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Slate'**
+  String get profilePaletteSlate;
+
   /// No description provided for @momentCommentSectionTitle.
   ///
   /// In en, this message translates to:

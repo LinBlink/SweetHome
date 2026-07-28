@@ -292,4 +292,52 @@ void main() {
       expect(find.byType(SvgPicture), findsOneWidget);
     });
   });
+
+  // The probe no longer blocks `runApp` (see `AppIconAssets.warmUp` and
+  // main.dart): the app paints with Material fallbacks and swaps in the
+  // artwork when the probe lands. That swap is the whole point of
+  // deferring, and it is invisible in a static test — an icon built
+  // *after* warm-up would pass whether or not the notification works.
+  // These build first, then warm up, which is the real sequence.
+  group('icons swap in when the deferred probe lands', () {
+    tearDown(AppIconAssets.debugReset);
+
+    testWidgets('a mounted fallback becomes artwork without a rebuild above it',
+        (t) async {
+      AppIconAssets.debugReset();
+      await t.pumpWidget(const MaterialApp(home: AppIcon(AppIcons.chatSend)));
+
+      // First frame: probe hasn't run, so this is the Material fallback.
+      expect(find.byType(SvgPicture), findsNothing);
+      expect(t.widget<Icon>(find.byType(Icon)).icon, AppIcons.chatSend.fallback);
+
+      // Probe lands. Nothing above the icon rebuilds — only the
+      // notification can drive this.
+      AppIconAssets.debugSetDrawn([AppIcons.chatSend]);
+      await t.pump();
+
+      expect(find.byType(SvgPicture), findsOneWidget,
+          reason: 'the icon kept its Material fallback after the probe '
+              'finished — AppIconAssets.revision is not reaching AppIcon, so '
+              'deferring warm-up would leave the app on fallbacks forever');
+    });
+
+    testWidgets('still tracks pack switches after the swap', (t) async {
+      AppIconAssets.debugReset();
+      await t.pumpWidget(const MaterialApp(home: AppIcon(AppIcons.chatSend)));
+
+      AppIconAssets.debugSetDrawn([AppIcons.chatSend]);
+      AppIconAssets.debugSetDrawn([AppIcons.chatSend],
+          inPack: AppIconPack.playful);
+      await t.pump();
+
+      AppIconAssets.pack.value = AppIconPack.playful;
+      await t.pump();
+
+      final loader = t.widget<SvgPicture>(find.byType(SvgPicture)).bytesLoader;
+      expect((loader as SvgAssetLoader).assetName,
+          AppIcons.chatSend.assetPathIn(AppIconPack.playful),
+          reason: 'merging the two listenables must not drop the pack one');
+    });
+  });
 }

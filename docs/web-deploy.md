@@ -4,9 +4,16 @@
 
 ```bash
 flutter pub get
+python scripts/fetch_gfonts_mirror.py     # 需要能访问 fonts.gstatic.com
 flutter build web --release --no-web-resources-cdn --no-wasm-dry-run
 python scripts/precompress_web.py
 ```
+
+`fetch_gfonts_mirror.py` 把引擎的整套字体回退集（724 个文件、约 21MB）抓到
+`web/gfonts/`，由普通构建一并复制进 `build/web/`。已经抓过的不重复下载，
+所以日常构建时它是个空操作。**这一步不能省**，理由见下面的「字体回退」一节。
+`web/gfonts/` 不进 git（体积大且可确定性重建），换机器或升级 Flutter 后
+重跑一次即可；`--check` 可以只校验不下载。
 
 `--no-web-resources-cdn` **不是可选项**。省略它，`flutter_bootstrap.js` 会从
 `https://www.gstatic.com/flutter-canvaskit/` 加载渲染引擎 —— 该域名在中国大陆不可达，
@@ -85,18 +92,14 @@ server {
 
     # ── 字体回退出口 ──────────────────────────────────────────
     # CanvasKit 看不到系统字体，找不到的字形会向 fontFallbackBaseUrl 取。
-    # web/flutter_bootstrap.js 已把它从 fonts.gstatic.com 改指到这里。
+    # web/flutter_bootstrap.js 已把它从 fonts.gstatic.com 改指到这里，
+    # 文件由 fetch_gfonts_mirror.py 预先抓好、随构建产物一起发布，
+    # 所以这里就是普通静态目录，服务器不需要出网。
     #
-    # 本服务器出不了网，所以这里直接 404 —— 这一行【不能省】：没有它，
-    # 下面 `location /` 的 try_files 会把 index.html 当字体返回给引擎，
-    # 引擎拿 HTML 当 woff2 解析，反复失败重试。返回 404 则是瞬时失败，
-    # 引擎立刻放弃并使用内置字体。
-    #
-    # 应用已内置全部界面文案用字 + 3755 常用汉字 + 全部单色 emoji
-    # （见 pubspec.yaml 的 fonts: 段），走到这里的只剩生僻字、
-    # 非中文的用户正文、以及彩色/组合 emoji。
+    # URL 自带内容版本号（notosanssc/v37/...），同一 URL 内容永不改变，
+    # 可以放心 immutable。上面那条通用静态规则不覆盖 .woff2，所以要单列。
     location /gfonts/ {
-        return 404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
     }
 
     # ── 应用 ──────────────────────────────────────────────────
@@ -133,45 +136,48 @@ server {
 }
 ```
 
-## 如果将来服务器能出网
+## 字体回退：为什么必须让它真的能用
 
-把 `location /gfonts/` 换成反向代理，生僻字和彩色 emoji 就能补齐：
+`/gfonts/` 早先是【故意】返回 404 的，想法是「没内置的字形就让它退化成豆腐块，
+快速失败总比卡住好」。引擎不这么配合。
 
-```nginx
-# http {} 层
-proxy_cache_path /var/cache/nginx/gfonts levels=1:2 keys_zone=gfonts:10m
-                 max_size=512m inactive=365d use_temp_path=off;
+`_FallbackFontDownloadQueue` 只记录**成功**的下载：失败时它把 URL 从
+`pendingFonts` 里删掉，却不写进 `downloadedFonts`。于是同一段文字下次排版又会
+把同一个字体重新入队；而每批下载结束（哪怕全军覆没）都会广播一次字体变更消息，
+触发全应用重新排版，又回到原点。**一个没覆盖的字符不是一次 404，是无限次**——
+如果那段文字在动画里，就是逐帧刷屏。
 
-# server {} 层
-location /gfonts/ {
-    proxy_pass https://fonts.gstatic.com/s/;
-    proxy_set_header Host fonts.gstatic.com;
-    proxy_ssl_server_name on;
-    proxy_cache gfonts;
-    # Google Fonts 的 URL 自带内容版本号，同一 URL 内容永不变，可以长缓存
-    proxy_cache_valid 200 365d;
-    proxy_cache_valid 404 1m;
-    add_header Cache-Control "public, max-age=31536000, immutable";
-    add_header X-Cache-Status $upstream_cache_status;
-    resolver 223.5.5.5 119.29.29.29 valid=300s;
-}
-```
+这个洞也堵不上：`build_ui_fonts.py` 能扫到的只有我们自己的 ARB 和 Dart 源码，
+它看不见服务端下发的人名里的生僻字、聊天正文里的日文、消息里的 emoji。
+所以唯一的出路是让回退真的取得到——成功的下载引擎才会记住。
 
-不出网但想补齐的话，也可以在能访问的机器上把
-`notocoloremoji` 和 `roboto` 两个目录抓下来放进
-`/var/www/sweethome/gfonts/`，保持 `fonts.gstatic.com/s/` 的目录结构，
-再把 `return 404` 换成静态目录。
+整套 724 个文件才 21MB，客户端只按需取其中的几个 ~25KB 分片，
+放在自己站点上等于零首屏代价换无限覆盖。
 
-## 已知的显示差异
+内置子集（`pubspec.yaml` 的 `fonts:` 段）保留：它让界面文案和常用汉字
+一次网络请求都不用发，镜像只兜底剩下的部分。
 
-内置字体是**单色轮廓** emoji，不是彩色的 —— 彩色版（Noto Color Emoji）
-有好几 MB，且客户端和服务器都够不着 gstatic，没有可行的加载途径。
+升级 Flutter 之后重跑一次 `fetch_gfonts_mirror.py`：URL 里的版本号
+（`v37`、`v53`……）由 SDK 决定，脚本直接读 SDK 里的
+`font_fallback_data.dart`，两边不会走散。
 
-组合 emoji（👨‍👩‍👧‍👦 这类 ZWJ 序列）会显示为并排的单个 emoji。保留组合字形
-需要把字体从 71KB 撑到 3.7MB，不划算。
+## Emoji
 
-国旗 emoji（🇨🇳）不显示。它靠区域指示符的连字实现，同样在被裁掉的那批里。
-手机号输入框的国家选择器因此只有区号没有旗帜。
+emoji **不内置**，全部走 `/gfonts/` 镜像里的 Noto Color Emoji（彩色，完整）。
+
+以前是内置的：`ui_emoji.ttf`，3.8MB，而且在 `pubspec.yaml` 的 `fonts:` 段里
+——那里面的字体引擎启动时全部加载，等于每次首屏都背这 3.8MB。更糟的是子集化
+一个 COLR 字体本来就不干净：U+200D 和约 9500 个字形被裁掉了，ZWJ 一没，
+整字器就拼不出组合 emoji（👨‍👩‍👧‍👦）和国旗（🇨🇳）——花 3.8MB 买到的是比原版
+更差的覆盖。镜像一到位这个取舍就不成立了，于是删掉。
+
+现在的代价是每个 emoji 分片首次出现时一次 ~150KB 的按需请求
+（`notocoloremoji` 共 12 片，1.9MB），之后按 `immutable` 永久缓存。
+
+唯一需要留意的地方是 PDF 导出：`ChatExportPdfService` 把 emoji 用
+`TextPainter` 同步栅格化成 PNG，等不了异步下载。它因此在导出时用
+`FontLoader` 临时注册 `assets/fonts/NotoEmoji-Regular.ttf`（同一份上游字体，
+本来就要读给 `pdf` 包用），不进 `fonts:` 段，所以不占首屏。
 
 ## 验证
 
@@ -182,21 +188,31 @@ curl -sI -H 'Accept-Encoding: br' https://sweethome.asia/main.dart.js | grep -i 
 # 应返回 content-type: application/wasm
 curl -sI https://sweethome.asia/canvaskit/chromium/canvaskit.wasm | grep -i content-type
 
-# 字体镜像，首次 MISS 之后应为 HIT
-curl -sI https://sweethome.asia/gfonts/roboto/v32/KFOmCnqEu92Fr1Me4GZLCzYlKw.woff2 | grep -i 'x-cache-status\|HTTP/'
+# 字体回退镜像，应返回 200 + font/woff2
+curl -sI https://sweethome.asia/gfonts/notocoloremoji/v32/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.0.woff2 | grep -i 'HTTP/\|content-type\|cache-control'
+
+# 本地校验镜像是否完整（不下载）
+python scripts/fetch_gfonts_mirror.py --check
 ```
 
 浏览器 DevTools 的 Network 面板里**不应出现任何 gstatic.com 请求**。出现了就说明
 构建时漏了 `--no-web-resources-cdn`，或者 `flutter_bootstrap.js` 被默认模板覆盖了。
 
+`/gfonts/` 下**不应出现任何 404**，更不应出现同一个 URL 反复请求。出现了就是
+镜像没跟上 SDK（重跑 `fetch_gfonts_mirror.py`）或者根本没发布上去。
+
 ## Service Worker 的注意事项
 
-`web/flutter_bootstrap.js` 注册了 Flutter 生成的 Service Worker，重复访问因此
-几乎零网络请求。但构建日志会提示它 **已废弃（deprecated）**，未来 Flutter 版本
-会移除 —— 届时删掉 `serviceWorkerSettings` 那几行即可，上面的 HTTP 缓存配置
-会接管（重复访问变成一串 304，比现在慢但仍可接受）。
+**这个功能实际上已经没了。** 当前 SDK 生成的 `build/web/flutter_service_worker.js`
+只有 800 字节，内容是「安装即 skipWaiting，激活即 `registration.unregister()`
+并让所有页面重新导航」—— 一个专门用来把历史遗留 SW 注销掉的空壳，不再缓存任何东西。
+`web/flutter_bootstrap.js` 里的 `serviceWorkerSettings` 因此只剩注销的作用，
+删掉它也可以。
 
-如果某次发版后用户卡在旧版本：Service Worker 按 `serviceWorkerVersion` 判断更新，
-而该值每次构建都会变，正常情况会自动升级。手动恢复的办法是让用户在
+所以重复访问现在靠的是上面那套 HTTP 缓存：一串 304，比 SW 慢但可接受。
+顺带一提，这也意味着 `/gfonts/` 那 21MB **不会**被 SW 整体预缓存——
+浏览器只会取实际用到的那几个分片，并按 `immutable` 永久留着。
+
+如果有用户仍卡在旧版本，多半是旧 SW 还在：让他在
 DevTools → Application → Service Workers 里 Unregister，或者临时把
-`flutter_service_worker.js` 返回 404，浏览器会注销掉它。
+`flutter_service_worker.js` 返回 404。

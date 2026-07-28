@@ -233,10 +233,23 @@ _NodePath? _bfsPath(FamilyGraph graph, int viewerId, int targetId) {
 /// Emission order is irrelevant to the result — [_comparePaths] is a total
 /// order — but it mirrors the backend anyway to keep the two readable side by
 /// side.
+///
+/// **Every** step is dropped when the member on the far end isn't in the
+/// member list — the same check `buildGraph` does before adding either
+/// direction of an edge. A relation row can outlive the member it points at
+/// (someone leaves the family and the row isn't soft-deleted with them), and
+/// such a "ghost" is not just an unnameable endpoint: it stays walkable as a
+/// *transit node*, so paths route straight through a person who isn't in the
+/// family any more and come out with a confidently wrong term at the far side.
+/// Only the child branch used to filter, which meant the two engines walked
+/// different graphs the moment any stale row existed — and the whole point of
+/// [_comparePaths] being byte-identical to the backend's is that they don't.
 List<_Step> _neighbors(FamilyGraph graph, int id) {
   final steps = <_Step>[];
   for (final parentId in graph.parentsOf(id)) {
-    steps.add(_Step(parentTokenFor(graph.memberById(parentId)?.gender), parentId));
+    final parent = graph.memberById(parentId);
+    if (parent == null) continue;
+    steps.add(_Step(parentTokenFor(parent.gender), parentId));
   }
   for (final childId in graph.childrenOf(id)) {
     final child = graph.memberById(childId);
@@ -246,7 +259,9 @@ List<_Step> _neighbors(FamilyGraph graph, int id) {
   for (final spouseId in graph.spousesOf(id)) {
     // The token depends on whose direction we're walking: stepping *to* the
     // spouse, so it's that person's gender that names the step.
-    steps.add(_Step(spouseTokenFor(graph.memberById(spouseId)?.gender), spouseId));
+    final spouse = graph.memberById(spouseId);
+    if (spouse == null) continue;
+    steps.add(_Step(spouseTokenFor(spouse.gender), spouseId));
   }
   return steps;
 }
@@ -283,15 +298,24 @@ List<RelToken> _reduce(FamilyGraph graph, _NodePath path) {
   return tokens;
 }
 
+/// Mirrors `KinshipEngine.siblingToken` on the backend.
+///
+/// Note the `null` arm: it must be there, and it must mean *unknown*, not
+/// *female*. The other three step helpers ([parentTokenFor], [childTokenFor],
+/// [spouseTokenFor]) all take a `Gender?` and map null to the neutral token,
+/// and the backend's `genderOf` does the same. This one used to be written as
+/// `isMale ? brother : sister`, so a member the graph can't resolve fell
+/// through to 姐/妹 — the exact "no gender ⇒ female" bug that was fixed
+/// backend-side, still living on this one code path.
 RelToken _siblingToken(FamilyGraph graph, {required int fromId, required int siblingId}) {
   final sibling = graph.memberById(siblingId);
   final self = graph.memberById(fromId);
   final siblingIsElder = _isElder(self, sibling);
-  final isMale = sibling?.gender == Gender.male;
-  if (isMale) {
-    return siblingIsElder ? RelToken.elderBrother : RelToken.youngerBrother;
-  }
-  return siblingIsElder ? RelToken.elderSister : RelToken.youngerSister;
+  return switch (sibling?.gender) {
+    Gender.male => siblingIsElder ? RelToken.elderBrother : RelToken.youngerBrother,
+    Gender.female => siblingIsElder ? RelToken.elderSister : RelToken.youngerSister,
+    null => siblingIsElder ? RelToken.elderSibling : RelToken.youngerSibling,
+  };
 }
 
 /// Whether [sibling] is older than [self], with three levels of fallback —

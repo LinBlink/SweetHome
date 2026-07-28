@@ -2,11 +2,12 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show FontLoader, rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../core/app_theme.dart';
 import '../models/chat_models.dart';
 import 'chat_local_cache.dart';
 
@@ -49,11 +50,16 @@ class ChatExportPdfService {
   /// (see `kDefaultKinshipLocale`), so it goes first. The emoji font
   /// goes last — it only carries emoji glyphs, so it's never the
   /// right *first* choice, only a fallback for codepoints none of the
-  /// language fonts cover. It's the monochrome Noto **Emoji** (not
-  /// the "Color" variant) because the `pdf` package's TTF parser
-  /// renders standard TrueType outline (`glyf`) glyphs reliably, while
-  /// COLR/CPAL/CBDT color formats need special handling that the
-  /// parser's limited bitmap path doesn't always handle correctly.
+  /// language fonts cover.
+  ///
+  /// Despite the file name this is Noto **Color** Emoji (COLRv1 — check
+  /// with fontTools if in doubt; `assets/fonts/README.md` used to claim
+  /// otherwise). The `pdf` package's TTF parser only draws plain `glyf`
+  /// outlines, and in a COLR font the base glyphs are empty, so emoji
+  /// routed through pdf *text* come out blank. That is why they are
+  /// rasterised to PNG instead ([_renderEmojiToPng]); this entry stays
+  /// only so the parser has metrics and never falls off the end of the
+  /// fallback list.
   static const _fontAssets = [
     'assets/fonts/NotoSansSC-Regular.ttf',
     'assets/fonts/NotoSansTC-Medium.ttf',
@@ -334,16 +340,67 @@ class ChatExportPdfService {
     return pw.RichText(text: pw.TextSpan(children: spans));
   }
 
+  /// Family name for the emoji font registered at export time.
+  ///
+  /// Not declared in `pubspec.yaml`'s `fonts:` section on purpose:
+  /// everything listed there is loaded eagerly at engine init, and this
+  /// font is 3.9MB that only a PDF export ever needs. Loading it here
+  /// costs nothing extra — [_loadFonts] reads the same asset bytes for
+  /// the `pdf` package a moment earlier, so the bundle fetch is shared.
+  static const String _pdfEmojiFamily = 'PdfExportEmoji';
+
+  static const String _emojiFontAsset = 'assets/fonts/NotoEmoji-Regular.ttf';
+
+  /// Registers [_emojiFontAsset] with the Flutter engine, once per
+  /// process. Returns false if the asset is missing, in which case the
+  /// caller skips emoji rendering rather than emitting blank PNGs.
+  Future<bool> _ensureEmojiFont() async {
+    if (_emojiFontLoaded != null) return _emojiFontLoaded!;
+    try {
+      final data = await rootBundle.load(_emojiFontAsset);
+      await (FontLoader(_pdfEmojiFamily)
+            ..addFont(Future<ByteData>.value(data)))
+          .load();
+      _emojiFontLoaded = true;
+    } catch (_) {
+      _emojiFontLoaded = false;
+    }
+    return _emojiFontLoaded!;
+  }
+
+  static bool? _emojiFontLoaded;
+
   /// Render [emoji] as a transparent PNG using Flutter's `TextPainter`,
   /// which honors the platform's color emoji font (Apple Color Emoji
-  /// on iOS/macOS, Noto Color Emoji on most Linux/Android, the
-  /// browser's bundled font on web). The result is a tightly-cropped
-  /// PNG sized to the glyph's measured bounds plus 2px of padding.
+  /// on iOS/macOS, Noto Color Emoji on most Linux/Android). The result
+  /// is a tightly-cropped PNG sized to the glyph's measured bounds plus
+  /// 2px of padding.
+  ///
+  /// Web has no platform emoji font to honor — CanvasKit sees only the
+  /// families a style names — so the style names one explicitly:
+  /// [_pdfEmojiFamily], registered by [_ensureEmojiFont] from the same
+  /// `NotoEmoji-Regular.ttf` this service already hands the `pdf`
+  /// package.
+  ///
+  /// The app's own chain can't be used here. It deliberately carries no
+  /// emoji family (see [AppTheme.uiFontFallback]) — emoji resolve
+  /// through the engine's fallback mirror, which downloads
+  /// *asynchronously*. This painter lays out and rasterises in one
+  /// synchronous pass, so a glyph still in flight would be captured as
+  /// a blank PNG and cached as one. Registering the asset up front is
+  /// what makes the layout deterministic.
   Future<Uint8List?> _renderEmojiToPng(String emoji) async {
     if (emoji.isEmpty) return null;
+    if (!await _ensureEmojiFont()) return null;
     const fontSize = 16.0;
     final painter = TextPainter(
-      text: TextSpan(text: emoji, style: TextStyle(fontSize: fontSize)),
+      text: TextSpan(
+        text: emoji,
+        style: const TextStyle(
+          fontSize: fontSize,
+          fontFamily: _pdfEmojiFamily,
+        ),
+      ),
       textDirection: TextDirection.ltr,
     )..layout();
     if (painter.width <= 0 || painter.height <= 0) return null;
